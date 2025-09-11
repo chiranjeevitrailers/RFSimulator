@@ -9,6 +9,7 @@ import TestCaseManagement from '@/components/admin/TestCaseManagement';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
 import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import AlertManagement from '@/components/monitoring/AlertManagement';
+import BackupDashboard from '@/components/backup/BackupDashboard';
 import { auth } from '@/lib/auth';
 import { 
   Users, 
@@ -19,6 +20,7 @@ import {
   Activity,
   Monitor, // Added
   AlertTriangle, // Added
+  Database, // Added
   TrendingUp,
   AlertCircle,
   CheckCircle,
@@ -303,8 +305,9 @@ const AdminDashboard: React.FC = () => {
     { id: 'users', name: 'Users', icon: <Users className="w-4 h-4" /> },
     { id: 'test-cases', name: 'Test Cases', icon: <FileText className="w-4 h-4" /> },
     { id: 'security', name: 'Security', icon: <Shield className="w-4 h-4" /> },
-    { id: 'monitoring', name: 'Monitoring', icon: <Monitor className="w-4 h-4" /> }, // Added
-    { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
+      { id: 'monitoring', name: 'Monitoring', icon: <Monitor className="w-4 h-4" /> }, // Added
+      { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
+      { id: 'backup', name: 'Backup', icon: <Database className="w-4 h-4" /> }, // Added
     { id: 'analytics', name: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
@@ -569,6 +572,10 @@ const AdminDashboard: React.FC = () => {
 
         {activeTab === 'alerts' && (
           <AlertManagement userId={user.id} />
+        )}
+
+        {activeTab === 'backup' && (
+          <BackupDashboard userId={user.id} />
         )}
 
           {activeTab === 'analytics' && (
