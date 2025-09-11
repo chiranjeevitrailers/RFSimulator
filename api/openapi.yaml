@@ -1,0 +1,1022 @@
+openapi: 3.0.3
+info:
+  title: 5GLabX Platform API
+  description: |
+    Enterprise-grade 4G/5G log analysis platform API with complete 3GPP compliance.
+    
+    ## Features
+    - Complete 4G/5G protocol support (RRC, NAS, MAC, RLC, PDCP, PHY)
+    - Real-time log processing and analysis
+    - Advanced message correlation and anomaly detection
+    - Enterprise security and authentication
+    - High-performance data processing
+    - Comprehensive monitoring and alerting
+    
+    ## Authentication
+    All API endpoints require authentication using JWT tokens. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    API requests are rate limited to prevent abuse:
+    - Standard users: 1000 requests/hour
+    - Premium users: 10000 requests/hour
+    - Enterprise users: Unlimited
+    
+    ## Support
+    For API support and documentation, contact: api-support@5glabx.com
+  version: 1.0.0
+  contact:
+    name: 5GLabX API Support
+    email: api-support@5glabx.com
+    url: https://5glabx.com/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://5glabx.com/terms
+
+servers:
+  - url: https://api.5glabx.com/v1
+    description: Production server
+  - url: https://staging-api.5glabx.com/v1
+    description: Staging server
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "admin"
+                password:
+                  type: string
+                  format: password
+                  example: "admin123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    $ref: '#/components/schemas/User'
+                  permissions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["READ", "WRITE", "ADMINISTER"]
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidate user session
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh token
+      description: Refresh JWT token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+  # Log processing endpoints
+  /logs:
+    get:
+      tags:
+        - Logs
+      summary: Get logs
+      description: Retrieve logs with filtering and pagination
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of logs per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+        - name: protocol
+          in: query
+          description: Filter by protocol
+          schema:
+            type: string
+            enum: [RRC, NAS, MAC, RLC, PDCP, PHY]
+        - name: generation
+          in: query
+          description: Filter by generation
+          schema:
+            type: string
+            enum: [4G, 5G]
+        - name: startTime
+          in: query
+          description: Start time filter (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          description: End time filter (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: rnti
+          in: query
+          description: Filter by RNTI
+          schema:
+            type: string
+        - name: ueId
+          in: query
+          description: Filter by UE ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LogEntry'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  totalCount:
+                    type: integer
+                    example: 1500
+
+    post:
+      tags:
+        - Logs
+      summary: Upload logs
+      description: Upload and process new log data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - logs
+              properties:
+                logs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RawLogEntry'
+                source:
+                  type: string
+                  description: Log source identifier
+                  example: "srsenb_001"
+                format:
+                  type: string
+                  enum: [srsran, open5gs, kamailio]
+                  example: "srsran"
+      responses:
+        '201':
+          description: Logs processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  processedCount:
+                    type: integer
+                    example: 150
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: []
+
+  /logs/{logId}:
+    get:
+      tags:
+        - Logs
+      summary: Get specific log
+      description: Retrieve a specific log entry by ID
+      parameters:
+        - name: logId
+          in: path
+          required: true
+          description: Log entry ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Log entry retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/LogEntry'
+        '404':
+          description: Log entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Message analysis endpoints
+  /analysis/messages:
+    get:
+      tags:
+        - Analysis
+      summary: Analyze messages
+      description: Perform advanced message analysis
+      parameters:
+        - name: messageType
+          in: query
+          description: Filter by message type
+          schema:
+            type: string
+        - name: protocol
+          in: query
+          description: Filter by protocol
+          schema:
+            type: string
+            enum: [RRC, NAS, MAC, RLC, PDCP, PHY]
+        - name: generation
+          in: query
+          description: Filter by generation
+          schema:
+            type: string
+            enum: [4G, 5G]
+        - name: timeRange
+          in: query
+          description: Time range for analysis
+          schema:
+            type: string
+            enum: [1h, 6h, 24h, 7d, 30d]
+            default: "24h"
+      responses:
+        '200':
+          description: Analysis completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analysis:
+                    $ref: '#/components/schemas/MessageAnalysis'
+
+  /analysis/correlation:
+    get:
+      tags:
+        - Analysis
+      summary: Message correlation analysis
+      description: Analyze message correlations and sequences
+      parameters:
+        - name: ueId
+          in: query
+          description: Filter by UE ID
+          schema:
+            type: string
+        - name: rnti
+          in: query
+          description: Filter by RNTI
+          schema:
+            type: string
+        - name: sequenceType
+          in: query
+          description: Type of sequence to analyze
+          schema:
+            type: string
+            enum: [RRC_CONNECTION_ESTABLISHMENT, NAS_REGISTRATION, DATA_TRANSFER, HANDOVER]
+      responses:
+        '200':
+          description: Correlation analysis completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  correlations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MessageCorrelation'
+
+  /analysis/anomalies:
+    get:
+      tags:
+        - Analysis
+      summary: Anomaly detection
+      description: Detect anomalies in message patterns
+      parameters:
+        - name: severity
+          in: query
+          description: Filter by severity level
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        - name: timeRange
+          in: query
+          description: Time range for anomaly detection
+          schema:
+            type: string
+            enum: [1h, 6h, 24h, 7d]
+            default: "24h"
+      responses:
+        '200':
+          description: Anomalies detected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  anomalies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Anomaly'
+
+  # CLI management endpoints
+  /cli/tools:
+    get:
+      tags:
+        - CLI Management
+      summary: Get CLI tools status
+      description: Retrieve status of all CLI tools
+      responses:
+        '200':
+          description: CLI tools status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  tools:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CLITool'
+
+  /cli/tools/{toolName}/start:
+    post:
+      tags:
+        - CLI Management
+      summary: Start CLI tool
+      description: Start a specific CLI tool
+      parameters:
+        - name: toolName
+          in: path
+          required: true
+          description: Name of the CLI tool
+          schema:
+            type: string
+            enum: [srsenb, srsue, open5gs-mmed, open5gs-sgwc, open5gs-sgwup, kamailio]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config:
+                  type: object
+                  description: Tool configuration
+                autoStart:
+                  type: boolean
+                  description: Auto-start on system boot
+                  default: false
+      responses:
+        '200':
+          description: CLI tool started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  processId:
+                    type: integer
+                    example: 12345
+                  message:
+                    type: string
+                    example: "CLI tool started successfully"
+
+  /cli/tools/{toolName}/stop:
+    post:
+      tags:
+        - CLI Management
+      summary: Stop CLI tool
+      description: Stop a specific CLI tool
+      parameters:
+        - name: toolName
+          in: path
+          required: true
+          description: Name of the CLI tool
+          schema:
+            type: string
+            enum: [srsenb, srsue, open5gs-mmed, open5gs-sgwc, open5gs-sgwup, kamailio]
+      responses:
+        '200':
+          description: CLI tool stopped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "CLI tool stopped successfully"
+
+  # System monitoring endpoints
+  /system/health:
+    get:
+      tags:
+        - System
+      summary: System health check
+      description: Get system health status
+      security: []
+      responses:
+        '200':
+          description: System health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded, unhealthy]
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  services:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        enum: [up, down]
+                      cliManager:
+                        type: string
+                        enum: [up, down]
+                      networkManager:
+                        type: string
+                        enum: [up, down]
+                      securityManager:
+                        type: string
+                        enum: [up, down]
+                  metrics:
+                    $ref: '#/components/schemas/SystemMetrics'
+
+  /system/metrics:
+    get:
+      tags:
+        - System
+      summary: System metrics
+      description: Get detailed system performance metrics
+      responses:
+        '200':
+          description: System metrics retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  metrics:
+                    $ref: '#/components/schemas/SystemMetrics'
+
+  /system/alerts:
+    get:
+      tags:
+        - System
+      summary: Get system alerts
+      description: Retrieve system alerts and notifications
+      parameters:
+        - name: severity
+          in: query
+          description: Filter by severity
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [active, resolved, acknowledged]
+      responses:
+        '200':
+          description: Alerts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  alerts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Alert'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "user_1234567890_abc123"
+        username:
+          type: string
+          example: "admin"
+        role:
+          type: string
+          enum: [ADMIN, OPERATOR, ANALYST, VIEWER]
+          example: "ADMIN"
+        email:
+          type: string
+          format: email
+          example: "admin@5glabx.com"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["READ", "WRITE", "ADMINISTER"]
+        createdAt:
+          type: string
+          format: date-time
+        lastLogin:
+          type: string
+          format: date-time
+
+    LogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "log_1234567890_abc123"
+        timestamp:
+          type: string
+          format: date-time
+        source:
+          type: string
+          example: "srsenb_001"
+        protocol:
+          type: string
+          enum: [RRC, NAS, MAC, RLC, PDCP, PHY]
+          example: "RRC"
+        generation:
+          type: string
+          enum: [4G, 5G]
+          example: "5G"
+        messageType:
+          type: string
+          example: "RRCSetupRequest"
+        rnti:
+          type: string
+          example: "0x1234"
+        ueId:
+          type: string
+          example: "12345"
+        cellId:
+          type: string
+          example: "1"
+        level:
+          type: string
+          enum: [info, warn, error]
+          example: "info"
+        rawMessage:
+          type: string
+          example: "[RRC] RRC Setup Request from UE 12345"
+        informationElements:
+          type: object
+          additionalProperties: true
+        compliance:
+          type: string
+          enum: [3GPP_COMPLIANT, LEGACY_PARSING, NON_COMPLIANT, ERROR]
+          example: "3GPP_COMPLIANT"
+        validation:
+          $ref: '#/components/schemas/ValidationResult'
+
+    RawLogEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+          example: "[RRC] RRC Setup Request from UE 12345"
+        level:
+          type: string
+          enum: [info, warn, error]
+          example: "info"
+
+    ValidationResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          example: true
+        errors:
+          type: array
+          items:
+            type: string
+          example: []
+        warnings:
+          type: array
+          items:
+            type: string
+          example: []
+        compliance:
+          type: string
+          enum: [3GPP_COMPLIANT, LEGACY_PARSING, NON_COMPLIANT, ERROR]
+          example: "3GPP_COMPLIANT"
+
+    MessageAnalysis:
+      type: object
+      properties:
+        totalMessages:
+          type: integer
+          example: 1500
+        messageTypes:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            "RRCSetupRequest": 150
+            "RRCSetup": 150
+            "RRCSetupComplete": 150
+        protocols:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            "RRC": 450
+            "NAS": 300
+            "MAC": 750
+        generations:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            "4G": 600
+            "5G": 900
+        averageValidationScore:
+          type: number
+          format: float
+          example: 95.5
+        averageComplexityScore:
+          type: number
+          format: float
+          example: 45.2
+        anomalies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Anomaly'
+
+    MessageCorrelation:
+      type: object
+      properties:
+        sequenceName:
+          type: string
+          example: "RRC_CONNECTION_ESTABLISHMENT"
+        ueId:
+          type: string
+          example: "12345"
+        rnti:
+          type: string
+          example: "0x1234"
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          description: Duration in milliseconds
+          example: 1500
+        status:
+          type: string
+          enum: [complete, incomplete, timeout, error]
+          example: "complete"
+
+    Anomaly:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "anomaly_1234567890_abc123"
+        type:
+          type: string
+          example: "COMPLIANCE"
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          example: "HIGH"
+        description:
+          type: string
+          example: "Message not 3GPP compliant"
+        recommendation:
+          type: string
+          example: "Check message format against 3GPP specifications"
+        detectedAt:
+          type: string
+          format: date-time
+        affectedMessages:
+          type: array
+          items:
+            type: string
+          example: ["log_123", "log_124"]
+
+    CLITool:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "srsenb"
+        status:
+          type: string
+          enum: [running, stopped, error, unknown]
+          example: "running"
+        processId:
+          type: integer
+          example: 12345
+        startTime:
+          type: string
+          format: date-time
+        uptime:
+          type: integer
+          description: Uptime in seconds
+          example: 3600
+        health:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          example: "healthy"
+        configuration:
+          type: object
+          additionalProperties: true
+        lastError:
+          type: string
+          example: ""
+
+    SystemMetrics:
+      type: object
+      properties:
+        cpu:
+          type: object
+          properties:
+            usage:
+              type: number
+              format: float
+              example: 45.5
+            cores:
+              type: integer
+              example: 8
+        memory:
+          type: object
+          properties:
+            used:
+              type: integer
+              example: 2048
+            total:
+              type: integer
+              example: 8192
+            usage:
+              type: number
+              format: float
+              example: 25.0
+        disk:
+          type: object
+          properties:
+            used:
+              type: integer
+              example: 50000
+            total:
+              type: integer
+              example: 100000
+            usage:
+              type: number
+              format: float
+              example: 50.0
+        network:
+          type: object
+          properties:
+            bytesIn:
+              type: integer
+              example: 1024000
+            bytesOut:
+              type: integer
+              example: 512000
+        database:
+          type: object
+          properties:
+            connections:
+              type: integer
+              example: 5
+            queriesPerSecond:
+              type: number
+              format: float
+              example: 150.5
+        messageProcessing:
+          type: object
+          properties:
+            messagesPerSecond:
+              type: number
+              format: float
+              example: 250.0
+            averageProcessingTime:
+              type: number
+              format: float
+              example: 0.8
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "alert_1234567890_abc123"
+        type:
+          type: string
+          example: "SYSTEM_ERROR"
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          example: "HIGH"
+        title:
+          type: string
+          example: "Database connection failed"
+        description:
+          type: string
+          example: "Unable to connect to database server"
+        status:
+          type: string
+          enum: [active, resolved, acknowledged]
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+        acknowledgedBy:
+          type: string
+          example: "admin"
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 15
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: false
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Authentication failed"
+        code:
+          type: string
+          example: "AUTH_FAILED"
+        details:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Logs
+    description: Log processing and retrieval
+  - name: Analysis
+    description: Message analysis and correlation
+  - name: CLI Management
+    description: CLI tool management and monitoring
+  - name: System
+    description: System monitoring and health checks
