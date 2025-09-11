@@ -5,6 +5,7 @@ import NRTestCaseViewer from './NRTestCaseViewer';
 import LTETestCaseViewer from './LTETestCaseViewer';
 import IMSSIPTestCaseViewer from './IMSSIPTestCaseViewer';
 import ORANTestCaseViewer from './ORANTestCaseViewer';
+import NBIoTV2XNTNTestCaseViewer from './NBIoTV2XNTNTestCaseViewer';
 import { 
   Wifi, 
   Signal, 
@@ -69,7 +70,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       icon: <BarChart3 className="w-5 h-5" />,
       color: 'bg-yellow-100 text-yellow-600',
       count: '50+',
-      status: 'pending'
+      status: 'completed'
     },
     {
       id: 'V2X',
@@ -78,7 +79,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       icon: <FileText className="w-5 h-5" />,
       color: 'bg-red-100 text-red-600',
       count: '50+',
-      status: 'pending'
+      status: 'completed'
     },
     {
       id: 'NTN',
@@ -87,7 +88,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       icon: <Settings className="w-5 h-5" />,
       color: 'bg-indigo-100 text-indigo-600',
       count: '50+',
-      status: 'pending'
+      status: 'completed'
     }
   ];
 
@@ -115,29 +116,11 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       case 'O_RAN':
         return <ORANTestCaseViewer userId={userId} />;
       case 'NB_IoT':
-        return (
-          <div className="text-center py-12">
-            <BarChart3 className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">NB-IoT Test Cases</h3>
-            <p className="text-gray-500">Coming soon in Phase 2, Week 7</p>
-          </div>
-        );
+        return <NBIoTV2XNTNTestCaseViewer userId={userId} />;
       case 'V2X':
-        return (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">V2X Test Cases</h3>
-            <p className="text-gray-500">Coming soon in Phase 2, Week 7</p>
-          </div>
-        );
+        return <NBIoTV2XNTNTestCaseViewer userId={userId} />;
       case 'NTN':
-        return (
-          <div className="text-center py-12">
-            <Settings className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">NTN Test Cases</h3>
-            <p className="text-gray-500">Coming soon in Phase 2, Week 7</p>
-          </div>
-        );
+        return <NBIoTV2XNTNTestCaseViewer userId={userId} />;
       default:
         return <NRTestCaseViewer userId={userId} />;
     }
