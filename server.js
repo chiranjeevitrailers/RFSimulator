@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const cors = require('cors');
+const DatabaseService = require('./services/database/DatabaseService');
+const NetworkConnectivityManager = require('./services/network/NetworkConnectivityManager');
 
 class RealCLILogServer {
   constructor() {
@@ -14,11 +16,15 @@ class RealCLILogServer {
     this.cliProcesses = new Map();
     this.logWatchers = new Map();
     this.logBuffers = new Map();
+    this.databaseService = new DatabaseService();
+    this.networkManager = new NetworkConnectivityManager();
 
     this.setupMiddleware();
     this.setupRoutes();
     this.setupWebSocket();
     this.initializeCLIMonitoring();
+    this.initializeDatabase();
+    this.initializeNetworkMonitoring();
   }
 
   setupMiddleware() {
@@ -232,6 +238,187 @@ class RealCLILogServer {
 
       res.json(metrics);
     });
+
+    // Database API routes
+    this.setupDatabaseRoutes();
+  }
+
+  setupDatabaseRoutes() {
+    // Get database statistics
+    this.app.get('/api/database/stats', async (req, res) => {
+      try {
+        const stats = await this.databaseService.getDatabaseStats();
+        res.json(stats);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get log entries with filters
+    this.app.get('/api/database/logs', async (req, res) => {
+      try {
+        const { source, level, startTime, endTime, component, limit = 1000, offset = 0 } = req.query;
+        
+        const filters = {};
+        if (source) filters.source = source;
+        if (level) filters.level = level;
+        if (startTime) filters.startTime = startTime;
+        if (endTime) filters.endTime = endTime;
+        if (component) filters.component = component;
+
+        const logs = await this.databaseService.getLogEntries(filters, parseInt(limit), parseInt(offset));
+        res.json(logs);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get process status history
+    this.app.get('/api/database/process-history/:processType', async (req, res) => {
+      try {
+        const { processType } = req.params;
+        const { limit = 100 } = req.query;
+        
+        const history = await this.databaseService.getProcessStatusHistory(processType, parseInt(limit));
+        res.json(history);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get health metrics
+    this.app.get('/api/database/health-metrics/:processType', async (req, res) => {
+      try {
+        const { processType } = req.params;
+        const { startTime, endTime } = req.query;
+        
+        if (!startTime || !endTime) {
+          return res.status(400).json({ error: 'startTime and endTime are required' });
+        }
+
+        const metrics = await this.databaseService.getHealthMetrics(processType, startTime, endTime);
+        res.json(metrics);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get performance metrics
+    this.app.get('/api/database/performance-metrics/:processType/:metricType', async (req, res) => {
+      try {
+        const { processType, metricType } = req.params;
+        const { startTime, endTime } = req.query;
+        
+        if (!startTime || !endTime) {
+          return res.status(400).json({ error: 'startTime and endTime are required' });
+        }
+
+        const metrics = await this.databaseService.getPerformanceMetrics(processType, metricType, startTime, endTime);
+        res.json(metrics);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get configuration history
+    this.app.get('/api/database/config-history/:processType', async (req, res) => {
+      try {
+        const { processType } = req.params;
+        const { limit = 50 } = req.query;
+        
+        const history = await this.databaseService.getConfigurationHistory(processType, parseInt(limit));
+        res.json(history);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Network connectivity routes
+    this.setupNetworkRoutes();
+  }
+
+  setupNetworkRoutes() {
+    // Get network connectivity status
+    this.app.get('/api/network/status', async (req, res) => {
+      try {
+        const results = this.networkManager.getTestResults();
+        res.json(results);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Test specific connection
+    this.app.get('/api/network/test/:fromTool/:toTarget', async (req, res) => {
+      try {
+        const { fromTool, toTarget } = req.params;
+        const result = await this.networkManager.testSpecificConnection(fromTool, toTarget);
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get network diagnostics
+    this.app.get('/api/network/diagnostics', async (req, res) => {
+      try {
+        const diagnostics = await this.networkManager.performDiagnostics();
+        res.json(diagnostics);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get active connections
+    this.app.get('/api/network/connections', async (req, res) => {
+      try {
+        const connections = await this.networkManager.getActiveConnections();
+        res.json(connections);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get network statistics
+    this.app.get('/api/network/statistics', async (req, res) => {
+      try {
+        const stats = await this.networkManager.getNetworkStatistics();
+        res.json(stats);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Check port availability
+    this.app.get('/api/network/port/:port', async (req, res) => {
+      try {
+        const { port } = req.params;
+        const { protocol = 'tcp' } = req.query;
+        
+        const result = await this.networkManager.checkPortAvailability(parseInt(port), protocol);
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  }
+
+  async initializeDatabase() {
+    try {
+      await this.databaseService.initialize();
+      console.log('Database service initialized');
+    } catch (error) {
+      console.error('Database initialization error:', error);
+    }
+  }
+
+  async initializeNetworkMonitoring() {
+    try {
+      await this.networkManager.initialize();
+      console.log('Network connectivity monitoring initialized');
+    } catch (error) {
+      console.error('Network monitoring initialization error:', error);
+    }
   }
 
   setupWebSocket() {
@@ -391,15 +578,26 @@ class RealCLILogServer {
       if (source === 'srsran') {
         const srsranMatch = line.match(/^\[([A-Z]+)\]\s*\[([IWED])\]\s*(?:\[[^\]]+\]\s*)?(.+)$/);
         if (srsranMatch) {
-          return {
+          const logEntry = {
             id: Date.now() + Math.random(),
             timestamp,
             source: 'srsran',
             layer: srsranMatch[1].toLowerCase(),
             level: srsranMatch[2],
             message: srsranMatch[3].trim(),
-            raw: line
+            raw: line,
+            component: srsranMatch[1],
+            messageType: this.extractMessageType(srsranMatch[3].trim()),
+            rnti: this.extractRnti(srsranMatch[3].trim()),
+            ueId: this.extractUeId(srsranMatch[3].trim()),
+            fields: this.extractFields(srsranMatch[3].trim()),
+            rawData: line
           };
+
+          // Save to database
+          this.databaseService.saveLogEntry(logEntry);
+          
+          return logEntry;
         }
       }
 
@@ -1435,6 +1633,50 @@ class RealCLILogServer {
     });
   }
 
+  // Helper methods for log parsing
+  extractMessageType(message) {
+    if (message.includes('PDSCH')) return 'PDSCH';
+    if (message.includes('PUSCH')) return 'PUSCH';
+    if (message.includes('PUCCH')) return 'PUCCH';
+    if (message.includes('RRC')) return 'RRC';
+    if (message.includes('MAC')) return 'MAC';
+    if (message.includes('RLC')) return 'RLC';
+    if (message.includes('PDCP')) return 'PDCP';
+    return 'GENERIC';
+  }
+
+  extractRnti(message) {
+    const match = message.match(/rnti[=:\s]*(?:0x)?([0-9a-fA-F]+)/i);
+    return match ? match[1] : null;
+  }
+
+  extractUeId(message) {
+    const match = message.match(/ue[=:\s]*(\d+)/i);
+    return match ? match[1] : null;
+  }
+
+  extractFields(message) {
+    const fields = {};
+    
+    // Extract common fields
+    const rntiMatch = message.match(/rnti[=:\s]*(?:0x)?([0-9a-fA-F]+)/i);
+    if (rntiMatch) fields.rnti = rntiMatch[1];
+    
+    const ueMatch = message.match(/ue[=:\s]*(\d+)/i);
+    if (ueMatch) fields.ue = ueMatch[1];
+    
+    const mcsMatch = message.match(/mcs[=:\s]*(\d+)/i);
+    if (mcsMatch) fields.mcs = parseInt(mcsMatch[1]);
+    
+    const prbMatch = message.match(/prb[=:\s]*(\d+)/i);
+    if (prbMatch) fields.prb = parseInt(prbMatch[1]);
+    
+    const sizeMatch = message.match(/size[=:\s]*(\d+)/i);
+    if (sizeMatch) fields.size = parseInt(sizeMatch[1]);
+    
+    return fields;
+  }
+
   stop() {
     console.log('Stopping Real CLI Log Server...');
 
@@ -1451,6 +1693,16 @@ class RealCLILogServer {
     // Close watchers
     for (const [name, watcher] of this.logWatchers) {
       watcher.watcher.close();
+    }
+
+    // Close database connection
+    if (this.databaseService) {
+      this.databaseService.close();
+    }
+
+    // Stop network monitoring
+    if (this.networkManager) {
+      this.networkManager.stopPeriodicTesting();
     }
 
     console.log('Server stopped');
