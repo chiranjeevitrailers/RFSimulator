@@ -1,0 +1,66 @@
+{
+  "srsran": {
+    "primary": "/var/log/srsran/enb.log",
+    "fallback": [
+      "/tmp/srsran.log",
+      "./logs/srsran.log",
+      "/var/log/srsran.log"
+    ],
+    "format": "srsran",
+    "autoStart": false,
+    "command": "srsenb",
+    "args": [
+      "--rf.device=zmq",
+      "--rf.device_args=\"fail_on_disconnect=true\"",
+      "--log.level=info",
+      "--log.filename=/tmp/srsran.log"
+    ]
+  },
+  "open5gs": {
+    "primary": "/var/log/open5gs/mme.log",
+    "fallback": [
+      "/var/log/open5gs/smf.log",
+      "/var/log/open5gs/upf.log",
+      "./logs/open5gs.log",
+      "/tmp/open5gs.log"
+    ],
+    "format": "open5gs",
+    "autoStart": false,
+    "command": "open5gs-mmed",
+    "args": [
+      "-c",
+      "/etc/open5gs/mme.yaml"
+    ]
+  },
+  "kamailio": {
+    "primary": "/var/log/kamailio.log",
+    "fallback": [
+      "/tmp/kamailio.log",
+      "./logs/kamailio.log",
+      "/var/log/kamailio/kamailio.log"
+    ],
+    "format": "kamailio",
+    "autoStart": false,
+    "command": "kamailio",
+    "args": [
+      "-f",
+      "/etc/kamailio/kamailio.cfg",
+      "-DD",
+      "-E"
+    ]
+  },
+  "server": {
+    "port": 8080,
+    "websocketPort": 8081,
+    "logLevel": "info",
+    "maxBufferSize": 1000,
+    "reconnectInterval": 5000,
+    "healthCheckInterval": 30000
+  },
+  "frontend": {
+    "websocketUrl": "ws://localhost:8081",
+    "apiUrl": "http://localhost:8080",
+    "reconnectAttempts": 5,
+    "reconnectDelay": 2000
+  }
+}

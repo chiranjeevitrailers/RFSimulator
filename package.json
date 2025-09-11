@@ -1,0 +1,77 @@
+{
+  "name": "5glabx-platform-desktop",
+  "version": "1.0.0",
+  "description": "5GLabX Platform - Desktop Application with Complete CLI Integration",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "install:all": "bash install.sh",
+    "install:check": "bash install.sh --status",
+    "uninstall": "bash install.sh --uninstall",
+    "setup": "npm install && npm run config",
+    "config": "node scripts/setup-config.js",
+    "start": "npm run dev-full",
+    "dev": "npm run electron-dev",
+    "dev-full": "concurrently \"npm run server\" \"npm run electron-dev\"",
+    "server": "node server.js",
+    "server-dev": "nodemon server.js",
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_IS_DEV=true electron .",
+    "build-electron": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir",
+    "test": "npm run server-test",
+    "server-test": "curl -s http://localhost:8080/health || echo 'Server not running'",
+    "logs": "tail -f /var/log/5glabx/server.log",
+    "clean": "rm -rf node_modules dist *.log"
+  },
+  "keywords": [
+    "5G",
+    "srsRAN",
+    "Open5GS", 
+    "Kamailio",
+    "O-RAN",
+    "NB-IoT",
+    "V2X",
+    "NTN"
+  ],
+  "author": "5GLabX Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "cors": "^2.8.5",
+    "concurrently": "^8.0.1",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.5glabx.platform",
+    "productName": "5GLabX Platform",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!dist",
+      "!*.md"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "electron/assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "electron/assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "electron/assets/icon.png",
+      "category": "Development"
+    }
+  }
+}

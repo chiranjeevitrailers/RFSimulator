@@ -1,0 +1,12 @@
+# Desktop Application Icons
+
+Place the following icon files in this directory:
+
+- icon.ico (Windows)
+- icon.icns (macOS)  
+- icon.png (Linux)
+
+Icons should be:
+- 256x256 pixels minimum
+- High quality PNG/ICO/ICNS format
+- Represent the 5GLabX Platform brand
