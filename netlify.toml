@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin-dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/user-dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  NEXT_PUBLIC_APP_URL = "https://5glabx.com"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_APP_URL = "https://deploy-preview-$DEPLOY_ID--5glabx.netlify.app"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_APP_URL = "https://$BRANCH--5glabx.netlify.app"
