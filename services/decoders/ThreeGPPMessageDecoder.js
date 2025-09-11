@@ -9,7 +9,7 @@ class ThreeGPPMessageDecoder {
   // Initialize 3GPP message templates based on specifications
   initializeMessageTemplates() {
     return {
-      // RRC Messages (3GPP TS 38.331)
+      // 5G NR RRC Messages (3GPP TS 38.331)
       'RRCSetupRequest': {
         protocol: 'RRC',
         version: '5G',
@@ -89,7 +89,7 @@ class ThreeGPPMessageDecoder {
         }
       },
 
-      // RLC Messages (3GPP TS 38.322)
+      // 5G NR RLC Messages (3GPP TS 38.322)
       'RLCDATA': {
         protocol: 'RLC',
         version: '5G',
@@ -99,6 +99,91 @@ class ThreeGPPMessageDecoder {
             'P': { type: 'bitstring', length: 1 },
             'SI': { type: 'bitstring', length: 2 },
             'SN': { type: 'bitstring', length: 12 },
+            'SO': { type: 'bitstring', length: 16, optional: true },
+            'data': { type: 'octetstring', optional: true }
+          }
+        }
+      },
+
+      // 4G LTE RRC Messages (3GPP TS 36.331)
+      'LTE_RRCConnectionRequest': {
+        protocol: 'RRC',
+        version: '4G',
+        template: {
+          'rrcConnectionRequest': {
+            'ue-Identity': {
+              's-TMSI': {
+                'mmec': { type: 'bitstring', length: 8 },
+                'm-TMSI': { type: 'bitstring', length: 32 }
+              }
+            },
+            'establishmentCause': { type: 'enum', values: ['emergency', 'highPriorityAccess', 'mt-Access', 'mo-Signalling', 'mo-Data', 'mo-VoiceCall', 'mo-VideoCall', 'mo-SMS', 'spare6', 'spare5', 'spare4', 'spare3', 'spare2', 'spare1'] },
+            'spare': { type: 'bitstring', length: 1 }
+          }
+        }
+      },
+
+      'LTE_RRCConnectionSetup': {
+        protocol: 'RRC',
+        version: '4G',
+        template: {
+          'rrcConnectionSetup': {
+            'rrc-TransactionIdentifier': { type: 'integer', range: [0, 3] },
+            'criticalExtensions': {
+              'rrcConnectionSetup-r8': {
+                'radioResourceConfigDedicated': {
+                  'srb-ToAddModList': { type: 'sequence', optional: true },
+                  'drb-ToAddModList': { type: 'sequence', optional: true },
+                  'drb-ToReleaseList': { type: 'sequence', optional: true },
+                  'mac-MainConfig': { type: 'sequence', optional: true },
+                  'physicalConfigDedicated': { type: 'sequence', optional: true }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      // 4G LTE NAS Messages (3GPP TS 24.301)
+      'LTE_AttachRequest': {
+        protocol: 'NAS',
+        version: '4G',
+        template: {
+          'attachRequest': {
+            'epsAttachType': { type: 'enum', values: ['EPS', 'combinedEPS/IMSI', 'emergency', 'reserved'] },
+            'nasKeySetIdentifier': {
+              'tsc': { type: 'bitstring', length: 1 },
+              'nasKeySetIdentifier': { type: 'bitstring', length: 3 }
+            },
+            'epsMobileIdentity': { type: 'choice', options: ['IMSI', 'GUTI'] },
+            'ueNetworkCapability': { type: 'bitstring', length: 8 },
+            'esmMessageContainer': { type: 'sequence', optional: true },
+            'oldGutiType': { type: 'bitstring', length: 1, optional: true }
+          }
+        }
+      },
+
+      // 4G LTE MAC Messages (3GPP TS 36.321)
+      'LTE_MACPDU': {
+        protocol: 'MAC',
+        version: '4G',
+        template: {
+          'macPDU': {
+            'subPDUs': { type: 'sequence' }
+          }
+        }
+      },
+
+      // 4G LTE RLC Messages (3GPP TS 36.322)
+      'LTE_RLCDATA': {
+        protocol: 'RLC',
+        version: '4G',
+        template: {
+          'rlcData': {
+            'D/C': { type: 'bitstring', length: 1 },
+            'P': { type: 'bitstring', length: 1 },
+            'SI': { type: 'bitstring', length: 2 },
+            'SN': { type: 'bitstring', length: 10 }, // LTE uses 10-bit SN
             'SO': { type: 'bitstring', length: 16, optional: true },
             'data': { type: 'octetstring', optional: true }
           }
@@ -139,21 +224,36 @@ class ThreeGPPMessageDecoder {
         description: 'Tracking Area Code'
       },
 
-      // PHY Layer IEs (3GPP TS 38.211)
+      // PHY Layer IEs (3GPP TS 38.211 for 5G, TS 36.211 for 4G)
       'harqProcessId': {
         type: 'integer',
-        range: [0, 15],
-        description: 'HARQ Process Identifier'
+        range: [0, 15], // 5G NR: 0-15, 4G LTE: 0-7
+        description: 'HARQ Process Identifier (0-15 for 5G NR, 0-7 for 4G LTE)'
+      },
+      'harqProcessIdLTE': {
+        type: 'integer',
+        range: [0, 7],
+        description: 'HARQ Process Identifier for 4G LTE'
       },
       'mcsIndex': {
         type: 'integer',
-        range: [0, 31],
-        description: 'Modulation and Coding Scheme Index'
+        range: [0, 31], // 5G NR: 0-31, 4G LTE: 0-28
+        description: 'Modulation and Coding Scheme Index (0-31 for 5G NR, 0-28 for 4G LTE)'
+      },
+      'mcsIndexLTE': {
+        type: 'integer',
+        range: [0, 28],
+        description: 'Modulation and Coding Scheme Index for 4G LTE'
       },
       'modulationScheme': {
         type: 'enum',
         values: ['QPSK', '16QAM', '64QAM', '256QAM'],
-        description: 'Modulation Scheme'
+        description: 'Modulation Scheme (QPSK, 16QAM, 64QAM, 256QAM)'
+      },
+      'modulationSchemeLTE': {
+        type: 'enum',
+        values: ['QPSK', '16QAM', '64QAM'],
+        description: 'Modulation Scheme for 4G LTE (QPSK, 16QAM, 64QAM)'
       },
       'redundancyVersion': {
         type: 'integer',
@@ -188,11 +288,16 @@ class ThreeGPPMessageDecoder {
         description: 'Timing Advance in Ts units'
       },
 
-      // RLC Layer IEs (3GPP TS 38.322)
+      // RLC Layer IEs (3GPP TS 38.322 for 5G, TS 36.322 for 4G)
       'sequenceNumber': {
         type: 'integer',
-        range: [0, 4095],
-        description: 'RLC Sequence Number'
+        range: [0, 4095], // 5G NR: 12-bit SN (0-4095), 4G LTE: 10-bit SN (0-1023)
+        description: 'RLC Sequence Number (0-4095 for 5G NR, 0-1023 for 4G LTE)'
+      },
+      'sequenceNumberLTE': {
+        type: 'integer',
+        range: [0, 1023],
+        description: 'RLC Sequence Number for 4G LTE'
       },
       'segmentOffset': {
         type: 'integer',
@@ -217,16 +322,55 @@ class ThreeGPPMessageDecoder {
         description: 'ROHC Profile Identifier'
       },
 
-      // RRC Layer IEs (3GPP TS 38.331)
+      // RRC Layer IEs (3GPP TS 38.331 for 5G, TS 36.331 for 4G)
       'rrcTransactionId': {
         type: 'integer',
         range: [0, 3],
-        description: 'RRC Transaction Identifier'
+        description: 'RRC Transaction Identifier (same for 4G and 5G)'
       },
       'establishmentCause': {
         type: 'enum',
         values: ['emergency', 'highPriorityAccess', 'mt-Access', 'mo-Signalling', 'mo-Data', 'mo-VoiceCall', 'mo-VideoCall', 'mo-SMS', 'mps-PriorityAccess', 'mcs-PriorityAccess'],
-        description: 'RRC Establishment Cause'
+        description: 'RRC Establishment Cause (5G NR)'
+      },
+      'establishmentCauseLTE': {
+        type: 'enum',
+        values: ['emergency', 'highPriorityAccess', 'mt-Access', 'mo-Signalling', 'mo-Data', 'mo-VoiceCall', 'mo-VideoCall', 'mo-SMS', 'spare6', 'spare5', 'spare4', 'spare3', 'spare2', 'spare1'],
+        description: 'RRC Establishment Cause (4G LTE)'
+      },
+
+      // 4G LTE Specific IEs
+      'epsAttachType': {
+        type: 'enum',
+        values: ['EPS', 'combinedEPS/IMSI', 'emergency', 'reserved'],
+        description: 'EPS Attach Type for 4G LTE'
+      },
+      'nasKeySetIdentifier': {
+        type: 'bitstring',
+        length: 4,
+        description: 'NAS Key Set Identifier for 4G LTE'
+      },
+      'epsMobileIdentity': {
+        type: 'choice',
+        options: ['IMSI', 'GUTI'],
+        description: 'EPS Mobile Identity for 4G LTE'
+      },
+
+      // 5G NR Specific IEs
+      '5gsRegistrationType': {
+        type: 'enum',
+        values: ['initial', 'mobility', 'periodic', 'emergency'],
+        description: '5GS Registration Type for 5G NR'
+      },
+      '5gsMobileIdentity': {
+        type: 'choice',
+        options: ['5G-S-TMSI', 'IMEI', '5G-GUTI', 'SUCI'],
+        description: '5GS Mobile Identity for 5G NR'
+      },
+      'ngKSI': {
+        type: 'bitstring',
+        length: 4,
+        description: 'Next Generation Key Set Identifier for 5G NR'
       }
     };
   }
@@ -271,13 +415,30 @@ class ThreeGPPMessageDecoder {
   // Detect message type from raw message
   detectMessageType(rawMessage) {
     const messagePatterns = {
+      // 5G NR Messages
       'RRCSetupRequest': /RRC.*Setup.*Request|rrcSetupRequest/i,
       'RRCSetup': /RRC.*Setup(?!.*Request)|rrcSetup/i,
       'RRCSetupComplete': /RRC.*Setup.*Complete|rrcSetupComplete/i,
-      'RegistrationRequest': /Registration.*Request|registrationRequest/i,
+      'RegistrationRequest': /Registration.*Request|registrationRequest|5GS.*Registration/i,
       'MACPDU': /MAC.*PDU|macPDU|DL PDU|UL PDU/i,
       'RLCDATA': /RLC.*DATA|rlcData|TX PDU|RX PDU/i,
-      'PDCPPDU': /PDCP.*PDU|pdcpPDU/i
+      'PDCPPDU': /PDCP.*PDU|pdcpPDU/i,
+
+      // 4G LTE Messages
+      'LTE_RRCConnectionRequest': /RRC.*Connection.*Request|rrcConnectionRequest|LTE.*RRC.*Request/i,
+      'LTE_RRCConnectionSetup': /RRC.*Connection.*Setup|rrcConnectionSetup|LTE.*RRC.*Setup/i,
+      'LTE_RRCConnectionSetupComplete': /RRC.*Connection.*Setup.*Complete|rrcConnectionSetupComplete|LTE.*RRC.*Complete/i,
+      'LTE_AttachRequest': /Attach.*Request|attachRequest|EPS.*Attach|LTE.*Attach/i,
+      'LTE_AttachAccept': /Attach.*Accept|attachAccept|EPS.*Accept|LTE.*Accept/i,
+      'LTE_MACPDU': /LTE.*MAC.*PDU|LTE.*macPDU|LTE.*DL PDU|LTE.*UL PDU/i,
+      'LTE_RLCDATA': /LTE.*RLC.*DATA|LTE.*rlcData|LTE.*TX PDU|LTE.*RX PDU/i,
+
+      // Generic patterns (fallback)
+      'RRCGeneric': /RRC/i,
+      'NASGeneric': /NAS|EPS|5GS/i,
+      'MACGeneric': /MAC/i,
+      'RLCGeneric': /RLC/i,
+      'PDCPGeneric': /PDCP/i
     };
 
     for (const [type, pattern] of Object.entries(messagePatterns)) {
@@ -428,6 +589,9 @@ class ThreeGPPMessageDecoder {
     
     // Check protocol-specific rules
     this.checkProtocolRules(decoded, template.protocol, validation);
+    
+    // Check 4G vs 5G specific rules
+    this.checkGenerationSpecificRules(decoded, template, validation);
 
     return validation;
   }
@@ -470,6 +634,55 @@ class ThreeGPPMessageDecoder {
       case 'RLC':
         this.checkRLCRules(decoded, validation);
         break;
+    }
+  }
+
+  // Check 4G vs 5G specific rules
+  checkGenerationSpecificRules(decoded, template, validation) {
+    const version = template.version;
+    
+    if (version === '4G') {
+      this.check4GSpecificRules(decoded, validation);
+    } else if (version === '5G') {
+      this.check5GSpecificRules(decoded, validation);
+    }
+  }
+
+  // Check 4G LTE specific rules
+  check4GSpecificRules(decoded, validation) {
+    // Check LTE-specific field ranges
+    if (decoded.harqProcessId && decoded.harqProcessId.value > 7) {
+      validation.valid = false;
+      validation.errors.push('LTE HARQ Process ID must be in range [0, 7]');
+    }
+    
+    if (decoded.sequenceNumber && decoded.sequenceNumber.value > 1023) {
+      validation.valid = false;
+      validation.errors.push('LTE RLC Sequence Number must be in range [0, 1023]');
+    }
+    
+    if (decoded.mcsIndex && decoded.mcsIndex.value > 28) {
+      validation.valid = false;
+      validation.errors.push('LTE MCS Index must be in range [0, 28]');
+    }
+  }
+
+  // Check 5G NR specific rules
+  check5GSpecificRules(decoded, validation) {
+    // Check 5G-specific field ranges
+    if (decoded.harqProcessId && decoded.harqProcessId.value > 15) {
+      validation.valid = false;
+      validation.errors.push('5G NR HARQ Process ID must be in range [0, 15]');
+    }
+    
+    if (decoded.sequenceNumber && decoded.sequenceNumber.value > 4095) {
+      validation.valid = false;
+      validation.errors.push('5G NR RLC Sequence Number must be in range [0, 4095]');
+    }
+    
+    if (decoded.mcsIndex && decoded.mcsIndex.value > 31) {
+      validation.valid = false;
+      validation.errors.push('5G NR MCS Index must be in range [0, 31]');
     }
   }
 
