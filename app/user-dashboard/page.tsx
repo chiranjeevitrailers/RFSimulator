@@ -7,6 +7,7 @@ import SimulationDashboard from '@/components/simulation/SimulationDashboard';
 import TestExecutionDashboard from '@/components/simulation/TestExecutionDashboard';
 import RealTimeSimulationView from '@/components/simulation/RealTimeSimulationView';
 import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
+import PerformanceMonitor from '@/components/performance/PerformanceMonitor';
 import { 
   Activity, 
   BarChart3, 
@@ -183,10 +184,7 @@ const UserDashboard: React.FC = () => {
         )}
         
         {activeTab === 'settings' && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Settings</h2>
-            <p className="text-gray-600">Settings panel coming soon...</p>
-          </div>
+          <PerformanceMonitor userId={user.id} />
         )}
       </main>
     </div>
