@@ -8,11 +8,15 @@ import TestExecutionDashboard from '@/components/simulation/TestExecutionDashboa
 import RealTimeSimulationView from '@/components/simulation/RealTimeSimulationView';
 import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
 import PerformanceMonitor from '@/components/performance/PerformanceMonitor';
+import APIDocumentationViewer from '@/components/api/APIDocumentationViewer';
+import APITestingInterface from '@/components/api/APITestingInterface';
 import { 
   Activity, 
   BarChart3, 
   Settings, 
   LogOut,
+  FileText,
+  Play,
   User,
   Bell,
   HelpCircle
@@ -126,6 +130,28 @@ const UserDashboard: React.FC = () => {
                   Analytics
                 </button>
                 <button
+                  onClick={() => setActiveTab('api-docs')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'api-docs'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 inline mr-2" />
+                  API Docs
+                </button>
+                <button
+                  onClick={() => setActiveTab('api-testing')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'api-testing'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Play className="w-4 h-4 inline mr-2" />
+                  API Testing
+                </button>
+                <button
                   onClick={() => setActiveTab('settings')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     activeTab === 'settings'
@@ -185,6 +211,14 @@ const UserDashboard: React.FC = () => {
         
         {activeTab === 'settings' && (
           <PerformanceMonitor userId={user.id} />
+        )}
+        
+        {activeTab === 'api-docs' && (
+          <APIDocumentationViewer userId={user.id} />
+        )}
+        
+        {activeTab === 'api-testing' && (
+          <APITestingInterface userId={user.id} />
         )}
       </main>
     </div>
