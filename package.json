@@ -1,34 +1,24 @@
 {
-  "name": "5glabx-platform-desktop",
+  "name": "5glabx-protocol-simulator",
   "version": "1.0.0",
-  "description": "5GLabX Platform - Desktop Application with Complete CLI Integration",
-  "main": "electron/main.js",
-  "homepage": "./",
+  "description": "3GPP Protocol Simulator Platform - Professional 5G/4G Network Analysis Tool",
+  "main": "index.js",
   "scripts": {
-    "install:all": "bash install.sh",
-    "install:check": "bash install.sh --status",
-    "uninstall": "bash install.sh --uninstall",
-    "setup": "npm install && npm run config",
-    "config": "node scripts/setup-config.js",
-    "start": "npm run dev-full",
-    "dev": "npm run electron-dev",
-    "dev-full": "concurrently \"npm run server\" \"npm run electron-dev\"",
-    "server": "node server.js",
-    "server-dev": "nodemon server.js",
-    "electron": "electron .",
-    "electron-dev": "ELECTRON_IS_DEV=true electron .",
-    "build-electron": "electron-builder",
-    "dist": "electron-builder --publish=never",
-    "pack": "electron-builder --dir",
-    "test": "npm run server-test",
-    "server-test": "curl -s http://localhost:8080/health || echo 'Server not running'",
-    "logs": "tail -f /var/log/5glabx/server.log",
-    "clean": "rm -rf node_modules dist *.log"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "deploy": "netlify deploy --prod"
   },
   "keywords": [
     "5G",
+    "4G",
+    "3GPP",
+    "Protocol Simulator",
+    "Network Analysis",
     "srsRAN",
-    "Open5GS", 
+    "Open5GS",
     "Kamailio",
     "O-RAN",
     "NB-IoT",
@@ -38,40 +28,42 @@
   "author": "5GLabX Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "ws": "^8.14.2",
-    "cors": "^2.8.5",
-    "concurrently": "^8.0.1",
-    "nodemon": "^2.0.22"
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@supabase/supabase-js": "^2.38.0",
+    "@supabase/auth-helpers-nextjs": "^0.8.7",
+    "@supabase/auth-helpers-react": "^0.4.2",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "lucide-react": "^0.294.0",
+    "framer-motion": "^10.16.4",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "stripe": "^14.5.0",
+    "@stripe/stripe-js": "^2.1.11",
+    "react-hook-form": "^7.47.0",
+    "zod": "^3.22.4",
+    "@hookform/resolvers": "^3.3.2",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^2.30.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
-    "electron": "^27.0.0",
-    "electron-builder": "^24.6.4"
-  },
-  "build": {
-    "appId": "com.5glabx.platform",
-    "productName": "5GLabX Platform",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "**/*",
-      "!node_modules",
-      "!dist",
-      "!*.md"
-    ],
-    "mac": {
-      "category": "public.app-category.developer-tools",
-      "icon": "electron/assets/icon.icns"
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "electron/assets/icon.ico"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "electron/assets/icon.png",
-      "category": "Development"
-    }
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.2.0",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "^14.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
+    "jest": "^29.7.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/jest-dom": "^6.1.4"
   }
 }
