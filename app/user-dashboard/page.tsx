@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import SimulationDashboard from '@/components/simulation/SimulationDashboard';
+import TestExecutionDashboard from '@/components/simulation/TestExecutionDashboard';
+import RealTimeSimulationView from '@/components/simulation/RealTimeSimulationView';
 import { 
   Activity, 
   BarChart3, 
@@ -20,6 +22,7 @@ const UserDashboard: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('simulations');
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -88,6 +91,28 @@ const UserDashboard: React.FC = () => {
                   Simulations
                 </button>
                 <button
+                  onClick={() => setActiveTab('executions')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'executions'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Activity className="w-4 h-4 inline mr-2" />
+                  Executions
+                </button>
+                <button
+                  onClick={() => setActiveTab('realtime')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'realtime'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Activity className="w-4 h-4 inline mr-2" />
+                  Real-Time
+                </button>
+                <button
                   onClick={() => setActiveTab('analytics')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     activeTab === 'analytics'
@@ -139,6 +164,17 @@ const UserDashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'simulations' && (
           <SimulationDashboard userId={user.id} />
+        )}
+        
+        {activeTab === 'executions' && (
+          <TestExecutionDashboard userId={user.id} />
+        )}
+        
+        {activeTab === 'realtime' && (
+          <RealTimeSimulationView 
+            userId={user.id} 
+            executionId={selectedExecutionId || undefined}
+          />
         )}
         
         {activeTab === 'analytics' && (
