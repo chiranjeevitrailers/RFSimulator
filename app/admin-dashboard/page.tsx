@@ -11,6 +11,7 @@ import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import AlertManagement from '@/components/monitoring/AlertManagement';
 import BackupDashboard from '@/components/backup/BackupDashboard';
 import LoadTestingDashboard from '@/components/load-testing/LoadTestingDashboard';
+import DeploymentDashboard from '@/components/deployment/DeploymentDashboard';
 import { auth } from '@/lib/auth';
 import { 
   Users, 
@@ -23,6 +24,7 @@ import {
   AlertTriangle, // Added
   Database, // Added
   Zap, // Added
+  Rocket, // Added
   TrendingUp,
   AlertCircle,
   CheckCircle,
@@ -311,6 +313,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
     { id: 'backup', name: 'Backup', icon: <Database className="w-4 h-4" /> }, // Added
     { id: 'load-testing', name: 'Load Testing', icon: <Zap className="w-4 h-4" /> }, // Added
+    { id: 'deployment', name: 'Deployment', icon: <Rocket className="w-4 h-4" /> }, // Added
     { id: 'analytics', name: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
@@ -583,6 +586,10 @@ const AdminDashboard: React.FC = () => {
 
         {activeTab === 'load-testing' && (
           <LoadTestingDashboard userId={user.id} />
+        )}
+
+        {activeTab === 'deployment' && (
+          <DeploymentDashboard userId={user.id} />
         )}
 
           {activeTab === 'analytics' && (

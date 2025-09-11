@@ -1,23 +1,104 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
+  // Production optimizations
+  output: 'standalone',
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, s-maxage=86400',
+          },
+        ],
+      },
+    ];
   },
+
+  // Image optimization
   images: {
-    domains: ['images.unsplash.com', 'via.placeholder.com'],
+    domains: ['localhost', '5glabx.com', 'staging.5glabx.com'],
+    formats: ['image/webp', 'image/avif'],
   },
+
+  // Environment variables
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
+
+  // Webpack configuration
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Production optimizations
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      };
+    }
+
+    return config;
+  },
+
+  // Experimental features
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
+
+  // Redirects
   async redirects() {
     return [
       {
         source: '/dashboard',
         destination: '/user-dashboard',
-        permanent: false,
+        permanent: true,
+      },
+    ];
+  },
+
+  // Rewrites
+  async rewrites() {
+    return [
+      {
+        source: '/api/health',
+        destination: '/api/health-check',
       },
     ];
   },

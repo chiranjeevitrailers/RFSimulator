@@ -1,195 +1,219 @@
-# 5GLabX Protocol Simulator
+# 5GLabX Platform
 
-Professional 3GPP Protocol Simulator with 1000+ test cases, real-time analysis, and authentic hardware-like experience for 5G/4G network professionals.
+**Professional 5G Protocol Simulator & Analysis Platform**
+
+A comprehensive platform for 5G protocol simulation, analysis, and testing with support for srsRAN, Open5GS, and Kamailio IMS.
 
 ## 🚀 Features
 
-- **1000+ Test Cases**: Comprehensive coverage across 7 protocol categories
-- **Real-Time Simulation**: Live protocol analysis with authentic 3GPP values
-- **Multi-Layer Analysis**: PHY, MAC, RLC, PDCP, RRC, NAS, and IMS layers
-- **3GPP Compliance**: Full compliance with 3GPP standards and ASN.1 decoding
-- **Professional Dashboard**: Enterprise-grade analytics and reporting
-- **Team Collaboration**: Multi-user support with role-based access control
-- **Global Protocol Support**: 4G LTE, 5G NR, IMS/SIP, O-RAN, NB-IoT, V2X, NTN
+### Core Platform
+- **Protocol Simulator**: Complete 5G/4G protocol simulation with 1000+ test cases
+- **Real-time Analysis**: Live protocol analysis and visualization
+- **Multi-layer Support**: PHY, MAC, RLC, PDCP, RRC, NAS, IMS, SIP layers
+- **3GPP Compliance**: Full compliance with 3GPP standards
 
-## 🛠️ Tech Stack
+### Advanced Features
+- **User Dashboard**: Comprehensive user interface for protocol testing
+- **Admin Dashboard**: Complete platform management and monitoring
+- **Analytics & Reporting**: Advanced analytics with detailed reporting
+- **Performance Optimization**: Multi-strategy caching and optimization
+- **Security Hardening**: Enterprise-grade security with RBAC
+- **API Documentation**: Complete API documentation with testing interface
+- **Monitoring & Alerting**: Real-time monitoring with intelligent alerting
+- **Backup & Recovery**: Comprehensive backup and disaster recovery
+- **Load Testing**: Advanced load testing and scalability analysis
+- **CI/CD Pipeline**: Complete deployment and continuous integration
 
+### Technology Stack
 - **Frontend**: Next.js 14, React 18, TypeScript, TailwindCSS
-- **Backend**: Supabase (Database, Auth, Real-time, Storage)
-- **Deployment**: Netlify, Vercel
-- **Analytics**: Custom dashboard with real-time metrics
-- **Authentication**: Supabase Auth with role-based access
+- **Backend**: Node.js, Express.js, Supabase
+- **Database**: PostgreSQL with Supabase
+- **Authentication**: Supabase Auth with RBAC
+- **Deployment**: Netlify with CI/CD
+- **Monitoring**: Custom monitoring system with alerts
+- **Testing**: Jest, Playwright, Artillery
 
 ## 📋 Prerequisites
 
 - Node.js 18+ 
-- npm 8+
-- Supabase CLI
-- Git
+- pnpm 8+
+- Supabase account
+- Netlify account (for deployment)
 
-## 🚀 Quick Start
+## 🛠️ Installation
 
-### 1. Clone the Repository
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/5glabx/platform.git
+   cd platform
+   ```
 
-```bash
-git clone https://github.com/5glabx/protocol-simulator.git
-cd protocol-simulator
-```
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-### 2. Install Dependencies
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure the following variables:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   NEXTAUTH_SECRET=your_nextauth_secret
+   NEXTAUTH_URL=http://localhost:3000
+   ```
 
-```bash
-npm install
-```
+4. **Set up Supabase**
+   ```bash
+   # Install Supabase CLI
+   npm install -g supabase
+   
+   # Initialize Supabase
+   supabase init
+   
+   # Start local Supabase
+   supabase start
+   
+   # Run migrations
+   pnpm db:migrate
+   
+   # Seed database
+   pnpm db:seed
+   ```
 
-### 3. Set Up Environment Variables
+5. **Start development server**
+   ```bash
+   pnpm dev
+   ```
 
-Copy the example environment file and configure your variables:
-
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local` with your Supabase credentials:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=adminpassword
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 4. Set Up Supabase
-
-Start Supabase locally:
-
-```bash
-npm run supabase:start
-```
-
-Run database migrations:
-
-```bash
-npm run db:migrate
-```
-
-Seed the database with initial data:
-
-```bash
-npm run db:seed
-```
-
-Generate TypeScript types:
-
-```bash
-npm run supabase:generate-types
-```
-
-### 5. Start Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
-├── app/                    # Next.js 14 App Router
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Homepage
+5glabx-platform/
+├── app/                    # Next.js app directory
+│   ├── admin-dashboard/    # Admin dashboard pages
+│   ├── user-dashboard/     # User dashboard pages
+│   ├── api/               # API routes
+│   └── globals.css        # Global styles
 ├── components/            # React components
-│   ├── marketing/         # Marketing page components
-│   └── ui/               # Reusable UI components
+│   ├── admin/            # Admin components
+│   ├── user/             # User components
+│   ├── monitoring/       # Monitoring components
+│   ├── backup/           # Backup components
+│   ├── load-testing/     # Load testing components
+│   └── deployment/       # Deployment components
 ├── lib/                  # Utility libraries
 │   ├── supabase.ts       # Supabase client
-│   ├── auth.ts           # Authentication service
-│   └── utils.ts          # Utility functions
+│   ├── auth.ts           # Authentication
+│   ├── monitoring-system.ts
+│   ├── backup-manager.ts
+│   ├── load-testing-manager.ts
+│   └── deployment-manager.ts
 ├── supabase/             # Supabase configuration
-│   ├── migrations/       # Database migrations
-│   └── seed.sql          # Initial data
+│   └── migrations/       # Database migrations
+├── .github/              # GitHub workflows
+│   └── workflows/        # CI/CD pipelines
 ├── public/               # Static assets
-└── docs/                 # Documentation
+└── types/                # TypeScript types
 ```
 
-## 🎯 Available Scripts
+## 🚀 Deployment
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint errors
-- `npm run type-check` - Run TypeScript type checking
-- `npm run format` - Format code with Prettier
-- `npm run test` - Run tests
-- `npm run supabase:start` - Start Supabase locally
-- `npm run supabase:stop` - Stop Supabase
-- `npm run db:migrate` - Run database migrations
-- `npm run db:seed` - Seed database with initial data
+### Staging Deployment
+```bash
+# Deploy to staging
+pnpm deploy:staging
+```
 
-## 🗄️ Database Schema
+### Production Deployment
+```bash
+# Deploy to production
+pnpm deploy:production
+```
 
-The application uses Supabase with the following main tables:
+### Manual Deployment
+1. Build the application: `pnpm build`
+2. Deploy to Netlify: `netlify deploy --dir=.next --prod`
 
-- `users` - User profiles and roles
-- `test_cases` - 3GPP test case definitions
-- `test_executions` - Test execution results
-- `user_activities` - Audit logging
+## 🧪 Testing
 
-## 🔐 Authentication
+### Unit Tests
+```bash
+pnpm test
+```
 
-The application supports two types of users:
+### E2E Tests
+```bash
+pnpm test:e2e
+```
 
-1. **Admin Users**: Access admin dashboard for user management
-2. **Regular Users**: Access user dashboard for protocol simulation
+### Load Tests
+```bash
+pnpm test:load
+```
 
-Authentication is handled through Supabase Auth with simplified logic:
-- Admin login uses environment variables
-- User signup/login uses Supabase Auth
+### Security Tests
+```bash
+pnpm security
+```
 
-## 🌐 Deployment
+## 📊 Monitoring
 
-### Netlify Deployment
+The platform includes comprehensive monitoring:
 
-1. Connect your GitHub repository to Netlify
-2. Set environment variables in Netlify dashboard
-3. Deploy automatically on push to main branch
+- **System Metrics**: CPU, memory, disk, network usage
+- **Application Metrics**: Response times, error rates, throughput
+- **Database Metrics**: Query performance, connection pools
+- **Alert Management**: Configurable alerts with multiple channels
+- **Health Checks**: Automated health monitoring
+- **Performance Monitoring**: Real-time performance tracking
 
-### Vercel Deployment
+## 🔒 Security
 
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+- **Authentication**: Supabase Auth with JWT tokens
+- **Authorization**: Role-based access control (RBAC)
+- **Data Protection**: Row-level security (RLS)
+- **API Security**: Rate limiting, input validation
+- **Headers**: Security headers for XSS, CSRF protection
+- **Audit Logging**: Comprehensive audit trails
 
-## 📊 Test Cases
+## 📈 Performance
 
-The platform includes 1000+ test cases across 7 protocol categories:
+- **Caching**: Multi-strategy caching (Redis, CDN, browser)
+- **Optimization**: Code splitting, lazy loading, compression
+- **CDN**: Global content delivery network
+- **Database**: Query optimization, connection pooling
+- **Monitoring**: Real-time performance monitoring
 
-- **4G LTE**: 150 test cases
-- **5G NR**: 150 test cases  
-- **IMS/SIP**: 100 test cases
-- **O-RAN**: 100 test cases
-- **NB-IoT**: 50 test cases
-- **V2X**: 50 test cases
-- **NTN**: 50 test cases
+## 🔄 CI/CD
 
-Each test case includes:
-- Authentic 3GPP message flows
-- Layer-specific parameter values
-- Realistic timing and sequencing
-- Professional analysis tools
+The platform includes a complete CI/CD pipeline:
+
+- **Code Quality**: ESLint, Prettier, TypeScript checks
+- **Testing**: Unit, integration, and E2E tests
+- **Security**: Automated security scanning
+- **Deployment**: Automated staging and production deployments
+- **Monitoring**: Post-deployment health checks
+
+## 📚 API Documentation
+
+Complete API documentation is available at `/api/docs` with:
+- Interactive API explorer
+- Request/response examples
+- Authentication guides
+- Rate limiting information
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
 ## 📄 License
 
@@ -198,17 +222,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - **Documentation**: [docs.5glabx.com](https://docs.5glabx.com)
-- **Community**: [community.5glabx.com](https://community.5glabx.com)
+- **Issues**: [GitHub Issues](https://github.com/5glabx/platform/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/5glabx/platform/discussions)
 - **Email**: support@5glabx.com
-- **Issues**: [GitHub Issues](https://github.com/5glabx/protocol-simulator/issues)
 
-## 🏆 Recognition
+## 🎯 Roadmap
 
-- Winner of Best Protocol Analysis Tool 2024
-- Trusted by 10,000+ network professionals
-- Used by leading companies worldwide
-- 98% customer satisfaction rate
+- [ ] Mobile app development
+- [ ] Advanced protocol analysis
+- [ ] Machine learning integration
+- [ ] Multi-tenant architecture
+- [ ] Advanced reporting features
+- [ ] Integration with more 5G tools
+
+## 🙏 Acknowledgments
+
+- srsRAN Project
+- Open5GS Community
+- Kamailio IMS
+- 3GPP Standards
+- Next.js Team
+- Supabase Team
+- Netlify Team
 
 ---
 
-Built with ❤️ by the 5GLabX Team
+**Built with ❤️ by the 5GLabX Team**
