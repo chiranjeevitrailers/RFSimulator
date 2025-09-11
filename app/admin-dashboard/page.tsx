@@ -305,9 +305,9 @@ const AdminDashboard: React.FC = () => {
     { id: 'users', name: 'Users', icon: <Users className="w-4 h-4" /> },
     { id: 'test-cases', name: 'Test Cases', icon: <FileText className="w-4 h-4" /> },
     { id: 'security', name: 'Security', icon: <Shield className="w-4 h-4" /> },
-      { id: 'monitoring', name: 'Monitoring', icon: <Monitor className="w-4 h-4" /> }, // Added
-      { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
-      { id: 'backup', name: 'Backup', icon: <Database className="w-4 h-4" /> }, // Added
+    { id: 'monitoring', name: 'Monitoring', icon: <Monitor className="w-4 h-4" /> }, // Added
+    { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
+    { id: 'backup', name: 'Backup', icon: <Database className="w-4 h-4" /> }, // Added
     { id: 'analytics', name: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];

@@ -13,130 +13,86 @@ import {
   Edit, 
   Trash2, 
   Eye, 
+  Settings, 
   Clock, 
+  Calendar, 
+  Shield, 
+  AlertTriangle, 
   CheckCircle, 
   XCircle, 
-  AlertTriangle, 
-  Settings, 
-  Shield, 
-  HardDrive, 
-  Archive, 
-  FileText, 
-  Calendar, 
-  Timer, 
-  Zap, 
   Activity, 
-  TrendingUp, 
-  TrendingDown, 
-  Filter, 
+  HardDrive, 
+  Cloud, 
+  Server, 
+  Zap, 
+  FileText, 
+  Archive, 
+  Lock, 
+  Unlock, 
+  Compress, 
   Search, 
-  Save, 
-  Copy, 
-  Share, 
-  ExternalLink, 
-  Maximize2, 
-  Minimize2, 
+  Filter, 
   ChevronDown, 
   ChevronRight, 
+  Copy, 
+  Save, 
+  X, 
   Info, 
+  TrendingUp, 
+  TrendingDown, 
+  BarChart3, 
+  PieChart, 
+  LineChart, 
+  Target, 
+  Timer, 
+  Users, 
+  Globe, 
+  Mail, 
+  Phone, 
+  Bell, 
   AlertCircle as AlertCircleIcon, 
   CheckCircle as CheckCircleIcon, 
   XCircle as XCircleIcon, 
   Clock as ClockIcon, 
+  Calendar as CalendarIcon, 
+  Shield as ShieldIcon, 
+  Database as DatabaseIcon, 
+  Server as ServerIcon, 
+  HardDrive as HardDriveIcon, 
+  Cloud as CloudIcon, 
+  Archive as ArchiveIcon, 
+  Lock as LockIcon, 
+  Unlock as UnlockIcon, 
+  Compress as CompressIcon, 
+  FileText as FileTextIcon, 
+  Settings as SettingsIcon, 
   Play as PlayIcon, 
   Pause as PauseIcon, 
-  RotateCcw, 
-  RotateCw, 
-  Server, 
-  Cloud, 
-  Lock, 
-  Unlock, 
-  Compress, 
-  FileArchive, 
-  History, 
-  Target, 
-  Users, 
-  Globe, 
-  Cpu, 
-  MemoryStick, 
-  Network, 
-  Monitor, 
-  Smartphone, 
-  Tablet, 
-  Laptop, 
-  Desktop, 
-  Wifi, 
-  WifiOff, 
-  Signal, 
-  SignalHigh, 
-  SignalLow, 
-  SignalZero, 
-  Battery, 
-  BatteryCharging, 
-  Power, 
-  PowerOff, 
-  Zap as ZapIcon, 
-  Flashlight, 
-  FlashlightOff, 
-  Volume2, 
-  VolumeX, 
-  Mic, 
-  MicOff, 
-  Camera, 
-  CameraOff, 
-  Video, 
-  VideoOff, 
-  Phone, 
-  PhoneOff, 
-  MessageSquare, 
-  Mail, 
-  Send, 
-  Inbox, 
-  Outbox, 
-  Archive as ArchiveIcon, 
-  Trash, 
+  RefreshCw as RefreshCwIcon, 
+  Plus as PlusIcon, 
+  Edit as EditIcon, 
   Trash2 as Trash2Icon, 
-  Folder, 
-  FolderOpen, 
-  File, 
-  FileImage, 
-  FileVideo, 
-  FileAudio, 
-  FileCode, 
-  FileSpreadsheet, 
-  FilePresentation, 
-  FilePdf, 
-  FileWord, 
-  FileExcel, 
-  FilePowerpoint, 
-  FileZip, 
-  FileCheck, 
-  FileX, 
-  FilePlus, 
-  FileMinus, 
-  FileEdit, 
-  FileSearch, 
-  FileDownload, 
-  FileUpload, 
-  FileShare, 
-  FileLock, 
-  FileUnlock, 
-  FileHeart, 
-  FileStar, 
-  FileBookmark, 
-  FileBookmarkCheck, 
-  FileBookmarkX, 
-  FileBookmarkPlus, 
-  FileBookmarkMinus, 
-  FileBookmarkEdit, 
-  FileBookmarkSearch, 
-  FileBookmarkDownload, 
-  FileBookmarkUpload, 
-  FileBookmarkShare, 
-  FileBookmarkLock, 
-  FileBookmarkUnlock, 
-  FileBookmarkHeart, 
-  FileBookmarkStar
+  Eye as EyeIcon, 
+  Search as SearchIcon, 
+  Filter as FilterIcon, 
+  ChevronDown as ChevronDownIcon, 
+  ChevronRight as ChevronRightIcon, 
+  Copy as CopyIcon, 
+  Save as SaveIcon, 
+  X as XIcon, 
+  Info as InfoIcon, 
+  TrendingUp as TrendingUpIcon, 
+  TrendingDown as TrendingDownIcon, 
+  BarChart3 as BarChart3Icon, 
+  PieChart as PieChartIcon, 
+  LineChart as LineChartIcon, 
+  Target as TargetIcon, 
+  Timer as TimerIcon, 
+  Users as UsersIcon, 
+  Globe as GlobeIcon, 
+  Mail as MailIcon, 
+  Phone as PhoneIcon, 
+  Bell as BellIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -157,6 +113,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -200,9 +157,9 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
     }
   };
 
-  const handleCreateRecovery = async (backupJobId: string, type: 'full' | 'partial' | 'point_in_time', tables: string[]) => {
+  const handleCreateRecovery = async (backupJobId: string) => {
     try {
-      const job = await backupManager.createRecoveryJob(backupJobId, type, tables);
+      const job = await backupManager.createRecoveryJob(backupJobId, 'full', ['users', 'test_cases']);
       setRecoveryJobs(prev => [...prev, job]);
     } catch (error) {
       console.error('Failed to create recovery:', error);
@@ -257,12 +214,22 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
         return <TrendingUp className="w-4 h-4" />;
       case 'differential':
         return <TrendingDown className="w-4 h-4" />;
-      case 'scheduled':
-        return <Clock className="w-4 h-4" />;
-      case 'manual':
-        return <Play className="w-4 h-4" />;
-      case 'recovery':
-        return <RotateCcw className="w-4 h-4" />;
+      default:
+        return <Archive className="w-4 h-4" />;
+    }
+  };
+
+  const getStorageIcon = (type: string) => {
+    switch (type) {
+      case 'local':
+        return <HardDrive className="w-4 h-4" />;
+      case 's3':
+      case 'gcs':
+      case 'azure':
+        return <Cloud className="w-4 h-4" />;
+      case 'ftp':
+      case 'sftp':
+        return <Server className="w-4 h-4" />;
       default:
         return <Archive className="w-4 h-4" />;
     }
@@ -297,6 +264,33 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
     return matchesSearch && matchesStatus;
   });
 
+  const getOverviewStats = () => {
+    const totalBackups = backupJobs.length;
+    const successfulBackups = backupJobs.filter(job => job.status === 'completed').length;
+    const failedBackups = backupJobs.filter(job => job.status === 'failed').length;
+    const runningBackups = backupJobs.filter(job => job.status === 'running').length;
+    const totalRecoveries = recoveryJobs.length;
+    const successfulRecoveries = recoveryJobs.filter(job => job.status === 'completed').length;
+    const totalSize = backupJobs
+      .filter(job => job.size)
+      .reduce((sum, job) => sum + (job.size || 0), 0);
+    const totalRecords = backupJobs
+      .filter(job => job.records)
+      .reduce((sum, job) => sum + (job.records || 0), 0);
+
+    return {
+      totalBackups,
+      successfulBackups,
+      failedBackups,
+      runningBackups,
+      totalRecoveries,
+      successfulRecoveries,
+      totalSize,
+      totalRecords,
+      successRate: totalBackups > 0 ? (successfulBackups / totalBackups) * 100 : 0
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -307,6 +301,8 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
       </div>
     );
   }
+
+  const stats = getOverviewStats();
 
   return (
     <div className="space-y-6">
@@ -319,7 +315,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Backup & Recovery</h2>
-              <p className="text-sm text-gray-500">Manage backups, recovery, and disaster recovery plans</p>
+              <p className="text-sm text-gray-500">Database backup and disaster recovery management</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -334,7 +330,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
               onClick={() => setShowCreateModal(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create
+              Create Backup
             </Button>
           </div>
         </div>
@@ -345,7 +341,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search backups..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -371,10 +367,10 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6">
             {[
-              { id: 'overview', name: 'Overview', icon: <Activity className="w-4 h-4" /> },
+              { id: 'overview', name: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
               { id: 'configs', name: 'Configurations', icon: <Settings className="w-4 h-4" />, count: backupConfigs.length },
               { id: 'jobs', name: 'Backup Jobs', icon: <Archive className="w-4 h-4" />, count: backupJobs.length },
-              { id: 'recovery', name: 'Recovery', icon: <RotateCcw className="w-4 h-4" />, count: recoveryJobs.length },
+              { id: 'recovery', name: 'Recovery Jobs', icon: <Download className="w-4 h-4" />, count: recoveryJobs.length },
               { id: 'plans', name: 'DR Plans', icon: <Shield className="w-4 h-4" />, count: disasterRecoveryPlans.length }
             ].map((tab) => (
               <button
@@ -402,131 +398,112 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* Statistics */}
+              {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                       <Archive className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600">Total Backups</p>
-                      <p className="text-2xl font-bold text-gray-900">{backupJobs.length}</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats.totalBackups}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                       <CheckCircle className="w-6 h-6 text-green-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Successful</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {backupJobs.filter(job => job.status === 'completed').length}
-                      </p>
+                      <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats.successRate.toFixed(1)}%</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                      <XCircle className="w-6 h-6 text-red-600" />
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <HardDrive className="w-6 h-6 text-purple-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Failed</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {backupJobs.filter(job => job.status === 'failed').length}
-                      </p>
+                      <p className="text-sm font-medium text-gray-600">Total Size</p>
+                      <p className="text-2xl font-bold text-gray-900">{formatBytes(stats.totalSize)}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-yellow-600" />
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Database className="w-6 h-6 text-orange-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Running</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {backupJobs.filter(job => job.status === 'running').length}
-                      </p>
+                      <p className="text-sm font-medium text-gray-600">Total Records</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats.totalRecords.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Recent Backup Jobs */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Backup Jobs</h3>
-                {backupJobs.length > 0 ? (
+              {/* Recent Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Backup Jobs</h3>
                   <div className="space-y-3">
                     {backupJobs.slice(0, 5).map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                      <div key={job.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
                           {getTypeIcon(job.type)}
                           <div>
-                            <p className="font-medium text-gray-900">{job.id}</p>
+                            <p className="font-medium text-gray-900">{job.type} Backup</p>
                             <p className="text-sm text-gray-500">
                               {new Date(job.startedAt).toLocaleString()}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
                             {job.status.toUpperCase()}
                           </span>
                           {job.size && (
                             <span className="text-sm text-gray-500">{formatBytes(job.size)}</span>
                           )}
-                          {job.duration && (
-                            <span className="text-sm text-gray-500">{formatDuration(job.duration)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Recovery Jobs</h3>
+                  <div className="space-y-3">
+                    {recoveryJobs.slice(0, 5).map((job) => (
+                      <div key={job.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Download className="w-4 h-4" />
+                          <div>
+                            <p className="font-medium text-gray-900">{job.type} Recovery</p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(job.startedAt).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                            {job.status.toUpperCase()}
+                          </span>
+                          {job.recordsRestored && (
+                            <span className="text-sm text-gray-500">{job.recordsRestored} records</span>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Archive className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Backup Jobs</h4>
-                    <p className="text-gray-500">Create your first backup configuration to get started.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Disaster Recovery Plans */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Disaster Recovery Plans</h3>
-                {disasterRecoveryPlans.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {disasterRecoveryPlans.map((plan) => (
-                      <div key={plan.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">{plan.name}</h4>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(plan.priority)}`}>
-                            {plan.priority.toUpperCase()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">{plan.description}</p>
-                        <div className="space-y-1 text-sm text-gray-500">
-                          <p><strong>RTO:</strong> {plan.rto} minutes</p>
-                          <p><strong>RPO:</strong> {plan.rpo} minutes</p>
-                          <p><strong>Components:</strong> {plan.components.length}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Shield className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">No DR Plans</h4>
-                    <p className="text-gray-500">Create your first disaster recovery plan to get started.</p>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           )}
@@ -561,12 +538,6 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
                           >
                             <Edit className="w-3 h-3" />
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
                         </div>
                       </div>
                       
@@ -582,6 +553,13 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
                           <span className="font-medium">{config.schedule.frequency}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Storage:</span>
+                          <div className="flex items-center space-x-1">
+                            {getStorageIcon(config.storage.type)}
+                            <span className="font-medium">{config.storage.type}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">Tables:</span>
                           <span className="font-medium">{config.tables.length}</span>
                         </div>
@@ -594,12 +572,22 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
                           </span>
                         </div>
                       </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Features:</span>
+                          <div className="flex items-center space-x-2">
+                            {config.storage.encryption && <Lock className="w-3 h-3 text-green-600" />}
+                            {config.storage.compression && <Compress className="w-3 h-3 text-blue-600" />}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Settings className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <Archive className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <h4 className="text-lg font-medium text-gray-900 mb-2">No Backup Configurations</h4>
                   <p className="text-gray-500">Create your first backup configuration to get started.</p>
                 </div>
@@ -611,79 +599,103 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
           {activeTab === 'jobs' && (
             <div className="space-y-4">
               {filteredBackupJobs.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Job ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Started
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Duration
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Size
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredBackupJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {job.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div className="space-y-3">
+                  {filteredBackupJobs.map((job) => (
+                    <div key={job.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {getTypeIcon(job.type)}
+                          <div>
                             <div className="flex items-center space-x-2">
-                              {getTypeIcon(job.type)}
-                              <span>{job.type}</span>
+                              <span className="font-medium text-gray-900">{job.type} Backup</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                                {job.status.toUpperCase()}
+                              </span>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                              {job.status.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(job.startedAt).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {job.duration ? formatDuration(job.duration) : '-'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {job.size ? formatBytes(job.size) : '-'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex space-x-2">
-                              {job.status === 'running' && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleCancelBackup(job.id)}
-                                >
-                                  <Pause className="w-3 h-3" />
-                                </Button>
-                              )}
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-3 h-3" />
-                              </Button>
+                            <p className="text-sm text-gray-500">
+                              Started: {new Date(job.startedAt).toLocaleString()}
+                            </p>
+                            {job.completedAt && (
+                              <p className="text-sm text-gray-500">
+                                Duration: {job.duration ? formatDuration(job.duration) : 'N/A'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {job.size && (
+                            <span className="text-sm text-gray-500">{formatBytes(job.size)}</span>
+                          )}
+                          {job.records && (
+                            <span className="text-sm text-gray-500">{job.records.toLocaleString()} records</span>
+                          )}
+                          {job.status === 'running' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelBackup(job.id)}
+                            >
+                              <Pause className="w-3 h-3" />
+                            </Button>
+                          )}
+                          {job.status === 'completed' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCreateRecovery(job.id)}
+                            >
+                              <Download className="w-3 h-3" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setExpandedItem(
+                              expandedItem === job.id ? null : job.id
+                            )}
+                          >
+                            {expandedItem === job.id ? 
+                              <ChevronDown className="w-3 h-3" /> : 
+                              <ChevronRight className="w-3 h-3" />
+                            }
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {expandedItem === job.id && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">Job Details</h4>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <p><strong>ID:</strong> {job.id}</p>
+                                <p><strong>Type:</strong> {job.type}</p>
+                                <p><strong>Status:</strong> {job.status}</p>
+                                <p><strong>Started:</strong> {new Date(job.startedAt).toLocaleString()}</p>
+                                {job.completedAt && (
+                                  <p><strong>Completed:</strong> {new Date(job.completedAt).toLocaleString()}</p>
+                                )}
+                              </div>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">Metadata</h4>
+                              <div className="bg-gray-50 p-2 rounded text-sm">
+                                <pre className="text-gray-700 overflow-auto">
+                                  {JSON.stringify(job.metadata, null, 2)}
+                                </pre>
+                              </div>
+                            </div>
+                          </div>
+                          {job.error && (
+                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <h4 className="font-medium text-red-900 mb-1">Error</h4>
+                              <p className="text-sm text-red-700">{job.error}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -695,78 +707,91 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
             </div>
           )}
 
-          {/* Recovery Tab */}
+          {/* Recovery Jobs Tab */}
           {activeTab === 'recovery' && (
             <div className="space-y-4">
               {filteredRecoveryJobs.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Job ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Started
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Duration
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Tables
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredRecoveryJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {job.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div className="space-y-3">
+                  {filteredRecoveryJobs.map((job) => (
+                    <div key={job.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <Download className="w-4 h-4" />
+                          <div>
                             <div className="flex items-center space-x-2">
-                              {getTypeIcon(job.type)}
-                              <span>{job.type}</span>
+                              <span className="font-medium text-gray-900">{job.type} Recovery</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                                {job.status.toUpperCase()}
+                              </span>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                              {job.status.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(job.startedAt).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {job.duration ? formatDuration(job.duration) : '-'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {job.tables.length}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-3 h-3" />
-                              </Button>
+                            <p className="text-sm text-gray-500">
+                              Started: {new Date(job.startedAt).toLocaleString()}
+                            </p>
+                            {job.completedAt && (
+                              <p className="text-sm text-gray-500">
+                                Duration: {job.duration ? formatDuration(job.duration) : 'N/A'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {job.recordsRestored && (
+                            <span className="text-sm text-gray-500">{job.recordsRestored.toLocaleString()} records</span>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setExpandedItem(
+                              expandedItem === job.id ? null : job.id
+                            )}
+                          >
+                            {expandedItem === job.id ? 
+                              <ChevronDown className="w-3 h-3" /> : 
+                              <ChevronRight className="w-3 h-3" />
+                            }
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {expandedItem === job.id && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">Recovery Details</h4>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <p><strong>ID:</strong> {job.id}</p>
+                                <p><strong>Type:</strong> {job.type}</p>
+                                <p><strong>Status:</strong> {job.status}</p>
+                                <p><strong>Target Tables:</strong> {job.targetTables.join(', ')}</p>
+                                <p><strong>Started:</strong> {new Date(job.startedAt).toLocaleString()}</p>
+                                {job.completedAt && (
+                                  <p><strong>Completed:</strong> {new Date(job.completedAt).toLocaleString()}</p>
+                                )}
+                              </div>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">Metadata</h4>
+                              <div className="bg-gray-50 p-2 rounded text-sm">
+                                <pre className="text-gray-700 overflow-auto">
+                                  {JSON.stringify(job.metadata, null, 2)}
+                                </pre>
+                              </div>
+                            </div>
+                          </div>
+                          {job.error && (
+                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <h4 className="font-medium text-red-900 mb-1">Error</h4>
+                              <p className="text-sm text-red-700">{job.error}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <RotateCcw className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <Download className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <h4 className="text-lg font-medium text-gray-900 mb-2">No Recovery Jobs</h4>
                   <p className="text-gray-500">No recovery jobs found matching your criteria.</p>
                 </div>
@@ -774,7 +799,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
             </div>
           )}
 
-          {/* DR Plans Tab */}
+          {/* Disaster Recovery Plans Tab */}
           {activeTab === 'plans' && (
             <div className="space-y-4">
               {disasterRecoveryPlans.length > 0 ? (
@@ -786,46 +811,29 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
                           <Shield className="w-4 h-4" />
                           <h3 className="font-medium text-gray-900">{plan.name}</h3>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingItem(plan);
-                              setShowEditModal(true);
-                            }}
-                          >
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(plan.priority)}`}>
+                          {plan.priority.toUpperCase()}
+                        </span>
                       </div>
                       
                       <p className="text-sm text-gray-600 mb-3">{plan.description}</p>
                       
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-500">Priority:</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(plan.priority)}`}>
-                            {plan.priority.toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">RTO:</span>
-                          <span className="font-medium">{plan.rto} min</span>
+                          <span className="font-medium">{plan.rto} minutes</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">RPO:</span>
-                          <span className="font-medium">{plan.rpo} min</span>
+                          <span className="font-medium">{plan.rpo} minutes</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">Components:</span>
                           <span className="font-medium">{plan.components.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Contacts:</span>
+                          <span className="font-medium">{plan.contacts.length}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">Status:</span>
@@ -833,6 +841,27 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
                             plan.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                           }`}>
                             {plan.enabled ? 'ENABLED' : 'DISABLED'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Last Test:</span>
+                          <span className="font-medium">
+                            {plan.testingSchedule.lastTest 
+                              ? new Date(plan.testingSchedule.lastTest).toLocaleDateString()
+                              : 'Never'
+                            }
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Next Test:</span>
+                          <span className="font-medium">
+                            {plan.testingSchedule.nextTest 
+                              ? new Date(plan.testingSchedule.nextTest).toLocaleDateString()
+                              : 'Not scheduled'
+                            }
                           </span>
                         </div>
                       </div>
@@ -857,7 +886,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {showCreateModal ? 'Create' : 'Edit'} {activeTab.slice(0, -1)}
+                {showCreateModal ? 'Create' : 'Edit'} Backup Configuration
               </h3>
               <Button
                 variant="outline"
@@ -874,7 +903,7 @@ const BackupDashboard: React.FC<BackupDashboardProps> = ({ userId }) => {
             <div className="text-center py-8">
               <Settings className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h4 className="text-lg font-medium text-gray-900 mb-2">Form Implementation</h4>
-              <p className="text-gray-500">The form for creating/editing {activeTab} will be implemented here.</p>
+              <p className="text-gray-500">The form for creating/editing backup configurations will be implemented here.</p>
             </div>
           </div>
         </div>
