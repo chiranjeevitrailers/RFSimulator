@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import NRTestCaseViewer from './NRTestCaseViewer';
 import LTETestCaseViewer from './LTETestCaseViewer';
+import IMSSIPTestCaseViewer from './IMSSIPTestCaseViewer';
 import { 
   Wifi, 
   Signal, 
@@ -49,7 +50,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       icon: <Activity className="w-5 h-5" />,
       color: 'bg-purple-100 text-purple-600',
       count: '100+',
-      status: 'pending'
+      status: 'completed'
     },
     {
       id: 'O_RAN',
@@ -109,13 +110,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       case '4G_LTE':
         return <LTETestCaseViewer userId={userId} />;
       case 'IMS_SIP':
-        return (
-          <div className="text-center py-12">
-            <Activity className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">IMS/SIP Test Cases</h3>
-            <p className="text-gray-500">Coming soon in Phase 2, Week 5</p>
-          </div>
-        );
+        return <IMSSIPTestCaseViewer userId={userId} />;
       case 'O_RAN':
         return (
           <div className="text-center py-12">
