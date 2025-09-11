@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import NRTestCaseViewer from './NRTestCaseViewer';
 import LTETestCaseViewer from './LTETestCaseViewer';
 import IMSSIPTestCaseViewer from './IMSSIPTestCaseViewer';
+import ORANTestCaseViewer from './ORANTestCaseViewer';
 import { 
   Wifi, 
   Signal, 
@@ -59,7 +60,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       icon: <Layers className="w-5 h-5" />,
       color: 'bg-orange-100 text-orange-600',
       count: '100+',
-      status: 'pending'
+      status: 'completed'
     },
     {
       id: 'NB_IoT',
@@ -112,13 +113,7 @@ const ProtocolTestCaseManager: React.FC<ProtocolTestCaseManagerProps> = ({ userI
       case 'IMS_SIP':
         return <IMSSIPTestCaseViewer userId={userId} />;
       case 'O_RAN':
-        return (
-          <div className="text-center py-12">
-            <Layers className="w-12 h-12 text-orange-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">O-RAN Test Cases</h3>
-            <p className="text-gray-500">Coming soon in Phase 2, Week 6</p>
-          </div>
-        );
+        return <ORANTestCaseViewer userId={userId} />;
       case 'NB_IoT':
         return (
           <div className="text-center py-12">
