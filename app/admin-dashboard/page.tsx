@@ -10,6 +10,7 @@ import SecurityDashboard from '@/components/security/SecurityDashboard';
 import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import AlertManagement from '@/components/monitoring/AlertManagement';
 import BackupDashboard from '@/components/backup/BackupDashboard';
+import LoadTestingDashboard from '@/components/load-testing/LoadTestingDashboard';
 import { auth } from '@/lib/auth';
 import { 
   Users, 
@@ -21,6 +22,7 @@ import {
   Monitor, // Added
   AlertTriangle, // Added
   Database, // Added
+  Zap, // Added
   TrendingUp,
   AlertCircle,
   CheckCircle,
@@ -308,6 +310,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'monitoring', name: 'Monitoring', icon: <Monitor className="w-4 h-4" /> }, // Added
     { id: 'alerts', name: 'Alerts', icon: <AlertTriangle className="w-4 h-4" /> }, // Added
     { id: 'backup', name: 'Backup', icon: <Database className="w-4 h-4" /> }, // Added
+    { id: 'load-testing', name: 'Load Testing', icon: <Zap className="w-4 h-4" /> }, // Added
     { id: 'analytics', name: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
@@ -576,6 +579,10 @@ const AdminDashboard: React.FC = () => {
 
         {activeTab === 'backup' && (
           <BackupDashboard userId={user.id} />
+        )}
+
+        {activeTab === 'load-testing' && (
+          <LoadTestingDashboard userId={user.id} />
         )}
 
           {activeTab === 'analytics' && (
