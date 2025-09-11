@@ -1,7 +1,19 @@
-// Enhanced SrsRAN Message Decoder with Complete IE Breakdown
+// Enhanced SrsRAN Message Decoder with Complete IE Breakdown and 3GPP Compliance
 class SrsranMessageDecoder {
+  constructor() {
+    this.threeGPPDecoder = new ThreeGPPMessageDecoder();
+    this.analyzer = new ThreeGPPMessageAnalyzer();
+  }
+
   static parseLogMessage(rawMessage) {
     try {
+      // Try 3GPP-compliant decoding first
+      const threeGPPDecoded = this.tryThreeGPPDecoding(rawMessage);
+      if (threeGPPDecoded && threeGPPDecoded.compliance === '3GPP_COMPLIANT') {
+        return this.enhanceWithThreeGPPData(rawMessage, threeGPPDecoded);
+      }
+
+      // Fallback to legacy parsing
       const parsed = {
         raw: rawMessage,
         timestamp: new Date().toISOString(),
@@ -14,13 +26,69 @@ class SrsranMessageDecoder {
         channel: this.extractChannel(rawMessage),
         cellId: this.extractCellId(rawMessage),
         informationElements: this.extractInformationElements(rawMessage),
-        decodedMessage: this.decodeCompleteMessage(rawMessage)
+        decodedMessage: this.decodeCompleteMessage(rawMessage),
+        compliance: 'LEGACY_PARSING'
       };
       return parsed;
     } catch (error) {
       console.error('Message parsing error:', error);
       return this.createFallbackMessage(rawMessage);
     }
+  }
+
+  static tryThreeGPPDecoding(rawMessage) {
+    try {
+      if (typeof ThreeGPPMessageDecoder !== 'undefined') {
+        const decoder = new ThreeGPPMessageDecoder();
+        return decoder.decodeMessage(rawMessage);
+      }
+    } catch (error) {
+      console.warn('3GPP decoding failed, using legacy parsing:', error);
+    }
+    return null;
+  }
+
+  static enhanceWithThreeGPPData(rawMessage, threeGPPDecoded) {
+    return {
+      raw: rawMessage,
+      timestamp: new Date().toISOString(),
+      component: this.extractComponent(rawMessage),
+      level: this.extractLevel(rawMessage),
+      layer: this.determineLayer(rawMessage),
+      messageType: threeGPPDecoded.messageType,
+      rnti: threeGPPDecoded.decoded?.rnti?.value || this.extractRnti(rawMessage),
+      ueId: threeGPPDecoded.decoded?.ueId?.value || this.extractUeId(rawMessage),
+      channel: this.extractChannel(rawMessage),
+      cellId: threeGPPDecoded.decoded?.cellId?.value || this.extractCellId(rawMessage),
+      informationElements: this.mergeInformationElements(
+        this.extractInformationElements(rawMessage),
+        threeGPPDecoded.decoded
+      ),
+      decodedMessage: this.decodeCompleteMessage(rawMessage),
+      threeGPPDecoded: threeGPPDecoded,
+      compliance: threeGPPDecoded.compliance,
+      validation: threeGPPDecoded.validation
+    };
+  }
+
+  static mergeInformationElements(legacyIEs, threeGPPIEs) {
+    const merged = { ...legacyIEs };
+    
+    if (threeGPPIEs) {
+      for (const [key, value] of Object.entries(threeGPPIEs)) {
+        if (value && typeof value === 'object' && value.value !== undefined) {
+          merged[key] = {
+            value: value.value,
+            type: value.type,
+            description: value.description,
+            valid: value.valid,
+            source: '3GPP'
+          };
+        }
+      }
+    }
+    
+    return merged;
   }
 
   static extractComponent(msg) {
