@@ -1,0 +1,186 @@
+/* 5GLabX Platform Frontend Demo Styles */
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc;
+  color: #1f2937;
+}
+
+/* Sidebar transitions */
+.sidebar-transition {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Badge styles */
+.badge-live {
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+.badge-new {
+  background-color: #3b82f6;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.badge-demo {
+  background-color: #10b981;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+/* Collapsible section animations */
+.collapsible-section {
+  transition: all 0.3s ease-in-out;
+}
+
+.section-header {
+  transition: all 0.2s ease-in-out;
+}
+
+.section-header:hover {
+  background-color: #f1f5f9;
+}
+
+/* Chart containers */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Log entries */
+.log-entry {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.log-entry:hover {
+  background-color: #f8fafc;
+}
+
+.log-entry.info {
+  border-left: 3px solid #3b82f6;
+  background-color: #eff6ff;
+}
+
+.log-entry.warning {
+  border-left: 3px solid #f59e0b;
+  background-color: #fffbeb;
+}
+
+.log-entry.error {
+  border-left: 3px solid #ef4444;
+  background-color: #fef2f2;
+}
+
+.log-entry.debug {
+  border-left: 3px solid #6b7280;
+  background-color: #f9fafb;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-indicator.online {
+  background-color: #10b981;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.offline {
+  background-color: #ef4444;
+}
+
+.status-indicator.warning {
+  background-color: #f59e0b;
+}
+
+/* Demo banner */
+.demo-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar-transition {
+    width: 0 !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Loading animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
