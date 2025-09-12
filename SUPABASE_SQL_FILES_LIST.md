@@ -70,7 +70,21 @@ This document lists all SQL files required to deploy the complete 5GLabX commerc
 - Complete coverage of all major protocols
 - Professional-grade test case library
 
-### **5. Default Configurations**
+### **5. Comprehensive 3GPP Information Elements**
+**File**: `supabase/migrations/008_comprehensive_3gpp_ies.sql`
+**Size**: ~30KB
+**Execution Time**: 1-2 minutes
+**Purpose**: Adds detailed 3GPP-compliant Information Elements for IMS/SIP procedures
+
+**What it includes**:
+- **IMS Registration IEs** - Complete SIP REGISTER headers (From, To, Call-ID, CSeq, Contact, Authorization, P-Access-Network-Info, P-Visited-Network-ID, Security-Client, P-Preferred-Identity, User-Agent, Supported, Require)
+- **VoLTE Call IEs** - Complete SIP INVITE headers and SDP body (Request-Line, Via, Max-Forwards, From, To, Call-ID, CSeq, Contact, Route, P-Asserted-Identity, P-Charging-Vector, Session-Expires, SDP parameters, RTP/AVP codecs, QoS parameters)
+- **3GPP Standard References** - All IEs reference RFC 3261, TS 24.229, TS 33.203, RFC 4566, RFC 4028
+- **Complete Message Bodies** - SDP content with media descriptions, codec parameters, QoS settings
+- **Authentication Parameters** - Digest authentication, security client parameters
+- **IMS-specific Headers** - P-Access-Network-Info, P-Visited-Network-ID, P-Charging-Vector
+
+### **6. Default Configurations**
 **File**: `supabase/migrations/004_default_configurations_seed.sql`
 **Size**: ~20KB
 **Execution Time**: 1 minute
@@ -90,7 +104,7 @@ This document lists all SQL files required to deploy the complete 5GLabX commerc
 - Debug configuration template
 - Configuration validation and management
 
-### **6. Documentation & Tutorials**
+### **7. Documentation & Tutorials**
 **File**: `supabase/migrations/005_documentation_tutorials_seed.sql`
 **Size**: ~30KB
 **Execution Time**: 30 seconds
@@ -118,8 +132,9 @@ Execute the SQL files in this exact order:
 2. **Second**: `002_subscription_plans_seed.sql`
 3. **Third**: `006_comprehensive_1000_test_cases.sql`
 4. **Fourth**: `007_remaining_protocols_test_cases.sql`
-5. **Fifth**: `004_default_configurations_seed.sql`
-6. **Sixth**: `005_documentation_tutorials_seed.sql`
+5. **Fifth**: `008_comprehensive_3gpp_ies.sql`
+6. **Sixth**: `004_default_configurations_seed.sql`
+7. **Seventh**: `005_documentation_tutorials_seed.sql`
 
 ## 📊 **Expected Results After Deployment**
 
@@ -204,6 +219,7 @@ For deployment assistance:
 | 002 | Plans & Settings | 15KB | 30sec | 0 | 37 |
 | 006 | 1000+ Test Cases | 150KB | 5-7min | 0 | 1000+ |
 | 007 | Remaining Protocols | 50KB | 2-3min | 0 | 350+ |
+| 008 | 3GPP IEs | 30KB | 1-2min | 0 | 50+ |
 | 004 | Configurations | 20KB | 1min | 0 | 10+ |
 | 005 | Documentation | 30KB | 30sec | 0 | 8 |
-| **Total** | **Complete Platform** | **315KB** | **11-15min** | **25** | **1400+** |
+| **Total** | **Complete Platform** | **345KB** | **12-17min** | **25** | **1450+** |
