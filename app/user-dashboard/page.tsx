@@ -58,6 +58,8 @@ const UserDashboard: React.FC = () => {
       iframe.title = '5GLabX Platform';
       iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
       
+      console.log('Created iframe with src:', iframe.src);
+      
       // Add loading indicator
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'flex items-center justify-center h-full bg-gray-100';
