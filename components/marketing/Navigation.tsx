@@ -31,6 +31,7 @@ const Navigation = () => {
   const navigation = [
     { name: 'Features', href: '#features' },
     { name: 'Equipment', href: '#equipment' },
+    { name: '5GLAB Service', href: '#5glab-service' },
     { name: 'How It Works', href: '#how-it-works' },
     { name: 'Test Cases', href: '#test-cases' },
     { name: 'Pricing', href: '#pricing' },
@@ -82,6 +83,11 @@ const Navigation = () => {
                 <Link href="/equipment">
                   <button className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
                     Equipment
+                  </button>
+                </Link>
+                <Link href="/services">
+                  <button className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
+                    Services
                   </button>
                 </Link>
                 <span className="text-sm text-gray-700">Welcome, {user.name}</span>
@@ -161,6 +167,13 @@ const Navigation = () => {
                         onClick={() => setIsOpen(false)}
                       >
                         Equipment
+                      </Link>
+                      <Link
+                        href="/services"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Services
                       </Link>
                       {user.profile?.role === 'admin' && (
                         <Link
