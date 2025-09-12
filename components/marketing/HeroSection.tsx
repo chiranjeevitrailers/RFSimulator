@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+// Removed Button import for static export
 import { ArrowRight, Play, Shield, Zap, Users, Globe } from 'lucide-react';
 
 const HeroSection = () => {
@@ -40,15 +40,15 @@ const HeroSection = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/signup">
-                <Button size="xl" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors duration-200 flex items-center justify-center">
                   Start Free Trial
                   <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+                </button>
               </Link>
-              <Button variant="outline" size="xl" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-primary-600 bg-transparent border-2 border-primary-600 hover:bg-primary-50 rounded-lg transition-colors duration-200 flex items-center justify-center">
                 <Play className="w-5 h-5 mr-2" />
                 Watch Demo
-              </Button>
+              </button>
             </div>
 
             {/* Stats */}

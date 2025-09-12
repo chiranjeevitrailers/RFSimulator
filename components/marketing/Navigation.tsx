@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import UserMenu from '@/components/auth/UserMenu';
-import { auth } from '@/lib/auth';
+// Removed server-side dependencies for static export
 import { Menu, X, ChevronDown } from 'lucide-react';
 
 const Navigation = () => {
@@ -25,18 +23,9 @@ const Navigation = () => {
   }, []);
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const currentUser = await auth.getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Error checking user:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkUser();
+    // Mock user for static export
+    setUser({ email: 'demo@example.com', name: 'Demo User' });
+    setIsLoading(false);
   }, []);
 
   const navigation = [
@@ -47,14 +36,9 @@ const Navigation = () => {
     { name: 'Testimonials', href: '#testimonials' },
   ];
 
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-      setUser(null);
-      router.push('/');
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
+  const handleSignOut = () => {
+    setUser(null);
+    router.push('/');
   };
 
   return (
@@ -93,18 +77,26 @@ const Navigation = () => {
             {isLoading ? (
               <div className="w-8 h-8 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"></div>
             ) : user ? (
-              <UserMenu user={user} />
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-700">Welcome, {user.name}</span>
+                <button 
+                  onClick={() => setUser(null)}
+                  className="text-sm text-primary-600 hover:text-primary-700"
+                >
+                  Sign Out
+                </button>
+              </div>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="md">
+                  <button className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
                     Sign In
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/signup">
-                  <Button variant="primary" size="md">
+                  <button className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                     Get Started
-                  </Button>
+                  </button>
                 </Link>
               </>
             )}
@@ -180,14 +172,14 @@ const Navigation = () => {
                 ) : (
                   <>
                     <Link href="/login" onClick={() => setIsOpen(false)}>
-                      <Button variant="ghost" size="md" className="w-full">
+                      <button className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
                         Sign In
-                      </Button>
+                      </button>
                     </Link>
                     <Link href="/signup" onClick={() => setIsOpen(false)}>
-                      <Button variant="primary" size="md" className="w-full">
+                      <button className="w-full px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                         Get Started
-                      </Button>
+                      </button>
                     </Link>
                   </>
                 )}

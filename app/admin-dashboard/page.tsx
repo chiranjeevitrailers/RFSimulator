@@ -49,11 +49,11 @@ interface TestCase {
   name: string;
   category: string;
   description: string;
-  protocol_version: string;
-  complexity: string;
-  duration_ms: number;
-  layers: any;
-  message_flow: any[];
+  protocol_version?: string;
+  complexity?: string;
+  duration_ms?: number;
+  layers?: any;
+  message_flow?: any[];
   is_active: boolean;
   created_at: string;
   updated_at: string;

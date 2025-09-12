@@ -3,10 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-import { auth } from '@/lib/auth';
-import toast from 'react-hot-toast';
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -52,24 +49,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
     setErrors({});
 
     try {
-      if (isAdmin) {
-        // Admin login
-        const result = await auth.signInAdmin(formData.email, formData.password);
-        if (result.user) {
-          toast.success('Welcome back, Admin!');
+      // Mock authentication for static export
+      if (formData.email && formData.password) {
+        if (isAdmin) {
           router.push('/admin-dashboard');
-        }
-      } else {
-        // User login
-        const result = await auth.signInUser(formData.email, formData.password);
-        if (result.user) {
-          toast.success('Welcome back!');
+        } else {
           router.push('/user-dashboard');
         }
+      } else {
+        setErrors({ general: 'Please enter email and password' });
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      toast.error(error.message || 'Login failed. Please try again.');
       setErrors({ general: error.message || 'Login failed. Please try again.' });
     } finally {
       setLoading(false);
@@ -212,14 +203,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
 
           {/* Submit Button */}
           <div>
-            <Button
+            <button
               type="submit"
-              size="lg"
-              loading={loading}
-              className="w-full"
+              disabled={loading}
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing In...' : 'Sign In'}
-            </Button>
+            </button>
           </div>
 
           {/* Sign Up Link */}
