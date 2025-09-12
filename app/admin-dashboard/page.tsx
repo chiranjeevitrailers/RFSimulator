@@ -1,12 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Users, BarChart3, FileText, Settings, Edit3 } from 'lucide-react';
+import { Users, BarChart3, FileText, Settings, Edit3, LogOut } from 'lucide-react';
 import HomepageEditor from '@/components/admin/HomepageEditor';
+import { useAuth } from '@/components/auth/AuthProvider';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 const AdminDashboard: React.FC = () => {
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignOut = () => {
+    logout();
+  };
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
@@ -16,19 +22,9 @@ const AdminDashboard: React.FC = () => {
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <RouteGuard requireAuth={true} requireAdmin={true}>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,6 +36,25 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <span className="text-xl font-bold text-gray-900">5GLabX Admin</span>
               </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-medium text-sm">
+                    {user?.username?.charAt(0) || 'A'}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-gray-700">
+                  {user?.username || 'Admin'}
+                </span>
+              </div>
+              <button 
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 flex items-center space-x-2"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
@@ -191,7 +206,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </RouteGuard>
   );
 };
 

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
+import RouteGuard from '@/components/auth/RouteGuard';
 import {
   SubscriptionTab,
   SimulationsTab,
@@ -97,43 +99,18 @@ import {
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
-  const [user, setUser] = useState<any>({
-    id: 'user-1',
-    email: 'user@5glabx.com',
-    full_name: 'Demo User',
-    role: 'user'
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('simulations');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Mock user loading for static export
-    setIsLoading(false);
-  }, []);
-
   const handleSignOut = () => {
-    // Mock sign out for static export
-    console.log('Sign out clicked');
+    logout();
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <RouteGuard requireAuth={true} requireAdmin={false}>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -355,7 +332,8 @@ const UserDashboard: React.FC = () => {
         {activeTab === 'subscription' && <SubscriptionTab />}
         {activeTab === 'settings' && <SettingsTab />}
       </main>
-    </div>
+      </div>
+    </RouteGuard>
   );
 };
 

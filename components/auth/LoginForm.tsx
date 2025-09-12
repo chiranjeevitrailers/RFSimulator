@@ -2,9 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-import { validateAdminCredentials, LOGIN_CREDENTIALS } from '@/lib/admin-credentials';
+import { useAuth } from './AuthProvider';
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -18,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const router = useRouter();
+  const { login } = useAuth();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -50,23 +49,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
     setErrors({});
 
     try {
-      if (isAdmin) {
-        // Validate admin credentials
-        const result = validateAdminCredentials(formData.email, formData.password);
-        if (result.success) {
-          // Store admin user in localStorage for demo
-          localStorage.setItem('adminUser', JSON.stringify(result.user));
-          router.push('/admin-dashboard');
-        } else {
-          setErrors({ general: result.error });
-        }
-      } else {
-        // Regular user authentication (mock)
-        if (formData.email && formData.password) {
-          router.push('/user-dashboard');
-        } else {
-          setErrors({ general: 'Please enter email and password' });
-        }
+      const result = await login(formData.email, formData.password, isAdmin);
+      
+      if (!result.success) {
+        setErrors({ general: result.error || 'Login failed. Please try again.' });
       }
     } catch (error: any) {
       console.error('Login error:', error);
