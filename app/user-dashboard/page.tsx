@@ -13,6 +13,7 @@ import APITestingInterface from '@/components/api/APITestingInterface';
 import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
 import ProfessionalTestCaseViewer from '@/components/test-cases/ProfessionalTestCaseViewer';
+import DetailedTestCaseViewer from '@/components/test-cases/DetailedTestCaseViewer';
 import { 
   Activity, 
   BarChart3, 
@@ -24,7 +25,8 @@ import {
   Bell,
   HelpCircle,
   Shield,
-  Award
+  Award,
+  Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -167,17 +169,28 @@ const UserDashboard: React.FC = () => {
                   <Shield className="w-4 h-4 inline mr-2" />
                   3GPP Test Cases
                 </button>
-                <button
-                  onClick={() => setActiveTab('professional-test-cases')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'professional-test-cases'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Award className="w-4 h-4 inline mr-2" />
-                  Professional Tests
-                </button>
+            <button
+              onClick={() => setActiveTab('professional-test-cases')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'professional-test-cases'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Award className="w-4 h-4 inline mr-2" />
+              Professional Tests
+            </button>
+            <button
+              onClick={() => setActiveTab('detailed-test-cases')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'detailed-test-cases'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Database className="w-4 h-4 inline mr-2" />
+              Detailed Analysis
+            </button>
                 <button
                   onClick={() => setActiveTab('monitoring')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -267,9 +280,13 @@ const UserDashboard: React.FC = () => {
           <ThreeGPPTestCaseViewer userId={user.id} />
         )}
         
-        {activeTab === 'professional-test-cases' && (
-          <ProfessionalTestCaseViewer userId={user.id} />
-        )}
+            {activeTab === 'professional-test-cases' && (
+              <ProfessionalTestCaseViewer userId={user.id} />
+            )}
+
+            {activeTab === 'detailed-test-cases' && (
+              <DetailedTestCaseViewer userId={user.id} />
+            )}
       </main>
     </div>
   );
