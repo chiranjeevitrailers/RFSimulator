@@ -38,15 +38,15 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'preamble_id', 'integer', 
-             (15 + i)::TEXT, LPAD((15 + i)::TEXT, 2, '0'), LPAD((15 + i)::BINARY, 6, '0'), 6, true, true, 'TS 38.211 6.1.1'),
+             (15 + i)::TEXT, LPAD((15 + i)::TEXT, 2, '0'), LPAD((15 + i)::TEXT, 6, '0'), 6, true, true, 'TS 38.211 6.1.1'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'ra_rnti', 'integer', 
-             (12345 + i)::TEXT, LPAD((12345 + i)::TEXT, 4, '0'), LPAD((12345 + i)::BINARY, 16, '0'), 16, true, true, 'TS 38.211 6.1.1'),
+             (12345 + i)::TEXT, LPAD((12345 + i)::TEXT, 4, '0'), LPAD((12345 + i)::TEXT, 16, '0'), 16, true, true, 'TS 38.211 6.1.1'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_config_index', 'integer', 
-             (i % 64)::TEXT, LPAD((i % 64)::TEXT, 2, '0'), LPAD((i % 64)::BINARY, 8, '0'), 8, true, true, 'TS 38.211 6.1.1'),
+             (i % 64)::TEXT, LPAD((i % 64)::TEXT, 2, '0'), LPAD((i % 64)::TEXT, 8, '0'), 8, true, true, 'TS 38.211 6.1.1'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_occasion', 'integer', 
-             (i % 8)::TEXT, LPAD((i % 8)::TEXT, 1, '0'), LPAD((i % 8)::BINARY, 3, '0'), 3, true, true, 'TS 38.211 6.1.1'),
+             (i % 8)::TEXT, LPAD((i % 8)::TEXT, 1, '0'), LPAD((i % 8)::TEXT, 3, '0'), 3, true, true, 'TS 38.211 6.1.1'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_slot', 'integer', 
-             (i % 20)::TEXT, LPAD((i % 20)::TEXT, 2, '0'), LPAD((i % 20)::BINARY, 5, '0'), 5, true, true, 'TS 38.211 6.1.1')
+             (i % 20)::TEXT, LPAD((i % 20)::TEXT, 2, '0'), LPAD((i % 20)::TEXT, 5, '0'), 5, true, true, 'TS 38.211 6.1.1')
             ON CONFLICT DO NOTHING;
             
             -- Step 2: Random Access Response (PHY Layer)
@@ -67,15 +67,15 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ra_rnti', 'integer', 
-             (12345 + i)::TEXT, LPAD((12345 + i)::TEXT, 4, '0'), LPAD((12345 + i)::BINARY, 16, '0'), 16, true, true, 'TS 38.211 6.1.2'),
+             (12345 + i)::TEXT, LPAD((12345 + i)::TEXT, 4, '0'), LPAD((12345 + i)::TEXT, 16, '0'), 16, true, true, 'TS 38.211 6.1.2'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ta', 'integer', 
-             (i * 10)::TEXT, LPAD((i * 10)::TEXT, 3, '0'), LPAD((i * 10)::BINARY, 11, '0'), 11, true, true, 'TS 38.211 6.1.2'),
+             (i * 10)::TEXT, LPAD((i * 10)::TEXT, 3, '0'), LPAD((i * 10)::TEXT, 11, '0'), 11, true, true, 'TS 38.211 6.1.2'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ul_grant', 'bit_string', 
              '{"mcs": ' || (i % 28)::TEXT || ', "rb_allocation": ' || (i % 100)::TEXT || '}', 
              LPAD((i % 28)::TEXT, 2, '0') || LPAD((i % 100)::TEXT, 2, '0'), 
-             LPAD((i % 28)::BINARY, 5, '0') || LPAD((i % 100)::BINARY, 7, '0'), 12, true, true, 'TS 38.211 6.1.2'),
+             LPAD((i % 28)::TEXT, 5, '0') || LPAD((i % 100)::TEXT, 7, '0'), 12, true, true, 'TS 38.211 6.1.2'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'temp_crnti', 'integer', 
-             (45678 + i)::TEXT, LPAD((45678 + i)::TEXT, 4, '0'), LPAD((45678 + i)::BINARY, 16, '0'), 16, true, true, 'TS 38.211 6.1.2')
+             (45678 + i)::TEXT, LPAD((45678 + i)::TEXT, 4, '0'), LPAD((45678 + i)::TEXT, 16, '0'), 16, true, true, 'TS 38.211 6.1.2')
             ON CONFLICT DO NOTHING;
             
             -- Step 3: RRC Setup Request (RRC Layer)
@@ -98,7 +98,7 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_3_rrc_setup_request', 'ue_identity', 'bit_string', 
              '{"type": "random_value", "value": "' || (1234567890123456 + i)::TEXT || '"}', 
              LPAD((1234567890123456 + i)::TEXT, 16, '0'), 
-             LPAD((1234567890123456 + i)::BINARY, 64, '0'), 64, true, true, 'TS 38.331 6.2.2'),
+             LPAD((1234567890123456 + i)::TEXT, 64, '0'), 64, true, true, 'TS 38.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_3_rrc_setup_request', 'establishment_cause', 'enumerated', 
              CASE WHEN i % 2 = 0 THEN 'mo_Data' ELSE 'mo_Signalling' END, 
              CASE WHEN i % 2 = 0 THEN '00' ELSE '01' END, 
@@ -125,7 +125,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_4_rrc_setup', 'rrc_transaction_id', 'integer', 
-             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::BINARY, 2, '0'), 2, true, true, 'TS 38.331 6.2.2'),
+             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::TEXT, 2, '0'), 2, true, true, 'TS 38.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_4_rrc_setup', 'radio_bearer_config', 'sequence', 
              '{"srb1": {"enabled": true, "rlc_config": "am"}, "srb2": {"enabled": true, "rlc_config": "am"}}', 
              '01', '01', 1, true, true, 'TS 38.331 6.2.2'),
@@ -155,7 +155,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_5_rrc_setup_complete', 'rrc_transaction_id', 'integer', 
-             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::BINARY, 2, '0'), 2, true, true, 'TS 38.331 6.2.2'),
+             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::TEXT, 2, '0'), 2, true, true, 'TS 38.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_5_rrc_setup_complete', 'selected_plmn_identity', 'sequence', 
              '{"mcc": "001", "mnc": "01"}', '00101', '0000000000000001', 16, true, true, 'TS 38.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_5_rrc_setup_complete', 'registered_amf', 'sequence', 
@@ -187,11 +187,11 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_6_registration_request', '5g_s_tmsi', 'bit_string', 
              CASE WHEN i % 2 = 0 THEN '{"type": "5g_s_tmsi", "value": "' || (1234567890 + i)::TEXT || '"}' ELSE 'null' END, 
              CASE WHEN i % 2 = 0 THEN LPAD((1234567890 + i)::TEXT, 8, '0') ELSE '00' END, 
-             CASE WHEN i % 2 = 0 THEN LPAD((1234567890 + i)::BINARY, 32, '0') ELSE '00' END, 
+             CASE WHEN i % 2 = 0 THEN LPAD((1234567890 + i)::TEXT, 32, '0') ELSE '00' END, 
              CASE WHEN i % 2 = 0 THEN 32 ELSE 8 END, false, true, 'TS 24.501 8.2.1'),
             (test_case_uuid, message_uuid, 'step_6_registration_request', 'ng_ksi', 'bit_string', 
              '{"type": "ng_ksi", "value": "' || (i % 15)::TEXT || '"}', 
-             LPAD((i % 15)::TEXT, 1, '0'), LPAD((i % 15)::BINARY, 4, '0'), 4, true, true, 'TS 24.501 8.2.1'),
+             LPAD((i % 15)::TEXT, 1, '0'), LPAD((i % 15)::TEXT, 4, '0'), 4, true, true, 'TS 24.501 8.2.1'),
             (test_case_uuid, message_uuid, 'step_6_registration_request', 'ue_security_capability', 'sequence', 
              '{"5g_ea": ["5G-EA0", "5G-EA1", "5G-EA2"], "5g_ia": ["5G-IA0", "5G-IA1", "5G-IA2"]}', 
              '01', '01', 1, true, true, 'TS 24.501 8.2.1'),
@@ -219,7 +219,7 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_7_registration_accept', '5g_guti', 'bit_string', 
              '{"type": "5g_guti", "mcc": "001", "mnc": "01", "amf_region_id": "01", "amf_set_id": "0001", "amf_pointer": "01", "5g_tmsi": "' || (1234567890 + i)::TEXT || '"}', 
              '001010100010001' || LPAD((1234567890 + i)::TEXT, 8, '0'), 
-             '0000000000000001' || LPAD((1234567890 + i)::BINARY, 32, '0'), 48, true, true, 'TS 24.501 8.2.2'),
+             '0000000000000001' || LPAD((1234567890 + i)::TEXT, 32, '0'), 48, true, true, 'TS 24.501 8.2.2'),
             (test_case_uuid, message_uuid, 'step_7_registration_accept', 'allowed_nssai', 'sequence', 
              '{"sst": 1, "sd": "000001"}', '01000001', '0000000100000001', 16, true, true, 'TS 24.501 8.2.2'),
             (test_case_uuid, message_uuid, 'step_7_registration_accept', 'configured_nssai', 'sequence', 
@@ -246,7 +246,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_8_pdu_session_establishment_request', 'pdu_session_id', 'integer', 
-             ((i % 15) + 1)::TEXT, LPAD(((i % 15) + 1)::TEXT, 1, '0'), LPAD(((i % 15) + 1)::BINARY, 4, '0'), 4, true, true, 'TS 24.501 8.3.1'),
+             ((i % 15) + 1)::TEXT, LPAD(((i % 15) + 1)::TEXT, 1, '0'), LPAD(((i % 15) + 1)::TEXT, 4, '0'), 4, true, true, 'TS 24.501 8.3.1'),
             (test_case_uuid, message_uuid, 'step_8_pdu_session_establishment_request', 'request_type', 'enumerated', 
              CASE WHEN i % 2 = 0 THEN 'initial' ELSE 'existing' END, 
              CASE WHEN i % 2 = 0 THEN '00' ELSE '01' END, 
@@ -277,7 +277,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_9_pdu_session_establishment_accept', 'pdu_session_id', 'integer', 
-             ((i % 15) + 1)::TEXT, LPAD(((i % 15) + 1)::TEXT, 1, '0'), LPAD(((i % 15) + 1)::BINARY, 4, '0'), 4, true, true, 'TS 24.501 8.3.2'),
+             ((i % 15) + 1)::TEXT, LPAD(((i % 15) + 1)::TEXT, 1, '0'), LPAD(((i % 15) + 1)::TEXT, 4, '0'), 4, true, true, 'TS 24.501 8.3.2'),
             (test_case_uuid, message_uuid, 'step_9_pdu_session_establishment_accept', 'qos_rules', 'sequence', 
              '{"qfi": 1, "5qi": 9, "priority_level": 1, "preemption_capability": "enabled", "preemption_vulnerability": "disabled"}', 
              '01090101', '00000001000010010000000100000001', 32, true, true, 'TS 24.501 8.3.2'),
@@ -286,7 +286,7 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_9_pdu_session_establishment_accept', 'pdu_address', 'sequence', 
              '{"type": "IPv4", "address": "192.168.1.' || (i + 1)::TEXT || '"}', 
              'C0A801' || LPAD((i + 1)::TEXT, 2, '0'), 
-             '110000001010100000000001' || LPAD((i + 1)::BINARY, 8, '0'), 32, true, true, 'TS 24.501 8.3.2')
+             '110000001010100000000001' || LPAD((i + 1)::TEXT, 8, '0'), 32, true, true, 'TS 24.501 8.3.2')
             ON CONFLICT DO NOTHING;
         END IF;
     END LOOP;
@@ -345,15 +345,15 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'preamble_id', 'integer', 
-             (10 + i)::TEXT, LPAD((10 + i)::TEXT, 2, '0'), LPAD((10 + i)::BINARY, 6, '0'), 6, true, true, 'TS 36.211 5.7'),
+             (10 + i)::TEXT, LPAD((10 + i)::TEXT, 2, '0'), LPAD((10 + i)::TEXT, 6, '0'), 6, true, true, 'TS 36.211 5.7'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'ra_rnti', 'integer', 
-             (10000 + i)::TEXT, LPAD((10000 + i)::TEXT, 4, '0'), LPAD((10000 + i)::BINARY, 16, '0'), 16, true, true, 'TS 36.211 5.7'),
+             (10000 + i)::TEXT, LPAD((10000 + i)::TEXT, 4, '0'), LPAD((10000 + i)::TEXT, 16, '0'), 16, true, true, 'TS 36.211 5.7'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_config_index', 'integer', 
-             (i % 64)::TEXT, LPAD((i % 64)::TEXT, 2, '0'), LPAD((i % 64)::BINARY, 8, '0'), 8, true, true, 'TS 36.211 5.7'),
+             (i % 64)::TEXT, LPAD((i % 64)::TEXT, 2, '0'), LPAD((i % 64)::TEXT, 8, '0'), 8, true, true, 'TS 36.211 5.7'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_occasion', 'integer', 
-             (i % 8)::TEXT, LPAD((i % 8)::TEXT, 1, '0'), LPAD((i % 8)::BINARY, 3, '0'), 3, true, true, 'TS 36.211 5.7'),
+             (i % 8)::TEXT, LPAD((i % 8)::TEXT, 1, '0'), LPAD((i % 8)::TEXT, 3, '0'), 3, true, true, 'TS 36.211 5.7'),
             (test_case_uuid, message_uuid, 'step_1_ra_preamble', 'prach_slot', 'integer', 
-             (i % 20)::TEXT, LPAD((i % 20)::TEXT, 2, '0'), LPAD((i % 20)::BINARY, 5, '0'), 5, true, true, 'TS 36.211 5.7')
+             (i % 20)::TEXT, LPAD((i % 20)::TEXT, 2, '0'), LPAD((i % 20)::TEXT, 5, '0'), 5, true, true, 'TS 36.211 5.7')
             ON CONFLICT DO NOTHING;
             
             -- Step 2: Random Access Response (PHY Layer)
@@ -374,15 +374,15 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ra_rnti', 'integer', 
-             (10000 + i)::TEXT, LPAD((10000 + i)::TEXT, 4, '0'), LPAD((10000 + i)::BINARY, 16, '0'), 16, true, true, 'TS 36.211 6.2.3'),
+             (10000 + i)::TEXT, LPAD((10000 + i)::TEXT, 4, '0'), LPAD((10000 + i)::TEXT, 16, '0'), 16, true, true, 'TS 36.211 6.2.3'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ta', 'integer', 
-             (i * 8)::TEXT, LPAD((i * 8)::TEXT, 3, '0'), LPAD((i * 8)::BINARY, 11, '0'), 11, true, true, 'TS 36.211 6.2.3'),
+             (i * 8)::TEXT, LPAD((i * 8)::TEXT, 3, '0'), LPAD((i * 8)::TEXT, 11, '0'), 11, true, true, 'TS 36.211 6.2.3'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'ul_grant', 'bit_string', 
              '{"mcs": ' || (i % 28)::TEXT || ', "rb_allocation": ' || (i % 100)::TEXT || '}', 
              LPAD((i % 28)::TEXT, 2, '0') || LPAD((i % 100)::TEXT, 2, '0'), 
-             LPAD((i % 28)::BINARY, 5, '0') || LPAD((i % 100)::BINARY, 7, '0'), 12, true, true, 'TS 36.211 6.2.3'),
+             LPAD((i % 28)::TEXT, 5, '0') || LPAD((i % 100)::TEXT, 7, '0'), 12, true, true, 'TS 36.211 6.2.3'),
             (test_case_uuid, message_uuid, 'step_2_ra_response', 'temp_crnti', 'integer', 
-             (30000 + i)::TEXT, LPAD((30000 + i)::TEXT, 4, '0'), LPAD((30000 + i)::BINARY, 16, '0'), 16, true, true, 'TS 36.211 6.2.3')
+             (30000 + i)::TEXT, LPAD((30000 + i)::TEXT, 4, '0'), LPAD((30000 + i)::TEXT, 16, '0'), 16, true, true, 'TS 36.211 6.2.3')
             ON CONFLICT DO NOTHING;
             
             -- Step 3: RRC Connection Request (RRC Layer)
@@ -405,7 +405,7 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_3_rrc_connection_request', 'ue_identity', 'bit_string', 
              '{"type": "random_value", "value": "' || (9876543210987654 + i)::TEXT || '"}', 
              LPAD((9876543210987654 + i)::TEXT, 16, '0'), 
-             LPAD((9876543210987654 + i)::BINARY, 64, '0'), 64, true, true, 'TS 36.331 6.2.2'),
+             LPAD((9876543210987654 + i)::TEXT, 64, '0'), 64, true, true, 'TS 36.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_3_rrc_connection_request', 'establishment_cause', 'enumerated', 
              CASE WHEN i % 2 = 0 THEN 'mo_Data' ELSE 'mo_Signalling' END, 
              CASE WHEN i % 2 = 0 THEN '00' ELSE '01' END, 
@@ -432,7 +432,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_4_rrc_connection_setup', 'rrc_transaction_id', 'integer', 
-             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::BINARY, 2, '0'), 2, true, true, 'TS 36.331 6.2.2'),
+             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::TEXT, 2, '0'), 2, true, true, 'TS 36.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_4_rrc_connection_setup', 'radio_bearer_config', 'sequence', 
              '{"srb1": {"enabled": true, "rlc_config": "am"}, "srb2": {"enabled": true, "rlc_config": "am"}}', 
              '01', '01', 1, true, true, 'TS 36.331 6.2.2'),
@@ -462,7 +462,7 @@ BEGIN
                 ie_size, mandatory, is_valid, standard_reference
             ) VALUES 
             (test_case_uuid, message_uuid, 'step_5_rrc_connection_setup_complete', 'rrc_transaction_id', 'integer', 
-             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::BINARY, 2, '0'), 2, true, true, 'TS 36.331 6.2.2'),
+             (i % 4)::TEXT, LPAD((i % 4)::TEXT, 1, '0'), LPAD((i % 4)::TEXT, 2, '0'), 2, true, true, 'TS 36.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_5_rrc_connection_setup_complete', 'selected_plmn_identity', 'sequence', 
              '{"mcc": "001", "mnc": "01"}', '00101', '0000000000000001', 16, true, true, 'TS 36.331 6.2.2'),
             (test_case_uuid, message_uuid, 'step_5_rrc_connection_setup_complete', 'registered_mme', 'sequence', 
@@ -494,11 +494,11 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_6_attach_request', 'old_guti', 'bit_string', 
              CASE WHEN i % 2 = 0 THEN '{"type": "guti", "mcc": "001", "mnc": "01", "mmegi": "0001", "mmec": "01", "m_tmsi": "' || (1234567890 + i)::TEXT || '"}' ELSE 'null' END, 
              CASE WHEN i % 2 = 0 THEN '00101000101' || LPAD((1234567890 + i)::TEXT, 8, '0') ELSE '00' END, 
-             CASE WHEN i % 2 = 0 THEN '0000000000000001' || LPAD((1234567890 + i)::BINARY, 32, '0') ELSE '00' END, 
+             CASE WHEN i % 2 = 0 THEN '0000000000000001' || LPAD((1234567890 + i)::TEXT, 32, '0') ELSE '00' END, 
              CASE WHEN i % 2 = 0 THEN 48 ELSE 8 END, false, true, 'TS 24.301 5.5.1.1'),
             (test_case_uuid, message_uuid, 'step_6_attach_request', 'ksi', 'bit_string', 
              '{"type": "ksi", "value": "' || (i % 15)::TEXT || '"}', 
-             LPAD((i % 15)::TEXT, 1, '0'), LPAD((i % 15)::BINARY, 4, '0'), 4, true, true, 'TS 24.301 5.5.1.1'),
+             LPAD((i % 15)::TEXT, 1, '0'), LPAD((i % 15)::TEXT, 4, '0'), 4, true, true, 'TS 24.301 5.5.1.1'),
             (test_case_uuid, message_uuid, 'step_6_attach_request', 'ue_network_capability', 'sequence', 
              '{"eea": ["EEA0", "EEA1", "EEA2"], "eia": ["EIA0", "EIA1", "EIA2"]}', 
              '01', '01', 1, true, true, 'TS 24.301 5.5.1.1'),
@@ -527,17 +527,17 @@ BEGIN
             (test_case_uuid, message_uuid, 'step_7_attach_accept', 'guti', 'bit_string', 
              '{"type": "guti", "mcc": "001", "mnc": "01", "mmegi": "0001", "mmec": "01", "m_tmsi": "' || (9876543210 + i)::TEXT || '"}', 
              '00101000101' || LPAD((9876543210 + i)::TEXT, 8, '0'), 
-             '0000000000000001' || LPAD((9876543210 + i)::BINARY, 32, '0'), 48, true, true, 'TS 24.301 5.5.1.2'),
+             '0000000000000001' || LPAD((9876543210 + i)::TEXT, 32, '0'), 48, true, true, 'TS 24.301 5.5.1.2'),
             (test_case_uuid, message_uuid, 'step_7_attach_accept', 'eps_bearer_context_status', 'sequence', 
              '{"ebi": 5, "bearer_state": "active"}', '0501', '0000010100000001', 16, true, true, 'TS 24.301 5.5.1.2'),
             (test_case_uuid, message_uuid, 'step_7_attach_accept', 'esm_message_container', 'sequence', 
              '{"pdn_type": "IPv4", "pdn_address": "192.168.1.' || (i + 1)::TEXT || '"}', 
              '01C0A801' || LPAD((i + 1)::TEXT, 2, '0'), 
-             '00000001110000001010100000000001' || LPAD((i + 1)::BINARY, 8, '0'), 32, true, true, 'TS 24.301 5.5.1.2'),
+             '00000001110000001010100000000001' || LPAD((i + 1)::TEXT, 8, '0'), 32, true, true, 'TS 24.301 5.5.1.2'),
             (test_case_uuid, message_uuid, 'step_7_attach_accept', 'eps_mobile_identity', 'sequence', 
              '{"type": "guti", "mcc": "001", "mnc": "01", "mmegi": "0001", "mmec": "01", "m_tmsi": "' || (9876543210 + i)::TEXT || '"}', 
              '00101000101' || LPAD((9876543210 + i)::TEXT, 8, '0'), 
-             '0000000000000001' || LPAD((9876543210 + i)::BINARY, 32, '0'), 48, true, true, 'TS 24.301 5.5.1.2')
+             '0000000000000001' || LPAD((9876543210 + i)::TEXT, 32, '0'), 48, true, true, 'TS 24.301 5.5.1.2')
             ON CONFLICT DO NOTHING;
             
             -- Step 8: Attach Complete (NAS Layer)
