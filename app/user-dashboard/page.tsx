@@ -39,62 +39,61 @@ const UserDashboard: React.FC = () => {
       }
     }
 
-    // Load 5GLabX Platform
+    // Load 5GLabX Platform - Simple iframe approach
     const load5GLabXPlatform = () => {
+      console.log('Starting to load 5GLabX Platform...');
       const rootElement = document.getElementById('5glabx-platform-root');
-      if (!rootElement) return;
+      if (!rootElement) {
+        console.error('5glabx-platform-root element not found!');
+        return;
+      }
+      console.log('Found 5glabx-platform-root element:', rootElement);
 
-      // Create a container for the 5GLabX platform
-      const platformContainer = document.createElement('div');
-      platformContainer.id = 'root';
-      platformContainer.className = 'w-full h-full';
-      rootElement.appendChild(platformContainer);
-
-      // Load the 5GLabX platform styles
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = '/styles.css';
-      document.head.appendChild(link);
-
-      // Load external dependencies
-      const scripts = [
-        'https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js',
-        'https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js',
-        'https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js',
-        'https://resource.trickle.so/vendor_lib/unpkg/lucide@0.513.0/lucide.min.js',
-        'https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js'
-      ];
-
-      const loadScript = (src: string) => {
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = src;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
+      // Create iframe to load the 5GLabX platform
+      const iframe = document.createElement('iframe');
+      iframe.src = '/index.html';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.title = '5GLabX Platform';
+      iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
+      
+      // Add loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'flex items-center justify-center h-full bg-gray-100';
+      loadingDiv.innerHTML = `
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p class="text-gray-600">Loading 5GLabX Platform...</p>
+        </div>
+      `;
+      
+      rootElement.appendChild(loadingDiv);
+      
+      iframe.onload = () => {
+        console.log('5GLabX Platform iframe loaded successfully');
+        rootElement.removeChild(loadingDiv);
+        rootElement.appendChild(iframe);
+        console.log('5GLabX Platform loaded successfully');
       };
-
-      const loadAllScripts = async () => {
-        try {
-          for (const src of scripts) {
-            await loadScript(src);
-          }
-          
-          // Load the 5GLabX platform app
-          const appScript = document.createElement('script');
-          appScript.src = '/app.js';
-          appScript.type = 'text/babel';
-          appScript.onload = () => {
-            console.log('5GLabX Platform loaded successfully');
-          };
-          document.head.appendChild(appScript);
-        } catch (error) {
-          console.error('Error loading 5GLabX Platform:', error);
-        }
+      
+      iframe.onerror = (error) => {
+        console.error('5GLabX Platform iframe failed to load:', error);
+        loadingDiv.innerHTML = `
+          <div class="text-center">
+            <div class="text-red-600 mb-4">
+              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Failed to Load Platform</h3>
+            <p class="text-gray-600 mb-4">There was an error loading the 5GLabX platform.</p>
+            <button onclick="location.reload()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+              Retry
+            </button>
+          </div>
+        `;
       };
-
-      loadAllScripts();
     };
 
     // Load platform after a short delay to ensure DOM is ready
