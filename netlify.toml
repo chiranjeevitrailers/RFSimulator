@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm build"
+  command = "rm -rf node_modules/.cache && rm -rf .next && pnpm install && pnpm build"
   publish = "out"
 
 [build.environment]
@@ -82,7 +82,7 @@
 
 # Plugin configuration
 [[plugins]]
-  package = "@netlify/plugin-nextjs"
+  package = "@netlify/plugin-nextjs@5.13.1"
 
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
