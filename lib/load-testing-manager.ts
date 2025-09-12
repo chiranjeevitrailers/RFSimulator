@@ -458,9 +458,9 @@ export class LoadTestingManager {
 
     // Calculate statistics
     responseTimes.sort((a, b) => a - b);
-    const totalRequests = successfulRequests + failedRequests;
+    const totalRequestsCount = successfulRequests + failedRequests;
 
-    execution.results.totalRequests = totalRequests;
+    execution.results.totalRequests = totalRequestsCount;
     execution.results.successfulRequests = successfulRequests;
     execution.results.failedRequests = failedRequests;
     execution.results.averageResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;

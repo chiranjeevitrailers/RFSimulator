@@ -29,7 +29,7 @@ import {
   Archive, 
   Lock, 
   Unlock, 
-  Compress, 
+  FileArchive, 
   Search, 
   Filter, 
   ChevronDown, 

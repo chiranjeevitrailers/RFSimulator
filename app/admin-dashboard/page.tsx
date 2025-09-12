@@ -29,7 +29,6 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Database,
   Server,
   Cpu,
   HardDrive,
@@ -117,8 +116,21 @@ const AdminDashboard: React.FC = () => {
     const loadAdminData = async () => {
       try {
         const currentUser = await auth.getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
+        if (currentUser && currentUser.email) {
+          const userData: User = {
+            id: currentUser.id,
+            email: currentUser.email,
+            full_name: currentUser.user_metadata?.full_name || '',
+            avatar_url: currentUser.user_metadata?.avatar_url || '',
+            role: currentUser.app_metadata?.role || 'user',
+            subscription_tier: 'pro',
+            subscription_status: 'active',
+            created_at: currentUser.created_at,
+            updated_at: currentUser.updated_at || currentUser.created_at,
+            last_login: new Date().toISOString(),
+            is_active: true
+          };
+          setUser(userData);
         }
 
         // Mock data for demonstration
