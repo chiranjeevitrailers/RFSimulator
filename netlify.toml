@@ -3,8 +3,8 @@
   publish = "out"
 
 [build.environment]
-  NODE_VERSION = "18"
-  PNPM_VERSION = "8"
+  NODE_VERSION = "22.16.0"
+  PNPM_VERSION = "9"
   NODE_ENV = "production"
 
 # Redirects for SPA routing
