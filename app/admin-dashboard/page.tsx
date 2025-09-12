@@ -38,15 +38,22 @@ import {
 interface User {
   id: string;
   email: string;
+  full_name?: string;
+  avatar_url?: string;
+  role?: string;
+  subscription_tier?: string;
+  subscription_status?: string;
+  created_at: string;
+  updated_at?: string;
+  last_login?: string;
+  last_sign_in_at?: string;
+  is_active?: boolean;
   profile?: {
     first_name?: string;
     last_name?: string;
     role?: string;
     company?: string;
   };
-  created_at: string;
-  last_sign_in_at?: string;
-  is_active?: boolean;
 }
 
 interface TestCase {
