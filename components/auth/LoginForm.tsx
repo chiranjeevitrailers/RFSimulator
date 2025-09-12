@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { validateAdminCredentials, LOGIN_CREDENTIALS } from '@/lib/admin-credentials';
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -49,15 +50,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
     setErrors({});
 
     try {
-      // Mock authentication for static export
-      if (formData.email && formData.password) {
-        if (isAdmin) {
+      if (isAdmin) {
+        // Validate admin credentials
+        const result = validateAdminCredentials(formData.email, formData.password);
+        if (result.success) {
+          // Store admin user in localStorage for demo
+          localStorage.setItem('adminUser', JSON.stringify(result.user));
           router.push('/admin-dashboard');
         } else {
-          router.push('/user-dashboard');
+          setErrors({ general: result.error });
         }
       } else {
-        setErrors({ general: 'Please enter email and password' });
+        // Regular user authentication (mock)
+        if (formData.email && formData.password) {
+          router.push('/user-dashboard');
+        } else {
+          setErrors({ general: 'Please enter email and password' });
+        }
       }
     } catch (error: any) {
       console.error('Login error:', error);
@@ -236,6 +245,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
               >
                 Admin Access
               </Link>
+            </div>
+          )}
+
+          {/* Admin Credentials Display */}
+          {isAdmin && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-900 mb-2">Admin Credentials:</h4>
+              <div className="space-y-1 text-xs text-blue-800">
+                <div><strong>Email:</strong> admin@5glabx.com</div>
+                <div><strong>Password:</strong> 5GLabX@Admin2024!</div>
+                <div className="mt-2 text-blue-600">
+                  <strong>Super Admin:</strong> superadmin@5glabx.com / SuperAdmin@5GLabX2024!
+                </div>
+                <div className="text-blue-600">
+                  <strong>Manager:</strong> manager@5glabx.com / Manager@5GLabX2024!
+                </div>
+              </div>
             </div>
           )}
         </form>

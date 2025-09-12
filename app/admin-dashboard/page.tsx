@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Users, BarChart3, FileText, Settings } from 'lucide-react';
+import { Users, BarChart3, FileText, Settings, Edit3 } from 'lucide-react';
+import HomepageEditor from '@/components/admin/HomepageEditor';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -9,6 +10,7 @@ const AdminDashboard: React.FC = () => {
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'homepage', name: 'Homepage Editor', icon: <Edit3 className="w-4 h-4" /> },
     { id: 'users', name: 'Users', icon: <Users className="w-4 h-4" /> },
     { id: 'test-cases', name: 'Test Cases', icon: <FileText className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
@@ -76,12 +78,97 @@ const AdminDashboard: React.FC = () => {
               </p>
             </div>
             
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Users className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Users</p>
+                    <p className="text-2xl font-bold text-gray-900">1,234</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <FileText className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Test Cases</p>
+                    <p className="text-2xl font-bold text-gray-900">5,678</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <BarChart3 className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Active Services</p>
+                    <p className="text-2xl font-bold text-gray-900">89</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Settings className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Equipment</p>
+                    <p className="text-2xl font-bold text-gray-900">156</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Overview Dashboard</h3>
-              <p className="text-gray-600">Dashboard content coming soon...</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  onClick={() => setActiveTab('homepage')}
+                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Edit3 className="w-5 h-5 text-primary-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Edit Homepage</p>
+                    <p className="text-sm text-gray-600">Update homepage content</p>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Users className="w-5 h-5 text-primary-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Manage Users</p>
+                    <p className="text-sm text-gray-600">User management</p>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Settings className="w-5 h-5 text-primary-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">System Settings</p>
+                    <p className="text-sm text-gray-600">Configure system</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         )}
+
+        {activeTab === 'homepage' && <HomepageEditor />}
 
         {activeTab === 'users' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
