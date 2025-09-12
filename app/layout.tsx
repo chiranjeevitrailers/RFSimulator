@@ -91,6 +91,18 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Handle external service worker errors
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('error', (event) => {
+                  console.warn('Service worker error handled:', event);
+                });
+              }
+            `,
+          }}
+        />
         <Toaster
           position="top-right"
           toastOptions={{
