@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: '5GLabX Team' }],
   creator: '5GLabX',
+  manifest: '/site.webmanifest',
   publisher: '5GLabX',
   formatDetection: {
     email: false,

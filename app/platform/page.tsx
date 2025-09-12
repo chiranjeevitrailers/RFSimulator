@@ -38,6 +38,67 @@ const PlatformPage: React.FC = () => {
         }
       }
     }
+
+    // Load 5GLabX Platform
+    const load5GLabXPlatform = () => {
+      const rootElement = document.getElementById('5glabx-platform-root');
+      if (!rootElement) return;
+
+      // Create a container for the 5GLabX platform
+      const platformContainer = document.createElement('div');
+      platformContainer.id = 'root';
+      platformContainer.className = 'w-full h-full';
+      rootElement.appendChild(platformContainer);
+
+      // Load the 5GLabX platform styles
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/styles.css';
+      document.head.appendChild(link);
+
+      // Load external dependencies
+      const scripts = [
+        'https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/lucide@0.513.0/lucide.min.js',
+        'https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js'
+      ];
+
+      const loadScript = (src: string) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      const loadAllScripts = async () => {
+        try {
+          for (const src of scripts) {
+            await loadScript(src);
+          }
+          
+          // Load the 5GLabX platform app
+          const appScript = document.createElement('script');
+          appScript.src = '/app.js';
+          appScript.type = 'text/babel';
+          appScript.onload = () => {
+            console.log('5GLabX Platform loaded successfully');
+          };
+          document.head.appendChild(appScript);
+        } catch (error) {
+          console.error('Error loading 5GLabX Platform:', error);
+        }
+      };
+
+      loadAllScripts();
+    };
+
+    // Load platform after a short delay to ensure DOM is ready
+    setTimeout(load5GLabXPlatform, 100);
   }, []);
 
   const handleSignOut = () => {
@@ -143,17 +204,9 @@ const PlatformPage: React.FC = () => {
         {/* Main Content - 5GLabX Platform */}
         <main className="flex-1">
           <div className="h-screen">
-            <iframe
-              src="/index.html"
-              className="w-full h-full border-0"
-              title="5GLabX Platform"
-              style={{ 
-                width: '100%', 
-                height: '100%', 
-                border: 'none',
-                display: 'block'
-              }}
-            />
+            <div id="5glabx-platform-root" className="w-full h-full">
+              {/* 5GLabX Platform will be loaded here */}
+            </div>
           </div>
         </main>
 
