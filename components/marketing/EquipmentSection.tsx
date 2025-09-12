@@ -220,8 +220,8 @@ const EquipmentSection: React.FC = () => {
                           <Antenna className="w-5 h-5 text-primary-600" />
                         </div>
                         <div>
-                          <h5 className="font-semibold text-gray-900">5G Base Station A1</h5>
-                          <p className="text-sm text-gray-600">Ericsson AIR 6449</p>
+                          <h5 className="font-semibold text-gray-900">5GLabX Base Station A1</h5>
+                          <p className="text-sm text-gray-600">5GLabX --&gt;4G&5G LAB BS-001</p>
                         </div>
                       </div>
                       <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -229,10 +229,10 @@ const EquipmentSection: React.FC = () => {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      <div>Serial: SN123456789</div>
-                      <div>Firmware: v2.1.3</div>
-                      <div>Location: Lab A</div>
-                      <div>Frequency: 3.5-3.7 GHz</div>
+                      <div>Serial: 5GLabX-SN-001</div>
+                      <div>Firmware: 5GLabX-v2.1.3</div>
+                      <div>Location: 5GLabX Lab A</div>
+                      <div>Frequency: 5GLabX 3.5-3.7 GHz</div>
                     </div>
                   </div>
 
@@ -243,8 +243,8 @@ const EquipmentSection: React.FC = () => {
                           <Smartphone className="w-5 h-5 text-primary-600" />
                         </div>
                         <div>
-                          <h5 className="font-semibold text-gray-900">Test UE Device</h5>
-                          <p className="text-sm text-gray-600">Samsung Galaxy S21</p>
+                          <h5 className="font-semibold text-gray-900">5GLabX Test UE Device</h5>
+                          <p className="text-sm text-gray-600">5GLabX --&gt;4G&5G LAB UE-001</p>
                         </div>
                       </div>
                       <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
@@ -252,10 +252,10 @@ const EquipmentSection: React.FC = () => {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      <div>Serial: SN987654321</div>
-                      <div>Firmware: v1.8.2</div>
-                      <div>Location: Test Bench</div>
-                      <div>Protocol: 5G NR</div>
+                      <div>Serial: 5GLabX-SN-002</div>
+                      <div>Firmware: 5GLabX-v1.8.2</div>
+                      <div>Location: 5GLabX Test Bench</div>
+                      <div>Protocol: 5GLabX 5G NR</div>
                     </div>
                   </div>
 
@@ -266,8 +266,8 @@ const EquipmentSection: React.FC = () => {
                           <Cpu className="w-5 h-5 text-primary-600" />
                         </div>
                         <div>
-                          <h5 className="font-semibold text-gray-900">Signal Analyzer</h5>
-                          <p className="text-sm text-gray-600">Keysight N9040B</p>
+                          <h5 className="font-semibold text-gray-900">5GLabX Signal Analyzer</h5>
+                          <p className="text-sm text-gray-600">5GLabX --&gt;4G&5G LAB SA-001</p>
                         </div>
                       </div>
                       <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -275,10 +275,10 @@ const EquipmentSection: React.FC = () => {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      <div>Serial: SN555666777</div>
-                      <div>Firmware: v3.2.1</div>
-                      <div>Location: Rack 2</div>
-                      <div>Range: 1Hz-44GHz</div>
+                      <div>Serial: 5GLabX-SN-003</div>
+                      <div>Firmware: 5GLabX-v3.2.1</div>
+                      <div>Location: 5GLabX Rack 2</div>
+                      <div>Range: 5GLabX 1Hz-44GHz</div>
                     </div>
                   </div>
                 </div>

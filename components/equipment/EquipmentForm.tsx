@@ -48,9 +48,9 @@ const equipmentTypes = [
 ];
 
 const manufacturers = [
-  'Ericsson', 'Nokia', 'Huawei', 'Samsung', 'Qualcomm', 'Intel',
-  'Keysight', 'Rohde & Schwarz', 'Anritsu', 'VIAVI', 'Spirent',
-  'Cisco', 'Juniper', 'Dell', 'HP', 'IBM', 'Other'
+  '5GLabX -->4G&5G LAB', '5GLabX Custom', '5GLabX Pro', '5GLabX Enterprise',
+  '5GLabX Test', '5GLabX Development', '5GLabX Research', '5GLabX Innovation',
+  '5GLabX Advanced', '5GLabX Premium', '5GLabX Standard', 'Other'
 ];
 
 const EquipmentForm: React.FC = () => {
@@ -343,7 +343,7 @@ const EquipmentForm: React.FC = () => {
                       value={formData.model || ''}
                       onChange={(e) => handleInputChange('model', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="e.g., AIR 6449"
+                      placeholder="e.g., 5GLabX-BS-001"
                     />
                   </div>
 
@@ -357,7 +357,7 @@ const EquipmentForm: React.FC = () => {
                       value={formData.serialNumber || ''}
                       onChange={(e) => handleInputChange('serialNumber', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="e.g., SN123456789"
+                      placeholder="e.g., 5GLabX-SN-001"
                     />
                   </div>
 
@@ -370,7 +370,7 @@ const EquipmentForm: React.FC = () => {
                       value={formData.firmwareVersion || ''}
                       onChange={(e) => handleInputChange('firmwareVersion', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="e.g., v2.1.3"
+                      placeholder="e.g., 5GLabX-v2.1.3"
                     />
                   </div>
 
@@ -398,7 +398,7 @@ const EquipmentForm: React.FC = () => {
                       value={formData.location || ''}
                       onChange={(e) => handleInputChange('location', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="e.g., Lab Room A, Rack 1"
+                      placeholder="e.g., 5GLabX Lab A, Rack 1"
                     />
                   </div>
                 </div>
@@ -416,7 +416,7 @@ const EquipmentForm: React.FC = () => {
                         value={formData.specifications?.frequency || ''}
                         onChange={(e) => handleInputChange('specifications.frequency', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="e.g., 3.5-3.7 GHz"
+                        placeholder="e.g., 5GLabX 3.5-3.7 GHz"
                       />
                     </div>
 
@@ -429,7 +429,7 @@ const EquipmentForm: React.FC = () => {
                         value={formData.specifications?.power || ''}
                         onChange={(e) => handleInputChange('specifications.power', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="e.g., 40W"
+                        placeholder="e.g., 5GLabX 40W"
                       />
                     </div>
 
@@ -442,7 +442,7 @@ const EquipmentForm: React.FC = () => {
                         value={formData.specifications?.range || ''}
                         onChange={(e) => handleInputChange('specifications.range', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="e.g., 2km radius"
+                        placeholder="e.g., 5GLabX 2km radius"
                       />
                     </div>
 
@@ -455,7 +455,7 @@ const EquipmentForm: React.FC = () => {
                         value={formData.specifications?.capacity || ''}
                         onChange={(e) => handleInputChange('specifications.capacity', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="e.g., 1000 concurrent users"
+                        placeholder="e.g., 5GLabX 1000 concurrent users"
                       />
                     </div>
 
@@ -468,7 +468,7 @@ const EquipmentForm: React.FC = () => {
                         value={formData.specifications?.protocol || ''}
                         onChange={(e) => handleInputChange('specifications.protocol', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="e.g., 5G NR, LTE, 3GPP Release 16"
+                        placeholder="e.g., 5GLabX 5G NR, LTE, 3GPP Release 16"
                       />
                     </div>
                   </div>
