@@ -1,12 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Users, BarChart3, FileText, Settings, Edit3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Users, BarChart3, FileText, Settings, Edit3, LogOut } from 'lucide-react';
 import HomepageEditor from '@/components/admin/HomepageEditor';
+import AuthGuard from '@/components/auth/AuthGuard';
+import { sessionManager } from '@/lib/session-manager';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    // Clear all sessions using session manager
+    sessionManager.clearAllSessions();
+    
+    // Redirect to admin login page
+    router.push('/admin/login');
+  };
+
+  useEffect(() => {
+    // Ensure we're on the client side
+    setIsClient(true);
+  }, []);
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
@@ -15,6 +33,18 @@ const AdminDashboard: React.FC = () => {
     { id: 'test-cases', name: 'Test Cases', icon: <FileText className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
+
+  // Don't render on server side
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -28,18 +58,26 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AuthGuard requireAuth={true} requireAdmin={true} redirectTo="/admin/login">
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">5G</span>
                 </div>
                 <span className="text-xl font-bold text-gray-900">5GLabX Admin</span>
               </div>
+              <button 
+                onClick={handleSignOut}
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
@@ -192,7 +230,11 @@ const AdminDashboard: React.FC = () => {
         )}
       </div>
     </div>
+    </AuthGuard>
   );
 };
+
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
 
 export default AdminDashboard;

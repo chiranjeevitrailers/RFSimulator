@@ -7,7 +7,7 @@ import AuthGuard from '@/components/auth/AuthGuard';
 import { sessionManager } from '@/lib/session-manager';
 import { subscriptionManager } from '@/lib/subscription-manager';
 
-const UserDashboard: React.FC = () => {
+const PlatformPage: React.FC = () => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -39,63 +39,62 @@ const UserDashboard: React.FC = () => {
       }
     }
 
-    // Load 5GLabX Platform - Simple iframe approach
+    // Load 5GLabX Platform
     const load5GLabXPlatform = () => {
-      console.log('Starting to load 5GLabX Platform...');
       const rootElement = document.getElementById('5glabx-platform-root');
-      if (!rootElement) {
-        console.error('5glabx-platform-root element not found!');
-        return;
-      }
-      console.log('Found 5glabx-platform-root element:', rootElement);
+      if (!rootElement) return;
 
-      // Create iframe to load the 5GLabX platform
-      const iframe = document.createElement('iframe');
-      iframe.src = '/index.html';
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = 'none';
-      iframe.title = '5GLabX Platform';
-      iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
-      
-      console.log('Created iframe with src:', iframe.src);
-      
-      // Add loading indicator
-      const loadingDiv = document.createElement('div');
-      loadingDiv.className = 'flex items-center justify-center h-full bg-gray-100';
-      loadingDiv.innerHTML = `
-        <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p class="text-gray-600">Loading 5GLabX Platform...</p>
-        </div>
-      `;
-      
-      rootElement.appendChild(loadingDiv);
-      
-      iframe.onload = () => {
-        console.log('5GLabX Platform iframe loaded successfully');
-        rootElement.removeChild(loadingDiv);
-        rootElement.appendChild(iframe);
-        console.log('5GLabX Platform loaded successfully');
+      // Create a container for the 5GLabX platform
+      const platformContainer = document.createElement('div');
+      platformContainer.id = 'root';
+      platformContainer.className = 'w-full h-full';
+      rootElement.appendChild(platformContainer);
+
+      // Load the 5GLabX platform styles
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/styles.css';
+      document.head.appendChild(link);
+
+      // Load external dependencies
+      const scripts = [
+        'https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js',
+        'https://resource.trickle.so/vendor_lib/unpkg/lucide@0.513.0/lucide.min.js',
+        'https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js'
+      ];
+
+      const loadScript = (src: string) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
       };
-      
-      iframe.onerror = (error) => {
-        console.error('5GLabX Platform iframe failed to load:', error);
-        loadingDiv.innerHTML = `
-          <div class="text-center">
-            <div class="text-red-600 mb-4">
-              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Failed to Load Platform</h3>
-            <p class="text-gray-600 mb-4">There was an error loading the 5GLabX platform.</p>
-            <button onclick="location.reload()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-              Retry
-            </button>
-          </div>
-        `;
+
+      const loadAllScripts = async () => {
+        try {
+          for (const src of scripts) {
+            await loadScript(src);
+          }
+          
+          // Load the 5GLabX platform app
+          const appScript = document.createElement('script');
+          appScript.src = '/app.js';
+          appScript.type = 'text/babel';
+          appScript.onload = () => {
+            console.log('5GLabX Platform loaded successfully');
+          };
+          document.head.appendChild(appScript);
+        } catch (error) {
+          console.error('Error loading 5GLabX Platform:', error);
+        }
       };
+
+      loadAllScripts();
     };
 
     // Load platform after a short delay to ensure DOM is ready
@@ -110,6 +109,7 @@ const UserDashboard: React.FC = () => {
     router.push('/login');
   };
 
+  // Don't render on server side
   if (!isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -123,18 +123,30 @@ const UserDashboard: React.FC = () => {
 
   return (
     <AuthGuard requireAuth={true} requireAdmin={false} redirectTo="/login">
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <h1 className="text-xl font-bold text-primary-600">5GLabX Platform</h1>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header with User Info and Sign Out */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">5G</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">5GLabX Platform</h1>
+                    <p className="text-sm text-gray-600">Professional Protocol Analyzer & Network Simulation</p>
+                  </div>
                 </div>
               </div>
+              
               <div className="flex items-center space-x-4">
-                {/* Subscription Status Display */}
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-sm text-gray-600">Platform Active</span>
+                </div>
+                
+                {/* Subscription Status */}
                 {subscriptionStatus && (
                   <div className="flex items-center space-x-2">
                     {subscriptionStatus.isTrial ? (
@@ -148,12 +160,15 @@ const UserDashboard: React.FC = () => {
                         <span>Subscribed</span>
                       </div>
                     )}
+                    
+                    {/* Trial Usage Warning */}
                     {subscriptionStatus.isTrial && subscriptionStatus.usage && (
                       <div className="flex items-center space-x-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
                         <AlertTriangle className="w-3 h-3" />
                         <span>{subscriptionStatus.usage.testCasesThisMonth}/3 test cases used</span>
                       </div>
                     )}
+                    
                     <button
                       onClick={() => setShowSubscriptionModal(true)}
                       className="text-xs text-blue-600 hover:text-blue-800 underline"
@@ -162,6 +177,7 @@ const UserDashboard: React.FC = () => {
                     </button>
                   </div>
                 )}
+                
                 {user && (
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
@@ -172,6 +188,7 @@ const UserDashboard: React.FC = () => {
                     </span>
                   </div>
                 )}
+                
                 <button
                   onClick={handleSignOut}
                   className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -207,6 +224,7 @@ const UserDashboard: React.FC = () => {
                     ×
                   </button>
                 </div>
+                
                 {subscriptionStatus && (
                   <div className="space-y-4">
                     <div className="bg-gray-50 rounded-lg p-4">
@@ -216,6 +234,7 @@ const UserDashboard: React.FC = () => {
                           {subscriptionStatus.isTrial ? 'Free Trial' : 'Professional'}
                         </span>
                       </div>
+                      
                       {subscriptionStatus.isTrial && (
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2 text-yellow-600 text-sm">
@@ -231,6 +250,7 @@ const UserDashboard: React.FC = () => {
                         </div>
                       )}
                     </div>
+                    
                     {subscriptionStatus.usage && (
                       <div className="space-y-2">
                         <h4 className="font-medium text-gray-900">Usage This Month</h4>
@@ -241,6 +261,7 @@ const UserDashboard: React.FC = () => {
                         </div>
                       </div>
                     )}
+                    
                     <div className="flex space-x-3 pt-4">
                       <button
                         onClick={() => {
@@ -272,4 +293,4 @@ const UserDashboard: React.FC = () => {
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
 
-export default UserDashboard;
+export default PlatformPage;

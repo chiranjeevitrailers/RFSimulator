@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/auth';
+import { sessionManager } from '@/lib/session-manager';
 import { Loader2 } from 'lucide-react';
 
 interface AuthGuardProps {
@@ -26,32 +27,38 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const user = await auth.getCurrentUser();
-        
-        if (user) {
-          setIsAuthenticated(true);
-          
-          // Check if user is admin
-          if (requireAdmin) {
-            const userRole = await auth.getUserRole(user.id);
-            setIsAdmin(userRole === 'admin');
-            
-            if (userRole !== 'admin') {
-              router.push('/user-dashboard');
-              return;
-            }
-          }
-        } else {
-          setIsAuthenticated(false);
-          
-          if (requireAuth) {
+        // Check for admin authentication
+        if (requireAdmin) {
+          const isAdminAuth = sessionManager.isAdminAuthenticated();
+          if (isAdminAuth) {
+            setIsAuthenticated(true);
+            setIsAdmin(true);
+          } else {
+            setIsAuthenticated(false);
+            setIsAdmin(false);
             router.push(redirectTo);
             return;
+          }
+        } else {
+          // Check for regular user authentication
+          const isUserAuth = sessionManager.isUserAuthenticated();
+          if (isUserAuth) {
+            setIsAuthenticated(true);
+            setIsAdmin(false);
+          } else {
+            setIsAuthenticated(false);
+            setIsAdmin(false);
+            
+            if (requireAuth) {
+              router.push(redirectTo);
+              return;
+            }
           }
         }
       } catch (error) {
         console.error('Auth check error:', error);
         setIsAuthenticated(false);
+        setIsAdmin(false);
         
         if (requireAuth) {
           router.push(redirectTo);
