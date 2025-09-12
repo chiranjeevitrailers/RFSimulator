@@ -111,10 +111,6 @@
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },
-  "resolutions": {
-    "@humanwhocodes/config-array": "^0.14.0",
-    "@humanwhocodes/object-schema": "^2.0.4"
-  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
