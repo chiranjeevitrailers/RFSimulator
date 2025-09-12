@@ -19,6 +19,8 @@ import {
   MessageSquare,
   Layers
 } from 'lucide-react';
+import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
+import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -31,6 +33,7 @@ const UserDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('simulations');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+  const [protocolAnalyzerView, setProtocolAnalyzerView] = useState<'dashboard' | 'analyzer'>('dashboard');
 
   useEffect(() => {
     // Mock user loading for static export
@@ -331,9 +334,72 @@ const UserDashboard: React.FC = () => {
             )}
 
             {activeTab === 'protocol-analyzer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Analyzer</h3>
-                <p className="text-gray-600">Protocol analyzer coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                {protocolAnalyzerView === 'dashboard' ? (
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900">Protocol Analyzer</h3>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setProtocolAnalyzerView('dashboard')}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                            protocolAnalyzerView === 'dashboard'
+                              ? 'bg-primary-100 text-primary-700'
+                              : 'text-gray-600 hover:text-gray-700'
+                          }`}
+                        >
+                          Dashboard
+                        </button>
+                        <button
+                          onClick={() => setProtocolAnalyzerView('analyzer')}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                            protocolAnalyzerView === 'analyzer'
+                              ? 'bg-primary-100 text-primary-700'
+                              : 'text-gray-600 hover:text-gray-700'
+                          }`}
+                        >
+                          Live Analyzer
+                        </button>
+                      </div>
+                    </div>
+                    <ProtocolAnalyzerDashboard />
+                  </div>
+                ) : (
+                  <div>
+                    <div className="p-4 border-b border-gray-200 bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900">Live Protocol Analyzer</h3>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => setProtocolAnalyzerView('dashboard')}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                              protocolAnalyzerView === 'dashboard'
+                                ? 'bg-primary-100 text-primary-700'
+                                : 'text-gray-600 hover:text-gray-700'
+                            }`}
+                          >
+                            Dashboard
+                          </button>
+                          <button
+                            onClick={() => setProtocolAnalyzerView('analyzer')}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                              protocolAnalyzerView === 'analyzer'
+                                ? 'bg-primary-100 text-primary-700'
+                                : 'text-gray-600 hover:text-gray-700'
+                            }`}
+                          >
+                            Live Analyzer
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <ProtocolAnalyzerViewer 
+                      executionId="exec-001"
+                      testCaseId="tc-5g-nr-random-access"
+                      userId="user-1"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
