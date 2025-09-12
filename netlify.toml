@@ -82,7 +82,7 @@
 
 # Plugin configuration
 [[plugins]]
-  package = "@netlify/plugin-nextjs@5.13.1"
+  package = "@netlify/plugin-nextjs"
 
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
