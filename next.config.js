@@ -21,6 +21,12 @@ const nextConfig = {
   
   // Webpack configuration to handle module resolution
   webpack: (config, { isServer }) => {
+    // Add explicit path aliases for better module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, '.'),
+    };
+    
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
