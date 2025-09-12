@@ -14,6 +14,9 @@ import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
 import ProfessionalTestCaseViewer from '@/components/test-cases/ProfessionalTestCaseViewer';
 import DetailedTestCaseViewer from '@/components/test-cases/DetailedTestCaseViewer';
+import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
+import LogViewer from '@/components/logs/LogViewer';
+import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
 import { 
   Activity, 
   BarChart3, 
@@ -26,7 +29,10 @@ import {
   HelpCircle,
   Shield,
   Award,
-  Database
+  Database,
+  Monitor,
+  MessageSquare,
+  Layers
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -191,6 +197,39 @@ const UserDashboard: React.FC = () => {
               <Database className="w-4 h-4 inline mr-2" />
               Detailed Analysis
             </button>
+            <button
+              onClick={() => setActiveTab('protocol-analyzer')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'protocol-analyzer'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Monitor className="w-4 h-4 inline mr-2" />
+              Protocol Analyzer
+            </button>
+            <button
+              onClick={() => setActiveTab('log-viewer')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'log-viewer'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4 inline mr-2" />
+              Log Viewer
+            </button>
+            <button
+              onClick={() => setActiveTab('protocol-layers')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'protocol-layers'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Layers className="w-4 h-4 inline mr-2" />
+              Protocol Layers
+            </button>
                 <button
                   onClick={() => setActiveTab('monitoring')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -286,6 +325,32 @@ const UserDashboard: React.FC = () => {
 
             {activeTab === 'detailed-test-cases' && (
               <DetailedTestCaseViewer userId={user.id} />
+            )}
+
+            {activeTab === 'protocol-analyzer' && (
+              <ProtocolAnalyzerViewer 
+                executionId="exec_123" 
+                testCaseId="5NR_INIT_0001" 
+                userId={user.id} 
+              />
+            )}
+
+            {activeTab === 'log-viewer' && (
+              <LogViewer 
+                executionId="exec_123" 
+                testCaseId="5NR_INIT_0001" 
+                userId={user.id} 
+                mode="enhanced"
+              />
+            )}
+
+            {activeTab === 'protocol-layers' && (
+              <ProtocolLayerDisplay 
+                executionId="exec_123" 
+                testCaseId="5NR_INIT_0001" 
+                userId={user.id} 
+                selectedLayers={['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS']}
+              />
             )}
       </main>
     </div>
