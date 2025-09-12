@@ -2,6 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  SubscriptionTab,
+  SimulationsTab,
+  ExecutionsTab,
+  RealTimeTab,
+  AnalyticsTab,
+  APIDocsTab,
+  APITestingTab,
+  ThreeGPPTestCasesTab,
+  ProfessionalTestCasesTab,
+  DetailedTestCasesTab,
+  ProtocolAnalyzerTab,
+  LogViewerTab,
+  ProtocolLayersTab,
+  MonitoringTab,
+  SettingsTab
+} from '@/components/dashboard/DashboardTabs';
 import { 
   Activity, 
   BarChart3, 
@@ -17,7 +34,65 @@ import {
   Database,
   Monitor,
   MessageSquare,
-  Layers
+  Layers,
+  CreditCard,
+  Crown,
+  Star,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Zap,
+  Globe,
+  Server,
+  Cpu,
+  MemoryStick,
+  HardDrive,
+  Network,
+  Router,
+  Switch,
+  Smartphone,
+  Wifi,
+  Signal,
+  Battery,
+  Volume2,
+  VolumeX,
+  Eye,
+  EyeOff,
+  Download,
+  Upload,
+  RefreshCw,
+  Filter,
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  Copy,
+  Share,
+  ExternalLink,
+  Maximize2,
+  Minimize2,
+  Pause,
+  Square,
+  RotateCcw,
+  Code,
+  TrendingUp,
+  Target,
+  Info,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle2,
+  AlertCircle,
+  Calendar,
+  Save,
+  Send,
+  FileText as FileTextIcon,
+  BookOpen,
+  Terminal,
+  Command,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  ChevronLeft
 } from 'lucide-react';
 
 const UserDashboard: React.FC = () => {
@@ -212,6 +287,17 @@ const UserDashboard: React.FC = () => {
                   Monitoring
                 </button>
                 <button
+                  onClick={() => setActiveTab('subscription')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'subscription'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Crown className="w-4 h-4 inline mr-2" />
+                  Subscription
+                </button>
+                <button
                   onClick={() => setActiveTab('settings')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     activeTab === 'settings'
@@ -253,103 +339,21 @@ const UserDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'simulations' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Simulation Dashboard</h3>
-            <p className="text-gray-600">Simulation dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'executions' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Execution Dashboard</h3>
-            <p className="text-gray-600">Test execution dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'realtime' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Real-Time Simulation View</h3>
-            <p className="text-gray-600">Real-time simulation view coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
-            <p className="text-gray-600">Analytics dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'settings' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Monitor</h3>
-            <p className="text-gray-600">Performance monitor coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'api-docs' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Documentation</h3>
-            <p className="text-gray-600">API documentation coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'api-testing' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Testing Interface</h3>
-            <p className="text-gray-600">API testing interface coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'monitoring' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monitoring Dashboard</h3>
-            <p className="text-gray-600">Monitoring dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === '3gpp-test-cases' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">3GPP Test Cases</h3>
-            <p className="text-gray-600">3GPP test cases viewer coming soon...</p>
-          </div>
-        )}
-        
-            {activeTab === 'professional-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional Test Cases</h3>
-                <p className="text-gray-600">Professional test cases viewer coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === 'detailed-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Cases</h3>
-                <p className="text-gray-600">Detailed test cases viewer coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === 'protocol-analyzer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Analyzer</h3>
-                <p className="text-gray-600">Protocol analyzer coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === 'log-viewer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Viewer</h3>
-                <p className="text-gray-600">Log viewer coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === 'protocol-layers' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
-                <p className="text-gray-600">Protocol layers display coming soon...</p>
-              </div>
-            )}
+        {activeTab === 'simulations' && <SimulationsTab />}
+        {activeTab === 'executions' && <ExecutionsTab />}
+        {activeTab === 'realtime' && <RealTimeTab />}
+        {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'api-docs' && <APIDocsTab />}
+        {activeTab === 'api-testing' && <APITestingTab />}
+        {activeTab === '3gpp-test-cases' && <ThreeGPPTestCasesTab />}
+        {activeTab === 'professional-test-cases' && <ProfessionalTestCasesTab />}
+        {activeTab === 'detailed-test-cases' && <DetailedTestCasesTab />}
+        {activeTab === 'protocol-analyzer' && <ProtocolAnalyzerTab />}
+        {activeTab === 'log-viewer' && <LogViewerTab />}
+        {activeTab === 'protocol-layers' && <ProtocolLayersTab />}
+        {activeTab === 'monitoring' && <MonitoringTab />}
+        {activeTab === 'subscription' && <SubscriptionTab />}
+        {activeTab === 'settings' && <SettingsTab />}
       </main>
     </div>
   );
