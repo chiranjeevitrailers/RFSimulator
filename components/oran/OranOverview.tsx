@@ -1,20 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Server, 
-  Link, 
-  Activity, 
-  Clock, 
-  Wifi, 
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  TrendingUp,
-  TrendingDown
-} from 'lucide-react';
 
 interface OranNode {
   id: string;
@@ -147,12 +133,9 @@ const OranOverview: React.FC<OranOverviewProps> = ({
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Wifi className="w-8 h-8 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">O-RAN Network Overview</h1>
-            <p className="text-sm text-gray-600">Real-time O-RAN network monitoring and analysis</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">O-RAN Network Overview</h1>
+          <p className="text-sm text-gray-600">Real-time O-RAN network monitoring and analysis</p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -162,142 +145,101 @@ const OranOverview: React.FC<OranOverviewProps> = ({
 
       {/* Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600">Total Nodes</h3>
-              <Server className="w-5 h-5 text-blue-500" />
-            </div>
-            <div className="text-3xl font-bold text-blue-600">{oranStatus.totalNodes}</div>
-            <p className="text-sm text-gray-500 mt-1">{oranStatus.activeNodes} active</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-sm font-medium text-gray-600 mb-4">Total Nodes</h3>
+          <div className="text-3xl font-bold text-blue-600">{oranStatus.totalNodes}</div>
+          <p className="text-sm text-gray-500 mt-1">{oranStatus.activeNodes} active</p>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600">Interfaces</h3>
-              <Link className="w-5 h-5 text-green-500" />
-            </div>
-            <div className="text-3xl font-bold text-green-600">{oranStatus.totalInterfaces}</div>
-            <p className="text-sm text-gray-500 mt-1">{oranStatus.activeInterfaces} up</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-sm font-medium text-gray-600 mb-4">Interfaces</h3>
+          <div className="text-3xl font-bold text-green-600">{oranStatus.totalInterfaces}</div>
+          <p className="text-sm text-gray-500 mt-1">{oranStatus.activeInterfaces} up</p>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600">Throughput</h3>
-              <Activity className="w-5 h-5 text-purple-500" />
-            </div>
-            <div className="text-3xl font-bold text-purple-600">{Math.floor(oranStatus.throughput)}</div>
-            <p className="text-sm text-gray-500 mt-1">Mbps total network</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-sm font-medium text-gray-600 mb-4">Throughput</h3>
+          <div className="text-3xl font-bold text-purple-600">{Math.floor(oranStatus.throughput)}</div>
+          <p className="text-sm text-gray-500 mt-1">Mbps total network</p>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600">Avg Latency</h3>
-              <Clock className="w-5 h-5 text-orange-500" />
-            </div>
-            <div className="text-3xl font-bold text-orange-600">{oranStatus.latency.toFixed(1)}</div>
-            <p className="text-sm text-gray-500 mt-1">ms network latency</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-sm font-medium text-gray-600 mb-4">Avg Latency</h3>
+          <div className="text-3xl font-bold text-orange-600">{oranStatus.latency.toFixed(1)}</div>
+          <p className="text-sm text-gray-500 mt-1">ms network latency</p>
+        </div>
       </div>
 
       {/* Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* O-RAN Nodes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Server className="w-5 h-5 mr-2" />
-              O-RAN Nodes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {nodes.map((node) => (
-                <div key={node.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${node.status === 'online' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <div>
-                      <div className="font-medium text-gray-900">{node.name}</div>
-                      <div className="text-sm text-gray-500">{node.ipAddress}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={getNodeTypeColor(node.type)}>
-                      {node.type.toUpperCase()}
-                    </Badge>
-                    <div className="text-right text-sm">
-                      <div>CPU: {node.cpu}%</div>
-                      <div>RAM: {node.memory}%</div>
-                    </div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">O-RAN Nodes</h3>
+          <div className="space-y-3">
+            {nodes.map((node) => (
+              <div key={node.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${node.status === 'online' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <div>
+                    <div className="font-medium text-gray-900">{node.name}</div>
+                    <div className="text-sm text-gray-500">{node.ipAddress}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="flex items-center space-x-2">
+                  <span className={`px-2 py-1 rounded text-xs ${getNodeTypeColor(node.type)}`}>
+                    {node.type.toUpperCase()}
+                  </span>
+                  <div className="text-right text-sm">
+                    <div>CPU: {node.cpu}%</div>
+                    <div>RAM: {node.memory}%</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Interface Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Link className="w-5 h-5 mr-2" />
-              Interface Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {interfaces.map((intf) => (
-                <div key={intf.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${intf.status === 'up' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <div>
-                      <div className="font-medium text-gray-900">{intf.type.toUpperCase()}</div>
-                      <div className="text-sm text-gray-500">{intf.latency}ms latency</div>
-                    </div>
-                  </div>
-                  <div className="text-right text-sm">
-                    <div className="font-medium">{intf.throughput} Mbps</div>
-                    <div className="text-red-600">{intf.errorRate.toFixed(2)}% errors</div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Interface Status</h3>
+          <div className="space-y-3">
+            {interfaces.map((intf) => (
+              <div key={intf.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${intf.status === 'up' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <div>
+                    <div className="font-medium text-gray-900">{intf.type.toUpperCase()}</div>
+                    <div className="text-sm text-gray-500">{intf.latency}ms latency</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="text-right text-sm">
+                  <div className="font-medium">{intf.throughput} Mbps</div>
+                  <div className="text-red-600">{intf.errorRate.toFixed(2)}% errors</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Performance Trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2" />
-            Network Performance Trends
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">98.5%</div>
-              <div className="text-sm text-gray-600">Network Uptime</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">2.3ms</div>
-              <div className="text-sm text-gray-600">Average Latency</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">1.2Gbps</div>
-              <div className="text-sm text-gray-600">Peak Throughput</div>
-            </div>
+      <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Network Performance Trends</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">98.5%</div>
+            <div className="text-sm text-gray-600">Network Uptime</div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">2.3ms</div>
+            <div className="text-sm text-gray-600">Average Latency</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">1.2Gbps</div>
+            <div className="text-sm text-gray-600">Peak Throughput</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

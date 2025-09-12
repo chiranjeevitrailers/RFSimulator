@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, BarChart3, FileText, Settings, Edit3, LogOut } from 'lucide-react';
 import HomepageEditor from '@/components/admin/HomepageEditor';
@@ -10,6 +10,7 @@ import { sessionManager } from '@/lib/session-manager';
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
   const handleSignOut = () => {
@@ -20,6 +21,11 @@ const AdminDashboard: React.FC = () => {
     router.push('/admin/login');
   };
 
+  useEffect(() => {
+    // Ensure we're on the client side
+    setIsClient(true);
+  }, []);
+
   const tabs = [
     { id: 'overview', name: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'homepage', name: 'Homepage Editor', icon: <Edit3 className="w-4 h-4" /> },
@@ -27,6 +33,18 @@ const AdminDashboard: React.FC = () => {
     { id: 'test-cases', name: 'Test Cases', icon: <FileText className="w-4 h-4" /> },
     { id: 'settings', name: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
+
+  // Don't render on server side
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -215,5 +233,8 @@ const AdminDashboard: React.FC = () => {
     </AuthGuard>
   );
 };
+
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
 
 export default AdminDashboard;

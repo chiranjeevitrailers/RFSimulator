@@ -31,6 +31,8 @@ class SessionManager {
 
   // Admin session management
   setAdminSession(adminData: Omit<AdminSession, 'loginTime'>): void {
+    if (typeof window === 'undefined') return;
+    
     const session: AdminSession = {
       ...adminData,
       loginTime: Date.now()
@@ -39,6 +41,8 @@ class SessionManager {
   }
 
   getAdminSession(): AdminSession | null {
+    if (typeof window === 'undefined') return null;
+    
     try {
       const sessionData = localStorage.getItem(this.ADMIN_SESSION_KEY);
       if (!sessionData) return null;
@@ -60,6 +64,7 @@ class SessionManager {
   }
 
   clearAdminSession(): void {
+    if (typeof window === 'undefined') return;
     localStorage.removeItem(this.ADMIN_SESSION_KEY);
   }
 
@@ -69,6 +74,8 @@ class SessionManager {
 
   // User session management
   setUserSession(userData: Omit<UserSession, 'loginTime'>): void {
+    if (typeof window === 'undefined') return;
+    
     const session: UserSession = {
       ...userData,
       loginTime: Date.now()
@@ -77,6 +84,8 @@ class SessionManager {
   }
 
   getUserSession(): UserSession | null {
+    if (typeof window === 'undefined') return null;
+    
     try {
       const sessionData = localStorage.getItem(this.USER_SESSION_KEY);
       if (!sessionData) return null;
@@ -98,6 +107,7 @@ class SessionManager {
   }
 
   clearUserSession(): void {
+    if (typeof window === 'undefined') return;
     localStorage.removeItem(this.USER_SESSION_KEY);
   }
 
@@ -107,6 +117,8 @@ class SessionManager {
 
   // Clear all sessions
   clearAllSessions(): void {
+    if (typeof window === 'undefined') return;
+    
     this.clearAdminSession();
     this.clearUserSession();
     localStorage.removeItem('auth_token');

@@ -23,14 +23,15 @@ import {
   Car,
   Satellite
 } from 'lucide-react';
-import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
-import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+// Temporarily comment out imports to isolate the issue
+// import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
+// import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
 import LogViewer from '@/components/logs/LogViewer';
 import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
-import OranOverview from '@/components/oran/OranOverview';
-import V2xOverview from '@/components/v2x/V2xOverview';
-import NtnOverview from '@/components/ntn/NtnOverview';
-import NbiotOverview from '@/components/nbiot/NbiotOverview';
+// import OranOverview from '@/components/oran/OranOverview';
+// import V2xOverview from '@/components/v2x/V2xOverview';
+// import NtnOverview from '@/components/ntn/NtnOverview';
+// import NbiotOverview from '@/components/nbiot/NbiotOverview';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { sessionManager } from '@/lib/session-manager';
 
@@ -46,8 +47,11 @@ const UserDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('simulations');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [protocolAnalyzerView, setProtocolAnalyzerView] = useState<'dashboard' | 'analyzer'>('dashboard');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // Ensure we're on the client side
+    setIsClient(true);
     // Mock user loading for static export
     setIsLoading(false);
   }, []);
@@ -59,6 +63,18 @@ const UserDashboard: React.FC = () => {
     // Redirect to login page
     router.push('/login');
   };
+
+  // Don't render on server side
+  if (!isClient) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -416,72 +432,9 @@ const UserDashboard: React.FC = () => {
             )}
 
             {activeTab === 'protocol-analyzer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                {protocolAnalyzerView === 'dashboard' ? (
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900">Protocol Analyzer</h3>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => setProtocolAnalyzerView('dashboard')}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                            protocolAnalyzerView === 'dashboard'
-                              ? 'bg-primary-100 text-primary-700'
-                              : 'text-gray-600 hover:text-gray-700'
-                          }`}
-                        >
-                          Dashboard
-                        </button>
-                        <button
-                          onClick={() => setProtocolAnalyzerView('analyzer')}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                            protocolAnalyzerView === 'analyzer'
-                              ? 'bg-primary-100 text-primary-700'
-                              : 'text-gray-600 hover:text-gray-700'
-                          }`}
-                        >
-                          Live Analyzer
-                        </button>
-                      </div>
-                    </div>
-                    <ProtocolAnalyzerDashboard />
-                  </div>
-                ) : (
-                  <div>
-                    <div className="p-4 border-b border-gray-200 bg-gray-50">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">Live Protocol Analyzer</h3>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setProtocolAnalyzerView('dashboard')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                              protocolAnalyzerView === 'dashboard'
-                                ? 'bg-primary-100 text-primary-700'
-                                : 'text-gray-600 hover:text-gray-700'
-                            }`}
-                          >
-                            Dashboard
-                          </button>
-                          <button
-                            onClick={() => setProtocolAnalyzerView('analyzer')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                              protocolAnalyzerView === 'analyzer'
-                                ? 'bg-primary-100 text-primary-700'
-                                : 'text-gray-600 hover:text-gray-700'
-                            }`}
-                          >
-                            Live Analyzer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <ProtocolAnalyzerViewer 
-                      executionId="exec-001"
-                      testCaseId="tc-5g-nr-random-access"
-                      userId="user-1"
-                    />
-                  </div>
-                )}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Analyzer</h3>
+                <p className="text-gray-600">Protocol analyzer coming soon...</p>
               </div>
             )}
 
@@ -508,42 +461,30 @@ const UserDashboard: React.FC = () => {
             )}
 
             {activeTab === 'oran' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <OranOverview 
-                  executionId="exec-001"
-                  testCaseId="tc-oran-network"
-                  userId="user-1"
-                />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">O-RAN</h3>
+                <p className="text-gray-600">O-RAN network monitoring coming soon...</p>
               </div>
             )}
 
             {activeTab === 'v2x' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <V2xOverview 
-                  executionId="exec-001"
-                  testCaseId="tc-v2x-communication"
-                  userId="user-1"
-                />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">V2X</h3>
+                <p className="text-gray-600">V2X communication system coming soon...</p>
               </div>
             )}
 
             {activeTab === 'ntn' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <NtnOverview 
-                  executionId="exec-001"
-                  testCaseId="tc-ntn-satellite"
-                  userId="user-1"
-                />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">NTN</h3>
+                <p className="text-gray-600">Non-Terrestrial Network monitoring coming soon...</p>
               </div>
             )}
 
             {activeTab === 'nbiot' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <NbiotOverview 
-                  executionId="exec-001"
-                  testCaseId="tc-nbiot-iot"
-                  userId="user-1"
-                />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">NB-IoT</h3>
+                <p className="text-gray-600">NB-IoT network monitoring coming soon...</p>
               </div>
             )}
       </main>
@@ -551,5 +492,8 @@ const UserDashboard: React.FC = () => {
     </AuthGuard>
   );
 };
+
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
 
 export default UserDashboard;
