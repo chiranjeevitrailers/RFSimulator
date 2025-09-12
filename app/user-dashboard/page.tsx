@@ -11,6 +11,7 @@ import PerformanceMonitor from '@/components/performance/PerformanceMonitor';
 import APIDocumentationViewer from '@/components/api/APIDocumentationViewer';
 import APITestingInterface from '@/components/api/APITestingInterface';
 import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
+import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
 import { 
   Activity, 
   BarChart3, 
@@ -20,7 +21,8 @@ import {
   Play,
   User,
   Bell,
-  HelpCircle
+  HelpCircle,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -153,6 +155,17 @@ const UserDashboard: React.FC = () => {
                   API Testing
                 </button>
                 <button
+                  onClick={() => setActiveTab('3gpp-test-cases')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === '3gpp-test-cases'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Shield className="w-4 h-4 inline mr-2" />
+                  3GPP Test Cases
+                </button>
+                <button
                   onClick={() => setActiveTab('monitoring')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     activeTab === 'monitoring'
@@ -235,6 +248,10 @@ const UserDashboard: React.FC = () => {
         
         {activeTab === 'monitoring' && (
           <MonitoringDashboard userId={user.id} />
+        )}
+        
+        {activeTab === '3gpp-test-cases' && (
+          <ThreeGPPTestCaseViewer userId={user.id} />
         )}
       </main>
     </div>
