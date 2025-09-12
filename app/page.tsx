@@ -1,6 +1,7 @@
 import Navigation from '@/components/marketing/Navigation';
 import HeroSection from '@/components/marketing/HeroSection';
 import FeaturesSection from '@/components/marketing/FeaturesSection';
+import EquipmentSection from '@/components/marketing/EquipmentSection';
 import HowItWorksSection from '@/components/marketing/HowItWorksSection';
 import TestimonialsSection from '@/components/marketing/TestimonialsSection';
 import SocialProofSection from '@/components/marketing/SocialProofSection';
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Navigation />
       <HeroSection />
       <FeaturesSection />
+      <EquipmentSection />
       <HowItWorksSection />
       <TestimonialsSection />
       <SocialProofSection />

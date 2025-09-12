@@ -30,6 +30,7 @@ const Navigation = () => {
 
   const navigation = [
     { name: 'Features', href: '#features' },
+    { name: 'Equipment', href: '#equipment' },
     { name: 'How It Works', href: '#how-it-works' },
     { name: 'Test Cases', href: '#test-cases' },
     { name: 'Pricing', href: '#pricing' },
@@ -77,7 +78,12 @@ const Navigation = () => {
             {isLoading ? (
               <div className="w-8 h-8 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"></div>
             ) : user ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-4">
+                <Link href="/equipment">
+                  <button className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
+                    Equipment
+                  </button>
+                </Link>
                 <span className="text-sm text-gray-700">Welcome, {user.name}</span>
                 <button 
                   onClick={() => setUser(null)}
@@ -148,6 +154,13 @@ const Navigation = () => {
                         onClick={() => setIsOpen(false)}
                       >
                         Dashboard
+                      </Link>
+                      <Link
+                        href="/equipment"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Equipment
                       </Link>
                       {user.profile?.role === 'admin' && (
                         <Link
