@@ -235,7 +235,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
 
           {/* Sign Up Link */}
           {!isAdmin && (
-            <div className="text-center">
+            <div className="text-center space-y-3">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
                 <Link
@@ -243,6 +243,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
                   className="font-medium text-primary-600 hover:text-primary-500"
                 >
                   Sign up for free
+                </Link>
+              </p>
+              <p className="text-sm text-gray-600">
+                Forgot your password?{' '}
+                <Link
+                  href="/forgot-password"
+                  className="font-medium text-primary-600 hover:text-primary-500"
+                >
+                  Reset it here
                 </Link>
               </p>
             </div>

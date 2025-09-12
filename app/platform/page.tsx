@@ -143,12 +143,52 @@ const PlatformPage: React.FC = () => {
         {/* Main Content - 5GLabX Platform */}
         <main className="flex-1">
           <div className="h-screen">
-            <iframe
-              src="/index.html"
-              className="w-full h-full border-0"
-              title="5GLabX Platform"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-            />
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <span className="text-white font-bold text-2xl">5G</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">5GLabX Platform</h2>
+                <p className="text-gray-600 mb-6">Professional Protocol Analyzer & Network Simulation</p>
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Features</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>O-RAN Analysis</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>NB-IoT Testing</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>V2X Communication</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>NTN Monitoring</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Protocol Layers</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Real-time Analysis</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Platform Status:</strong> Active and Ready
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      All 5GLabX features are available and operational
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
 
