@@ -492,7 +492,7 @@ const ProtocolAnalyzerViewer: React.FC<ProtocolAnalyzerViewerProps> = ({
 
         {/* Right Panel - Logs and Performance */}
         <div className="w-80 border-l border-gray-200 bg-gray-50">
-          <Tabs defaultValue="logs" className="h-full">
+          <Tabs value="logs" onValueChange={() => {}} className="h-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="logs">Logs</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>
