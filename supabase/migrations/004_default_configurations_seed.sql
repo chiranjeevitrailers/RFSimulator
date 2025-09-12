@@ -3,12 +3,48 @@
 -- Production-ready default configurations for all protocols
 -- ==============================================
 
+-- Create system user for default configurations
+DO $$
+DECLARE
+    system_user_id UUID;
+BEGIN
+    -- Check if system user already exists
+    SELECT id INTO system_user_id FROM public.users WHERE email = 'system@5glabx.com';
+    
+    -- If system user doesn't exist, create it
+    IF system_user_id IS NULL THEN
+        -- Insert system user into auth.users (this will be handled by Supabase auth)
+        -- For now, we'll create a system user in our users table
+        INSERT INTO public.users (
+            id, email, full_name, role, subscription_tier, subscription_status,
+            company_name, is_active, created_at, updated_at
+        ) VALUES (
+            gen_random_uuid(),
+            'system@5glabx.com',
+            '5GLabX System',
+            'admin',
+            'enterprise',
+            'active',
+            '5GLabX Platform',
+            true,
+            NOW(),
+            NOW()
+        ) RETURNING id INTO system_user_id;
+    END IF;
+    
+    -- Store system user ID in a variable for use in configurations
+    PERFORM set_config('app.system_user_id', system_user_id::TEXT, false);
+END $$;
+
 -- Insert default configurations for all test cases
 DO $$
 DECLARE
     test_case_record RECORD;
     config_id UUID;
+    system_user_id UUID;
 BEGIN
+    -- Get system user ID
+    SELECT current_setting('app.system_user_id')::UUID INTO system_user_id;
     -- Loop through all test cases and create default configurations
     FOR test_case_record IN 
         SELECT id, test_case_id, category, protocol, name 
@@ -29,7 +65,7 @@ BEGIN
                     'Default 5G NR Configuration',
                     'Default configuration for 5G NR test cases with standard parameters',
                     test_case_record.id,
-                    NULL, -- System default configuration
+                    system_user_id, -- System default configuration
                     '5G_NR',
                     'NR',
                     '1.0',
@@ -115,7 +151,7 @@ BEGIN
                     'Default 4G LTE Configuration',
                     'Default configuration for 4G LTE test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     '4G_LTE',
                     'LTE',
                     '1.0',
@@ -201,7 +237,7 @@ BEGIN
                     'Default IMS/SIP Configuration',
                     'Default configuration for IMS/SIP test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'IMS_SIP',
                     'SIP',
                     '1.0',
@@ -264,7 +300,7 @@ BEGIN
                     'Default O-RAN Configuration',
                     'Default configuration for O-RAN test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'O_RAN',
                     'E2',
                     '1.0',
@@ -322,7 +358,7 @@ BEGIN
                     'Default NB-IoT Configuration',
                     'Default configuration for NB-IoT test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'NB_IoT',
                     'NB-IoT',
                     '1.0',
@@ -388,7 +424,7 @@ BEGIN
                     'Default V2X Configuration',
                     'Default configuration for V2X test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'V2X',
                     'PC5',
                     '1.0',
@@ -446,7 +482,7 @@ BEGIN
                     'Default NTN Configuration',
                     'Default configuration for NTN test cases with standard parameters',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'NTN',
                     'NTN',
                     '1.0',
@@ -504,7 +540,7 @@ BEGIN
                     'Default Custom Configuration',
                     'Default configuration for custom protocol test cases',
                     test_case_record.id,
-                    NULL,
+                    system_user_id,
                     'CUSTOM',
                     'Custom',
                     '1.0',
@@ -556,16 +592,23 @@ BEGIN
 END $$;
 
 -- Insert additional template configurations
-INSERT INTO public.test_configurations (
-    name, description, test_case_id, user_id, category, protocol, version,
-    configuration_data, is_template, is_public, is_default, usage_count, rating
-) VALUES 
--- High Performance 5G NR Configuration
-(
-    'High Performance 5G NR Configuration',
-    'Optimized 5G NR configuration for maximum performance testing',
-    NULL,
-    NULL,
+DO $$
+DECLARE
+    system_user_id UUID;
+BEGIN
+    -- Get system user ID
+    SELECT current_setting('app.system_user_id')::UUID INTO system_user_id;
+    
+    INSERT INTO public.test_configurations (
+        name, description, test_case_id, user_id, category, protocol, version,
+        configuration_data, is_template, is_public, is_default, usage_count, rating
+    ) VALUES 
+    -- High Performance 5G NR Configuration
+    (
+        'High Performance 5G NR Configuration',
+        'Optimized 5G NR configuration for maximum performance testing',
+        NULL,
+        system_user_id,
     '5G_NR',
     'NR',
     '1.0',
@@ -617,12 +660,12 @@ INSERT INTO public.test_configurations (
     0.0
 ),
 
--- Debug Configuration
-(
-    'Debug Configuration',
-    'Configuration optimized for debugging and troubleshooting',
-    NULL,
-    NULL,
+    -- Debug Configuration
+    (
+        'Debug Configuration',
+        'Configuration optimized for debugging and troubleshooting',
+        NULL,
+        system_user_id,
     '5G_NR',
     'NR',
     '1.0',
@@ -657,13 +700,14 @@ INSERT INTO public.test_configurations (
             "customParameters": {"detailed_logging": true, "step_by_step": true, "breakpoints": true}
         }
     }',
-    true,
-    true,
-    false,
-    0,
-    0.0
-)
-ON CONFLICT (name, user_id) DO NOTHING;
+        true,
+        true,
+        false,
+        0,
+        0.0
+    )
+    ON CONFLICT (name, user_id) DO NOTHING;
+END $$;
 
 -- Verification
 DO $$
