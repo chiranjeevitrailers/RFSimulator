@@ -7,33 +7,29 @@
 DO $$
 DECLARE
     system_user_id UUID;
+    existing_user_id UUID;
 BEGIN
-    -- Check if system user already exists
-    SELECT id INTO system_user_id FROM public.users WHERE email = 'system@5glabx.com';
+    -- First, try to find an existing admin user to use for system configurations
+    SELECT id INTO existing_user_id FROM public.users WHERE role = 'admin' LIMIT 1;
     
-    -- If system user doesn't exist, create it
-    IF system_user_id IS NULL THEN
-        -- Insert system user into auth.users (this will be handled by Supabase auth)
-        -- For now, we'll create a system user in our users table
-        INSERT INTO public.users (
-            id, email, full_name, role, subscription_tier, subscription_status,
-            company_name, is_active, created_at, updated_at
-        ) VALUES (
-            gen_random_uuid(),
-            'system@5glabx.com',
-            '5GLabX System',
-            'admin',
-            'enterprise',
-            'active',
-            '5GLabX Platform',
-            true,
-            NOW(),
-            NOW()
-        ) RETURNING id INTO system_user_id;
+    IF existing_user_id IS NOT NULL THEN
+        -- Use existing admin user for system configurations
+        system_user_id := existing_user_id;
+        RAISE NOTICE 'Using existing admin user % for system configurations', system_user_id;
+    ELSE
+        -- If no admin user exists, we'll need to create one through Supabase auth
+        -- For now, we'll use a placeholder approach
+        RAISE NOTICE 'No admin user found. System configurations will be created when first admin user is available.';
+        -- We'll skip creating configurations for now and let them be created when needed
+        system_user_id := NULL;
     END IF;
     
     -- Store system user ID in a variable for use in configurations
-    PERFORM set_config('app.system_user_id', system_user_id::TEXT, false);
+    IF system_user_id IS NOT NULL THEN
+        PERFORM set_config('app.system_user_id', system_user_id::TEXT, false);
+    ELSE
+        PERFORM set_config('app.system_user_id', 'NULL', false);
+    END IF;
 END $$;
 
 -- Insert default configurations for all test cases
@@ -44,7 +40,20 @@ DECLARE
     system_user_id UUID;
 BEGIN
     -- Get system user ID
-    SELECT current_setting('app.system_user_id')::UUID INTO system_user_id;
+    SELECT current_setting('app.system_user_id') INTO system_user_id;
+    
+    -- If system_user_id is 'NULL' string, set it to NULL
+    IF system_user_id = 'NULL' THEN
+        system_user_id := NULL;
+    ELSE
+        system_user_id := system_user_id::UUID;
+    END IF;
+    
+    -- Only proceed if we have a system user
+    IF system_user_id IS NULL THEN
+        RAISE NOTICE 'Skipping default configuration creation - no system user available';
+        RETURN;
+    END IF;
     -- Loop through all test cases and create default configurations
     FOR test_case_record IN 
         SELECT id, test_case_id, category, protocol, name 
@@ -597,7 +606,20 @@ DECLARE
     system_user_id UUID;
 BEGIN
     -- Get system user ID
-    SELECT current_setting('app.system_user_id')::UUID INTO system_user_id;
+    SELECT current_setting('app.system_user_id') INTO system_user_id;
+    
+    -- If system_user_id is 'NULL' string, set it to NULL
+    IF system_user_id = 'NULL' THEN
+        system_user_id := NULL;
+    ELSE
+        system_user_id := system_user_id::UUID;
+    END IF;
+    
+    -- Only proceed if we have a system user
+    IF system_user_id IS NULL THEN
+        RAISE NOTICE 'Skipping template configuration creation - no system user available';
+        RETURN;
+    END IF;
     
     INSERT INTO public.test_configurations (
         name, description, test_case_id, user_id, category, protocol, version,
