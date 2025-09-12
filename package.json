@@ -88,9 +88,9 @@
     "@types/jest": "^29.5.8",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/lodash": "^4.14.202",
-    "@types/node": "^20.11.0",
+    "@types/node": "^20.19.13",
     "@types/nodemailer": "^6.4.14",
-    "@types/react": "^18.2.48",
+    "@types/react": "^18.3.24",
     "@types/react-dom": "^18.2.18",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -109,7 +109,7 @@
     "prettier-plugin-tailwindcss": "^0.5.9",
     "snyk": "^1.1248.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.2"
   },
   "resolutions": {
     "@opentelemetry/core": "^1.21.0",
