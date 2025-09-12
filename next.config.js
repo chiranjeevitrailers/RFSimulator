@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Basic configuration for deployment
+  // Static export configuration for Netlify
   output: 'export',
   trailingSlash: true,
   images: {

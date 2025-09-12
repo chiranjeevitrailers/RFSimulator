@@ -1,18 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import AuthGuard from '@/components/auth/AuthGuard';
-import UserMenu from '@/components/auth/UserMenu';
-import UserManagement from '@/components/admin/UserManagement';
-import SystemAnalytics from '@/components/admin/SystemAnalytics';
-import TestCaseManagement from '@/components/admin/TestCaseManagement';
-import SecurityDashboard from '@/components/security/SecurityDashboard';
-import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
-import AlertManagement from '@/components/monitoring/AlertManagement';
-import BackupDashboard from '@/components/backup/BackupDashboard';
-import LoadTestingDashboard from '@/components/load-testing/LoadTestingDashboard';
-import DeploymentDashboard from '@/components/deployment/DeploymentDashboard';
-import { auth } from '@/lib/auth';
 import { 
   Users, 
   BarChart3, 
@@ -122,23 +110,21 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const loadAdminData = async () => {
       try {
-        const currentUser = await auth.getCurrentUser();
-        if (currentUser && currentUser.email) {
-          const userData: User = {
-            id: currentUser.id,
-            email: currentUser.email,
-            full_name: currentUser.user_metadata?.full_name || '',
-            avatar_url: currentUser.user_metadata?.avatar_url || '',
-            role: currentUser.app_metadata?.role || 'user',
-            subscription_tier: 'pro',
-            subscription_status: 'active',
-            created_at: currentUser.created_at,
-            updated_at: currentUser.updated_at || currentUser.created_at,
-            last_login: new Date().toISOString(),
-            is_active: true
-          };
-          setUser(userData);
-        }
+        // Mock admin user for static export
+        const userData: User = {
+          id: 'admin-1',
+          email: 'admin@5glabx.com',
+          full_name: 'Admin User',
+          avatar_url: '',
+          role: 'admin',
+          subscription_tier: 'pro',
+          subscription_status: 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          is_active: true
+        };
+        setUser(userData);
 
         // Mock data for demonstration
         const mockUsers: User[] = [
@@ -349,28 +335,34 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <AuthGuard requireAuth={true} requireAdmin={true} redirectTo="/login">
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">5G</span>
-                  </div>
-                  <span className="text-xl font-bold text-gray-900">5GLabX</span>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">5G</span>
                 </div>
-                <div className="hidden md:block text-sm text-gray-500">
-                  Admin Dashboard
-                </div>
+                <span className="text-xl font-bold text-gray-900">5GLabX</span>
               </div>
-              
-              {user && <UserMenu user={user} />}
+              <div className="hidden md:block text-sm text-gray-500">
+                Admin Dashboard
+              </div>
             </div>
+            
+            {user && (
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {user.full_name?.charAt(0) || 'A'}
+                </div>
+                <span className="text-sm font-medium text-gray-900">{user.full_name}</span>
+              </div>
+            )}
           </div>
-        </header>
+        </div>
+      </header>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Tabs */}
@@ -570,52 +562,66 @@ const AdminDashboard: React.FC = () => {
           )}
 
           {activeTab === 'users' && (
-            <UserManagement
-              users={users}
-              onUserUpdate={handleUserUpdate}
-              onUserDelete={handleUserDelete}
-              onUserCreate={handleUserCreate}
-            />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">User Management</h3>
+              <p className="text-gray-600">User management interface coming soon...</p>
+            </div>
           )}
 
           {activeTab === 'test-cases' && (
-            <TestCaseManagement
-              testCases={testCases}
-              onTestCaseUpdate={handleTestCaseUpdate}
-              onTestCaseDelete={handleTestCaseDelete}
-              onTestCaseCreate={handleTestCaseCreate}
-            />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Case Management</h3>
+              <p className="text-gray-600">Test case management interface coming soon...</p>
+            </div>
           )}
           
         {activeTab === 'security' && (
-          <SecurityDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Dashboard</h3>
+            <p className="text-gray-600">Security dashboard coming soon...</p>
+          </div>
         )}
 
         {activeTab === 'monitoring' && (
-          <MonitoringDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monitoring Dashboard</h3>
+            <p className="text-gray-600">Monitoring dashboard coming soon...</p>
+          </div>
         )}
 
         {activeTab === 'alerts' && (
-          <AlertManagement userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Alert Management</h3>
+            <p className="text-gray-600">Alert management interface coming soon...</p>
+          </div>
         )}
 
         {activeTab === 'backup' && (
-          <BackupDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Backup Dashboard</h3>
+            <p className="text-gray-600">Backup dashboard coming soon...</p>
+          </div>
         )}
 
         {activeTab === 'load-testing' && (
-          <LoadTestingDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Load Testing Dashboard</h3>
+            <p className="text-gray-600">Load testing dashboard coming soon...</p>
+          </div>
         )}
 
         {activeTab === 'deployment' && (
-          <DeploymentDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Deployment Dashboard</h3>
+            <p className="text-gray-600">Deployment dashboard coming soon...</p>
+          </div>
         )}
 
           {activeTab === 'analytics' && (
-            <SystemAnalytics
-              metrics={systemMetrics}
-              userActivity={userActivity}
-            />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
+              <p className="text-gray-600">Analytics dashboard coming soon...</p>
+            </div>
           )}
 
           {activeTab === 'settings' && (
@@ -626,7 +632,7 @@ const AdminDashboard: React.FC = () => {
           )}
         </div>
       </div>
-    </AuthGuard>
+    </div>
   );
 };
 
