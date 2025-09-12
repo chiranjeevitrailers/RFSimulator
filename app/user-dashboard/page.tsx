@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+import ComprehensiveTestCaseDashboard from '@/components/test-cases/ComprehensiveTestCaseDashboard';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const UserDashboard: React.FC = () => {
     role: 'user'
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('simulations');
+  const [activeTab, setActiveTab] = useState('test-cases');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [protocolAnalyzerView, setProtocolAnalyzerView] = useState<'dashboard' | 'analyzer'>('dashboard');
 
@@ -74,15 +75,15 @@ const UserDashboard: React.FC = () => {
               </div>
               <nav className="ml-10 flex space-x-8">
                 <button
-                  onClick={() => setActiveTab('simulations')}
+                  onClick={() => setActiveTab('test-cases')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'simulations'
+                    activeTab === 'test-cases'
                       ? 'bg-primary-100 text-primary-700'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <Activity className="w-4 h-4 inline mr-2" />
-                  Simulations
+                  Test Cases
                 </button>
                 <button
                   onClick={() => setActiveTab('executions')}
@@ -280,10 +281,9 @@ const UserDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'simulations' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Simulation Dashboard</h3>
-            <p className="text-gray-600">Simulation dashboard coming soon...</p>
+        {activeTab === 'test-cases' && (
+          <div className="h-full">
+            <ComprehensiveTestCaseDashboard userId={user.id} />
           </div>
         )}
         
