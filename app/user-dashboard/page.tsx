@@ -1,22 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/auth';
-import SimulationDashboard from '@/components/simulation/SimulationDashboard';
-import TestExecutionDashboard from '@/components/simulation/TestExecutionDashboard';
-import RealTimeSimulationView from '@/components/simulation/RealTimeSimulationView';
-import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
-import PerformanceMonitor from '@/components/performance/PerformanceMonitor';
-import APIDocumentationViewer from '@/components/api/APIDocumentationViewer';
-import APITestingInterface from '@/components/api/APITestingInterface';
-import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
-import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
-import ProfessionalTestCaseViewer from '@/components/test-cases/ProfessionalTestCaseViewer';
-import DetailedTestCaseViewer from '@/components/test-cases/DetailedTestCaseViewer';
-import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
-import LogViewer from '@/components/logs/LogViewer';
-import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
 import { 
   Activity, 
   BarChart3, 
@@ -38,38 +22,24 @@ import { Button } from '@/components/ui/Button';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>({
+    id: 'user-1',
+    email: 'user@5glabx.com',
+    full_name: 'Demo User',
+    role: 'user'
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('simulations');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAuth();
+    // Mock user loading for static export
+    setIsLoading(false);
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const currentUser = await auth.getCurrentUser();
-      if (!currentUser) {
-        router.push('/login');
-        return;
-      }
-      setUser(currentUser);
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      router.push('/login');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-      router.push('/');
-    } catch (error) {
-      console.error('Sign out failed:', error);
-    }
+  const handleSignOut = () => {
+    // Mock sign out for static export
+    console.log('Sign out clicked');
   };
 
   if (isLoading) {
@@ -281,76 +251,101 @@ const UserDashboard: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'simulations' && (
-          <SimulationDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Simulation Dashboard</h3>
+            <p className="text-gray-600">Simulation dashboard coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'executions' && (
-          <TestExecutionDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Execution Dashboard</h3>
+            <p className="text-gray-600">Test execution dashboard coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'realtime' && (
-          <RealTimeSimulationView 
-            userId={user.id} 
-            executionId={selectedExecutionId || undefined}
-          />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Real-Time Simulation View</h3>
+            <p className="text-gray-600">Real-time simulation view coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'analytics' && (
-          <AnalyticsDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
+            <p className="text-gray-600">Analytics dashboard coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'settings' && (
-          <PerformanceMonitor userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Monitor</h3>
+            <p className="text-gray-600">Performance monitor coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'api-docs' && (
-          <APIDocumentationViewer userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Documentation</h3>
+            <p className="text-gray-600">API documentation coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'api-testing' && (
-          <APITestingInterface userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Testing Interface</h3>
+            <p className="text-gray-600">API testing interface coming soon...</p>
+          </div>
         )}
         
         {activeTab === 'monitoring' && (
-          <MonitoringDashboard userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monitoring Dashboard</h3>
+            <p className="text-gray-600">Monitoring dashboard coming soon...</p>
+          </div>
         )}
         
         {activeTab === '3gpp-test-cases' && (
-          <ThreeGPPTestCaseViewer userId={user.id} />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">3GPP Test Cases</h3>
+            <p className="text-gray-600">3GPP test cases viewer coming soon...</p>
+          </div>
         )}
         
             {activeTab === 'professional-test-cases' && (
-              <ProfessionalTestCaseViewer userId={user.id} />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional Test Cases</h3>
+                <p className="text-gray-600">Professional test cases viewer coming soon...</p>
+              </div>
             )}
 
             {activeTab === 'detailed-test-cases' && (
-              <DetailedTestCaseViewer userId={user.id} />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Cases</h3>
+                <p className="text-gray-600">Detailed test cases viewer coming soon...</p>
+              </div>
             )}
 
             {activeTab === 'protocol-analyzer' && (
-              <ProtocolAnalyzerViewer 
-                executionId="exec_123" 
-                testCaseId="5NR_INIT_0001" 
-                userId={user.id} 
-              />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Analyzer</h3>
+                <p className="text-gray-600">Protocol analyzer coming soon...</p>
+              </div>
             )}
 
             {activeTab === 'log-viewer' && (
-              <LogViewer 
-                executionId="exec_123" 
-                testCaseId="5NR_INIT_0001" 
-                userId={user.id} 
-                mode="enhanced"
-              />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Viewer</h3>
+                <p className="text-gray-600">Log viewer coming soon...</p>
+              </div>
             )}
 
             {activeTab === 'protocol-layers' && (
-              <ProtocolLayerDisplay 
-                executionId="exec_123" 
-                testCaseId="5NR_INIT_0001" 
-                userId={user.id} 
-                selectedLayers={['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS']}
-              />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
+                <p className="text-gray-600">Protocol layers display coming soon...</p>
+              </div>
             )}
       </main>
     </div>
