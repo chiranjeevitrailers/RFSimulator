@@ -75,7 +75,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
             email: formData.email,
             role: 'user'
           });
-          router.push('/platform');
+          router.push('/user-dashboard');
         } else {
           setErrors({ general: 'Please enter email and password' });
         }
