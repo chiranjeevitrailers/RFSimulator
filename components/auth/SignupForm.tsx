@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle, Phone } from 'lucide-react';
 import { auth } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
 const SignupForm: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
+    mobileNumber: '',
     password: '',
     confirmPassword: '',
     firstName: '',
@@ -32,6 +33,15 @@ const SignupForm: React.FC = () => {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Mobile number validation
+    if (!formData.mobileNumber) {
+      newErrors.mobileNumber = 'Mobile number is required';
+    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.mobileNumber.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.mobileNumber = 'Please enter a valid mobile number';
+    } else if (formData.mobileNumber.replace(/[\s\-\(\)]/g, '').length < 10) {
+      newErrors.mobileNumber = 'Mobile number must be at least 10 digits';
     }
 
     // Password validation
@@ -228,6 +238,34 @@ const SignupForm: React.FC = () => {
               </div>
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Mobile Number Field */}
+            <div>
+              <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                Mobile Number
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="mobileNumber"
+                  name="mobileNumber"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={formData.mobileNumber}
+                  onChange={handleInputChange}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    errors.mobileNumber ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter your mobile number"
+                />
+              </div>
+              {errors.mobileNumber && (
+                <p className="mt-1 text-sm text-red-600">{errors.mobileNumber}</p>
               )}
             </div>
 
