@@ -19,10 +19,18 @@ import {
   MessageSquare,
   Layers,
   Wifi,
-  Cloud
+  Cloud,
+  Car,
+  Satellite
 } from 'lucide-react';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+import LogViewer from '@/components/logs/LogViewer';
+import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
+import OranOverview from '@/components/oran/OranOverview';
+import V2xOverview from '@/components/v2x/V2xOverview';
+import NtnOverview from '@/components/ntn/NtnOverview';
+import NbiotOverview from '@/components/nbiot/NbiotOverview';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { sessionManager } from '@/lib/session-manager';
 
@@ -233,6 +241,50 @@ const UserDashboard: React.FC = () => {
               <Cloud className="w-4 h-4 inline mr-2" />
               5GLAB Services
             </button>
+            <button
+              onClick={() => setActiveTab('oran')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'oran'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Wifi className="w-4 h-4 inline mr-2" />
+              O-RAN
+            </button>
+            <button
+              onClick={() => setActiveTab('v2x')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'v2x'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Car className="w-4 h-4 inline mr-2" />
+              V2X
+            </button>
+            <button
+              onClick={() => setActiveTab('ntn')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'ntn'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Satellite className="w-4 h-4 inline mr-2" />
+              NTN
+            </button>
+            <button
+              onClick={() => setActiveTab('nbiot')}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                activeTab === 'nbiot'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Wifi className="w-4 h-4 inline mr-2" />
+              NB-IoT
+            </button>
                 <button
                   onClick={() => setActiveTab('monitoring')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -434,16 +486,64 @@ const UserDashboard: React.FC = () => {
             )}
 
             {activeTab === 'log-viewer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Viewer</h3>
-                <p className="text-gray-600">Log viewer coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <LogViewer 
+                  executionId="exec-001"
+                  testCaseId="tc-5g-nr-random-access"
+                  userId="user-1"
+                  mode="enhanced"
+                />
               </div>
             )}
 
             {activeTab === 'protocol-layers' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
-                <p className="text-gray-600">Protocol layers display coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <ProtocolLayerDisplay 
+                  executionId="exec-001"
+                  testCaseId="tc-5g-nr-random-access"
+                  userId="user-1"
+                  selectedLayers={['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS']}
+                />
+              </div>
+            )}
+
+            {activeTab === 'oran' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <OranOverview 
+                  executionId="exec-001"
+                  testCaseId="tc-oran-network"
+                  userId="user-1"
+                />
+              </div>
+            )}
+
+            {activeTab === 'v2x' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <V2xOverview 
+                  executionId="exec-001"
+                  testCaseId="tc-v2x-communication"
+                  userId="user-1"
+                />
+              </div>
+            )}
+
+            {activeTab === 'ntn' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <NtnOverview 
+                  executionId="exec-001"
+                  testCaseId="tc-ntn-satellite"
+                  userId="user-1"
+                />
+              </div>
+            )}
+
+            {activeTab === 'nbiot' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <NbiotOverview 
+                  executionId="exec-001"
+                  testCaseId="tc-nbiot-iot"
+                  userId="user-1"
+                />
               </div>
             )}
       </main>
