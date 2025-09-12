@@ -30,7 +30,8 @@ BEGIN
             ) VALUES (
                 test_case_uuid, 'register_step', 1, 0, 'UL', 'SIP', 'IMS',
                 'REGISTER', 'SIP REGISTER', 'Initial SIP REGISTER request for IMS registration',
-                'RFC 3261 Section 10.1, TS 24.229 Section 5.1.1', 'Release 17'
+                'RFC 3261 Section 10.1, TS 24.229 Section 5.1.1', 'Release 17',
+                '{}', 'register_response_step', 10000, '{}'
             ) RETURNING id INTO message_uuid;
         END IF;
         
@@ -122,7 +123,8 @@ BEGIN
             ) VALUES (
                 test_case_uuid, 'invite_step', 1, 0, 'UL', 'SIP', 'IMS',
                 'INVITE', 'SIP INVITE', 'SIP INVITE request for VoLTE call setup',
-                'RFC 3261 Section 17.1.1, TS 24.229 Section 5.4.1', 'Release 17'
+                'RFC 3261 Section 17.1.1, TS 24.229 Section 5.4.1', 'Release 17',
+                '{}', 'invite_response_step', 15000, '{}'
             ) RETURNING id INTO message_uuid;
         END IF;
         
