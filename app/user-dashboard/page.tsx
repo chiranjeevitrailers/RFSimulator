@@ -18,7 +18,6 @@ import {
   MessageSquare,
   Layers
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -239,10 +238,13 @@ const UserDashboard: React.FC = () => {
                   {user.email}
                 </span>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4 mr-2" />
+              <button 
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4 mr-2 inline" />
                 Sign Out
-              </Button>
+              </button>
             </div>
           </div>
         </div>

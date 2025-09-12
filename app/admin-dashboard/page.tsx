@@ -364,32 +364,32 @@ const AdminDashboard: React.FC = () => {
         </div>
       </header>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Tabs */}
-          <div className="mb-8">
-            <nav className="flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.icon}
-                  <span>{tab.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs */}
+        <div className="mb-8">
+          <nav className="flex space-x-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.name}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
 
-          {/* Tab Content */}
-          {activeTab === 'overview' && (
-            <div className="space-y-8">
-              {/* Welcome Section */}
-              <div>
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Welcome Section */}
+            <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   Welcome back, {user?.profile?.first_name || 'Admin'}!
                 </h1>
@@ -559,22 +559,23 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {activeTab === 'users' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">User Management</h3>
-              <p className="text-gray-600">User management interface coming soon...</p>
-            </div>
-          )}
+        {activeTab === 'users' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">User Management</h3>
+            <p className="text-gray-600">User management interface coming soon...</p>
+          </div>
+        )}
 
-          {activeTab === 'test-cases' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Case Management</h3>
-              <p className="text-gray-600">Test case management interface coming soon...</p>
-            </div>
-          )}
-          
+        {activeTab === 'test-cases' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Case Management</h3>
+            <p className="text-gray-600">Test case management interface coming soon...</p>
+          </div>
+        )}
+        
         {activeTab === 'security' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Dashboard</h3>
@@ -617,19 +618,19 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-          {activeTab === 'analytics' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
-              <p className="text-gray-600">Analytics dashboard coming soon...</p>
-            </div>
-          )}
+        {activeTab === 'analytics' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
+            <p className="text-gray-600">Analytics dashboard coming soon...</p>
+          </div>
+        )}
 
-          {activeTab === 'settings' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Settings</h3>
-              <p className="text-gray-600">Settings panel coming soon...</p>
-            </div>
-          )}
+        {activeTab === 'settings' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Settings</h3>
+            <p className="text-gray-600">Settings panel coming soon...</p>
+          </div>
+        )}
         </div>
       </div>
     </div>
