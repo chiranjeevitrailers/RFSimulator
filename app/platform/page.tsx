@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Crown, AlertTriangle, Clock } from 'lucide-react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { sessionManager } from '@/lib/session-manager';
+import { subscriptionManager } from '@/lib/subscription-manager';
 
 const PlatformPage: React.FC = () => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   useEffect(() => {
     // Ensure we're on the client side
@@ -19,6 +22,21 @@ const PlatformPage: React.FC = () => {
     const userSession = sessionManager.getUserSession();
     if (userSession) {
       setUser(userSession);
+      
+      // Check subscription status
+      const status = subscriptionManager.checkSubscriptionStatus(userSession.id);
+      setSubscriptionStatus(status);
+      
+      // If no subscription, start a trial
+      if (!status.hasAccess) {
+        try {
+          subscriptionManager.startTrial(userSession.id, 'starter');
+          const newStatus = subscriptionManager.checkSubscriptionStatus(userSession.id);
+          setSubscriptionStatus(newStatus);
+        } catch (error) {
+          console.error('Error starting trial:', error);
+        }
+      }
     }
   }, []);
 
@@ -67,6 +85,29 @@ const PlatformPage: React.FC = () => {
                   <span className="text-sm text-gray-600">Platform Active</span>
                 </div>
                 
+                {/* Subscription Status */}
+                {subscriptionStatus && (
+                  <div className="flex items-center space-x-2">
+                    {subscriptionStatus.isTrial ? (
+                      <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                        <Clock className="w-3 h-3" />
+                        <span>Trial: {subscriptionStatus.daysRemaining} days left</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        <Crown className="w-3 h-3" />
+                        <span>Subscribed</span>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setShowSubscriptionModal(true)}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Manage
+                    </button>
+                  </div>
+                )}
+                
                 {user && (
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
@@ -101,6 +142,74 @@ const PlatformPage: React.FC = () => {
             />
           </div>
         </main>
+
+        {/* Subscription Management Modal */}
+        {showSubscriptionModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Subscription Management</h3>
+                  <button
+                    onClick={() => setShowSubscriptionModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                {subscriptionStatus && (
+                  <div className="space-y-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Current Plan</span>
+                        <span className="text-sm text-gray-600">
+                          {subscriptionStatus.isTrial ? 'Trial' : 'Professional'}
+                        </span>
+                      </div>
+                      
+                      {subscriptionStatus.isTrial && (
+                        <div className="flex items-center space-x-2 text-yellow-600 text-sm">
+                          <Clock className="w-4 h-4" />
+                          <span>{subscriptionStatus.daysRemaining} days remaining</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {subscriptionStatus.usage && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-gray-900">Usage This Month</h4>
+                        <div className="text-sm text-gray-600">
+                          <div>Test Cases: {subscriptionStatus.usage.testCasesThisMonth} / {subscriptionStatus.limitations?.testCasesPerMonth || 'Unlimited'}</div>
+                          <div>API Calls: {subscriptionStatus.usage.apiCallsThisMonth} / {subscriptionStatus.limitations?.apiCallsPerMonth || 'Unlimited'}</div>
+                          <div>Active Sessions: {subscriptionStatus.usage.currentSessions} / {subscriptionStatus.limitations?.concurrentSessions || 'Unlimited'}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex space-x-3 pt-4">
+                      <button
+                        onClick={() => {
+                          setShowSubscriptionModal(false);
+                          router.push('/pricing');
+                        }}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        {subscriptionStatus.isTrial ? 'Upgrade Now' : 'Change Plan'}
+                      </button>
+                      <button
+                        onClick={() => setShowSubscriptionModal(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AuthGuard>
   );

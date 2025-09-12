@@ -34,7 +34,8 @@ const Navigation = () => {
     { name: '5GLAB Service', href: '#5glab-service' },
     { name: 'How It Works', href: '#how-it-works' },
     { name: 'Test Cases', href: '#test-cases' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'Feedback', href: '/feedback' },
     { name: 'Testimonials', href: '#testimonials' },
   ];
 
