@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { validateAdminCredentials, LOGIN_CREDENTIALS } from '@/lib/admin-credentials';
+import { sessionManager } from '@/lib/session-manager';
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -54,8 +55,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
         // Validate admin credentials
         const result = validateAdminCredentials(formData.email, formData.password);
         if (result.success) {
-          // Store admin user in localStorage for demo
-          localStorage.setItem('adminUser', JSON.stringify(result.user));
+          // Store admin session using session manager
+          sessionManager.setAdminSession({
+            email: result.user.email,
+            username: result.user.username,
+            role: result.user.role,
+            permissions: result.user.permissions
+          });
           router.push('/admin-dashboard');
         } else {
           setErrors({ general: result.error });
@@ -63,6 +69,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
       } else {
         // Regular user authentication (mock)
         if (formData.email && formData.password) {
+          // Store user session using session manager
+          sessionManager.setUserSession({
+            id: 'user-' + Date.now(),
+            email: formData.email,
+            role: 'user'
+          });
           router.push('/user-dashboard');
         } else {
           setErrors({ general: 'Please enter email and password' });

@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+import AuthGuard from '@/components/auth/AuthGuard';
+import { sessionManager } from '@/lib/session-manager';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -43,8 +45,11 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   const handleSignOut = () => {
-    // Mock sign out for static export
-    console.log('Sign out clicked');
+    // Clear all sessions using session manager
+    sessionManager.clearAllSessions();
+    
+    // Redirect to login page
+    router.push('/login');
   };
 
   if (isLoading) {
@@ -63,7 +68,8 @@ const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AuthGuard requireAuth={true} requireAdmin={false} redirectTo="/login">
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -442,6 +448,7 @@ const UserDashboard: React.FC = () => {
             )}
       </main>
     </div>
+    </AuthGuard>
   );
 };
 
