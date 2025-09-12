@@ -117,8 +117,9 @@ const PricingPage: React.FC = () => {
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Access the complete 5GLabX Platform with professional protocol analysis, 
-            real-time monitoring, and advanced 5G/4G testing capabilities.
+            Start with a <strong>14-day free trial</strong> (3 test cases only) to experience the 5GLabX Platform. 
+            Upgrade to unlock unlimited access to professional protocol analysis, real-time monitoring, 
+            and advanced 5G/4G testing capabilities.
           </p>
           
           {/* Billing Toggle */}
@@ -223,6 +224,37 @@ const PricingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Trial Information */}
+      <section className="py-16 bg-yellow-50 border-y border-yellow-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              🎯 Free Trial - Limited Access
+            </h2>
+            <p className="text-lg text-gray-600 mb-6">
+              New users get a <strong>14-day free trial</strong> with <strong>limited access</strong> to test the platform:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h3 className="font-semibold text-red-800 mb-2">Test Cases</h3>
+                <p className="text-red-700 text-sm">Only <strong>3 test cases</strong> allowed during trial</p>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h3 className="font-semibold text-red-800 mb-2">Sessions</h3>
+                <p className="text-red-700 text-sm">Only <strong>1 concurrent session</strong> at a time</p>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h3 className="font-semibold text-red-800 mb-2">Features</h3>
+                <p className="text-red-700 text-sm">Limited to <strong>basic features only</strong></p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-6">
+              <strong>Upgrade to any paid plan</strong> to unlock unlimited test cases, advanced features, and full platform access.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -236,7 +268,8 @@ const PricingPage: React.FC = () => {
                 Can I try the platform before subscribing?
               </h3>
               <p className="text-gray-600">
-                Yes! All plans come with a 14-day free trial. No credit card required to start.
+                Yes! New users get a 14-day free trial with limited access (3 test cases only). 
+                No credit card required to start. Upgrade to unlock full platform access.
               </p>
             </div>
             

@@ -120,9 +120,32 @@ class SubscriptionManager {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 14); // 14-day trial
 
+    // Create trial plan with very limited access
+    const trialPlan: SubscriptionPlan = {
+      id: 'trial',
+      name: 'Free Trial',
+      price: 0,
+      billingCycle: 'monthly',
+      features: [
+        'Access to 5GLabX Platform',
+        'Basic Protocol Analysis',
+        'Limited Test Cases (3 only)',
+        '14-day trial period',
+        'Community Support'
+      ],
+      limitations: {
+        testCasesPerMonth: 3, // Only 3 test cases for trial
+        concurrentSessions: 1, // Only 1 session at a time
+        apiCallsPerMonth: 10, // Very limited API calls
+        supportLevel: 'community'
+      },
+      status: 'trial',
+      trialEndsAt
+    };
+
     const subscription: UserSubscription = {
       userId,
-      plan: { ...plan, status: 'trial', trialEndsAt },
+      plan: trialPlan,
       startDate: now,
       endDate: trialEndsAt,
       isActive: true,

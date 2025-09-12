@@ -99,6 +99,15 @@ const PlatformPage: React.FC = () => {
                         <span>Subscribed</span>
                       </div>
                     )}
+                    
+                    {/* Trial Usage Warning */}
+                    {subscriptionStatus.isTrial && subscriptionStatus.usage && (
+                      <div className="flex items-center space-x-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>{subscriptionStatus.usage.testCasesThisMonth}/3 test cases used</span>
+                      </div>
+                    )}
+                    
                     <button
                       onClick={() => setShowSubscriptionModal(true)}
                       className="text-xs text-blue-600 hover:text-blue-800 underline"
@@ -164,14 +173,22 @@ const PlatformPage: React.FC = () => {
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-gray-900">Current Plan</span>
                         <span className="text-sm text-gray-600">
-                          {subscriptionStatus.isTrial ? 'Trial' : 'Professional'}
+                          {subscriptionStatus.isTrial ? 'Free Trial' : 'Professional'}
                         </span>
                       </div>
                       
                       {subscriptionStatus.isTrial && (
-                        <div className="flex items-center space-x-2 text-yellow-600 text-sm">
-                          <Clock className="w-4 h-4" />
-                          <span>{subscriptionStatus.daysRemaining} days remaining</span>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 text-yellow-600 text-sm">
+                            <Clock className="w-4 h-4" />
+                            <span>{subscriptionStatus.daysRemaining} days remaining</span>
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            <div className="font-medium text-red-600 mb-1">Trial Limitations:</div>
+                            <div>• Only 3 test cases allowed</div>
+                            <div>• 1 concurrent session only</div>
+                            <div>• Limited to basic features</div>
+                          </div>
                         </div>
                       )}
                     </div>
