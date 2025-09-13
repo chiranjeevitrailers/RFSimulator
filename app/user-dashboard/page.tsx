@@ -12,6 +12,10 @@ export default function UserDashboard() {
 			</header>
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+					<Link href="/5glabx" className="block bg-white border rounded-lg p-6 hover:shadow-md transition">
+						<h2 className="text-base font-semibold text-gray-900">5GLabX Hub</h2>
+						<p className="text-sm text-gray-600 mt-1">Full platform navigation</p>
+					</Link>
 					<Link href="/test-runner" className="block bg-white border rounded-lg p-6 hover:shadow-md transition">
 						<h2 className="text-base font-semibold text-gray-900">Test Runner</h2>
 						<p className="text-sm text-gray-600 mt-1">Select test case, run, stream logs</p>
