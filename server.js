@@ -92,6 +92,34 @@ class RealCLILogServer {
       res.json(logs.slice(-limit));
     });
 
+    // Ingest logs (single or batch) for a given source
+    this.app.post('/api/logs/:source', (req, res) => {
+      const { source } = req.params;
+      const payload = req.body;
+
+      try {
+        if (!payload) {
+          return res.status(400).json({ error: 'Missing request body' });
+        }
+
+        const logs = Array.isArray(payload) ? payload : [payload];
+        let accepted = 0;
+
+        logs.forEach((raw) => {
+          const normalized = this.normalizeIncomingLog(source, raw);
+          if (normalized) {
+            this.addLogToBufferAndBroadcast(source, normalized);
+            accepted += 1;
+          }
+        });
+
+        res.json({ success: true, accepted, source });
+      } catch (error) {
+        console.error('Log ingestion error:', error);
+        res.status(500).json({ error: 'Failed to ingest logs' });
+      }
+    });
+
     // Configuration Management APIs
     this.setupConfigRoutes();
   }
@@ -487,6 +515,52 @@ class RealCLILogServer {
       default:
         console.log('Unknown WebSocket message type:', data.type);
     }
+  }
+
+  normalizeIncomingLog(source, raw) {
+    try {
+      // Accept either already structured entries or simple text lines
+      if (typeof raw === 'string') {
+        return {
+          id: Date.now() + Math.random(),
+          timestamp: new Date().toISOString(),
+          source,
+          level: 'I',
+          message: raw,
+          raw,
+        };
+      }
+
+      // If structured, ensure required fields
+      return {
+        id: raw.id || Date.now() + Math.random(),
+        timestamp: raw.timestamp || new Date().toISOString(),
+        source: raw.source || source,
+        level: raw.level || 'I',
+        message: raw.message || '',
+        layer: raw.layer,
+        protocol: raw.protocol,
+        executionId: raw.executionId,
+        testCaseId: raw.testCaseId,
+        data: raw.data,
+        raw: raw.raw || raw.message,
+        decoded: raw.decoded,
+        informationElements: raw.informationElements,
+        validation: raw.validation,
+        performance: raw.performance,
+      };
+    } catch (error) {
+      console.error('normalizeIncomingLog error:', error);
+      return null;
+    }
+  }
+
+  addLogToBufferAndBroadcast(source, logEntry) {
+    const buffer = this.logBuffers.get(source) || [];
+    buffer.push(logEntry);
+    if (buffer.length > 2000) buffer.shift();
+    this.logBuffers.set(source, buffer);
+    this.broadcastLog(source, logEntry);
   }
 
   initializeCLIMonitoring() {

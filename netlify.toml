@@ -1,5 +1,5 @@
 [build]
-  command = "npx next build"
+  command = "npm run build"
   publish = "out"
 
 [build.environment]
@@ -24,11 +24,13 @@
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/*.js"
@@ -41,16 +43,24 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/site.webmanifest"
+  for = "/manifest.webmanifest"
   [headers.values]
     Content-Type = "application/manifest+json"
     Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/favicon.ico"
   [headers.values]
     Content-Type = "image/x-icon"
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/favicon.svg"
+  [headers.values]
+    Content-Type = "image/svg+xml"
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
 
 # Plugin configuration for static export
 [[plugins]]
