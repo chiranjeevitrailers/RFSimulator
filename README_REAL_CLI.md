@@ -30,7 +30,7 @@ sudo chown -R $USER:$USER /var/log/kamailio
 
 ### 1. Install Dependencies
 ```bash
-cd E:\5glabxtrickle
+cd /path/to/5glabx-platform
 npm install
 ```
 
@@ -255,7 +255,7 @@ After=network.target
 [Service]
 Type=simple
 User=$USER
-WorkingDirectory=/path/to/5glabxtrickle
+WorkingDirectory=/path/to/5glabx-platform
 ExecStart=/usr/bin/node server.js
 Restart=always
 RestartSec=5

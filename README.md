@@ -25,9 +25,12 @@ A comprehensive platform for 5G protocol simulation, analysis, and testing with 
 - **CI/CD Pipeline**: Complete deployment and continuous integration
 
 ### Technology Stack
-- **Frontend**: Next.js 14, React 18, TypeScript, TailwindCSS
-- **Backend**: Node.js, Express.js, Supabase
+- **Frontend**: Next.js 15, React 18, TypeScript, TailwindCSS
+- **Hosting**: Netlify (Static Site Hosting + Edge CDN)
+- **Backend**: Supabase (Backend-as-a-Service)
 - **Database**: PostgreSQL with Supabase
+- **CI/CD**: GitHub Actions + Netlify Functions
+- **CDN**: Standard unpkg.com and jsdelivr.net CDNs
 - **Authentication**: Supabase Auth with RBAC
 - **Deployment**: Netlify with CI/CD
 - **Monitoring**: Custom monitoring system with alerts
