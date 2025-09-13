@@ -45,3 +45,18 @@
     accessibility = 0.8
     best-practices = 0.8
     seo = 0.8
+
+# API proxy for 5GLabX backend
+[[redirects]]
+  from = "/api/5glabx/*"
+  to = "https://your-5glabx-backend.example.com/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+
+# Optional: If 5GLabX frontend is deployed separately
+# [[redirects]]
+#   from = "/5glabx/*"
+#   to = "https://5glabx-frontend.example.com/:splat"
+#   status = 200
+#   force = true

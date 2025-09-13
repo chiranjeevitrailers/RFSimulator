@@ -23,6 +23,12 @@ import {
 } from 'lucide-react';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+import LogViewer from '@/components/logs/LogViewer';
+import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
+import ProfessionalTestCaseViewer from '@/components/test-cases/ProfessionalTestCaseViewer';
+import DetailedTestCaseViewer from '@/components/test-cases/DetailedTestCaseViewer';
+import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
+import Subscribed5glabx from '@/components/subscriptions/Subscribed5glabx';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -337,23 +343,44 @@ const UserDashboard: React.FC = () => {
         )}
         
         {activeTab === '3gpp-test-cases' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">3GPP Test Cases</h3>
-            <p className="text-gray-600">3GPP test cases viewer coming soon...</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">3GPP Test Cases</h3>
+              <Subscribed5glabx>
+                <ThreeGPPTestCaseViewer 
+                  userId={user.id}
+                  apiBase="/api/5glabx"
+                />
+              </Subscribed5glabx>
+            </div>
           </div>
         )}
         
             {activeTab === 'professional-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional Test Cases</h3>
-                <p className="text-gray-600">Professional test cases viewer coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional Test Cases</h3>
+                  <Subscribed5glabx>
+                    <ProfessionalTestCaseViewer 
+                      userId={user.id}
+                      apiBase="/api/5glabx"
+                    />
+                  </Subscribed5glabx>
+                </div>
               </div>
             )}
 
             {activeTab === 'detailed-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Cases</h3>
-                <p className="text-gray-600">Detailed test cases viewer coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Cases</h3>
+                  <Subscribed5glabx>
+                    <DetailedTestCaseViewer 
+                      userId={user.id}
+                      apiBase="/api/5glabx"
+                    />
+                  </Subscribed5glabx>
+                </div>
               </div>
             )}
 
@@ -386,7 +413,12 @@ const UserDashboard: React.FC = () => {
                         </button>
                       </div>
                     </div>
-                    <ProtocolAnalyzerDashboard />
+                    <Subscribed5glabx>
+                      <ProtocolAnalyzerDashboard 
+                        userId={user.id}
+                        apiBase="/api/5glabx"
+                      />
+                    </Subscribed5glabx>
                   </div>
                 ) : (
                   <div>
@@ -417,27 +449,44 @@ const UserDashboard: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <ProtocolAnalyzerViewer 
-                      executionId="exec-001"
-                      testCaseId="tc-5g-nr-random-access"
-                      userId="user-1"
-                    />
+                    <Subscribed5glabx>
+                      <ProtocolAnalyzerViewer 
+                        executionId="exec-001"
+                        testCaseId="tc-5g-nr-random-access"
+                        userId={user.id}
+                        apiBase="/api/5glabx"
+                      />
+                    </Subscribed5glabx>
                   </div>
                 )}
               </div>
             )}
 
             {activeTab === 'log-viewer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Viewer</h3>
-                <p className="text-gray-600">Log viewer coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">5GLabX Log Viewer</h3>
+                  <Subscribed5glabx>
+                    <LogViewer 
+                      userId={user.id}
+                      apiBase="/api/5glabx"
+                    />
+                  </Subscribed5glabx>
+                </div>
               </div>
             )}
 
             {activeTab === 'protocol-layers' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
-                <p className="text-gray-600">Protocol layers display coming soon...</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
+                  <Subscribed5glabx>
+                    <ProtocolLayerDisplay 
+                      userId={user.id}
+                      apiBase="/api/5glabx"
+                    />
+                  </Subscribed5glabx>
+                </div>
               </div>
             )}
       </main>
