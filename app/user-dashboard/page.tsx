@@ -11,7 +11,7 @@ export default function UserDashboard() {
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 text-white font-bold grid place-items-center">5G</div>
             <h1 className="text-lg font-semibold text-gray-900">5GLabX User Dashboard</h1>
           </div>
-          <a href="/5glabx/simple.html" className="text-sm text-primary-600 hover:text-primary-700">Open 5GLabX in new tab</a>
+          <a href="/5glabx/simple/" className="text-sm text-primary-600 hover:text-primary-700">Open 5GLabX in new tab</a>
         </div>
       </header>
 
@@ -23,7 +23,7 @@ export default function UserDashboard() {
           </div>
           <div style={{height:'78vh', borderTop:'1px solid #e5e7eb'}}>
             <iframe
-              src="/5glabx/simple.html"
+              src="/5glabx/simple/"
               title="5GLabX Platform"
               style={{ width: '100%', height: '100%', border: 0 }}
               sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
