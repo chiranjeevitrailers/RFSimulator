@@ -57,13 +57,15 @@ interface LogViewerProps {
   testCaseId: string;
   userId: string;
   mode: 'basic' | 'enhanced';
+  source?: 'srsran' | 'open5gs' | 'kamailio' | string;
 }
 
 const LogViewer: React.FC<LogViewerProps> = ({ 
   executionId, 
   testCaseId, 
   userId, 
-  mode 
+  mode,
+  source = 'srsran'
 }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<LogEntry[]>([]);
@@ -93,58 +95,93 @@ const LogViewer: React.FC<LogViewerProps> = ({
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Simulate real-time log generation
-    const logInterval = setInterval(() => {
-      const newLog: LogEntry = {
-        id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: new Date(),
-        level: ['debug', 'info', 'warning', 'error'][Math.floor(Math.random() * 4)] as any,
-        source: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        layer: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        protocol: ['NR-PHY', 'NR-MAC', 'NR-RLC', 'NR-PDCP', 'NR-RRC', '5G-NAS'][Math.floor(Math.random() * 6)],
-        message: `Message processed: ${Math.random().toString(36).substr(2, 9)}`,
-        data: {
-          messageType: 'TestMessage',
-          direction: ['UL', 'DL'][Math.floor(Math.random() * 2)],
-          size: Math.floor(Math.random() * 1000) + 100
-        },
-        messageId: `msg_${Math.random().toString(36).substr(2, 9)}`,
-        stepId: `step_${Math.floor(Math.random() * 10) + 1}`,
-        direction: ['UL', 'DL', 'BIDIRECTIONAL'][Math.floor(Math.random() * 3)] as any,
-        rawData: Math.random().toString(16).substr(2, 16).toUpperCase(),
-        decodedData: {
-          field1: Math.floor(Math.random() * 100),
-          field2: Math.random().toString(36).substr(2, 8)
-        },
-        informationElements: [
-          {
-            name: 'test_ie',
-            type: 'integer',
-            value: Math.floor(Math.random() * 100),
-            hexValue: Math.random().toString(16).substr(2, 4).toUpperCase(),
-            mandatory: true,
-            validationStatus: 'valid'
-          }
-        ],
-        validationResult: {
-          isValid: Math.random() > 0.1,
-          errors: [],
-          warnings: [],
-          complianceScore: Math.floor(Math.random() * 20) + 80
-        },
-        performanceData: {
-          latency: Math.floor(Math.random() * 10) + 1,
-          processingTime: Math.random() * 5,
-          memoryUsage: Math.random() * 100,
-          cpuUsage: Math.random() * 100
-        }
-      };
-      
-      setLogs(prev => [...prev.slice(-999), newLog]); // Keep last 1000 logs
-    }, 500);
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8080';
+    const wsBase = process.env.NEXT_PUBLIC_WS_URL || serverUrl.replace(/^http/, 'ws').replace(/:8080(?!\d)/, ':8081');
 
-    return () => clearInterval(logInterval);
-  }, []);
+    let ws: WebSocket | null = null;
+    let cancelled = false;
+
+    async function bootstrap() {
+      try {
+        // Initial fetch of recent logs
+        const resp = await fetch(`${serverUrl}/api/logs/${source}?limit=500`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (!cancelled) {
+            const normalized = (data || []).map((d: any) => ({
+              id: d.id || `log_${Math.random().toString(36).slice(2)}`,
+              timestamp: new Date(d.timestamp || Date.now()),
+              level: (d.level || 'info').toLowerCase(),
+              source: (d.source || source).toString().toUpperCase(),
+              layer: (d.layer || 'RRC').toString().toUpperCase(),
+              protocol: (d.protocol || 'NR-RRC').toString().toUpperCase(),
+              message: d.message || '',
+              data: d.data,
+              messageId: d.messageId,
+              stepId: d.stepId,
+              direction: d.direction,
+              rawData: d.raw || d.rawData,
+              decodedData: d.decoded || d.decodedData,
+              informationElements: d.informationElements,
+              validationResult: d.validation || d.validationResult,
+              performanceData: d.performance || d.performanceData,
+            } as LogEntry));
+            setLogs(normalized);
+          }
+        }
+      } catch (e) {
+        console.error('Initial log fetch failed:', e);
+      }
+
+      try {
+        // Live WebSocket stream
+        ws = new WebSocket(wsBase);
+        ws.onmessage = (evt) => {
+          try {
+            const payload = JSON.parse(evt.data);
+            if (payload?.type === 'log' && payload?.source) {
+              if (payload.source !== source) return;
+              const d = payload.data || {};
+              // Optional execution/test case filtering
+              if (executionId && d.executionId && d.executionId !== executionId) return;
+              if (testCaseId && d.testCaseId && d.testCaseId !== testCaseId) return;
+              const entry: LogEntry = {
+                id: d.id || `log_${Math.random().toString(36).slice(2)}`,
+                timestamp: new Date(d.timestamp || Date.now()),
+                level: (d.level || 'info').toLowerCase(),
+                source: (d.source || source).toString().toUpperCase(),
+                layer: (d.layer || 'RRC').toString().toUpperCase(),
+                protocol: (d.protocol || 'NR-RRC').toString().toUpperCase(),
+                message: d.message || '',
+                data: d.data,
+                messageId: d.messageId,
+                stepId: d.stepId,
+                direction: d.direction,
+                rawData: d.raw || d.rawData,
+                decodedData: d.decoded || d.decodedData,
+                informationElements: d.informationElements,
+                validationResult: d.validation || d.validationResult,
+                performanceData: d.performance || d.performanceData,
+              };
+              setLogs(prev => [...prev.slice(-999), entry]);
+            }
+          } catch (err) {
+            // ignore malformed messages
+          }
+        };
+        ws.onerror = () => {};
+      } catch (e) {
+        console.error('WebSocket connection failed:', e);
+      }
+    }
+
+    bootstrap();
+
+    return () => {
+      cancelled = true;
+      try { ws && ws.close(); } catch {}
+    };
+  }, [executionId, testCaseId, source]);
 
   useEffect(() => {
     // Apply filters
