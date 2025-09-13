@@ -87,7 +87,7 @@ export const db = {
   async createUser(userData: Partial<User>) {
     checkSupabase();
     
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('users')
       .insert([userData])
       .select()
@@ -99,7 +99,7 @@ export const db = {
 
   async getUserById(id: string) {
     checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', id)
@@ -110,8 +110,7 @@ export const db = {
   },
 
   async getUserByEmail(email: string) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('email', email)
@@ -122,8 +121,7 @@ export const db = {
   },
 
   async updateUser(id: string, updates: Partial<User>) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('users')
       .update(updates)
       .eq('id', id)
@@ -135,8 +133,7 @@ export const db = {
   },
 
   async getAllUsers(limit = 50, offset = 0) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .order('created_at', { ascending: false })
@@ -148,8 +145,7 @@ export const db = {
 
   // Test case operations
   async createTestCase(testCaseData: Partial<TestCase>) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_cases')
       .insert([testCaseData])
       .select()
@@ -160,8 +156,7 @@ export const db = {
   },
 
   async getTestCaseById(id: string) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_cases')
       .select('*')
       .eq('id', id)
@@ -172,8 +167,7 @@ export const db = {
   },
 
   async getAllTestCases(limit = 50, offset = 0) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_cases')
       .select('*')
       .eq('is_active', true)
@@ -185,8 +179,7 @@ export const db = {
   },
 
   async getTestCasesByCategory(category: string, limit = 50, offset = 0) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_cases')
       .select('*')
       .eq('category', category)
@@ -200,8 +193,7 @@ export const db = {
 
   // Test execution operations
   async createTestExecution(executionData: Partial<TestExecution>) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_executions')
       .insert([executionData])
       .select()
@@ -212,8 +204,7 @@ export const db = {
   },
 
   async getTestExecutionsByUser(userId: string, limit = 50, offset = 0) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('test_executions')
       .select(`
         *,
@@ -233,8 +224,7 @@ export const db = {
 
   // User activity operations
   async logUserActivity(activityData: Partial<UserActivity>) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('user_activities')
       .insert([activityData])
       .select()
@@ -245,8 +235,7 @@ export const db = {
   },
 
   async getUserActivities(userId: string, limit = 50, offset = 0) {
-    checkSupabase();
-    const { data, error } = await supabase!
+    const { data, error } = await supabase
       .from('user_activities')
       .select('*')
       .eq('user_id', userId)
