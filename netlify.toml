@@ -61,42 +61,7 @@
     best-practices = 0.8
     seo = 0.8
 
-# Serve static files
-[[redirects]]
-  from = "/site.webmanifest"
-  to = "/site.webmanifest"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/favicon.ico"
-  to = "/favicon.ico"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/favicon-16x16.png"
-  to = "/favicon-16x16.png"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/favicon-32x32.png"
-  to = "/favicon-32x32.png"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/apple-touch-icon.png"
-  to = "/apple-touch-icon.png"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/og-image.png"
-  to = "/og-image.png"
-  status = 200
-  force = true
+# Static files are served directly by Netlify from the publish directory
 
 # Serve 5GLabX platform from public directory
 [[redirects]]
