@@ -5,7 +5,7 @@ interface Subscribed5glabxProps {
   iframeSrc?: string;
 }
 
-export default function Subscribed5glabx({ iframeSrc = '/5glabx' }: Subscribed5glabxProps) {
+export default function Subscribed5glabx({ iframeSrc = '/5glabx/simple.html' }: Subscribed5glabxProps) {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'denied'>('checking');
   const [isLoading, setIsLoading] = useState(true);
 
