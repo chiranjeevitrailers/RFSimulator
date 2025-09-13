@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { enhancedTestCaseManager, EnhancedTestCase, TestCaseExecutionResult } from '@/lib/enhanced-test-case-manager';
+import { supabase } from '@/lib/supabase';
 
 interface ThreeGPPTestCaseViewerProps {
   userId: string;
@@ -47,6 +48,13 @@ const ThreeGPPTestCaseViewer: React.FC<ThreeGPPTestCaseViewerProps> = ({ userId 
 
   const loadTestCases = async () => {
     try {
+      if (!supabase) {
+        console.warn('Supabase client not initialized. Using mock data.');
+        // Use mock data when Supabase is not available
+        setTestCases(enhancedTestCaseManager.getMockTestCases());
+        return;
+      }
+
       // Load 3GPP compliant test cases
       const { data, error } = await supabase
         .from('enhanced_test_cases')

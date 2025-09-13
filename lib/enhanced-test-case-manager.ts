@@ -664,6 +664,134 @@ export class EnhancedTestCaseManager {
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  // Mock data for when Supabase is not available
+  getMockTestCases(): EnhancedTestCase[] {
+    return [
+      {
+        id: 'tc_5g_nr_random_access',
+        name: '5G NR Random Access Procedure',
+        description: 'Complete 5G NR random access procedure with RACH preamble transmission',
+        category: '5G_NR',
+        subcategory: 'Initial Access',
+        complexity: 'intermediate',
+        duration: 30,
+        protocol_layers: ['PHY', 'MAC', 'RRC'],
+        test_data: {
+          messages: [
+            { type: 'RACH_Preamble', layer: 'PHY', direction: 'UL' },
+            { type: 'Random_Access_Response', layer: 'MAC', direction: 'DL' },
+            { type: 'RRC_Setup_Request', layer: 'RRC', direction: 'UL' }
+          ]
+        },
+        expected_results: {
+          success_criteria: ['RACH preamble detected', 'RAR received', 'RRC setup complete']
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_by: 'system',
+        is_active: true,
+        tags: ['5G', 'NR', 'RACH', 'Random Access'],
+        execution_history: [],
+        performance_baseline: {
+          average_latency_ms: 15,
+          average_throughput_mbps: 100,
+          success_rate_percent: 95,
+          error_rate_percent: 2,
+          last_updated: new Date().toISOString(),
+          sample_size: 100
+        },
+        validation_results: {
+          ie_validation: {
+            total_ies: 25,
+            valid_ies: 24,
+            invalid_ies: 1,
+            validation_score: 96
+          },
+          message_flow_validation: {
+            total_messages: 3,
+            valid_messages: 3,
+            invalid_messages: 0,
+            flow_score: 100
+          },
+          layer_compliance: {
+            phy_compliance: 98,
+            mac_compliance: 95,
+            rrc_compliance: 100
+          }
+        },
+        layer_statistics: [
+          { layer: 'PHY', message_count: 1, error_count: 0, latency_ms: 5 },
+          { layer: 'MAC', message_count: 1, error_count: 0, latency_ms: 8 },
+          { layer: 'RRC', message_count: 1, error_count: 0, latency_ms: 2 }
+        ]
+      },
+      {
+        id: 'tc_lte_attach_procedure',
+        name: 'LTE Attach Procedure',
+        description: 'Complete LTE attach procedure with authentication and security setup',
+        category: '4G_LTE',
+        subcategory: 'Initial Attach',
+        complexity: 'advanced',
+        duration: 45,
+        protocol_layers: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'],
+        test_data: {
+          messages: [
+            { type: 'Attach_Request', layer: 'NAS', direction: 'UL' },
+            { type: 'Authentication_Request', layer: 'NAS', direction: 'DL' },
+            { type: 'Authentication_Response', layer: 'NAS', direction: 'UL' },
+            { type: 'Security_Mode_Command', layer: 'RRC', direction: 'DL' },
+            { type: 'Attach_Accept', layer: 'NAS', direction: 'DL' }
+          ]
+        },
+        expected_results: {
+          success_criteria: ['Authentication successful', 'Security setup complete', 'Attach accepted']
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_by: 'system',
+        is_active: true,
+        tags: ['LTE', 'Attach', 'Authentication', 'Security'],
+        execution_history: [],
+        performance_baseline: {
+          average_latency_ms: 25,
+          average_throughput_mbps: 150,
+          success_rate_percent: 98,
+          error_rate_percent: 1,
+          last_updated: new Date().toISOString(),
+          sample_size: 200
+        },
+        validation_results: {
+          ie_validation: {
+            total_ies: 45,
+            valid_ies: 44,
+            invalid_ies: 1,
+            validation_score: 98
+          },
+          message_flow_validation: {
+            total_messages: 5,
+            valid_messages: 5,
+            invalid_messages: 0,
+            flow_score: 100
+          },
+          layer_compliance: {
+            phy_compliance: 99,
+            mac_compliance: 98,
+            rrc_compliance: 100,
+            nas_compliance: 97
+          }
+        },
+        layer_statistics: [
+          { layer: 'PHY', message_count: 5, error_count: 0, latency_ms: 3 },
+          { layer: 'MAC', message_count: 5, error_count: 0, latency_ms: 5 },
+          { layer: 'RLC', message_count: 5, error_count: 0, latency_ms: 4 },
+          { layer: 'PDCP', message_count: 5, error_count: 0, latency_ms: 3 },
+          { layer: 'RRC', message_count: 2, error_count: 0, latency_ms: 6 },
+          { layer: 'NAS', message_count: 3, error_count: 0, latency_ms: 4 }
+        ]
+      }
+    ];
+  }
 }
 
 // Export interfaces
