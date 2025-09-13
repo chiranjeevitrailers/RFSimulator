@@ -465,13 +465,8 @@ const UserDashboard: React.FC = () => {
             {activeTab === 'log-viewer' && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">5GLabX Log Viewer</h3>
-                  <Subscribed5glabx>
-                    <LogViewer 
-                      userId={user.id}
-                      apiBase="/api/5glabx"
-                    />
-                  </Subscribed5glabx>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">5GLabX Platform</h3>
+                  <Subscribed5glabx iframeSrc="/5glabx" />
                 </div>
               </div>
             )}

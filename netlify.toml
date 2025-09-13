@@ -46,6 +46,13 @@
     best-practices = 0.8
     seo = 0.8
 
+# Serve 5GLabX platform from public directory
+[[redirects]]
+  from = "/5glabx/*"
+  to = "/5glabx/:splat"
+  status = 200
+  force = true
+
 # API proxy for 5GLabX backend
 [[redirects]]
   from = "/api/5glabx/*"
@@ -53,10 +60,3 @@
   status = 200
   force = true
   headers = {X-From = "Netlify"}
-
-# Optional: If 5GLabX frontend is deployed separately
-# [[redirects]]
-#   from = "/5glabx/*"
-#   to = "https://5glabx-frontend.example.com/:splat"
-#   status = 200
-#   force = true

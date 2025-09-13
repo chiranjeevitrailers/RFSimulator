@@ -2,28 +2,26 @@
 import React, { useEffect, useState } from 'react';
 
 interface Subscribed5glabxProps {
-  children: React.ReactNode;
-  fallbackComponent?: React.ReactNode;
+  iframeSrc?: string;
 }
 
-export default function Subscribed5glabx({ 
-  children, 
-  fallbackComponent 
-}: Subscribed5glabxProps) {
+export default function Subscribed5glabx({ iframeSrc = '/5glabx' }: Subscribed5glabxProps) {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'denied'>('checking');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkSubscription = async () => {
       try {
-        // For now, we'll simulate a subscription check
-        // In production, this would call your actual subscription API
-        const hasSubscription = true; // Mock: assume user has subscription
+        const response = await fetch('/.netlify/functions/check-subscription', { 
+          credentials: 'include' 
+        });
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        setStatus(hasSubscription ? 'allowed' : 'denied');
+        if (response.ok) {
+          const data = await response.json();
+          setStatus(data.hasSubscription ? 'allowed' : 'denied');
+        } else {
+          setStatus('denied');
+        }
       } catch (error) {
         console.error('Subscription check failed:', error);
         setStatus('denied');
@@ -47,7 +45,7 @@ export default function Subscribed5glabx({
   }
 
   if (status === 'denied') {
-    return fallbackComponent || (
+    return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
         <div className="text-yellow-600 mb-4">
           <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +54,7 @@ export default function Subscribed5glabx({
         </div>
         <h3 className="text-lg font-semibold text-yellow-800 mb-2">Subscription Required</h3>
         <p className="text-yellow-700 mb-4">
-          You need an active subscription to access 5GLabX features.
+          You need an active subscription to access the 5GLabX Platform.
         </p>
         <a 
           href="/pricing" 
@@ -68,5 +66,15 @@ export default function Subscribed5glabx({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <div style={{height:'78vh', borderRadius:8, overflow:'hidden', border:'1px solid #e5e7eb'}}>
+      <iframe 
+        src={iframeSrc} 
+        title="5GLabX Platform" 
+        style={{width:'100%', height:'100%', border:0}} 
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+        allow="fullscreen"
+      />
+    </div>
+  );
 }
