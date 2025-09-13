@@ -11,8 +11,8 @@ try {
   console.log('📦 Running Next.js build...');
   execSync('npx next build', { stdio: 'inherit' });
 
-  // Step 2: Copy static files from public to out directory
-  console.log('📁 Copying static files...');
+  // Step 2: Copy entire public directory to out directory (ensures favicons, manifest, and 5glabx assets)
+  console.log('📁 Copying public directory...');
   
   const publicDir = path.join(__dirname, '..', 'public');
   const outDir = path.join(__dirname, '..', 'out');
@@ -22,20 +22,31 @@ try {
     fs.mkdirSync(outDir, { recursive: true });
   }
   
-  // Copy static files (excluding 5glabx directory which is already handled)
-  const staticFiles = ['favicon.ico', 'site.webmanifest', 'favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png', 'og-image.png'];
-  
-  staticFiles.forEach(file => {
-    const srcPath = path.join(publicDir, file);
-    const destPath = path.join(outDir, file);
-    
-    if (fs.existsSync(srcPath)) {
-      fs.copyFileSync(srcPath, destPath);
-      console.log(`✅ Copied ${file}`);
+  if (fs.existsSync(publicDir)) {
+    // Node 16+: use fs.cpSync if available
+    if (typeof fs.cpSync === 'function') {
+      fs.cpSync(publicDir, outDir, { recursive: true, force: true });
     } else {
-      console.log(`⚠️  ${file} not found in public directory`);
+      // Fallback recursive copy
+      const copyRecursive = (src, dest) => {
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+        for (const entry of fs.readdirSync(src)) {
+          const srcPath = path.join(src, entry);
+          const destPath = path.join(dest, entry);
+          const stat = fs.statSync(srcPath);
+          if (stat.isDirectory()) {
+            copyRecursive(srcPath, destPath);
+          } else {
+            fs.copyFileSync(srcPath, destPath);
+          }
+        }
+      };
+      copyRecursive(publicDir, outDir);
     }
-  });
+    console.log('✅ Copied public directory');
+  } else {
+    console.log('⚠️  public directory not found');
+  }
   
   // Step 3: Verify 5GLabX platform files
   console.log('🔍 Verifying 5GLabX platform files...');
