@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getServerUrl, getWebSocketUrl } from '@/lib/env';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
@@ -77,94 +78,152 @@ const ProtocolAnalyzerViewer: React.FC<ProtocolAnalyzerViewerProps> = ({
   const [logs, setLogs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate execution data
-    const mockExecution = {
+    // Initialize from live logs (REST + WS)
+    const serverUrl = getServerUrl();
+    const wsUrl = getWebSocketUrl();
+    let ws: WebSocket | null = null;
+    let cancelled = false;
+
+    // seed execution shell
+    setExecution({
       executionId,
       testCaseId,
       status: 'running',
       startTime: new Date(),
-      progress: 45,
-      currentStep: 'executing_step_3',
-      messages: [
-        {
-          id: 'msg_1',
-          stepId: 'step_1',
-          timestamp: Date.now() - 5000,
-          direction: 'UL',
-          layer: 'PHY',
-          protocol: 'NR-PHY',
-          messageType: 'RandomAccessPreamble',
-          messageName: 'RA Preamble',
-          rawData: '0000000000000000',
-          decodedData: { preamble_id: 15, ra_rnti: 12345 },
-          informationElements: [
-            {
-              name: 'preamble_id',
-              type: 'integer',
-              value: 15,
-              hexValue: '0F',
-              binaryValue: '001111',
-              size: 6,
-              mandatory: true,
-              validationStatus: 'valid',
-              errors: [],
-              warnings: [],
-              standardReference: 'TS 38.211 6.1.1'
-            }
-          ],
-          layerParameters: { rsrp: -85, rsrq: -12, sinr: 18 },
-          validationResult: {
-            isValid: true,
-            errors: [],
-            warnings: [],
-            complianceScore: 100,
-            standardReference: 'TS 38.211 6.1.1'
-          },
-          performanceData: {
-            latency: 1,
-            processingTime: 0.8,
-            memoryUsage: 10,
-            cpuUsage: 5
+      progress: 0,
+      currentStep: '',
+      messages: [],
+      layerStats: [],
+      performanceMetrics: {}
+    });
+
+    async function bootstrap() {
+      try {
+        const resp = await fetch(`${serverUrl}/api/logs/srsran?limit=500`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (!cancelled) {
+            const initial = (data || []).filter((d: any) => {
+              if (executionId && d.executionId && d.executionId !== executionId) return false;
+              if (testCaseId && d.testCaseId && d.testCaseId !== testCaseId) return false;
+              return true;
+            }).map((d: any) => ({
+              timestamp: new Date(d.timestamp || Date.now()),
+              level: (d.level || 'info').toLowerCase(),
+              source: (d.source || 'RRC').toString(),
+              message: d.message || '',
+              data: d.data || {},
+              layer: (d.layer || 'RRC').toString().toUpperCase(),
+              protocol: (d.protocol || 'NR-RRC').toString().toUpperCase(),
+              rawData: d.raw || d.rawData,
+              decodedData: d.decoded || d.decodedData,
+              informationElements: d.informationElements || [],
+              validationResult: d.validation || d.validationResult || { isValid: true },
+              performanceData: d.performance || d.performanceData || {},
+            }));
+            setLogs(initial);
           }
         }
-      ],
-      layerStats: [
-        { layer: 'PHY', messageCount: 1, errorCount: 0, successRate: 100, averageLatency: 1 },
-        { layer: 'MAC', messageCount: 0, errorCount: 0, successRate: 100, averageLatency: 0 },
-        { layer: 'RLC', messageCount: 0, errorCount: 0, successRate: 100, averageLatency: 0 },
-        { layer: 'PDCP', messageCount: 0, errorCount: 0, successRate: 100, averageLatency: 0 },
-        { layer: 'RRC', messageCount: 0, errorCount: 0, successRate: 100, averageLatency: 0 },
-        { layer: 'NAS', messageCount: 0, errorCount: 0, successRate: 100, averageLatency: 0 }
-      ],
-      performanceMetrics: {
-        totalMessages: 1,
-        successfulMessages: 1,
-        failedMessages: 0,
-        averageLatency: 1,
-        maxLatency: 1,
-        minLatency: 1,
-        throughput: 100,
-        errorRate: 0,
-        successRate: 100
-      }
-    };
+      } catch {}
 
-    setExecution(mockExecution);
+      try {
+        ws = new WebSocket(wsUrl);
+        ws.onmessage = (evt) => {
+          try {
+            const payload = JSON.parse(evt.data);
+            if (payload?.type === 'log' && payload?.source) {
+              const d = payload.data || {};
+              if (executionId && d.executionId && d.executionId !== executionId) return;
+              if (testCaseId && d.testCaseId && d.testCaseId !== testCaseId) return;
+              const entry = {
+                timestamp: new Date(d.timestamp || Date.now()),
+                level: (d.level || 'info').toLowerCase(),
+                source: (d.source || 'RRC').toString(),
+                message: d.message || '',
+                data: d.data || {},
+                layer: (d.layer || 'RRC').toString().toUpperCase(),
+                protocol: (d.protocol || 'NR-RRC').toString().toUpperCase(),
+                rawData: d.raw || d.rawData,
+                decodedData: d.decoded || d.decodedData,
+                informationElements: d.informationElements || [],
+                validationResult: d.validation || d.validationResult || { isValid: true },
+                performanceData: d.performance || d.performanceData || {},
+              };
+              setLogs(prev => [...prev.slice(-499), entry]);
+            }
+          } catch {}
+        };
+      } catch {}
+    }
 
-    // Simulate real-time logs
-    const logInterval = setInterval(() => {
-      const newLog = {
-        timestamp: new Date(),
-        level: 'info',
-        source: 'PHY',
-        message: `Message processed: ${Math.random().toString(36).substr(2, 9)}`,
-        data: { layer: 'PHY', direction: 'UL' }
-      };
-      setLogs(prev => [...prev.slice(-99), newLog]); // Keep last 100 logs
-    }, 1000);
-
-    return () => clearInterval(logInterval);
+    bootstrap();
+    return () => { cancelled = true; try { ws && ws.close(); } catch {} };
   }, [executionId, testCaseId]);
+
+  // Derive execution view from logs
+  useEffect(() => {
+    const byLayer: Record<string, any[]> = {};
+    logs.forEach(l => {
+      const layer = (l.layer || 'RRC').toString().toUpperCase();
+      byLayer[layer] = byLayer[layer] || [];
+      byLayer[layer].push(l);
+    });
+    const layerStats = Object.entries(byLayer).map(([layer, items]) => {
+      const msgCount = items.length;
+      const errorCount = items.filter(i => i.level === 'error').length;
+      const latencies = items.map(i => i.performanceData?.latency).filter((n: any) => typeof n === 'number') as number[];
+      const avgLatency = latencies.length ? Math.round((latencies.reduce((a, b) => a + b, 0) / latencies.length) * 10) / 10 : 0;
+      const successRate = msgCount ? Math.round(((msgCount - errorCount) / msgCount) * 1000) / 10 : 100;
+      return { layer, messageCount: msgCount, errorCount, successRate, averageLatency: avgLatency };
+    });
+    const totalMessages = logs.length;
+    const failedMessages = logs.filter(l => l.level === 'error').length;
+    const successfulMessages = totalMessages - failedMessages;
+    const latencies = logs.map(l => l.performanceData?.latency).filter((n: any) => typeof n === 'number') as number[];
+    const averageLatency = latencies.length ? Math.round((latencies.reduce((a, b) => a + b, 0) / latencies.length) * 10) / 10 : 0;
+    const maxLatency = latencies.length ? Math.max(...latencies) : 0;
+    const minLatency = latencies.length ? Math.min(...latencies) : 0;
+    const errorRate = totalMessages ? Math.round((failedMessages / totalMessages) * 1000) / 10 : 0;
+    const successRate = totalMessages ? Math.round((successfulMessages / totalMessages) * 1000) / 10 : 100;
+
+    const messages = logs.map((l, idx) => ({
+      id: `msg_${idx}`,
+      stepId: l.data?.stepId || `step_${idx + 1}`,
+      timestamp: l.timestamp?.valueOf() || Date.now(),
+      direction: l.data?.direction || 'UL',
+      layer: l.layer,
+      protocol: l.protocol,
+      messageType: l.data?.messageType || 'Message',
+      messageName: l.message?.slice(0, 40) || 'Message',
+      rawData: l.rawData,
+      decodedData: l.decodedData,
+      informationElements: l.informationElements || [],
+      layerParameters: {},
+      validationResult: l.validationResult || { isValid: l.level !== 'error' },
+      performanceData: l.performanceData || {},
+    }));
+
+    setExecution(prev => ({
+      ...(prev || {}),
+      executionId,
+      testCaseId,
+      status: 'running',
+      messages,
+      layerStats,
+      performanceMetrics: {
+        totalMessages,
+        successfulMessages,
+        failedMessages,
+        averageLatency,
+        maxLatency,
+        minLatency,
+        throughput: 0,
+        errorRate,
+        successRate,
+      },
+      progress: Math.min(100, Math.round((messages.length / 100) * 100))
+    }));
+  }, [logs, executionId, testCaseId]);
 
   const getDirectionIcon = (direction: string) => {
     switch (direction) {
