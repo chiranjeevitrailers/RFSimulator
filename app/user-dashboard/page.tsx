@@ -7,28 +7,33 @@ import {
   BarChart3, 
   Settings, 
   LogOut,
-  FileText,
-  Play,
   User,
   Bell,
   HelpCircle,
   Shield,
-  Award,
   Database,
   Monitor,
   MessageSquare,
   Layers,
   Wifi,
-  Cloud
+  Cloud,
+  Play,
+  Pause,
+  Square,
+  Eye,
+  Download,
+  Upload,
+  RefreshCw,
+  Plus,
+  Search,
+  Filter,
+  Calendar,
+  Clock,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
-import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
-import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
-import LogViewer from '@/components/logs/LogViewer';
-import ThreeGPPTestCaseViewer from '@/components/test-cases/ThreeGPPTestCaseViewer';
-import ProfessionalTestCaseViewer from '@/components/test-cases/ProfessionalTestCaseViewer';
-import DetailedTestCaseViewer from '@/components/test-cases/DetailedTestCaseViewer';
-import ProtocolLayerDisplay from '@/components/protocol-layers/ProtocolLayerDisplay';
-import Subscribed5glabx from '@/components/subscriptions/Subscribed5glabx';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -36,12 +41,12 @@ const UserDashboard: React.FC = () => {
     id: 'user-1',
     email: 'user@5glabx.com',
     full_name: 'Demo User',
-    role: 'user'
+    role: 'user',
+    subscription_tier: 'pro',
+    subscription_status: 'active'
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('simulations');
-  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
-  const [protocolAnalyzerView, setProtocolAnalyzerView] = useState<'dashboard' | 'analyzer'>('dashboard');
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     // Mock user loading for static export
@@ -51,6 +56,7 @@ const UserDashboard: React.FC = () => {
   const handleSignOut = () => {
     // Mock sign out for static export
     console.log('Sign out clicked');
+    router.push('/login');
   };
 
   if (isLoading) {
@@ -80,6 +86,17 @@ const UserDashboard: React.FC = () => {
               </div>
               <nav className="ml-10 flex space-x-8">
                 <button
+                  onClick={() => setActiveTab('overview')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === 'overview'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Activity className="w-4 h-4 inline mr-2" />
+                  Overview
+                </button>
+                <button
                   onClick={() => setActiveTab('simulations')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     activeTab === 'simulations'
@@ -87,30 +104,8 @@ const UserDashboard: React.FC = () => {
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <Activity className="w-4 h-4 inline mr-2" />
+                  <Play className="w-4 h-4 inline mr-2" />
                   Simulations
-                </button>
-                <button
-                  onClick={() => setActiveTab('executions')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'executions'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Activity className="w-4 h-4 inline mr-2" />
-                  Executions
-                </button>
-                <button
-                  onClick={() => setActiveTab('realtime')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'realtime'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Activity className="w-4 h-4 inline mr-2" />
-                  Real-Time
                 </button>
                 <button
                   onClick={() => setActiveTab('analytics')}
@@ -124,125 +119,15 @@ const UserDashboard: React.FC = () => {
                   Analytics
                 </button>
                 <button
-                  onClick={() => setActiveTab('api-docs')}
+                  onClick={() => setActiveTab('5glabx-platform')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'api-docs'
+                    activeTab === '5glabx-platform'
                       ? 'bg-primary-100 text-primary-700'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <FileText className="w-4 h-4 inline mr-2" />
-                  API Docs
-                </button>
-                <button
-                  onClick={() => setActiveTab('api-testing')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'api-testing'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Play className="w-4 h-4 inline mr-2" />
-                  API Testing
-                </button>
-                <button
-                  onClick={() => setActiveTab('3gpp-test-cases')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === '3gpp-test-cases'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Shield className="w-4 h-4 inline mr-2" />
-                  3GPP Test Cases
-                </button>
-            <button
-              onClick={() => setActiveTab('professional-test-cases')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'professional-test-cases'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Award className="w-4 h-4 inline mr-2" />
-              Professional Tests
-            </button>
-            <button
-              onClick={() => setActiveTab('detailed-test-cases')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'detailed-test-cases'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Database className="w-4 h-4 inline mr-2" />
-              Detailed Analysis
-            </button>
-            <button
-              onClick={() => setActiveTab('protocol-analyzer')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'protocol-analyzer'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Monitor className="w-4 h-4 inline mr-2" />
-              Protocol Analyzer
-            </button>
-            <button
-              onClick={() => setActiveTab('log-viewer')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'log-viewer'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 inline mr-2" />
-              Log Viewer
-            </button>
-            <button
-              onClick={() => setActiveTab('protocol-layers')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'protocol-layers'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Layers className="w-4 h-4 inline mr-2" />
-              Protocol Layers
-            </button>
-            <button
-              onClick={() => setActiveTab('equipment')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === 'equipment'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Wifi className="w-4 h-4 inline mr-2" />
-              Equipment
-            </button>
-            <button
-              onClick={() => setActiveTab('5glab-services')}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === '5glab-services'
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Cloud className="w-4 h-4 inline mr-2" />
-              5GLAB Services
-            </button>
-                <button
-                  onClick={() => setActiveTab('monitoring')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'monitoring'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Activity className="w-4 h-4 inline mr-2" />
-                  Monitoring
+                  <Monitor className="w-4 h-4 inline mr-2" />
+                  5GLabX Platform
                 </button>
                 <button
                   onClick={() => setActiveTab('settings')}
@@ -286,204 +171,249 @@ const UserDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'simulations' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Simulation Dashboard</h3>
-            <p className="text-gray-600">Simulation dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'executions' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Execution Dashboard</h3>
-            <p className="text-gray-600">Test execution dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'realtime' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Real-Time Simulation View</h3>
-            <p className="text-gray-600">Real-time simulation view coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
-            <p className="text-gray-600">Analytics dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'settings' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Monitor</h3>
-            <p className="text-gray-600">Performance monitor coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'api-docs' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Documentation</h3>
-            <p className="text-gray-600">API documentation coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'api-testing' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Testing Interface</h3>
-            <p className="text-gray-600">API testing interface coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === 'monitoring' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monitoring Dashboard</h3>
-            <p className="text-gray-600">Monitoring dashboard coming soon...</p>
-          </div>
-        )}
-        
-        {activeTab === '3gpp-test-cases' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">3GPP Test Cases</h3>
-              <Subscribed5glabx>
-                <ThreeGPPTestCaseViewer 
-                  userId={user.id}
-                  apiBase="/api/5glabx"
-                />
-              </Subscribed5glabx>
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Welcome Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.full_name}!</h2>
+              <p className="text-gray-600">Here's what's happening with your 5G simulations today.</p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Activity className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Active Simulations</p>
+                    <p className="text-2xl font-semibold text-gray-900">3</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircle className="h-8 w-8 text-green-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Completed Today</p>
+                    <p className="text-2xl font-semibold text-gray-900">12</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <TrendingUp className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Success Rate</p>
+                    <p className="text-2xl font-semibold text-gray-900">94.2%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Clock className="h-8 w-8 text-orange-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Avg. Duration</p>
+                    <p className="text-2xl font-semibold text-gray-900">2.3m</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">5G NR Random Access simulation completed successfully</p>
+                    <p className="text-xs text-gray-500">2 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">LTE Attach Procedure simulation started</p>
+                    <p className="text-xs text-gray-500">5 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">IMS SIP Registration simulation in progress</p>
+                    <p className="text-xs text-gray-500">8 minutes ago</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
-        
-            {activeTab === 'professional-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional Test Cases</h3>
-                  <Subscribed5glabx>
-                    <ProfessionalTestCaseViewer 
-                      userId={user.id}
-                      apiBase="/api/5glabx"
-                    />
-                  </Subscribed5glabx>
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'detailed-test-cases' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Cases</h3>
-                  <Subscribed5glabx>
-                    <DetailedTestCaseViewer 
-                      userId={user.id}
-                      apiBase="/api/5glabx"
-                    />
-                  </Subscribed5glabx>
-                </div>
-              </div>
-            )}
+        {activeTab === 'simulations' && (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Simulations</h2>
+              <button className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                <Plus className="w-4 h-4 mr-2" />
+                New Simulation
+              </button>
+            </div>
 
-            {activeTab === 'protocol-analyzer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                {protocolAnalyzerView === 'dashboard' ? (
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900">Protocol Analyzer</h3>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => setProtocolAnalyzerView('dashboard')}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                            protocolAnalyzerView === 'dashboard'
-                              ? 'bg-primary-100 text-primary-700'
-                              : 'text-gray-600 hover:text-gray-700'
-                          }`}
-                        >
-                          Dashboard
-                        </button>
-                        <button
-                          onClick={() => setProtocolAnalyzerView('analyzer')}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                            protocolAnalyzerView === 'analyzer'
-                              ? 'bg-primary-100 text-primary-700'
-                              : 'text-gray-600 hover:text-gray-700'
-                          }`}
-                        >
-                          Live Analyzer
-                        </button>
-                      </div>
-                    </div>
-                    <Subscribed5glabx>
-                      <ProtocolAnalyzerDashboard 
-                        userId={user.id}
-                        apiBase="/api/5glabx"
-                      />
-                    </Subscribed5glabx>
+            {/* Filters */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search simulations..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
                   </div>
-                ) : (
-                  <div>
-                    <div className="p-4 border-b border-gray-200 bg-gray-50">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">Live Protocol Analyzer</h3>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setProtocolAnalyzerView('dashboard')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                              protocolAnalyzerView === 'dashboard'
-                                ? 'bg-primary-100 text-primary-700'
-                                : 'text-gray-600 hover:text-gray-700'
-                            }`}
-                          >
-                            Dashboard
-                          </button>
-                          <button
-                            onClick={() => setProtocolAnalyzerView('analyzer')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                              protocolAnalyzerView === 'analyzer'
-                                ? 'bg-primary-100 text-primary-700'
-                                : 'text-gray-600 hover:text-gray-700'
-                            }`}
-                          >
-                            Live Analyzer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <Subscribed5glabx>
-                      <ProtocolAnalyzerViewer 
-                        executionId="exec-001"
-                        testCaseId="tc-5g-nr-random-access"
-                        userId={user.id}
-                        apiBase="/api/5glabx"
-                      />
-                    </Subscribed5glabx>
+                </div>
+                <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
+                </button>
+              </div>
+            </div>
+
+            {/* Simulations Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  id: 1,
+                  name: '5G NR Random Access',
+                  status: 'running',
+                  progress: 65,
+                  duration: '2m 30s',
+                  category: '5G NR'
+                },
+                {
+                  id: 2,
+                  name: 'LTE Attach Procedure',
+                  status: 'completed',
+                  progress: 100,
+                  duration: '1m 45s',
+                  category: '4G LTE'
+                },
+                {
+                  id: 3,
+                  name: 'IMS SIP Registration',
+                  status: 'pending',
+                  progress: 0,
+                  duration: '0s',
+                  category: 'IMS'
+                }
+              ].map((simulation) => (
+                <div key={simulation.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">{simulation.name}</h3>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      simulation.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                      simulation.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {simulation.status}
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
+                  <p className="text-sm text-gray-600 mb-4">{simulation.category}</p>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Progress</span>
+                      <span>{simulation.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-primary-600 h-2 rounded-full" 
+                        style={{ width: `${simulation.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">
+                      <Clock className="w-4 h-4 inline mr-1" />
+                      {simulation.duration}
+                    </span>
+                    <div className="flex space-x-2">
+                      <button className="p-1 text-gray-400 hover:text-gray-600">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-1 text-gray-400 hover:text-gray-600">
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-            {activeTab === 'log-viewer' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">5GLabX Platform</h3>
-                  <Subscribed5glabx iframeSrc="/5glabx" />
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-600">Analytics dashboard coming soon...</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === '5glabx-platform' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">5GLabX Platform</h2>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Platform Online</span>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">5GLabX Professional Platform</h3>
+                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <Monitor className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-4">5GLabX Platform will be embedded here</p>
+                    <button className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                      <Play className="w-4 h-4 mr-2" />
+                      Launch Platform
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {activeTab === 'protocol-layers' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Protocol Layers</h3>
-                  <Subscribed5glabx>
-                    <ProtocolLayerDisplay 
-                      userId={user.id}
-                      apiBase="/api/5glabx"
-                    />
-                  </Subscribed5glabx>
-                </div>
-              </div>
-            )}
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-600">Settings panel coming soon...</p>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
