@@ -10,6 +10,8 @@ import {
   Filter,
   Download,
   RefreshCw,
+  Pause,
+  Play,
   Eye,
   EyeOff,
   Maximize2,
