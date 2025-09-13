@@ -70,7 +70,7 @@ export default function Subscribed5glabx({ iframeSrc = '/5glabx/simple.html' }: 
         src={iframeSrc} 
         title="5GLabX Platform" 
         style={{width:'100%', height:'100%', border:0}} 
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+        sandbox="allow-scripts allow-forms allow-popups"
         allow="fullscreen"
       />
     </div>
