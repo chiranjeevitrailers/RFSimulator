@@ -72,6 +72,7 @@ const ProtocolAnalyzerViewer: React.FC<ProtocolAnalyzerViewerProps> = ({
   const [autoScroll, setAutoScroll] = useState(true);
   const [timeAcceleration, setTimeAcceleration] = useState(1);
   const [captureMode, setCaptureMode] = useState<'messages' | 'full' | 'performance'>('full');
+  const [activeTab, setActiveTab] = useState<string>('logs');
   
   const logContainerRef = useRef<HTMLDivElement>(null);
   const [logs, setLogs] = useState<any[]>([]);
@@ -492,7 +493,7 @@ const ProtocolAnalyzerViewer: React.FC<ProtocolAnalyzerViewerProps> = ({
 
         {/* Right Panel - Logs and Performance */}
         <div className="w-80 border-l border-gray-200 bg-gray-50">
-          <Tabs defaultValue="logs" className="h-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="logs">Logs</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>
