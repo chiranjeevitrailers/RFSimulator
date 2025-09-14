@@ -35,7 +35,7 @@ import {
   XCircle
 } from 'lucide-react';
 import Subscribed5glabx from '@/components/subscriptions/Subscribed5glabx';
-import ProtocolAnalyzerDashboard from '@/components/protocol-analyzer/ProtocolAnalyzerDashboard';
+import EnhancedProtocolAnalyzerDashboard from '@/components/protocol-analyzer/EnhancedProtocolAnalyzerDashboard';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import TestSuitesDashboard from '@/components/test-suites/TestSuitesDashboard';
 
@@ -458,7 +458,7 @@ const UserDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional 5GLabX Protocol Analyzer</h3>
-                <ProtocolAnalyzerDashboard />
+                <EnhancedProtocolAnalyzerDashboard />
               </div>
             </div>
           </div>
