@@ -21,8 +21,10 @@ import {
   Zap,
   Shield,
   Network,
-  Layers
+  Layers,
+  MessageSquare
 } from 'lucide-react';
+import EnhancedMessageViewer from '../protocol-analyzer/EnhancedMessageViewer';
 
 interface TestResultsViewerProps {
   activeRun: any;
@@ -225,6 +227,7 @@ const TestResultsViewer: React.FC<TestResultsViewerProps> = ({ activeRun }) => {
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'messages', label: 'Message Flow', icon: MessageSquare },
               { id: 'details', label: 'Details', icon: FileText },
               { id: 'metrics', label: 'Metrics', icon: TrendingUp },
               { id: 'export', label: 'Export', icon: Download }
@@ -329,6 +332,12 @@ const TestResultsViewer: React.FC<TestResultsViewerProps> = ({ activeRun }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {selectedTab === 'messages' && (
+            <div className="h-96">
+              <EnhancedMessageViewer testRunId={activeRun.run_id} />
             </div>
           )}
 

@@ -4,6 +4,7 @@
  */
 
 import { createClient } from './supabase';
+import LayerMappingUtility, { DecodedMessage, InformationElement, LayerParameter } from './layer-mapping-utility';
 
 export interface TestExecutionJob {
   id: string;
@@ -341,17 +342,32 @@ export class TestExecutionWorker {
         throw new Error(`Test case ${testId} not found`);
       }
 
-      // Simulate test execution based on test type and configuration
-      const duration = await this.simulateTestExecution(testCase, job.configuration);
+      // Get test case messages and expected flow
+      const { data: testMessages, error: messagesError } = await this.supabase
+        .from('test_case_messages')
+        .select('*')
+        .eq('test_case_id', testId)
+        .order('step_order');
+
+      if (messagesError) {
+        throw new Error(`Failed to get test messages: ${messagesError.message}`);
+      }
+
+      // Simulate test execution with message flow
+      const duration = await this.simulateTestExecutionWithFlow(testCase, testMessages, job.configuration);
       
-      // Generate realistic metrics based on test type
-      const metrics = this.generateTestMetrics(testCase, job.configuration);
+      // Process and analyze the simulated messages
+      const { metrics, decodedMessages, validationResults } = await this.processTestMessages(
+        testCase, 
+        testMessages, 
+        job.run_id
+      );
       
       // Determine pass/fail based on metrics and test criteria
-      const status = this.evaluateTestResult(testCase, metrics);
+      const status = this.evaluateTestResult(testCase, metrics, validationResults);
       
       // Generate errors and warnings
-      const { errors, warnings } = this.generateTestIssues(testCase, metrics, status);
+      const { errors, warnings } = this.generateTestIssues(testCase, metrics, status, validationResults);
 
       const result: TestExecutionResult = {
         test_id: testId,
@@ -380,8 +396,8 @@ export class TestExecutionWorker {
     }
   }
 
-  private async simulateTestExecution(testCase: any, config: any): Promise<number> {
-    // Simulate realistic test execution time
+  private async simulateTestExecutionWithFlow(testCase: any, testMessages: any[], config: any): Promise<number> {
+    // Simulate realistic test execution time based on message flow
     const baseDuration = testCase.duration_minutes * 60; // Convert to seconds
     const acceleration = config.time_acceleration || 1;
     const actualDuration = baseDuration / acceleration;
@@ -394,6 +410,219 @@ export class TestExecutionWorker {
     await new Promise(resolve => setTimeout(resolve, Math.min(finalDuration * 100, 5000))); // Cap at 5 seconds for simulation
     
     return finalDuration;
+  }
+
+  private async processTestMessages(testCase: any, testMessages: any[], runId: string): Promise<{
+    metrics: any;
+    decodedMessages: DecodedMessage[];
+    validationResults: any[];
+  }> {
+    const layerMapping = LayerMappingUtility.getInstance();
+    const decodedMessages: DecodedMessage[] = [];
+    const validationResults: any[] = [];
+    const metrics: any = {};
+
+    // Process each test message
+    for (const testMessage of testMessages) {
+      // Generate realistic message data based on test case
+      const messageData = this.generateMessageData(testCase, testMessage);
+      
+      // Create decoded message object
+      const decodedMessage: DecodedMessage = {
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        protocol: testMessage.protocol,
+        message_type: testMessage.message_type,
+        message_name: testMessage.message_name,
+        message_direction: testMessage.direction,
+        decoded_data: messageData,
+        timestamp_us: Date.now() * 1000 + testMessage.timestamp_ms * 1000,
+        source_entity: this.getSourceEntity(testMessage),
+        target_entity: this.getTargetEntity(testMessage)
+      };
+
+      // Map message to layer
+      const layerMappingResult = layerMapping.mapMessageToLayer(decodedMessage);
+      
+      // Extract information elements
+      const informationElements = layerMapping.extractInformationElements(decodedMessage);
+      
+      // Extract layer parameters
+      const layerParameters = layerMapping.extractLayerParameters(decodedMessage, layerMappingResult.layer);
+      
+      // Validate message
+      const validation = layerMapping.validateMessage(decodedMessage, layerMappingResult.layer);
+      
+      // Store decoded message in database
+      await this.storeDecodedMessage(decodedMessage, layerMappingResult, informationElements, layerParameters, runId);
+      
+      // Store validation results
+      validationResults.push({
+        message_id: decodedMessage.id,
+        layer: layerMappingResult.layer,
+        validation: validation,
+        confidence: layerMappingResult.confidence
+      });
+
+      decodedMessages.push(decodedMessage);
+    }
+
+    // Calculate metrics from processed messages
+    metrics.total_messages = decodedMessages.length;
+    metrics.layers_analyzed = [...new Set(validationResults.map(r => r.layer))];
+    metrics.validation_errors = validationResults.filter(r => !r.validation.isValid).length;
+    metrics.validation_warnings = validationResults.reduce((sum, r) => sum + r.validation.warnings.length, 0);
+    metrics.avg_confidence = validationResults.reduce((sum, r) => sum + r.confidence, 0) / validationResults.length;
+
+    // Add protocol-specific metrics
+    if (testCase.protocol === 'NR' || testCase.protocol === 'LTE') {
+      metrics.rsrp_dbm = -80 - Math.random() * 40;
+      metrics.rsrq_db = -10 - Math.random() * 10;
+      metrics.sinr_db = 10 + Math.random() * 20;
+    }
+
+    return { metrics, decodedMessages, validationResults };
+  }
+
+  private generateMessageData(testCase: any, testMessage: any): any {
+    // Generate realistic message data based on test case and message type
+    const baseData = testMessage.validation_criteria || {};
+    
+    // Add protocol-specific data
+    switch (testMessage.protocol) {
+      case 'NR':
+      case 'LTE':
+        return {
+          ...baseData,
+          rrc_transaction_id: Math.floor(Math.random() * 3),
+          establishment_cause: 'mo-Data',
+          ue_identity: '001010123456789',
+          cell_id: 12345,
+          pci: 123,
+          rsrp: -80 - Math.random() * 40,
+          rsrq: -10 - Math.random() * 10,
+          sinr: 10 + Math.random() * 20
+        };
+      
+      case 'SIP':
+        return {
+          ...baseData,
+          call_id: `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          cseq: Math.floor(Math.random() * 1000),
+          from: 'sip:user1@example.com',
+          to: 'sip:user2@example.com',
+          contact: 'sip:user1@192.168.1.100:5060'
+        };
+      
+      case 'E2':
+        return {
+          ...baseData,
+          e2_node_id: 'e2node_001',
+          service_model: 'ORAN-E2SM-KPM',
+          subscription_id: Math.floor(Math.random() * 1000)
+        };
+      
+      default:
+        return baseData;
+    }
+  }
+
+  private getSourceEntity(testMessage: any): string {
+    if (testMessage.direction === 'UL') {
+      return 'UE';
+    } else if (testMessage.direction === 'DL') {
+      return testMessage.protocol === 'SIP' ? 'IMS' : 'gNodeB';
+    }
+    return 'Unknown';
+  }
+
+  private getTargetEntity(testMessage: any): string {
+    if (testMessage.direction === 'UL') {
+      return testMessage.protocol === 'SIP' ? 'IMS' : 'gNodeB';
+    } else if (testMessage.direction === 'DL') {
+      return 'UE';
+    }
+    return 'Unknown';
+  }
+
+  private async storeDecodedMessage(
+    message: DecodedMessage,
+    layerMapping: any,
+    informationElements: InformationElement[],
+    layerParameters: LayerParameter[],
+    runId: string
+  ): Promise<void> {
+    try {
+      // Store decoded message
+      const { data: storedMessage, error: messageError } = await this.supabase
+        .from('decoded_messages')
+        .insert({
+          log_file_id: null, // Will be set if processing uploaded files
+          test_run_id: runId,
+          message_id: message.id,
+          timestamp_us: message.timestamp_us,
+          protocol: message.protocol,
+          message_type: message.message_type,
+          message_name: message.message_name,
+          message_direction: message.message_direction,
+          layer: layerMapping.layer,
+          sublayer: layerMapping.sublayer,
+          source_entity: message.source_entity,
+          target_entity: message.target_entity,
+          decoded_data: message.decoded_data,
+          information_elements: informationElements.reduce((acc, ie) => {
+            acc[ie.name] = ie.value;
+            return acc;
+          }, {} as any),
+          ie_count: informationElements.length,
+          validation_status: 'valid',
+          standard_reference: layerMapping.standard_reference
+        })
+        .select()
+        .single();
+
+      if (messageError) {
+        console.error('Failed to store decoded message:', messageError);
+        return;
+      }
+
+      // Store information elements
+      for (const ie of informationElements) {
+        await this.supabase
+          .from('decoded_information_elements')
+          .insert({
+            message_id: storedMessage.id,
+            ie_name: ie.name,
+            ie_type: ie.type,
+            ie_value: ie.value,
+            ie_value_hex: ie.hex_value,
+            ie_value_binary: ie.binary_value,
+            ie_size: ie.size,
+            mandatory: ie.mandatory,
+            is_valid: true,
+            standard_reference: ie.standard_reference
+          });
+      }
+
+      // Store layer parameters
+      for (const param of layerParameters) {
+        await this.supabase
+          .from('decoded_layer_parameters')
+          .insert({
+            message_id: storedMessage.id,
+            layer: layerMapping.layer,
+            parameter_category: param.context,
+            parameter_name: param.name,
+            parameter_type: param.type,
+            parameter_value: param.value,
+            parameter_unit: param.unit,
+            context: param.context,
+            source: param.source
+          });
+      }
+
+    } catch (error) {
+      console.error('Failed to store decoded message data:', error);
+    }
   }
 
   private generateTestMetrics(testCase: any, config: any): any {
@@ -430,9 +659,23 @@ export class TestExecutionWorker {
     return metrics;
   }
 
-  private evaluateTestResult(testCase: any, metrics: any): 'passed' | 'failed' | 'warning' {
+  private evaluateTestResult(testCase: any, metrics: any, validationResults?: any[]): 'passed' | 'failed' | 'warning' {
     const successCriteria = testCase.success_criteria || {};
     const failureThresholds = testCase.failure_thresholds || {};
+    
+    // Check validation results first
+    if (validationResults) {
+      const validationErrors = validationResults.filter(r => !r.validation.isValid).length;
+      const validationWarnings = validationResults.reduce((sum, r) => sum + r.validation.warnings.length, 0);
+      
+      if (validationErrors > 0) {
+        return 'failed';
+      }
+      
+      if (validationWarnings > 0) {
+        return 'warning';
+      }
+    }
     
     // Check latency criteria
     if (successCriteria.latency_ms?.max && metrics.latency_ms > successCriteria.latency_ms.max) {
@@ -449,6 +692,15 @@ export class TestExecutionWorker {
       return 'failed';
     }
     
+    // Check message validation criteria
+    if (metrics.validation_errors > 0) {
+      return 'failed';
+    }
+    
+    if (metrics.validation_warnings > 0) {
+      return 'warning';
+    }
+    
     // Check for warnings (close to failure thresholds)
     if (failureThresholds.latency_ms?.max && metrics.latency_ms > failureThresholds.latency_ms.max * 0.8) {
       return 'warning';
@@ -457,12 +709,24 @@ export class TestExecutionWorker {
     return 'passed';
   }
 
-  private generateTestIssues(testCase: any, metrics: any, status: string): { errors: string[], warnings: string[] } {
+  private generateTestIssues(testCase: any, metrics: any, status: string, validationResults?: any[]): { errors: string[], warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
     
-    if (status === 'failed') {
-      // Generate realistic failure reasons
+    // Add validation errors and warnings
+    if (validationResults) {
+      for (const result of validationResults) {
+        if (!result.validation.isValid) {
+          errors.push(...result.validation.errors);
+        }
+        if (result.validation.warnings.length > 0) {
+          warnings.push(...result.validation.warnings);
+        }
+      }
+    }
+    
+    if (status === 'failed' && errors.length === 0) {
+      // Generate realistic failure reasons if no validation errors
       const failureReasons = [
         'RRC connection timeout',
         'Handover failure',
@@ -477,8 +741,8 @@ export class TestExecutionWorker {
       errors.push(failureReasons[Math.floor(Math.random() * failureReasons.length)]);
     }
     
-    if (status === 'warning' || Math.random() < 0.3) {
-      // Generate warnings
+    if (status === 'warning' && warnings.length === 0) {
+      // Generate warnings if no validation warnings
       const warningReasons = [
         'Minor timing variation detected',
         'Signal quality below optimal',
