@@ -1,343 +1,434 @@
-# 5GLabX Platform - Supabase Deployment Guide
+# 5GLabX Supabase Deployment Guide
 
-## 🚀 **Complete Commercial Platform Database Setup**
+## 🎯 **Overview**
 
-This guide provides all the SQL files needed to deploy the complete 5GLabX commercial platform database to Supabase.
+This guide provides step-by-step instructions for deploying the 5GLabX Platform to Supabase with all real-time simulation features enabled.
 
-## 📋 **Deployment Checklist**
+## ✅ **Pre-Deployment Verification**
 
-### **Prerequisites**
-- [ ] Supabase account and project created
-- [ ] Supabase project URL and API key available
-- [ ] Database access permissions
-- [ ] Backup of existing data (if any)
+The database completeness verification shows:
+- **100% Database Completeness** ✅
+- **24/24 Tables** ✅
+- **5/5 Functions** ✅
+- **3/3 Views** ✅
+- **3/3 Extensions** ✅
+- **9/9 Seed Files** ✅
+- **52 RLS Policies** ✅
+- **304 Indexes** ✅
+- **40 Triggers** ✅
 
-### **Required Files**
-- [ ] `001_complete_platform_schema.sql` - Core database schema
-- [ ] `002_subscription_plans_seed.sql` - Subscription plans and system settings
-- [ ] `003_comprehensive_test_cases_seed.sql` - Test cases and configurations
-- [ ] `004_default_configurations_seed.sql` - Default configurations
-- [ ] `005_documentation_tutorials_seed.sql` - Documentation and tutorials
+## 🚀 **Deployment Steps**
 
-## 🗄️ **Database Schema Overview**
+### **1. Supabase Project Setup**
 
-### **Core Tables (25 tables)**
-1. **Authentication & User Management**
-   - `users` - User profiles and subscription info
-   - `user_profiles` - Extended user information
-   - `user_subscriptions` - Subscription management
-   - `billing_history` - Payment and billing records
-   - `usage_tracking` - Usage monitoring
+```bash
+# Install Supabase CLI
+npm install -g supabase
 
-2. **Test Cases & Configurations**
-   - `test_case_categories` - Test case categories
-   - `test_cases` - Main test case definitions
-   - `test_case_messages` - Individual messages
-   - `test_case_information_elements` - Detailed IEs
-   - `test_case_layer_parameters` - Layer configurations
-   - `test_configurations` - Configuration management
+# Login to Supabase
+supabase login
 
-3. **Test Execution & Results**
-   - `test_case_executions` - Execution tracking
-   - `test_execution_messages` - Executed messages
-   - `test_execution_logs` - Execution logs
-   - `performance_metrics` - Performance data
+# Initialize project (if not already done)
+supabase init
 
-4. **Analytics & Reporting**
-   - `user_analytics` - User usage analytics
-   - `test_case_analytics` - Test case analytics
-   - `audit_logs` - System audit trail
-
-5. **Content Management**
-   - `documentation` - Platform documentation
-   - `tutorials` - Learning tutorials
-   - `support_tickets` - Support system
-   - `feedback` - User feedback
-
-6. **System Configuration**
-   - `subscription_plans` - Subscription plans
-   - `system_settings` - System configuration
-   - `feature_flags` - Feature management
-
-## 📁 **SQL Files to Execute**
-
-### **1. Core Database Schema**
-**File**: `001_complete_platform_schema.sql`
-**Purpose**: Creates all database tables, indexes, RLS policies, and helper functions
-**Size**: ~50KB
-**Execution Time**: ~2-3 minutes
-
-**What it creates**:
-- 25 core tables with proper relationships
-- 50+ performance indexes
-- Row Level Security (RLS) policies
-- Helper functions for data processing
-- Triggers for updated_at columns
-
-### **2. Subscription Plans & System Settings**
-**File**: `002_subscription_plans_seed.sql`
-**Purpose**: Seeds subscription plans, categories, and system settings
-**Size**: ~15KB
-**Execution Time**: ~30 seconds
-
-**What it creates**:
-- 4 subscription plans (Free, Pro, Enterprise, Custom)
-- 8 test case categories (4G LTE, 5G NR, IMS/SIP, O-RAN, NB-IoT, V2X, NTN, Custom)
-- 15 system settings
-- 10 feature flags
-
-### **3. Comprehensive Test Cases**
-**File**: `003_comprehensive_test_cases_seed.sql`
-**Purpose**: Seeds detailed test cases with messages, IEs, and layer parameters
-**Size**: ~25KB
-**Execution Time**: ~1-2 minutes
-
-**What it creates**:
-- 10+ comprehensive test cases across all protocols
-- Detailed message flows with 3GPP compliance
-- Information Elements with validation
-- Layer parameters for all protocol layers
-- 3GPP standard references
-
-### **4. Default Configurations**
-**File**: `004_default_configurations_seed.sql`
-**Purpose**: Creates default configurations for all test cases
-**Size**: ~20KB
-**Execution Time**: ~1 minute
-
-**What it creates**:
-- Default configurations for all protocol types
-- Template configurations for common scenarios
-- High-performance and debug configurations
-- Configuration validation and management
-
-### **5. Documentation & Tutorials**
-**File**: `005_documentation_tutorials_seed.sql`
-**Purpose**: Seeds platform documentation and tutorials
-**Size**: ~30KB
-**Execution Time**: ~30 seconds
-
-**What it creates**:
-- 5 comprehensive documentation articles
-- 3 detailed tutorials (Beginner, Intermediate, Advanced)
-- Learning objectives and prerequisites
-- SEO-optimized content
-
-## 🚀 **Deployment Instructions**
-
-### **Step 1: Access Supabase SQL Editor**
-1. Log in to your Supabase dashboard
-2. Navigate to your project
-3. Go to "SQL Editor" in the left sidebar
-4. Click "New Query"
-
-### **Step 2: Execute SQL Files in Order**
-
-#### **Execute File 1: Core Schema**
-```sql
--- Copy and paste the entire content of 001_complete_platform_schema.sql
--- Click "Run" to execute
--- Wait for completion (2-3 minutes)
+# Link to your Supabase project
+supabase link --project-ref YOUR_PROJECT_REF
 ```
 
-#### **Execute File 2: Subscription Plans**
-```sql
--- Copy and paste the entire content of 002_subscription_plans_seed.sql
--- Click "Run" to execute
--- Wait for completion (30 seconds)
+### **2. Database Migration**
+
+Run migrations in the correct order:
+
+```bash
+# Core schema
+supabase db push --file supabase/migrations/001_complete_platform_schema.sql
+
+# Enhanced test cases
+supabase db push --file supabase/migrations/002_test_cases_enhanced.sql
+
+# Test cases seed data
+supabase db push --file supabase/migrations/003_comprehensive_test_cases_seed.sql
+
+# Default configurations
+supabase db push --file supabase/migrations/004_default_configurations_seed.sql
+
+# Alert management
+supabase db push --file supabase/migrations/005_alert_management_tables.sql
+
+# 1000 test cases
+supabase db push --file supabase/migrations/006_comprehensive_1000_test_cases.sql
+
+# Remaining protocols
+supabase db push --file supabase/migrations/007_remaining_protocols_test_cases.sql
+
+# 3GPP IEs
+supabase db push --file supabase/migrations/008_comprehensive_3gpp_ies.sql
+
+# Message flows
+supabase db push --file supabase/migrations/009_complete_3gpp_message_flows.sql
+
+# Test configuration
+supabase db push --file supabase/migrations/010_test_configuration_tables.sql
+
+# Test suites enhancements
+supabase db push --file supabase/migrations/011_test_suites_enhancements.sql
+
+# Decoded messages schema (CRITICAL for real-time simulation)
+supabase db push --file supabase/migrations/012_decoded_messages_schema.sql
+
+# Missing columns and improvements
+supabase db push --file supabase/migrations/013_fix_missing_columns_and_improvements.sql
+
+# Comprehensive seed data
+supabase db push --file supabase/migrations/014_comprehensive_seed_data_setup.sql
+
+# Database optimization
+supabase db push --file supabase/migrations/015_final_database_optimization.sql
+
+# Missing tables and functions
+supabase db push --file supabase/migrations/016_missing_tables_and_functions.sql
+
+# Missing indexes (CRITICAL for performance)
+supabase db push --file supabase/migrations/017_missing_indexes.sql
 ```
 
-#### **Execute File 3: Test Cases**
-```sql
--- Copy and paste the entire content of 003_comprehensive_test_cases_seed.sql
--- Click "Run" to execute
--- Wait for completion (1-2 minutes)
+### **3. Seed Data Loading**
+
+```bash
+# Core seed data
+supabase db push --file supabase/seed.sql
+
+# Test cases
+supabase db push --file supabase/seed_test_cases.sql
+
+# 5G NR test cases
+supabase db push --file supabase/seed_5g_nr_test_cases.sql
+
+# 4G LTE test cases
+supabase db push --file supabase/seed_4g_lte_test_cases.sql
+
+# 3GPP compliant test cases
+supabase db push --file supabase/seed_3gpp_compliant_test_cases.sql
+
+# IMS SIP test cases
+supabase db push --file supabase/seed_ims_sip_test_cases.sql
+
+# O-RAN test cases
+supabase db push --file supabase/seed_oran_test_cases.sql
+
+# NB-IoT, V2X, NTN test cases
+supabase db push --file supabase/seed_nbiot_v2x_ntn_test_cases.sql
+
+# Detailed test cases
+supabase db push --file supabase/seed_detailed_test_cases.sql
 ```
 
-#### **Execute File 4: Configurations**
-```sql
--- Copy and paste the entire content of 004_default_configurations_seed.sql
--- Click "Run" to execute
--- Wait for completion (1 minute)
-```
+### **4. Environment Configuration**
 
-#### **Execute File 5: Documentation**
-```sql
--- Copy and paste the entire content of 005_documentation_tutorials_seed.sql
--- Click "Run" to execute
--- Wait for completion (30 seconds)
-```
+Create `.env.local` file:
 
-### **Step 3: Verify Deployment**
-
-#### **Check Table Creation**
-```sql
-SELECT COUNT(*) as table_count
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-AND table_name IN (
-    'users', 'user_profiles', 'subscription_plans', 'user_subscriptions',
-    'billing_history', 'usage_tracking', 'test_case_categories', 'test_cases',
-    'test_case_messages', 'test_case_information_elements', 'test_case_layer_parameters',
-    'test_configurations', 'test_case_executions', 'test_execution_messages',
-    'test_execution_logs', 'user_analytics', 'test_case_analytics',
-    'performance_metrics', 'documentation', 'tutorials', 'support_tickets',
-    'feedback', 'system_settings', 'feature_flags', 'audit_logs'
-);
--- Should return 25
-```
-
-#### **Check Data Population**
-```sql
--- Check subscription plans
-SELECT COUNT(*) FROM public.subscription_plans;
--- Should return 4
-
--- Check test cases
-SELECT COUNT(*) FROM public.test_cases;
--- Should return 10+
-
--- Check configurations
-SELECT COUNT(*) FROM public.test_configurations;
--- Should return 10+
-
--- Check documentation
-SELECT COUNT(*) FROM public.documentation;
--- Should return 5
-
--- Check tutorials
-SELECT COUNT(*) FROM public.tutorials;
--- Should return 3
-```
-
-## 🔧 **Post-Deployment Configuration**
-
-### **1. Environment Variables**
-Update your application with these Supabase environment variables:
 ```env
+# Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Real-time Simulation Configuration
+NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3000
+NEXT_PUBLIC_SIMULATION_API_URL=http://localhost:3000/api/simulation
+
+# Application Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=5GLabX Protocol Analyzer
 ```
 
-### **2. Authentication Setup**
-1. Go to Supabase Dashboard → Authentication → Settings
-2. Configure email templates
-3. Set up OAuth providers (if needed)
-4. Configure password policies
+### **5. Supabase Configuration**
 
-### **3. Storage Setup**
-1. Go to Supabase Dashboard → Storage
-2. Create buckets for:
-   - `test-results` - Test execution results
-   - `configurations` - User configurations
-   - `exports` - Data exports
-   - `uploads` - File uploads
+#### **Enable Real-time Features**
 
-### **4. Edge Functions (Optional)**
-Deploy edge functions for:
-- Payment processing
-- Email notifications
-- Data processing
-- API rate limiting
+```sql
+-- Enable real-time for key tables
+ALTER PUBLICATION supabase_realtime ADD TABLE public.test_case_executions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.decoded_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.test_run_queue;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.test_run_metrics;
+```
 
-## 📊 **Database Statistics**
+#### **Configure Row Level Security**
 
-### **Expected Data Volume**
-- **Tables**: 25 core tables
-- **Indexes**: 50+ performance indexes
-- **Test Cases**: 10+ comprehensive test cases
-- **Configurations**: 10+ default configurations
-- **Documentation**: 5 articles + 3 tutorials
-- **Subscription Plans**: 4 plans with features and limits
+All tables have RLS enabled with appropriate policies. Verify with:
 
-### **Performance Optimizations**
-- **Indexes**: Optimized for common queries
-- **RLS Policies**: Secure data access
-- **Triggers**: Automatic timestamp updates
-- **Functions**: Helper functions for common operations
+```sql
+-- Check RLS status
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = 'public' 
+AND rowsecurity = true;
+```
 
-## 🔒 **Security Features**
+#### **Set up Storage Buckets**
 
-### **Row Level Security (RLS)**
-- All tables have RLS enabled
-- User-specific data access policies
-- Admin override policies
-- Secure data isolation
+```sql
+-- Create storage buckets for log files
+INSERT INTO storage.buckets (id, name, public) VALUES 
+('log-files', 'log-files', false),
+('test-artifacts', 'test-artifacts', false),
+('reports', 'reports', false);
+```
 
-### **Data Protection**
-- Encrypted sensitive data
-- Audit logging for all changes
-- Secure API access
-- Compliance with GDPR/CCPA
+### **6. Real-time Simulation Setup**
+
+#### **WebSocket Configuration**
+
+The real-time simulation requires WebSocket support. Configure in your Next.js app:
+
+```typescript
+// lib/supabase.ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+})
+```
+
+#### **API Routes Configuration**
+
+Ensure all API routes are properly configured:
+
+- `/api/simulation/stream` - Real-time simulation control
+- `/api/tests/*` - Test case management
+- `/api/test-suites/*` - Test suite management
+
+### **7. Performance Optimization**
+
+#### **Database Indexes**
+
+All 304 indexes are automatically created. Monitor performance with:
+
+```sql
+-- Check index usage
+SELECT * FROM public.index_usage_stats 
+ORDER BY idx_scan DESC;
+
+-- Check table sizes
+SELECT * FROM public.table_size_stats 
+ORDER BY total_size DESC;
+```
+
+#### **Connection Pooling**
+
+Configure Supabase connection pooling:
+
+```env
+# In your Supabase dashboard
+DATABASE_POOL_SIZE=20
+DATABASE_POOL_TIMEOUT=30
+```
+
+### **8. Security Configuration**
+
+#### **API Keys**
+
+- **Anon Key**: For client-side operations
+- **Service Role Key**: For server-side operations (keep secret)
+- **JWT Secret**: For authentication
+
+#### **CORS Configuration**
+
+```typescript
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+    ]
+  },
+}
+```
+
+### **9. Testing Deployment**
+
+#### **Database Connectivity Test**
+
+```typescript
+// Test database connection
+const testConnection = async () => {
+  const { data, error } = await supabase
+    .from('test_cases')
+    .select('count')
+    .limit(1);
+  
+  if (error) {
+    console.error('Database connection failed:', error);
+  } else {
+    console.log('Database connection successful');
+  }
+};
+```
+
+#### **Real-time Simulation Test**
+
+```typescript
+// Test real-time simulation
+const testSimulation = async () => {
+  const response = await fetch('/api/simulation/stream?testCaseId=tc-001&action=initialize');
+  const data = await response.json();
+  
+  if (data.success) {
+    console.log('Real-time simulation initialized successfully');
+  } else {
+    console.error('Real-time simulation failed:', data.error);
+  }
+};
+```
+
+### **10. Monitoring and Maintenance**
+
+#### **Health Checks**
+
+Set up monitoring for:
+
+- Database performance
+- Real-time connections
+- API response times
+- Error rates
+- Storage usage
+
+#### **Backup Strategy**
+
+```bash
+# Automated backups (configure in Supabase dashboard)
+# Daily backups with 30-day retention
+# Point-in-time recovery enabled
+```
+
+#### **Scaling Considerations**
+
+- **Database**: Supabase handles automatic scaling
+- **Storage**: Monitor usage and upgrade as needed
+- **Real-time**: WebSocket connections scale automatically
+- **API**: Next.js API routes scale with Vercel/Netlify
+
+## 🎯 **Real-time Simulation Features**
+
+### **Supported Features**
+
+✅ **Real-time Message Streaming**
+✅ **Live KPI Updates**
+✅ **Interactive Playback Controls**
+✅ **Layer-based Message Grouping**
+✅ **Live Charts and Analytics**
+✅ **Time-based Navigation**
+✅ **Message Filtering**
+✅ **Performance Metrics**
+
+### **Required Tables**
+
+- `test_case_messages` - Test case message definitions
+- `decoded_messages` - Real-time message data
+- `test_run_queue` - Execution queue management
+- `test_run_configs` - Configuration management
+- `test_execution_workers` - Worker management
+
+### **Required Functions**
+
+- `get_layer_statistics()` - Layer performance metrics
+- `get_protocol_statistics()` - Protocol performance metrics
+- `get_test_execution_progress()` - Execution progress tracking
 
 ## 🚨 **Troubleshooting**
 
 ### **Common Issues**
 
-#### **Permission Errors**
+1. **WebSocket Connection Failed**
+   - Check CORS configuration
+   - Verify WebSocket URL
+   - Check firewall settings
+
+2. **Database Connection Timeout**
+   - Check connection pool settings
+   - Verify database credentials
+   - Check network connectivity
+
+3. **Real-time Updates Not Working**
+   - Verify RLS policies
+   - Check real-time publication settings
+   - Verify WebSocket connection
+
+4. **Performance Issues**
+   - Check index usage
+   - Monitor query performance
+   - Optimize database queries
+
+### **Debug Commands**
+
 ```sql
--- Grant necessary permissions
-GRANT USAGE ON SCHEMA public TO authenticated;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+-- Check active connections
+SELECT * FROM pg_stat_activity WHERE state = 'active';
+
+-- Check real-time subscriptions
+SELECT * FROM pg_replication_slots;
+
+-- Check table sizes
+SELECT * FROM public.table_size_stats;
+
+-- Check index usage
+SELECT * FROM public.index_usage_stats;
 ```
 
-#### **RLS Policy Issues**
-```sql
--- Check RLS status
-SELECT schemaname, tablename, rowsecurity 
-FROM pg_tables 
-WHERE schemaname = 'public';
+## 📊 **Post-Deployment Verification**
+
+Run the verification script:
+
+```bash
+node verify-database-completeness.js
 ```
 
-#### **Index Creation Issues**
-```sql
--- Check index status
-SELECT indexname, indexdef 
-FROM pg_indexes 
-WHERE schemaname = 'public';
-```
+Expected output:
+- ✅ 100% Database Completeness
+- ✅ All real-time simulation dependencies available
+- ✅ No critical issues found
+- ✅ Ready for Supabase deployment: YES
 
-### **Performance Issues**
-- Check index usage with `EXPLAIN ANALYZE`
-- Monitor query performance
-- Optimize slow queries
-- Consider partitioning for large tables
+## 🎉 **Success Criteria**
 
-## 📈 **Monitoring & Maintenance**
+Your 5GLabX deployment is successful when:
 
-### **Database Monitoring**
-- Monitor query performance
-- Check index usage
-- Monitor storage usage
-- Track connection counts
+1. ✅ All 24 tables are created
+2. ✅ All 5 functions are working
+3. ✅ All 3 views are accessible
+4. ✅ Real-time simulation is functional
+5. ✅ WebSocket connections are stable
+6. ✅ API endpoints are responding
+7. ✅ User authentication is working
+8. ✅ Test cases are loaded (1000+)
+9. ✅ Performance is optimal
+10. ✅ Security policies are enforced
 
-### **Regular Maintenance**
-- Update statistics
-- Vacuum tables
-- Monitor RLS policies
-- Check audit logs
+## 🚀 **Next Steps**
 
-## 🎉 **Deployment Complete!**
+After successful deployment:
 
-After successful deployment, your 5GLabX platform will have:
+1. **User Testing**: Test all real-time simulation features
+2. **Performance Monitoring**: Set up monitoring dashboards
+3. **User Training**: Provide user documentation
+4. **Feature Updates**: Plan future enhancements
+5. **Scaling**: Monitor usage and scale as needed
 
-✅ **Complete commercial database schema**
-✅ **Subscription and billing system**
-✅ **Comprehensive test case library**
-✅ **Professional configuration management**
-✅ **Documentation and tutorials**
-✅ **Security and compliance features**
-✅ **Performance optimizations**
-✅ **Audit and monitoring capabilities**
+---
 
-## 📞 **Support**
-
-For deployment issues:
-- **Email**: support@5glabx.com
-- **Documentation**: Check troubleshooting section
-- **Community**: Join our forum
-- **Professional Support**: Available for Enterprise customers
-
-**Your 5GLabX platform is now ready for commercial launch! 🚀**
+**🎯 The 5GLabX Platform is now ready for production use with full real-time simulation capabilities!**
