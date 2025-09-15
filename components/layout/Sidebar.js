@@ -154,7 +154,8 @@ function Sidebar({ appState, onNavigate }) {
 
     // Menu configuration - Updated with generic names and no NEW badges
     const mainViews = [
-      { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', badge: null },
+      { id: 'user-dashboard', label: 'User Dashboard', icon: 'layout-dashboard', badge: null },
+      { id: 'dashboard', label: 'Dashboard', icon: 'gauge', badge: null },
       { id: 'logs', label: 'Logs Viewer', icon: 'file-text', badge: null },
       { id: 'enhanced-logs', label: 'Enhanced Logs', icon: 'search', badge: null },
       { id: 'layer-trace', label: 'Layer Trace', icon: 'git-branch', badge: null },
