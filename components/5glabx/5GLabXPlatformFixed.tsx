@@ -42,6 +42,7 @@ import {
   Export,
   Import
 } from 'lucide-react';
+import LogViewer from '@/components/logs/LogViewer';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -431,15 +432,15 @@ const FiveGLabXPlatformFixed: React.FC = () => {
         return <DashboardView appState={appState} onStateChange={setAppState} />;
       case 'logs':
         return (
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <LogsView appState={appState} onStateChange={setAppState} />
-          </React.Suspense>
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
         );
-      case 'analytics':
+      case 'enhanced-logs':
         return (
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <AnalyticsView appState={appState} onStateChange={setAppState} />
-          </React.Suspense>
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
         );
       case 'layer-trace':
         return (

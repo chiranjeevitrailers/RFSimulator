@@ -6,6 +6,7 @@ import AnalyticsView from './views/AnalyticsView';
 import TestSuitesView from './views/TestSuitesView';
 import LayerTraceView from './views/LayerTraceView';
 import CallFlowView from './views/CallFlowView';
+import LogViewer from '@/components/logs/LogViewer';
 import { 
   Activity, 
   BarChart3, 
@@ -510,9 +511,17 @@ const FiveGLabXPlatform: React.FC = () => {
       case 'dashboard':
         return <DashboardView appState={appState} onStateChange={setAppState} />;
       case 'logs':
-        return <LogsView appState={appState} onStateChange={setAppState} />;
-      case 'analytics':
-        return <AnalyticsView appState={appState} onStateChange={setAppState} />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
+        );
+      case 'enhanced-logs':
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
+        );
       case 'layer-trace':
         return <LayerTraceView appState={appState} onStateChange={setAppState} />;
       case 'callflow':

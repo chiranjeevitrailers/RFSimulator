@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import LogViewer from '@/components/logs/LogViewer';
 
 // Very simple Dashboard View
 const DashboardView: React.FC = () => {
@@ -329,9 +330,17 @@ const FiveGLabXPlatformBasic: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <SimpleView title="Logs Viewer" description="Protocol log analysis and monitoring." />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
+        );
       case 'enhanced-logs':
-        return <SimpleView title="Enhanced Logs" description="Advanced log filtering and analysis capabilities." />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
+        );
       case 'layer-trace':
         return <SimpleView title="Layer Trace" description="Protocol layer message flow and timing analysis." />;
       case 'callflow':
