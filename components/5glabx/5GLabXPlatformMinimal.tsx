@@ -489,6 +489,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
     switch (currentView) {
       case 'dashboard':
         return <DashboardView />;
+      case 'test-case-data-flow':
+        return <TestCaseDataFlow />;
       case 'logs':
         return <LogsView appState={{}} onStateChange={() => {}} />;
       case 'enhanced-logs':
