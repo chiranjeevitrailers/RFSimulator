@@ -38,7 +38,7 @@ import Subscribed5glabx from '@/components/subscriptions/Subscribed5glabx';
 import EnhancedProtocolAnalyzerDashboard from '@/components/protocol-analyzer/EnhancedProtocolAnalyzerDashboard';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import TestSuitesDashboard from '@/components/test-suites/TestSuitesDashboard';
-import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformFixed';
+import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformStable';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
@@ -438,7 +438,7 @@ const UserDashboard: React.FC = () => {
             </div>
             
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[calc(100vh-200px)]">
+              <div className="h-[800px]">
                 <FiveGLabXPlatform />
               </div>
             </div>
