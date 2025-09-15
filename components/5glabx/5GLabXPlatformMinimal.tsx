@@ -12,6 +12,9 @@ import {
 // Import existing components from codebase
 import LogsView from './views/LogsView';
 import TestSuitesView from './views/TestSuitesView';
+import AnalyticsView from './views/AnalyticsView';
+import CallFlowView from './views/CallFlowView';
+import LayerTraceView from './views/LayerTraceView';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -192,6 +195,350 @@ const EnhancedLogsView: React.FC = () => {
       </div>
     </div>
   );
+};
+
+// Wrapper components for JavaScript views
+const OranOverviewView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranOverviewView) {
+    return React.createElement(window.OranOverviewView);
+  }
+  return <GenericView title="O-RAN Overview" description="O-RAN architecture overview and analysis." />;
+};
+
+const OranInterfacesView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranInterfacesView) {
+    return React.createElement(window.OranInterfacesView);
+  }
+  return <GenericView title="O-RAN Interfaces" description="O-RAN interface analysis and monitoring." />;
+};
+
+const OranCuAnalysisView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranCuAnalysisView) {
+    return React.createElement(window.OranCuAnalysisView);
+  }
+  return <GenericView title="O-RAN CU Analysis" description="Central Unit analysis and monitoring." />;
+};
+
+const OranDuAnalysisView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranDuAnalysisView) {
+    return React.createElement(window.OranDuAnalysisView);
+  }
+  return <GenericView title="O-RAN DU Analysis" description="Distributed Unit analysis and monitoring." />;
+};
+
+const OranE1InterfaceView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranE1InterfaceView) {
+    return React.createElement(window.OranE1InterfaceView);
+  }
+  return <GenericView title="O-RAN E1 Interface" description="E1 interface analysis and monitoring." />;
+};
+
+const OranF1InterfaceView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranF1InterfaceView) {
+    return React.createElement(window.OranF1InterfaceView);
+  }
+  return <GenericView title="O-RAN F1 Interface" description="F1 interface analysis and monitoring." />;
+};
+
+const OranPerformanceView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranPerformanceView) {
+    return React.createElement(window.OranPerformanceView);
+  }
+  return <GenericView title="O-RAN Performance" description="O-RAN performance analysis and monitoring." />;
+};
+
+const OranXappsView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranXappsView) {
+    return React.createElement(window.OranXappsView);
+  }
+  return <GenericView title="O-RAN xApps" description="xApps analysis and management." />;
+};
+
+const OranSmoView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.OranSmoView) {
+    return React.createElement(window.OranSmoView);
+  }
+  return <GenericView title="O-RAN SMO" description="Service Management and Orchestration analysis." />;
+};
+
+const NBIoTOverviewView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTOverviewView) {
+    return React.createElement(window.NBIoTOverviewView);
+  }
+  return <GenericView title="NB-IoT Overview" description="NB-IoT network overview and analysis." />;
+};
+
+const NBIoTCallFlowView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTCallFlowView) {
+    return React.createElement(window.NBIoTCallFlowView);
+  }
+  return <GenericView title="NB-IoT Call Flow" description="NB-IoT call flow analysis and monitoring." />;
+};
+
+const NBIoTAnalyticsView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTAnalyticsView) {
+    return React.createElement(window.NBIoTAnalyticsView);
+  }
+  return <GenericView title="NB-IoT Analytics" description="NB-IoT analytics and performance monitoring." />;
+};
+
+const NBIoTPhyLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTPhyLayerView) {
+    return React.createElement(window.NBIoTPhyLayerView);
+  }
+  return <GenericView title="NB-IoT PHY Layer" description="NB-IoT physical layer analysis." />;
+};
+
+const NBIoTMacLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTMacLayerView) {
+    return React.createElement(window.NBIoTMacLayerView);
+  }
+  return <GenericView title="NB-IoT MAC Layer" description="NB-IoT MAC layer analysis." />;
+};
+
+const NBIoTRrcLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTRrcLayerView) {
+    return React.createElement(window.NBIoTRrcLayerView);
+  }
+  return <GenericView title="NB-IoT RRC Layer" description="NB-IoT RRC layer analysis." />;
+};
+
+const NBIoTTestingView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NBIoTTestingView) {
+    return React.createElement(window.NBIoTTestingView);
+  }
+  return <GenericView title="NB-IoT Testing" description="NB-IoT test management and execution." />;
+};
+
+const V2xOverviewView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xOverviewView) {
+    return React.createElement(window.V2xOverviewView);
+  }
+  return <GenericView title="V2X Overview" description="Vehicle-to-everything communication overview." />;
+};
+
+const V2xSidelinkView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xSidelinkView) {
+    return React.createElement(window.V2xSidelinkView);
+  }
+  return <GenericView title="V2X Sidelink" description="V2X sidelink communication analysis." />;
+};
+
+const V2xAnalyticsView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xAnalyticsView) {
+    return React.createElement(window.V2xAnalyticsView);
+  }
+  return <GenericView title="V2X Analytics" description="V2X analytics and performance monitoring." />;
+};
+
+const V2xPhyLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xPhyLayerView) {
+    return React.createElement(window.V2xPhyLayerView);
+  }
+  return <GenericView title="V2X PHY Layer" description="V2X physical layer analysis." />;
+};
+
+const V2xMacLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xMacLayerView) {
+    return React.createElement(window.V2xMacLayerView);
+  }
+  return <GenericView title="V2X MAC Layer" description="V2X MAC layer analysis." />;
+};
+
+const V2xTestingView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xTestingView) {
+    return React.createElement(window.V2xTestingView);
+  }
+  return <GenericView title="V2X Testing" description="V2X test management and execution." />;
+};
+
+const V2xScenariosView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.V2xScenariosView) {
+    return React.createElement(window.V2xScenariosView);
+  }
+  return <GenericView title="V2X Scenarios" description="V2X scenario analysis and testing." />;
+};
+
+const NtnOverviewView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnOverviewView) {
+    return React.createElement(window.NtnOverviewView);
+  }
+  return <GenericView title="NTN Overview" description="Non-Terrestrial Network overview and analysis." />;
+};
+
+const NtnSatellitesView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnSatellitesView) {
+    return React.createElement(window.NtnSatellitesView);
+  }
+  return <GenericView title="Satellite Links" description="Satellite link analysis and monitoring." />;
+};
+
+const NtnAnalyticsView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnAnalyticsView) {
+    return React.createElement(window.NtnAnalyticsView);
+  }
+  return <GenericView title="NTN Analytics" description="NTN analytics and performance monitoring." badge="LIVE" />;
+};
+
+const NtnSib19View: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnSib19View) {
+    return React.createElement(window.NtnSib19View);
+  }
+  return <GenericView title="SIB19 Analysis" description="System Information Block 19 analysis." />;
+};
+
+const NtnTimingView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnTimingView) {
+    return React.createElement(window.NtnTimingView);
+  }
+  return <GenericView title="Timing & Delay" description="NTN timing and delay analysis." />;
+};
+
+const NtnDopplerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnDopplerView) {
+    return React.createElement(window.NtnDopplerView);
+  }
+  return <GenericView title="Doppler Analysis" description="Doppler effect analysis for NTN." />;
+};
+
+const NtnScenariosView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NtnScenariosView) {
+    return React.createElement(window.NtnScenariosView);
+  }
+  return <GenericView title="NTN Scenarios" description="NTN scenario analysis and testing." />;
+};
+
+const PhyLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.PhyLayerView) {
+    return React.createElement(window.PhyLayerView);
+  }
+  return <GenericView title="PHY Layer" description="Physical layer analysis and monitoring." />;
+};
+
+const MacLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.MacLayerView) {
+    return React.createElement(window.MacLayerView);
+  }
+  return <GenericView title="MAC Layer" description="MAC layer analysis and monitoring." />;
+};
+
+const RlcLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.RlcLayerView) {
+    return React.createElement(window.RlcLayerView);
+  }
+  return <GenericView title="RLC Layer" description="RLC layer analysis and monitoring." />;
+};
+
+const PdcpLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.PdcpLayerView) {
+    return React.createElement(window.PdcpLayerView);
+  }
+  return <GenericView title="PDCP Layer" description="PDCP layer analysis and monitoring." />;
+};
+
+const RrcLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.RrcLayerView) {
+    return React.createElement(window.RrcLayerView);
+  }
+  return <GenericView title="RRC Layer" description="RRC layer analysis and monitoring." />;
+};
+
+const NasLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.NasLayerView) {
+    return React.createElement(window.NasLayerView);
+  }
+  return <GenericView title="NAS Layer" description="NAS layer analysis and monitoring." />;
+};
+
+const ImsLayerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.ImsLayerView) {
+    return React.createElement(window.ImsLayerView);
+  }
+  return <GenericView title="IMS Analysis" description="IMS protocol analysis and monitoring." />;
+};
+
+const AmfAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.AmfAnalyzerView) {
+    return React.createElement(window.AmfAnalyzerView);
+  }
+  return <GenericView title="AMF Analyzer" description="Access and Mobility Management Function analyzer." />;
+};
+
+const SmfAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.SmfAnalyzerView) {
+    return React.createElement(window.SmfAnalyzerView);
+  }
+  return <GenericView title="SMF Analyzer" description="Session Management Function analyzer." />;
+};
+
+const UpfAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.UpfAnalyzerView) {
+    return React.createElement(window.UpfAnalyzerView);
+  }
+  return <GenericView title="UPF Analyzer" description="User Plane Function analyzer." />;
+};
+
+const AusfAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.AusfAnalyzerView) {
+    return React.createElement(window.AusfAnalyzerView);
+  }
+  return <GenericView title="AUSF Analyzer" description="Authentication Server Function analyzer." />;
+};
+
+const UdmAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.UdmAnalyzerView) {
+    return React.createElement(window.UdmAnalyzerView);
+  }
+  return <GenericView title="UDM Analyzer" description="Unified Data Management analyzer." />;
+};
+
+const ConfigManagerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.ConfigManagerView) {
+    return React.createElement(window.ConfigManagerView);
+  }
+  return <GenericView title="Config Manager" description="Configuration management and monitoring." />;
+};
+
+const MmeAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.MmeAnalyzerView) {
+    return React.createElement(window.MmeAnalyzerView);
+  }
+  return <GenericView title="MME Analyzer" description="Mobility Management Entity analyzer." />;
+};
+
+const SgwAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.SgwAnalyzerView) {
+    return React.createElement(window.SgwAnalyzerView);
+  }
+  return <GenericView title="SGW Analyzer" description="Serving Gateway analyzer." />;
+};
+
+const PgwAnalyzerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.PgwAnalyzerView) {
+    return React.createElement(window.PgwAnalyzerView);
+  }
+  return <GenericView title="PGW Analyzer" description="Packet Data Network Gateway analyzer." />;
+};
+
+const ReportGeneratorView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.ReportGeneratorView) {
+    return React.createElement(window.ReportGeneratorView);
+  }
+  return <GenericView title="Report Generator" description="Generate comprehensive analysis reports." />;
+};
+
+const ExportManagerView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.ExportManagerView) {
+    return React.createElement(window.ExportManagerView);
+  }
+  return <GenericView title="Export Manager" description="Export data and analysis results." />;
+};
+
+const HelpSupportView: React.FC = () => {
+  if (typeof window !== 'undefined' && window.HelpSupportView) {
+    return React.createElement(window.HelpSupportView);
+  }
+  return <GenericView title="Help & Support" description="User support and documentation." />;
 };
 
 // Generic View Component
@@ -482,109 +829,109 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'test-suites':
         return <TestSuitesView appState={{}} onStateChange={() => {}} />;
       case 'layer-trace':
-        return <GenericView title="Layer Trace" description="Protocol layer message flow and timing analysis." />;
+        return <LayerTraceView appState={{}} onStateChange={() => {}} />;
       case 'callflow':
-        return <GenericView title="Call Flow" description="Protocol message sequences and call flow analysis." />;
+        return <CallFlowView appState={{}} onStateChange={() => {}} />;
       case 'analytics':
-        return <GenericView title="Analytics" description="Real-time analytics and performance monitoring." badge="LIVE" />;
+        return <AnalyticsView appState={{}} onStateChange={() => {}} />;
       case 'oran-overview':
-        return <GenericView title="O-RAN Overview" description="O-RAN architecture overview and analysis." />;
+        return <OranOverviewView />;
       case 'oran-interfaces':
-        return <GenericView title="O-RAN Interfaces" description="O-RAN interface analysis and monitoring." />;
+        return <OranInterfacesView />;
       case 'oran-cu-analysis':
-        return <GenericView title="O-RAN CU Analysis" description="Central Unit analysis and monitoring." />;
+        return <OranCuAnalysisView />;
       case 'oran-du-analysis':
-        return <GenericView title="O-RAN DU Analysis" description="Distributed Unit analysis and monitoring." />;
+        return <OranDuAnalysisView />;
       case 'oran-e1-interface':
-        return <GenericView title="O-RAN E1 Interface" description="E1 interface analysis and monitoring." />;
+        return <OranE1InterfaceView />;
       case 'oran-f1-interface':
-        return <GenericView title="O-RAN F1 Interface" description="F1 interface analysis and monitoring." />;
+        return <OranF1InterfaceView />;
       case 'oran-performance':
-        return <GenericView title="O-RAN Performance" description="O-RAN performance analysis and monitoring." />;
+        return <OranPerformanceView />;
       case 'oran-xapps':
-        return <GenericView title="O-RAN xApps" description="xApps analysis and management." />;
+        return <OranXappsView />;
       case 'oran-smo':
-        return <GenericView title="O-RAN SMO" description="Service Management and Orchestration analysis." />;
+        return <OranSmoView />;
       case 'nbiot-overview':
-        return <GenericView title="NB-IoT Overview" description="NB-IoT network overview and analysis." />;
+        return <NBIoTOverviewView />;
       case 'nbiot-callflow':
-        return <GenericView title="NB-IoT Call Flow" description="NB-IoT call flow analysis and monitoring." />;
+        return <NBIoTCallFlowView />;
       case 'nbiot-analytics':
-        return <GenericView title="NB-IoT Analytics" description="NB-IoT analytics and performance monitoring." />;
+        return <NBIoTAnalyticsView />;
       case 'nbiot-phy-layer':
-        return <GenericView title="NB-IoT PHY Layer" description="NB-IoT physical layer analysis." />;
+        return <NBIoTPhyLayerView />;
       case 'nbiot-mac-layer':
-        return <GenericView title="NB-IoT MAC Layer" description="NB-IoT MAC layer analysis." />;
+        return <NBIoTMacLayerView />;
       case 'nbiot-rrc-layer':
-        return <GenericView title="NB-IoT RRC Layer" description="NB-IoT RRC layer analysis." />;
+        return <NBIoTRrcLayerView />;
       case 'nbiot-testing':
-        return <GenericView title="NB-IoT Testing" description="NB-IoT test management and execution." />;
+        return <NBIoTTestingView />;
       case 'v2x-overview':
-        return <GenericView title="V2X Overview" description="Vehicle-to-everything communication overview." />;
+        return <V2xOverviewView />;
       case 'v2x-sidelink':
-        return <GenericView title="V2X Sidelink" description="V2X sidelink communication analysis." />;
+        return <V2xSidelinkView />;
       case 'v2x-analytics':
-        return <GenericView title="V2X Analytics" description="V2X analytics and performance monitoring." />;
+        return <V2xAnalyticsView />;
       case 'v2x-phy-layer':
-        return <GenericView title="V2X PHY Layer" description="V2X physical layer analysis." />;
+        return <V2xPhyLayerView />;
       case 'v2x-mac-layer':
-        return <GenericView title="V2X MAC Layer" description="V2X MAC layer analysis." />;
+        return <V2xMacLayerView />;
       case 'v2x-testing':
-        return <GenericView title="V2X Testing" description="V2X test management and execution." />;
+        return <V2xTestingView />;
       case 'v2x-scenarios':
-        return <GenericView title="V2X Scenarios" description="V2X scenario analysis and testing." />;
+        return <V2xScenariosView />;
       case 'ntn-overview':
-        return <GenericView title="NTN Overview" description="Non-Terrestrial Network overview and analysis." />;
+        return <NtnOverviewView />;
       case 'ntn-satellites':
-        return <GenericView title="Satellite Links" description="Satellite link analysis and monitoring." />;
+        return <NtnSatellitesView />;
       case 'ntn-analytics':
-        return <GenericView title="NTN Analytics" description="NTN analytics and performance monitoring." badge="LIVE" />;
+        return <NtnAnalyticsView />;
       case 'ntn-sib19':
-        return <GenericView title="SIB19 Analysis" description="System Information Block 19 analysis." />;
+        return <NtnSib19View />;
       case 'ntn-timing':
-        return <GenericView title="Timing & Delay" description="NTN timing and delay analysis." />;
+        return <NtnTimingView />;
       case 'ntn-doppler':
-        return <GenericView title="Doppler Analysis" description="Doppler effect analysis for NTN." />;
+        return <NtnDopplerView />;
       case 'ntn-scenarios':
-        return <GenericView title="NTN Scenarios" description="NTN scenario analysis and testing." />;
+        return <NtnScenariosView />;
       case 'phy-layer':
-        return <GenericView title="PHY Layer" description="Physical layer analysis and monitoring." />;
+        return <PhyLayerView />;
       case 'mac-layer':
-        return <GenericView title="MAC Layer" description="MAC layer analysis and monitoring." />;
+        return <MacLayerView />;
       case 'rlc-layer':
-        return <GenericView title="RLC Layer" description="RLC layer analysis and monitoring." />;
+        return <RlcLayerView />;
       case 'pdcp-layer':
-        return <GenericView title="PDCP Layer" description="PDCP layer analysis and monitoring." />;
+        return <PdcpLayerView />;
       case 'rrc-layer':
-        return <GenericView title="RRC Layer" description="RRC layer analysis and monitoring." />;
+        return <RrcLayerView />;
       case 'nas-layer':
-        return <GenericView title="NAS Layer" description="NAS layer analysis and monitoring." />;
+        return <NasLayerView />;
       case 'ims-layer':
-        return <GenericView title="IMS Analysis" description="IMS protocol analysis and monitoring." />;
+        return <ImsLayerView />;
       case 'amf-analyzer':
-        return <GenericView title="AMF Analyzer" description="Access and Mobility Management Function analyzer." />;
+        return <AmfAnalyzerView />;
       case 'smf-analyzer':
-        return <GenericView title="SMF Analyzer" description="Session Management Function analyzer." />;
+        return <SmfAnalyzerView />;
       case 'upf-analyzer':
-        return <GenericView title="UPF Analyzer" description="User Plane Function analyzer." />;
+        return <UpfAnalyzerView />;
       case 'ausf-analyzer':
-        return <GenericView title="AUSF Analyzer" description="Authentication Server Function analyzer." />;
+        return <AusfAnalyzerView />;
       case 'udm-analyzer':
-        return <GenericView title="UDM Analyzer" description="Unified Data Management analyzer." />;
+        return <UdmAnalyzerView />;
       case 'config-manager':
-        return <GenericView title="Config Manager" description="Configuration management and monitoring." />;
+        return <ConfigManagerView />;
       case 'mme-analyzer':
-        return <GenericView title="MME Analyzer" description="Mobility Management Entity analyzer." />;
+        return <MmeAnalyzerView />;
       case 'sgw-analyzer':
-        return <GenericView title="SGW Analyzer" description="Serving Gateway analyzer." />;
+        return <SgwAnalyzerView />;
       case 'pgw-analyzer':
-        return <GenericView title="PGW Analyzer" description="Packet Data Network Gateway analyzer." />;
+        return <PgwAnalyzerView />;
       case 'report-generator':
-        return <GenericView title="Report Generator" description="Generate comprehensive analysis reports." />;
+        return <ReportGeneratorView />;
       case 'export-manager':
-        return <GenericView title="Export Manager" description="Export data and analysis results." />;
+        return <ExportManagerView />;
       case 'help-support':
-        return <GenericView title="Help & Support" description="User support and documentation." />;
+        return <HelpSupportView />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
