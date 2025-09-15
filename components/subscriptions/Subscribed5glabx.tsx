@@ -8,6 +8,7 @@ interface Subscribed5glabxProps {
 export default function Subscribed5glabx({ iframeSrc = '/5glabx/simple.html' }: Subscribed5glabxProps) {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'denied'>('checking');
   const [isLoading, setIsLoading] = useState(true);
+  const [iframeError, setIframeError] = useState(false);
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -64,6 +65,31 @@ export default function Subscribed5glabx({ iframeSrc = '/5glabx/simple.html' }: 
     );
   }
 
+  if (iframeError) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <div className="text-red-600 mb-4">
+          <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-red-800 mb-2">5GLabX Platform Unavailable</h3>
+        <p className="text-red-700 mb-4">
+          The 5GLabX platform is currently unavailable. Please try again later or contact support.
+        </p>
+        <button 
+          onClick={() => {
+            setIframeError(false);
+            window.location.reload();
+          }}
+          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div style={{height:'78vh', borderRadius:8, overflow:'hidden', border:'1px solid #e5e7eb'}}>
       <iframe 
@@ -72,6 +98,8 @@ export default function Subscribed5glabx({ iframeSrc = '/5glabx/simple.html' }: 
         style={{width:'100%', height:'100%', border:0}} 
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
         allow="fullscreen"
+        onError={() => setIframeError(true)}
+        onLoad={() => setIframeError(false)}
       />
     </div>
   );
