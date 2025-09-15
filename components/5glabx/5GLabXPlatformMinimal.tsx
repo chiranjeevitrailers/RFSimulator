@@ -832,9 +832,11 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <GenericView title="Logs Viewer" description="Protocol log analysis and monitoring." />;
+        return <LogsViewerView />;
       case 'enhanced-logs':
-        return <GenericView title="Enhanced Logs" description="Advanced log filtering and analysis capabilities." />;
+        return <EnhancedLogsView />;
+      case 'test-suites':
+        return <TestSuitesView />;
       case 'layer-trace':
         return <GenericView title="Layer Trace" description="Protocol layer message flow and timing analysis." />;
       case 'callflow':
@@ -939,8 +941,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <GenericView title="Export Manager" description="Export data and analysis results." />;
       case 'help-support':
         return <GenericView title="Help & Support" description="User support and documentation." />;
-      case 'test-suites':
-        return <GenericView title="Test Suites" description="Comprehensive test suite management and execution." />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
