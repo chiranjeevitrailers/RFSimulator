@@ -11,23 +11,18 @@ try {
   console.log('📦 Running Next.js build...');
   execSync('npx next build', { stdio: 'inherit' });
 
-  // Step 2: Copy static files from public to out directory
+  // Step 2: Copy static files from public to .next directory (for Netlify)
   console.log('📁 Copying static files...');
   
   const publicDir = path.join(__dirname, '..', 'public');
-  const outDir = path.join(__dirname, '..', 'out');
+  const nextDir = path.join(__dirname, '..', '.next');
   
-  // Ensure out directory exists
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-  
-  // Copy static files (excluding 5glabx directory which is already handled)
+  // Copy static files to .next directory for Netlify
   const staticFiles = ['favicon.ico', 'site.webmanifest', 'favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png', 'og-image.png'];
   
   staticFiles.forEach(file => {
     const srcPath = path.join(publicDir, file);
-    const destPath = path.join(outDir, file);
+    const destPath = path.join(nextDir, file);
     
     if (fs.existsSync(srcPath)) {
       fs.copyFileSync(srcPath, destPath);
@@ -37,14 +32,12 @@ try {
     }
   });
   
-  // Step 3: Verify 5GLabX platform files
-  console.log('🔍 Verifying 5GLabX platform files...');
-  const fiveglabxDir = path.join(outDir, '5glabx');
-  if (fs.existsSync(fiveglabxDir)) {
-    const files = fs.readdirSync(fiveglabxDir);
-    console.log(`✅ 5GLabX platform files found: ${files.join(', ')}`);
+  // Step 3: Verify build output
+  console.log('🔍 Verifying build output...');
+  if (fs.existsSync(nextDir)) {
+    console.log('✅ Next.js build output found');
   } else {
-    console.log('❌ 5GLabX platform directory not found');
+    console.log('❌ Next.js build output not found');
   }
   
   console.log('🎉 Build completed successfully!');
