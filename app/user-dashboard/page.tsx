@@ -38,7 +38,7 @@ import Subscribed5glabx from '@/components/subscriptions/Subscribed5glabx';
 import EnhancedProtocolAnalyzerDashboard from '@/components/protocol-analyzer/EnhancedProtocolAnalyzerDashboard';
 import ProtocolAnalyzerViewer from '@/components/protocol-analyzer/ProtocolAnalyzerViewer';
 import TestSuitesDashboard from '@/components/test-suites/TestSuitesDashboard';
-import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformSimple';
+import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformFixed';
 
 const UserDashboard: React.FC = () => {
   const router = useRouter();
