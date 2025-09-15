@@ -10,7 +10,18 @@ function GlobalSearch({ onSearchResults, placeholder = "Search across all logs a
     const [suggestions, setSuggestions] = React.useState([]);
     const [showSuggestions, setShowSuggestions] = React.useState(false);
 
-    const handleSearch = React.useCallback(window.HELPERS.debounce(async (searchQuery) => {
+    // Gracefully handle absence of global debounce helper
+    const debounce = (fn, wait = 300) => {
+      if (window.HELPERS?.debounce) return window.HELPERS.debounce(fn, wait);
+      // Fallback debounce implementation
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), wait);
+      };
+    };
+
+    const handleSearch = React.useCallback(debounce(async (searchQuery) => {
       try {
         if (!searchQuery.trim()) {
           setSuggestions([]);
@@ -99,9 +110,10 @@ function GlobalSearch({ onSearchResults, placeholder = "Search across all logs a
       showSuggestions && suggestions.length > 0 && React.createElement('div', {
         key: 'suggestions',
         className: 'absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50'
-      }, suggestions.map((suggestion, index) => 
-        React.createElement('div', {
-          key: index,
+      }, suggestions.map((suggestion) => {
+        const sKey = `${suggestion.category}-${suggestion.text}`;
+        return React.createElement('div', {
+          key: sKey,
           className: 'p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0',
           onClick: () => {
             setQuery(suggestion.text);
@@ -116,8 +128,8 @@ function GlobalSearch({ onSearchResults, placeholder = "Search across all logs a
             key: 'count',
             className: 'text-xs text-gray-500'
           }, `${suggestion.count} results`)
-        ])
-      ))
+        ]);
+      }))
     ]);
 
   } catch (error) {
@@ -128,6 +140,11 @@ function GlobalSearch({ onSearchResults, placeholder = "Search across all logs a
     }, 'Search failed to load');
   }
 }
+
+// Default props
+GlobalSearch.defaultProps = {
+  onSearchResults: () => {}
+};
 
 // Export GlobalSearch component
 window.GlobalSearch = GlobalSearch;
