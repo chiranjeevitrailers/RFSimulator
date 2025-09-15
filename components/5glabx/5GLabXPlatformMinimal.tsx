@@ -9,6 +9,10 @@ import {
   Satellite, Network, Server, Phone, MapPin, FileText, HelpCircle
 } from 'lucide-react';
 
+// Import existing components from codebase
+import LogsView from './views/LogsView';
+import TestSuitesView from './views/TestSuitesView';
+
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
   return (
@@ -164,137 +168,14 @@ const DashboardView: React.FC = () => {
   );
 };
 
-// Logs Viewer Component
-const LogsViewerView: React.FC = () => {
-  const sampleLogs = [
-    { timestamp: '2024-01-15 14:23:45.123', level: 'INFO', component: 'PHY', message: 'PDSCH transmission scheduled for UE 12345' },
-    { timestamp: '2024-01-15 14:23:45.156', level: 'DEBUG', component: 'MAC', message: 'DL PDU received from RLC layer' },
-    { timestamp: '2024-01-15 14:23:45.189', level: 'WARN', component: 'RRC', message: 'RRC connection timeout for UE 12346' },
-    { timestamp: '2024-01-15 14:23:45.234', level: 'INFO', component: 'NAS', message: 'NAS Attach Request received' },
-    { timestamp: '2024-01-15 14:23:45.267', level: 'ERROR', component: 'IMS', message: 'SIP INVITE failed - 408 Request Timeout' },
-    { timestamp: '2024-01-15 14:23:45.298', level: 'INFO', component: 'PHY', message: 'Uplink grant allocated to UE 12347' },
-    { timestamp: '2024-01-15 14:23:45.334', level: 'DEBUG', component: 'MAC', message: 'UL PDU transmitted successfully' },
-    { timestamp: '2024-01-15 14:23:45.367', level: 'INFO', component: 'RRC', message: 'RRC Connection Reconfiguration completed' }
-  ];
-
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'ERROR': return 'text-red-600 bg-red-50';
-      case 'WARN': return 'text-yellow-600 bg-yellow-50';
-      case 'INFO': return 'text-blue-600 bg-blue-50';
-      case 'DEBUG': return 'text-gray-600 bg-gray-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Logs Viewer</h1>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-600">Live Monitoring</span>
-          </div>
-          <button className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-            <RefreshCw className="w-4 h-4 mr-2 inline" />
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border overflow-hidden">
-        <div className="p-4 border-b bg-gray-50">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Search className="w-4 h-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search logs..." 
-                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>All Levels</option>
-              <option>ERROR</option>
-              <option>WARN</option>
-              <option>INFO</option>
-              <option>DEBUG</option>
-            </select>
-            <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>All Components</option>
-              <option>PHY</option>
-              <option>MAC</option>
-              <option>RRC</option>
-              <option>NAS</option>
-              <option>IMS</option>
-            </select>
-          </div>
-        </div>
-        
-        <div className="max-h-96 overflow-y-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 sticky top-0">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Component</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sampleLogs.map((log, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 font-mono">{log.timestamp}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(log.level)}`}>
-                      {log.level}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 font-medium">{log.component}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{log.message}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Enhanced Logs Component
+// Enhanced Logs Component - using existing implementation
 const EnhancedLogsView: React.FC = () => {
-  const sampleRows = [
-    {
-      id: 1,
-      timestamp: '2024-01-15 14:23:45.123',
-      level: 'INFO',
-      component: 'PHY',
-      message: 'PDSCH transmission scheduled for UE 12345',
-      details: {
-        ueId: '12345',
-        cellId: '12345',
-        mcs: 15,
-        tbs: 1024,
-        prb: 25
-      }
-    },
-    {
-      id: 2,
-      timestamp: '2024-01-15 14:23:45.156',
-      level: 'DEBUG',
-      component: 'MAC',
-      message: 'DL PDU received from RLC layer',
-      details: {
-        pduSize: 512,
-        lcid: 3,
-        harqId: 0,
-        ndi: 1
-      }
-    }
-  ];
-
+  // Use the existing EnhancedLogsView from the codebase
+  if (typeof window !== 'undefined' && window.EnhancedLogsView) {
+    return React.createElement(window.EnhancedLogsView);
+  }
+  
+  // Fallback if not available
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -304,247 +185,10 @@ const EnhancedLogsView: React.FC = () => {
             <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-gray-600">Enhanced Analysis</span>
           </div>
-          <button className="px-3 py-1.5 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">
-            <Download className="w-4 h-4 mr-2 inline" />
-            Export
-          </button>
         </div>
       </div>
-
-      <div className="bg-white rounded-lg border overflow-hidden">
-        <div className="p-4 border-b bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Search className="w-4 h-4 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Advanced search..." 
-                  className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <Filter className="w-4 h-4 text-gray-400" />
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option>All Time</option>
-                <option>Last Hour</option>
-                <option>Last 24 Hours</option>
-                <option>Last Week</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-                <Eye className="w-4 h-4 mr-2 inline" />
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Component</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sampleRows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 font-mono">{row.timestamp}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      row.level === 'INFO' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 bg-gray-50'
-                    }`}>
-                      {row.level}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 font-medium">{row.component}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{row.message}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    <div className="space-y-1">
-                      {Object.entries(row.details).map(([key, value]) => (
-                        <div key={key} className="text-xs">
-                          <span className="font-medium">{key}:</span> {value}
-                        </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <button className="text-blue-600 hover:text-blue-800 mr-2">Analyze</button>
-                    <button className="text-green-600 hover:text-green-800">Trace</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Test Suites Component
-const TestSuitesView: React.FC = () => {
-  const categories = [
-    { id: '5g-nr', name: '5G NR', count: 150 },
-    { id: 'lte', name: 'LTE', count: 120 },
-    { id: 'oran', name: 'O-RAN', count: 85 },
-    { id: 'nbiot', name: 'NB-IoT', count: 65 },
-    { id: 'v2x', name: 'V2X', count: 45 },
-    { id: 'ntn', name: 'NTN', count: 35 },
-    { id: 'ims', name: 'IMS', count: 55 },
-    { id: 'security', name: 'Security', count: 40 }
-  ];
-
-  const testSuites = [
-    { id: 1, name: '5G NR Initial Access', category: '5g-nr', status: 'ready', duration: '2m 30s', description: 'Complete initial access procedure testing' },
-    { id: 2, name: 'LTE Handover Procedures', category: 'lte', status: 'running', duration: '1m 45s', description: 'Inter-cell handover validation' },
-    { id: 3, name: 'O-RAN F1 Interface', category: 'oran', status: 'ready', duration: '3m 15s', description: 'F1 interface protocol testing' },
-    { id: 4, name: 'NB-IoT Attach Flow', category: 'nbiot', status: 'completed', duration: '1m 20s', description: 'NB-IoT device attachment procedures' },
-    { id: 5, name: 'V2X Sidelink Communication', category: 'v2x', status: 'ready', duration: '4m 10s', description: 'Vehicle-to-vehicle communication testing' },
-    { id: 6, name: 'NTN Satellite Handover', category: 'ntn', status: 'ready', duration: '5m 30s', description: 'Non-terrestrial network handover procedures' },
-    { id: 7, name: 'IMS SIP Registration', category: 'ims', status: 'failed', duration: '2m 15s', description: 'SIP registration and authentication' },
-    { id: 8, name: '5G Security Authentication', category: 'security', status: 'ready', duration: '1m 50s', description: '5G-AKA authentication procedures' }
-  ];
-
-  const [selectedCategory, setSelectedCategory] = React.useState('5g-nr');
-  const [selectedTests, setSelectedTests] = React.useState<number[]>([]);
-
-  const filteredTests = testSuites.filter(test => test.category === selectedCategory);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'running': return 'text-blue-600 bg-blue-50';
-      case 'completed': return 'text-green-600 bg-green-50';
-      case 'failed': return 'text-red-600 bg-red-50';
-      case 'ready': return 'text-gray-600 bg-gray-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Test Suites</h1>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Test Engine Ready</span>
-          </div>
-          <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center">
-            <Play className="w-4 h-4 mr-2" />
-            Run Selected
-          </button>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center">
-            <Square className="w-4 h-4 mr-2" />
-            Stop All
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Categories */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border p-4">
-            <h3 className="text-lg font-semibold mb-4">Categories</h3>
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-100 text-blue-700 border-l-2 border-blue-500'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{category.name}</span>
-                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                      {category.count}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Test Suites List */}
-        <div className="lg:col-span-3">
-          <div className="bg-white rounded-lg border overflow-hidden">
-            <div className="p-4 border-b bg-gray-50">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  {categories.find(c => c.id === selectedCategory)?.name} Test Suites
-                </h3>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedTests.length === filteredTests.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedTests(filteredTests.map(test => test.id));
-                      } else {
-                        setSelectedTests([]);
-                      }
-                    }}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="text-sm text-gray-600">Select All</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="divide-y divide-gray-200">
-              {filteredTests.map((test) => (
-                <div key={test.id} className="p-4 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedTests.includes(test.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedTests([...selectedTests, test.id]);
-                          } else {
-                            setSelectedTests(selectedTests.filter(id => id !== test.id));
-                          }
-                        }}
-                        className="rounded border-gray-300"
-                      />
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900">{test.name}</h4>
-                        <p className="text-sm text-gray-500">{test.description}</p>
-                        <div className="flex items-center space-x-4 mt-1">
-                          <span className="text-xs text-gray-400">Duration: {test.duration}</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(test.status)}`}>
-                            {test.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-                        <Play className="w-3 h-3 mr-1 inline" />
-                        Run
-                      </button>
-                      <button className="px-3 py-1.5 bg-gray-600 text-white rounded-md text-sm hover:bg-gray-700">
-                        <Eye className="w-3 h-3 mr-1 inline" />
-                        View
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="bg-white p-6 rounded-lg border">
+        <p className="text-gray-600">Enhanced logs view with comprehensive filtering and message decoding capabilities.</p>
       </div>
     </div>
   );
@@ -832,11 +476,11 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <LogsViewerView />;
+        return <LogsView appState={{}} onStateChange={() => {}} />;
       case 'enhanced-logs':
         return <EnhancedLogsView />;
       case 'test-suites':
-        return <TestSuitesView />;
+        return <TestSuitesView appState={{}} onStateChange={() => {}} />;
       case 'layer-trace':
         return <GenericView title="Layer Trace" description="Protocol layer message flow and timing analysis." />;
       case 'callflow':
