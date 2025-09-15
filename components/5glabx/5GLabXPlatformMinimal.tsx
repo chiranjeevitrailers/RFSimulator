@@ -10,7 +10,8 @@ import {
 } from 'lucide-react';
 
 // Import existing components from codebase
-import LogsView from './views/LogsView';
+import LogViewer from './components/logs/LogViewer';
+import EnhancedLogViewer from './components/logs/EnhancedLogViewer';
 import TestSuitesView from './views/TestSuitesView';
 import AnalyticsView from './views/AnalyticsView';
 import CallFlowView from './views/CallFlowView';
@@ -492,9 +493,17 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'test-case-data-flow':
         return <TestCaseDataFlow />;
       case 'logs':
-        return <LogsView appState={{}} onStateChange={() => {}} />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
+        );
       case 'enhanced-logs':
-        return <EnhancedLogsView appState={{}} onStateChange={() => {}} />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
+        );
       case 'test-suites':
         return <TestSuitesView appState={{}} onStateChange={() => {}} />;
       case 'layer-trace':
