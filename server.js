@@ -31,8 +31,8 @@ class RealCLILogServer {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.static(path.join(__dirname, 'public')));
-    // Serve 5GLabX static frontend from /5glabx
-    this.app.use('/5glabx', express.static(path.join(__dirname, 'netlify')));
+    // Serve 5GLabX static frontend from /5glabx (public assets)
+    this.app.use('/5glabx', express.static(path.join(__dirname, 'public/5glabx')));
   }
 
   setupRoutes() {
