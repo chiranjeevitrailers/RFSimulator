@@ -15,6 +15,7 @@ import TestSuitesView from './views/TestSuitesView';
 import AnalyticsView from './views/AnalyticsView';
 import CallFlowView from './views/CallFlowView';
 import LayerTraceView from './views/LayerTraceView';
+import EnhancedLogsView from './views/EnhancedLogsView';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -171,31 +172,6 @@ const DashboardView: React.FC = () => {
   );
 };
 
-// Enhanced Logs Component - using existing implementation
-const EnhancedLogsView: React.FC = () => {
-  // Use the existing EnhancedLogsView from the codebase
-  if (typeof window !== 'undefined' && window.EnhancedLogsView) {
-    return React.createElement(window.EnhancedLogsView);
-  }
-  
-  // Fallback if not available
-  return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Enhanced Logs</h1>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-600">Enhanced Analysis</span>
-          </div>
-        </div>
-      </div>
-      <div className="bg-white p-6 rounded-lg border">
-        <p className="text-gray-600">Enhanced logs view with comprehensive filtering and message decoding capabilities.</p>
-      </div>
-    </div>
-  );
-};
 
 // Wrapper components for JavaScript views
 const OranOverviewView: React.FC = () => {
@@ -825,7 +801,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'logs':
         return <LogsView appState={{}} onStateChange={() => {}} />;
       case 'enhanced-logs':
-        return <EnhancedLogsView />;
+        return <EnhancedLogsView appState={{}} onStateChange={() => {}} />;
       case 'test-suites':
         return <TestSuitesView appState={{}} onStateChange={() => {}} />;
       case 'layer-trace':
