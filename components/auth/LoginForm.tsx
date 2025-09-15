@@ -63,7 +63,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isAdmin = false }) => {
       } else {
         // Regular user authentication (mock)
         if (formData.email && formData.password) {
-          router.push('/');
+          router.push('/user-dashboard');
         } else {
           setErrors({ general: 'Please enter email and password' });
         }

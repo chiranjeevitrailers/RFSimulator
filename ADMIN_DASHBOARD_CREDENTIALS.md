@@ -35,8 +35,8 @@ Role: manager
 - **Production**: `https://your-domain.com/admin-dashboard`
 
 ### **User Dashboard URL**
-- **Local Development**: `http://localhost:3000/`
-- **Production**: `https://your-domain.com/`
+- **Local Development**: `http://localhost:3000/user-dashboard`
+- **Production**: `https://your-domain.com/user-dashboard`
 
 ### **Login Page**
 - **Local Development**: `http://localhost:3000/login`

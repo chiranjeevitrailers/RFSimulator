@@ -180,6 +180,7 @@ Route (app)                    Size     First Load JS
 ┌ ○ /                         16.2 kB         164 kB
 ├ ○ /_not-found               870 B          87.5 kB
 ├ ○ /admin-dashboard          53.1 kB         199 kB
+├ ○ /user-dashboard           41.8 kB         187 kB
 ├ ○ /admin/login              143 B           150 kB
 ├ ○ /login                    143 B           150 kB
 ├ ○ /signup                   3.34 kB         151 kB

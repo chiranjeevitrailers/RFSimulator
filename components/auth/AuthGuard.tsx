@@ -37,7 +37,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
             setIsAdmin(userRole === 'admin');
             
             if (userRole !== 'admin') {
-              router.push('/');
+              router.push('/user-dashboard');
               return;
             }
           }

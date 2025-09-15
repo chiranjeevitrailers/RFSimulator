@@ -30,7 +30,8 @@ The 5GLabX platform is now deployed using a modern, scalable stack that provides
 ```
 5glabx-platform/
 ├── app/                          # Next.js app directory
-│   └── admin-dashboard/         # Admin dashboard pages
+│   ├── admin-dashboard/         # Admin dashboard pages
+│   └── user-dashboard/          # User dashboard pages (functionalities removed)
 ├── components/                   # React components
 │   ├── subscriptions/           # Subscription management
 │   └── test-cases/              # Test case components
