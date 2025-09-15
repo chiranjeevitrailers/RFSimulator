@@ -6,8 +6,8 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
     }, []);
 
     const [connectionStatus, setConnectionStatus] = React.useState('disconnected');
-    const [wsUrl, setWsUrl] = React.useState('ws://localhost:8080/logs');
-    const [selectedSources, setSelectedSources] = React.useState(['srsran', 'open5gs', 'kamailio']);
+    const [wsUrl, setWsUrl] = React.useState('ws://localhost:8081');
+    const [selectedSources, setSelectedSources] = React.useState(['testcase']);
     const [logCount, setLogCount] = React.useState(0);
     const wsRef = React.useRef(null);
 
@@ -27,8 +27,8 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
       try {
         setConnectionStatus('connecting');
         
-        // Use backend data adapter for multi-source data
-        if (typeof window.DataAdapter !== 'undefined') {
+        // Disable browser DataAdapter path (Node-only readers)
+        if (false && typeof window.DataAdapter !== 'undefined') {
           const dataAdapter = new window.DataAdapter();
           dataAdapter.subscribe((logEntry) => {
             if (logEntry && selectedSources.some(src => logEntry.source === src)) {
@@ -50,8 +50,8 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
           return;
         }
 
-        // Fallback to CLIDataBridge
-        if (typeof window.CLIDataBridge !== 'undefined') {
+        // Disable CLIDataBridge simulation path in browser
+        if (false && typeof window.CLIDataBridge !== 'undefined') {
           const simulateRealTimeData = () => {
             try {
               const logs = window.CLIDataBridge.getRealtimeLogs();
@@ -212,6 +212,7 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
             key: 'sources-checkboxes',
             className: 'flex space-x-4'
           }, [
+            ['testcase', 'Test Case'],
             ['srsran', 'srsRAN'],
             ['open5gs', 'Open5GS'],
             ['kamailio', 'Kamailio']

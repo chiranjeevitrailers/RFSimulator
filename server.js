@@ -94,6 +94,9 @@ class RealCLILogServer {
 
     // Configuration Management APIs
     this.setupConfigRoutes();
+
+    // Test case playback APIs
+    this.setupPlaybackRoutes();
   }
 
   setupConfigRoutes() {
@@ -397,6 +400,59 @@ class RealCLILogServer {
         
         const result = await this.networkManager.checkPortAvailability(parseInt(port), protocol);
         res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  }
+
+  setupPlaybackRoutes() {
+    // Lazy load playback service to avoid browser bundling issues
+    const TestCasePlaybackService = require('./services/TestCasePlaybackService');
+    if (!this.playback) {
+      this.playback = new TestCasePlaybackService({
+        databaseService: this.databaseService,
+        websocketBroadcast: (type, source, data) => {
+          const msg = JSON.stringify({ type, source, data });
+          this.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              // Respect client source subscriptions
+              if (!client.subscribedSources || client.subscribedSources.includes(source)) {
+                try { client.send(msg); } catch {}
+              }
+            }
+          });
+        }
+      });
+    }
+
+    // Start playback
+    this.app.post('/api/test/playback/start', async (req, res) => {
+      try {
+        const { testCaseId, runId, speed, apiBaseUrl } = req.body || {};
+        if (!testCaseId) return res.status(400).json({ error: 'testCaseId is required' });
+        const result = await this.playback.startPlayback({ testCaseId, runId, speed, apiBaseUrl: apiBaseUrl || '/api' });
+        res.json(result);
+      } catch (error) {
+        console.error('Playback start error:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Stop playback
+    this.app.post('/api/test/playback/stop', async (req, res) => {
+      try {
+        const result = await this.playback.stopPlayback();
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Status
+    this.app.get('/api/test/playback/status', (req, res) => {
+      try {
+        res.json(this.playback.status());
       } catch (error) {
         res.status(500).json({ error: error.message });
       }

@@ -8,7 +8,7 @@ class WebSocketService {
     this.isConnected = false;
   }
 
-  connect(url = 'ws://localhost:8080/logs') {
+  connect(url = 'ws://localhost:8081') {
     try {
       this.ws = new WebSocket(url);
       

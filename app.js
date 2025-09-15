@@ -45,7 +45,7 @@ function App() {
     }, []);
 
     const [appState, setAppState] = React.useState({
-      currentView: 'dashboard',
+      currentView: 'user-dashboard',
       sidebarCollapsed: false,
       logs: [],
       selectedLog: null,
@@ -110,6 +110,7 @@ function App() {
     const renderCurrentView = () => {
       try {
         const viewComponents = {
+          'user-dashboard': UserDashboardView,
           'dashboard': DashboardView,
           'logs': LogsView,
           'enhanced-logs': EnhancedLogsView,

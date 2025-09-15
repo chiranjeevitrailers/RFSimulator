@@ -95,6 +95,9 @@ window.CONSTANTS = {
   // WebSocket configuration
   WEBSOCKET_RECONNECT_INTERVAL: 5000,
   WEBSOCKET_MAX_RETRIES: 10,
+
+  // External API base (Next/Supabase gateway)
+  API_BASE_URL: (typeof window !== 'undefined' && window.__API_BASE_URL__) || '/api',
   
   // UI configuration
   SIDEBAR_WIDTH: 256,
