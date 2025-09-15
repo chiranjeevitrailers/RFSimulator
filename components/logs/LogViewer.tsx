@@ -14,6 +14,8 @@ import {
   EyeOff,
   Maximize2,
   Minimize2,
+  Pause,
+  Play,
   Settings,
   Clock,
   AlertTriangle,
@@ -32,6 +34,7 @@ import {
   Target,
   TrendingUp
 } from 'lucide-react';
+import { useLogs } from '@/components/providers/LogProvider';
 
 interface LogEntry {
   id: string;
@@ -65,7 +68,7 @@ const LogViewer: React.FC<LogViewerProps> = ({
   userId, 
   mode 
 }) => {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const { logs: contextLogs, clearLogs: clearContextLogs } = useLogs();
   const [filteredLogs, setFilteredLogs] = useState<LogEntry[]>([]);
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,63 +95,21 @@ const LogViewer: React.FC<LogViewerProps> = ({
   
   const logContainerRef = useRef<HTMLDivElement>(null);
 
+  // Whenever context logs update, apply filters
   useEffect(() => {
-    // Simulate real-time log generation
-    const logInterval = setInterval(() => {
-      const newLog: LogEntry = {
-        id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: new Date(),
-        level: ['debug', 'info', 'warning', 'error'][Math.floor(Math.random() * 4)] as any,
-        source: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        layer: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        protocol: ['NR-PHY', 'NR-MAC', 'NR-RLC', 'NR-PDCP', 'NR-RRC', '5G-NAS'][Math.floor(Math.random() * 6)],
-        message: `Message processed: ${Math.random().toString(36).substr(2, 9)}`,
-        data: {
-          messageType: 'TestMessage',
-          direction: ['UL', 'DL'][Math.floor(Math.random() * 2)],
-          size: Math.floor(Math.random() * 1000) + 100
-        },
-        messageId: `msg_${Math.random().toString(36).substr(2, 9)}`,
-        stepId: `step_${Math.floor(Math.random() * 10) + 1}`,
-        direction: ['UL', 'DL', 'BIDIRECTIONAL'][Math.floor(Math.random() * 3)] as any,
-        rawData: Math.random().toString(16).substr(2, 16).toUpperCase(),
-        decodedData: {
-          field1: Math.floor(Math.random() * 100),
-          field2: Math.random().toString(36).substr(2, 8)
-        },
-        informationElements: [
-          {
-            name: 'test_ie',
-            type: 'integer',
-            value: Math.floor(Math.random() * 100),
-            hexValue: Math.random().toString(16).substr(2, 4).toUpperCase(),
-            mandatory: true,
-            validationStatus: 'valid'
-          }
-        ],
-        validationResult: {
-          isValid: Math.random() > 0.1,
-          errors: [],
-          warnings: [],
-          complianceScore: Math.floor(Math.random() * 20) + 80
-        },
-        performanceData: {
-          latency: Math.floor(Math.random() * 10) + 1,
-          processingTime: Math.random() * 5,
-          memoryUsage: Math.random() * 100,
-          cpuUsage: Math.random() * 100
-        }
-      };
-      
-      setLogs(prev => [...prev.slice(-999), newLog]); // Keep last 1000 logs
-    }, 500);
+    setFilteredLogs(contextLogs);
+  }, [contextLogs]);
 
-    return () => clearInterval(logInterval);
-  }, []);
+  useEffect(() => {
+    // Auto scroll to bottom
+    if (autoScroll && logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [filteredLogs, autoScroll]);
 
   useEffect(() => {
     // Apply filters
-    let filtered = logs;
+    let filtered = contextLogs;
 
     if (levelFilter !== 'all') {
       filtered = filtered.filter(log => log.level === levelFilter);
@@ -180,14 +141,7 @@ const LogViewer: React.FC<LogViewerProps> = ({
     }
 
     setFilteredLogs(filtered);
-  }, [logs, levelFilter, layerFilter, protocolFilter, sourceFilter, searchText, timeRange]);
-
-  useEffect(() => {
-    // Auto scroll to bottom
-    if (autoScroll && logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-    }
-  }, [filteredLogs, autoScroll]);
+  }, [contextLogs, levelFilter, layerFilter, protocolFilter, sourceFilter, searchText, timeRange]);
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -243,8 +197,7 @@ const LogViewer: React.FC<LogViewerProps> = ({
   };
 
   const clearLogs = () => {
-    setLogs([]);
-    setFilteredLogs([]);
+    clearContextLogs();
   };
 
   return (
