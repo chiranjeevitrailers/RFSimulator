@@ -99,7 +99,6 @@ A comprehensive platform for 5G protocol simulation, analysis, and testing with 
 5glabx-platform/
 ├── app/                    # Next.js app directory
 │   ├── admin-dashboard/    # Admin dashboard pages
-│   ├── user-dashboard/     # User dashboard pages
 │   ├── api/               # API routes
 │   └── globals.css        # Global styles
 ├── components/            # React components

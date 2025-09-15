@@ -183,7 +183,6 @@ Route (app)                    Size     First Load JS
 ├ ○ /admin/login              143 B           150 kB
 ├ ○ /login                    143 B           150 kB
 ├ ○ /signup                   3.34 kB         151 kB
-└ ○ /user-dashboard           41.8 kB         187 kB
 + First Load JS shared by all 86.6 kB
 ```
 
