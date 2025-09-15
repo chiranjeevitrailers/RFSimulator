@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export interface LogEntry {

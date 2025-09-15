@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import { LogProvider } from '@/components/providers/LogProvider';
+import ClientProviders from '@/components/ClientProviders';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -90,9 +90,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
       </head>
       <body className={inter.className}>
-        <LogProvider>
+        <ClientProviders>
           {children}
-        </LogProvider>
+        </ClientProviders>
         <Toaster
           position="top-right"
           toastOptions={{

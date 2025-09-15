@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // Import existing components from codebase
-import LogViewer from './components/logs/LogViewer';
+import LogViewer from '@/components/logs/LogViewer';
 import EnhancedLogViewer from './components/logs/EnhancedLogViewer';
 import TestSuitesView from './views/TestSuitesView';
 import AnalyticsView from './views/AnalyticsView';
