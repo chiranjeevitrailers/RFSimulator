@@ -6,8 +6,7 @@ import {
   Layers, Wifi, Cloud, Play, Pause, Square, Eye, Download, Upload,
   RefreshCw, Plus, Search, Filter, Calendar, Clock, TrendingUp,
   AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
-  Satellite, Network, Server, Phone, MapPin, Wave, FileText, Gear,
-  QuestionMark, Export, Import, Info
+  Satellite, Network, Server, Phone, MapPin, FileText, HelpCircle
 } from 'lucide-react';
 
 // Simple Dashboard View
@@ -236,7 +235,7 @@ const Sidebar: React.FC<{
     { id: 'ntn-analytics', label: 'NTN Analytics', icon: BarChart3, badge: 'LIVE' },
     { id: 'ntn-sib19', label: 'SIB19 Analysis', icon: FileText },
     { id: 'ntn-timing', label: 'Timing & Delay', icon: Clock },
-    { id: 'ntn-doppler', label: 'Doppler Analysis', icon: Wave },
+    { id: 'ntn-doppler', label: 'Doppler Analysis', icon: Activity },
     { id: 'ntn-scenarios', label: 'NTN Scenarios', icon: MapPin }
   ];
 
@@ -256,7 +255,7 @@ const Sidebar: React.FC<{
     { id: 'upf-analyzer', label: 'UPF Analyzer', icon: Server },
     { id: 'ausf-analyzer', label: 'AUSF Analyzer', icon: Server },
     { id: 'udm-analyzer', label: 'UDM Analyzer', icon: Database },
-    { id: 'config-manager', label: 'Config Manager', icon: Gear }
+    { id: 'config-manager', label: 'Config Manager', icon: Settings }
   ];
 
   const legacy4G = [
@@ -267,8 +266,8 @@ const Sidebar: React.FC<{
 
   const utilities = [
     { id: 'report-generator', label: 'Report Generator', icon: FileText },
-    { id: 'export-manager', label: 'Export Manager', icon: Export },
-    { id: 'help-support', label: 'Help & Support', icon: QuestionMark }
+    { id: 'export-manager', label: 'Export Manager', icon: Download },
+    { id: 'help-support', label: 'Help & Support', icon: HelpCircle }
   ];
 
   const testSuites = [
