@@ -7,7 +7,7 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
 
     const [connectionStatus, setConnectionStatus] = React.useState('disconnected');
     const [wsUrl, setWsUrl] = React.useState('ws://localhost:8080/logs');
-    const [selectedSources, setSelectedSources] = React.useState(['srsran', 'open5gs', 'kamailio']);
+    const [selectedSources, setSelectedSources] = React.useState(['testcase']);
     const [logCount, setLogCount] = React.useState(0);
     const wsRef = React.useRef(null);
 
@@ -212,6 +212,7 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
             key: 'sources-checkboxes',
             className: 'flex space-x-4'
           }, [
+            ['testcase', 'Test Case'],
             ['srsran', 'srsRAN'],
             ['open5gs', 'Open5GS'],
             ['kamailio', 'Kamailio']

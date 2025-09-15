@@ -227,7 +227,20 @@ function UserDashboardView({ appState, onStateChange }) {
           React.createElement('div', { key: 'exec', className: 'bg-white border rounded-lg p-3 space-y-3' }, [
             React.createElement('div', { key: 't', className: 'font-semibold' }, 'Test Execution Controls'),
             React.createElement('div', { key: 'btns', className: 'flex flex-wrap gap-2' }, [
-              React.createElement('button', { key: 'i', className: 'btn-primary' }, 'Run Individual Test'),
+              React.createElement('button', { key: 'i', className: 'btn-primary', onClick: async () => {
+                try {
+                  const testCaseId = 'tc-5g-nr-initial-access-1';
+                  await fetch('/api/test/playback/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ testCaseId, speed: 1.0, apiBaseUrl: '/api' })
+                  });
+                  alert('Test playback started');
+                } catch (e) {
+                  console.error('Start playback failed', e);
+                  alert('Failed to start playback');
+                }
+              } }, 'Run Individual Test'),
               React.createElement('button', { key: 'g', className: 'btn-primary' }, 'Run Test Group'),
               React.createElement('button', { key: 'f', className: 'btn-primary' }, 'Run Full Suite'),
               React.createElement('button', { key: 'sch', className: 'btn-secondary' }, 'Schedule Tests'),
