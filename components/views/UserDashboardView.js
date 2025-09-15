@@ -230,10 +230,11 @@ function UserDashboardView({ appState, onStateChange }) {
               React.createElement('button', { key: 'i', className: 'btn-primary', onClick: async () => {
                 try {
                   const testCaseId = 'tc-5g-nr-initial-access-1';
-                  await fetch('/api/test/playback/start', {
+                  const apiBaseUrl = window.CONSTANTS?.API_BASE_URL || '/api';
+                  await fetch(`${apiBaseUrl}/test/playback/start`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ testCaseId, speed: 1.0, apiBaseUrl: '/api' })
+                    body: JSON.stringify({ testCaseId, speed: 1.0, apiBaseUrl })
                   });
                   alert('Test playback started');
                 } catch (e) {
@@ -241,6 +242,16 @@ function UserDashboardView({ appState, onStateChange }) {
                   alert('Failed to start playback');
                 }
               } }, 'Run Individual Test'),
+              React.createElement('button', { key: 'stop', className: 'btn-secondary', onClick: async () => {
+                try {
+                  const apiBaseUrl = window.CONSTANTS?.API_BASE_URL || '/api';
+                  await fetch(`${apiBaseUrl}/test/playback/stop`, { method: 'POST' });
+                  alert('Test playback stopped');
+                } catch (e) {
+                  console.error('Stop playback failed', e);
+                  alert('Failed to stop playback');
+                }
+              } }, 'Stop Test'),
               React.createElement('button', { key: 'g', className: 'btn-primary' }, 'Run Test Group'),
               React.createElement('button', { key: 'f', className: 'btn-primary' }, 'Run Full Suite'),
               React.createElement('button', { key: 'sch', className: 'btn-secondary' }, 'Schedule Tests'),
