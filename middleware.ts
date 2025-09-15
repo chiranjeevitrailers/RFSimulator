@@ -8,7 +8,13 @@ export async function middleware(req: NextRequest) {
   const response = NextResponse.next();
   
   // Add security headers
-  response.headers.set('X-Frame-Options', 'DENY');
+  // Allow iframe embedding for 5GLabX platform, deny for everything else
+  if (req.nextUrl.pathname.startsWith('/5glabx/')) {
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  } else {
+    response.headers.set('X-Frame-Options', 'DENY');
+  }
+  
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
