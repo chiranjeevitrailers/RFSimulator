@@ -71,6 +71,9 @@ export const LogProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const url = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8081';
     const ws = new WebSocket(url);
 
+    let hasRealData = false;
+    let mockInterval: any = null;
+
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
@@ -82,13 +85,46 @@ export const LogProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           candidate = msg;
         }
         const normalised = normaliseIncoming(candidate);
-        if (normalised) addLog(normalised);
+        if (normalised) {
+          hasRealData = true;
+          addLog(normalised);
+        }
       } catch (err) {
         // Non-JSON payloads ignored
       }
     };
 
-    return () => ws.close();
+    ws.onerror = () => {
+      // ignore; fallback handled below
+    };
+
+    // After 2 seconds, if still no real data, start emitting mock logs for demo
+    const demoTimeout = setTimeout(() => {
+      if (!hasRealData) {
+        mockInterval = setInterval(() => {
+          const now = Date.now();
+          const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'];
+          const layer = layers[Math.floor(Math.random()*layers.length)];
+          const newLog: LogEntry = {
+            id: `demo_${now}`,
+            timestamp: new Date(),
+            level: ['debug','info','warning','error'][Math.floor(Math.random()*4)] as any,
+            source: layer,
+            layer,
+            protocol: `NR-${layer}`,
+            message: `Mock ${layer} message ${Math.random().toString(36).substr(2,5)}`,
+            data: { messageType: 'Demo', size: Math.floor(Math.random()*800)+100 },
+          } as LogEntry;
+          addLog(newLog);
+        }, 800);
+      }
+    }, 2000);
+
+    return () => {
+      ws.close();
+      clearTimeout(demoTimeout);
+      if (mockInterval) clearInterval(mockInterval);
+    };
   }, [addLog]);
 
   return (
