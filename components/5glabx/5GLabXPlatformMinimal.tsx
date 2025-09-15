@@ -271,6 +271,10 @@ const Sidebar: React.FC<{
     { id: 'help-support', label: 'Help & Support', icon: QuestionMark }
   ];
 
+  const testSuites = [
+    { id: 'test-suites', label: 'Test Suites', icon: Shield }
+  ];
+
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4">
@@ -355,6 +359,14 @@ const Sidebar: React.FC<{
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">UTILITIES</h3>
           <div className="space-y-1">
             {utilities.map(renderMenuItem)}
+          </div>
+        </div>
+
+        {/* Test Suites */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">TEST SUITES</h3>
+          <div className="space-y-1">
+            {testSuites.map(renderMenuItem)}
           </div>
         </div>
       </nav>
@@ -482,6 +494,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <GenericView title="Export Manager" description="Export data and analysis results." />;
       case 'help-support':
         return <GenericView title="Help & Support" description="User support and documentation." />;
+      case 'test-suites':
+        return <GenericView title="Test Suites" description="Comprehensive test suite management and execution." />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
