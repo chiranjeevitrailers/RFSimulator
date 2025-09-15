@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Required for static export
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 import { createClient } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
