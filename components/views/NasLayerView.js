@@ -2,7 +2,9 @@
 function NasLayerView() {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [logs, setLogs] = React.useState([]);
@@ -68,7 +70,7 @@ function NasLayerView() {
       React.createElement('div', {
         key: 'content',
         className: 'flex-1 overflow-auto'
-      }, React.createElement(NASStats, { logs, stats: nasStats }))
+      }, React.createElement((window.NASStats || (()=>null)), { logs, stats: nasStats }))
     ]);
 
   } catch (error) {
@@ -79,6 +81,8 @@ function NasLayerView() {
     }, 'NasLayerView Error');
   }
 }
+
+NasLayerView.defaultProps = {};
 
 // Export NasLayerView component
 window.NasLayerView = NasLayerView;
