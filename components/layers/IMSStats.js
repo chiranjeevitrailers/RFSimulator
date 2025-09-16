@@ -1,13 +1,16 @@
 // IMSStats Component
 function IMSStats({ logs }) {
   try {
-    const imsLogs = logs?.filter(log => 
-      log.protocol === 'SIP' || 
-      log.component === 'IMS' ||
-      log.message?.includes('SIP') ||
-      log.message?.includes('INVITE') ||
-      log.message?.includes('REGISTER')
-    ) || [];
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const imsLogs = safeLogs.filter(log => {
+      const msg = (log.message || '').toUpperCase();
+      return log.protocol === 'SIP' ||
+             log.component === 'IMS' ||
+             msg.includes('SIP') ||
+             msg.includes('INVITE') ||
+             msg.includes('REGISTER');
+    });
 
     const sessionStats = React.useMemo(() => {
       return {
@@ -172,6 +175,11 @@ function IMSStats({ logs }) {
     }, 'IMSStats Error');
   }
 }
+
+// Default props to avoid undefined errors
+IMSStats.defaultProps = {
+  logs: []
+};
 
 // Export IMSStats component
 window.IMSStats = IMSStats;
