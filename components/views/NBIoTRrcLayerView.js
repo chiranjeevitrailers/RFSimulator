@@ -2,7 +2,9 @@
 function NBIoTRrcLayerView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [rrcStats, setRrcStats] = React.useState({
@@ -92,5 +94,10 @@ function NBIoTRrcLayerView({ appState, onStateChange }) {
     }, 'NB-IoT RRC Layer Error');
   }
 }
+
+NBIoTRrcLayerView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.NBIoTRrcLayerView = NBIoTRrcLayerView;
