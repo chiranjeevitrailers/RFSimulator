@@ -2,7 +2,9 @@
 function ExportManagerView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [exports, setExports] = React.useState([
@@ -143,5 +145,10 @@ function ExportManagerView({ appState, onStateChange }) {
     }, 'Export Manager Error');
   }
 }
+
+ExportManagerView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.ExportManagerView = ExportManagerView;
