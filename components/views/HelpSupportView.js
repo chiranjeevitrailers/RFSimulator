@@ -2,7 +2,9 @@
 function HelpSupportView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const helpSections = [
@@ -137,5 +139,10 @@ function HelpSupportView({ appState, onStateChange }) {
     }, 'Help & Support Error');
   }
 }
+
+HelpSupportView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.HelpSupportView = HelpSupportView;
