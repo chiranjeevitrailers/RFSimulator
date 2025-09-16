@@ -2,7 +2,9 @@
 function NBIoTPhyLayerView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [phyStats, setPhyStats] = React.useState({
@@ -128,5 +130,10 @@ function NBIoTPhyLayerView({ appState, onStateChange }) {
     }, 'NB-IoT PHY Layer Error');
   }
 }
+
+NBIoTPhyLayerView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.NBIoTPhyLayerView = NBIoTPhyLayerView;
