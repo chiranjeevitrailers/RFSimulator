@@ -13,8 +13,8 @@ function AusfAnalyzerView() {
       try {
         if (window.LogProcessor) {
           const logProcessor = new window.LogProcessor();
-          const unsubscribe = logProcessor.subscribe((logs) => {
-            const ausfLogs = logs.filter(log => 
+          const unsubscribe = logProcessor.subscribe((logs = []) => {
+            const ausfLogs = (Array.isArray(logs) ? logs : []).filter(log => 
               (log.source === 'Open5GS' && log.component === 'ausf') ||
               log.message?.includes('AUSF') ||
               log.message?.includes('Authentication') ||
@@ -104,12 +104,14 @@ function AusfAnalyzerView() {
         React.createElement('h3', { key: 'title', className: 'text-lg font-semibold mb-4' }, 
           'Recent AUSF Messages'),
         React.createElement('div', { key: 'message-list', className: 'space-y-2 max-h-64 overflow-y-auto' },
-          (ausfLogs.slice(-10) || []).map((log, index) =>
-            React.createElement('div', {
-              key: index,
+          (ausfLogs.slice(-10) || []).map((log, index) => {
+            const k = log.id ?? log.timestamp ?? index;
+            const timeStr = new Date(log.timestamp || Date.now()).toLocaleTimeString();
+            return React.createElement('div', {
+              key: k,
               className: 'p-3 bg-gray-50 rounded text-sm border-l-4 border-indigo-500'
-            }, `${log.timestamp || 'N/A'} - ${log.message || 'No message'}`)
-          )
+            }, `${timeStr} - ${log.message || 'No message'}`);
+          })
         )
       ])
     ]);
