@@ -15,6 +15,7 @@ function UserDashboardView({ appState, onStateChange }) {
       { id: 'platform', label: '5GLabX Platform', icon: 'layout-dashboard' },
       { id: 'advanced-analyzer', label: 'Advanced Analyzer', icon: 'settings' },
       { id: 'test-suites', label: 'Test Suites', icon: 'files' },
+      { id: 'professional-testing', label: 'Professional Testing', icon: 'test-tube' },
       { id: 'settings', label: 'Settings', icon: 'sliders-horizontal' }
     ];
 
@@ -263,6 +264,47 @@ function UserDashboardView({ appState, onStateChange }) {
       ])
     );
 
+    const ProfessionalTestingTab = () => {
+      // Check if the professional testing platform component is available
+      if (window.AdvancedTestingPlatform) {
+        return React.createElement(window.AdvancedTestingPlatform, {
+          appState: appState,
+          onStateChange: onStateChange
+        });
+      } else {
+        return React.createElement('div', { className: 'space-y-4' }, [
+          React.createElement('div', { key: 'hdr', className: 'bg-white border rounded-lg p-4 flex items-center justify-between' }, [
+            React.createElement('h3', { key: 't', className: 'text-lg font-semibold' }, 'Professional Testing Platform'),
+            React.createElement('span', { key: 'st', className: 'text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700' }, 'QXDM/Keysight-like Interface')
+          ]),
+          React.createElement('div', { key: 'content', className: 'bg-white border rounded-lg p-6' }, [
+            React.createElement('div', { key: 'info', className: 'text-center py-8' }, [
+              React.createElement('i', { key: 'icon', 'data-lucide': 'test-tube', className: 'w-16 h-16 text-blue-600 mx-auto mb-4' }),
+              React.createElement('h4', { key: 'title', className: 'text-lg font-semibold text-gray-900 mb-2' }, 'Professional Testing Platform'),
+              React.createElement('p', { key: 'desc', className: 'text-gray-600 mb-4' }, 'Advanced testing interface with multi-column dashboard, real-time execution monitoring, and comprehensive test case management.'),
+              React.createElement('div', { key: 'features', className: 'grid grid-cols-1 md:grid-cols-3 gap-4 mt-6' }, [
+                React.createElement('div', { key: 'f1', className: 'text-center p-4' }, [
+                  React.createElement('i', { key: 'i1', 'data-lucide': 'layers', className: 'w-8 h-8 text-green-600 mx-auto mb-2' }),
+                  React.createElement('h5', { key: 't1', className: 'font-medium' }, 'Multi-Column Layout'),
+                  React.createElement('p', { key: 'd1', className: 'text-sm text-gray-600' }, 'Professional dashboard with sidebar navigation and main content area')
+                ]),
+                React.createElement('div', { key: 'f2', className: 'text-center p-4' }, [
+                  React.createElement('i', { key: 'i2', 'data-lucide': 'activity', className: 'w-8 h-8 text-blue-600 mx-auto mb-2' }),
+                  React.createElement('h5', { key: 't2', className: 'font-medium' }, 'Real-time Execution'),
+                  React.createElement('p', { key: 'd2', className: 'text-sm text-gray-600' }, 'Live test execution monitoring with progress tracking')
+                ]),
+                React.createElement('div', { key: 'f3', className: 'text-center p-4' }, [
+                  React.createElement('i', { key: 'i3', 'data-lucide': 'bar-chart-3', className: 'w-8 h-8 text-purple-600 mx-auto mb-2' }),
+                  React.createElement('h5', { key: 't3', className: 'font-medium' }, 'Advanced Analytics'),
+                  React.createElement('p', { key: 'd3', className: 'text-sm text-gray-600' }, 'Comprehensive test results and performance metrics')
+                ])
+              ])
+            ])
+          ])
+        ]);
+      }
+    };
+
     const SettingsTab = () => (
       React.createElement('div', { className: 'bg-white border rounded-lg p-4 space-y-4' }, [
         React.createElement('div', { key: 't', className: 'text-lg font-semibold' }, 'Preferences'),
@@ -285,6 +327,7 @@ function UserDashboardView({ appState, onStateChange }) {
         case 'platform': return React.createElement(PlatformTab);
         case 'advanced-analyzer': return React.createElement(AdvancedAnalyzerTab);
         case 'test-suites': return React.createElement(TestSuitesTab);
+        case 'professional-testing': return React.createElement(ProfessionalTestingTab);
         case 'analytics': return React.createElement('div', { className: 'bg-white border rounded-lg p-4' }, 'Analytics coming soon');
         case 'settings': return React.createElement(SettingsTab);
         default: return React.createElement(OverviewTab);
