@@ -67,7 +67,7 @@ function PdcpLayerView() {
       React.createElement('div', {
         key: 'content',
         className: 'flex-1 overflow-auto'
-      }, React.createElement(PDCPStats, { logs, stats: pdcpStats }))
+      }, React.createElement((window.PDCPStats || (()=>null)), { logs, stats: pdcpStats }))
     ]);
 
   } catch (error) {

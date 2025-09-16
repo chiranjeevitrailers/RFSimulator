@@ -105,54 +105,7 @@ function PhyLayerView() {
       className: 'space-y-6',
       'data-name': 'phy-layer-view',
       'data-file': 'components/views/PhyLayerView.js'
-    }, [
-      React.createElement('h1', {
-        key: 'title',
-        className: 'text-2xl font-bold text-gray-900'
-      }, 'PHY Layer Analysis - Complete Parameter View'),
-
-      React.createElement('div', {
-        key: 'channel-stats',
-        className: 'grid grid-cols-3 gap-4'
-      }, [
-        React.createElement('div', {
-          key: 'pdsch',
-          className: 'bg-blue-50 p-4 rounded-lg border border-blue-200'
-        }, [
-          React.createElement('h3', { key: 'title', className: 'font-semibold text-blue-800 mb-3' }, 'PDSCH (Downlink)'),
-          React.createElement('div', { key: 'stats', className: 'space-y-1 text-sm' }, [
-            React.createElement('div', { key: 'count' }, `Messages: ${phyData.pdschStats.count}`),
-            React.createElement('div', { key: 'throughput' }, `Throughput: ${phyData.pdschStats.avgThroughput} Mbps`),
-            React.createElement('div', { key: 'sinr' }, `SINR: ${phyData.pdschStats.avgSinr} dB`),
-            React.createElement('div', { key: 'harq' }, `HARQ Processes: ${phyData.pdschStats.harqProcesses}`)
-          ])
-        ]),
-        React.createElement('div', {
-          key: 'pusch',
-          className: 'bg-green-50 p-4 rounded-lg border border-green-200'
-        }, [
-          React.createElement('h3', { key: 'title', className: 'font-semibold text-green-800 mb-3' }, 'PUSCH (Uplink)'),
-          React.createElement('div', { key: 'stats', className: 'space-y-1 text-sm' }, [
-            React.createElement('div', { key: 'count' }, `Messages: ${phyData.puschStats.count}`),
-            React.createElement('div', { key: 'power' }, `TX Power: ${phyData.puschStats.avgPower} dBm`),
-            React.createElement('div', { key: 'success' }, `Success: ${phyData.puschStats.successRate}%`),
-            React.createElement('div', { key: 'retx' }, `Retransmissions: ${phyData.puschStats.retransmissions}`)
-          ])
-        ]),
-        React.createElement('div', {
-          key: 'pucch',
-          className: 'bg-purple-50 p-4 rounded-lg border border-purple-200'
-        }, [
-          React.createElement('h3', { key: 'title', className: 'font-semibold text-purple-800 mb-3' }, 'PUCCH (Control)'),
-          React.createElement('div', { key: 'stats', className: 'space-y-1 text-sm' }, [
-            React.createElement('div', { key: 'count' }, `Messages: ${phyData.pucchStats.count}`),
-            React.createElement('div', { key: 'cqi' }, `CQI: ${phyData.pucchStats.avgCqi}`),
-            React.createElement('div', { key: 'sr' }, `SR Count: ${phyData.pucchStats.srCount}`),
-            React.createElement('div', { key: 'ack' }, `ACK/NACK: ${phyData.pucchStats.ackNackCount}`)
-          ])
-        ])
-      ])
-    ]);
+    }, React.createElement((window.PHYStats || (()=>null)), { logs, stats: phyData }));
 
   } catch (error) {
     console.error('PhyLayerView error:', error);

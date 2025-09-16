@@ -67,7 +67,7 @@ function RrcLayerView() {
       React.createElement('div', {
         key: 'content',
         className: 'flex-1 overflow-auto'
-      }, React.createElement(RRCStats, { logs, stats: rrcStats }))
+      }, React.createElement((window.RRCStats || (()=>null)), { logs, stats: rrcStats }))
     ]);
 
   } catch (error) {
