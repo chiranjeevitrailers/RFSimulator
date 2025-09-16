@@ -2,8 +2,8 @@
 function NBIoTMacLayerView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
-    }, []);
+      if(window.lucide?.createIcons){window.lucide.createIcons();}
+    },[]);
 
     const [macStats, setMacStats] = React.useState({
       pduCount: 450,
@@ -92,5 +92,7 @@ function NBIoTMacLayerView({ appState, onStateChange }) {
     }, 'NB-IoT MAC Layer Error');
   }
 }
+
+NBIoTMacLayerView.defaultProps={appState:{},onStateChange:()=>{}};
 
 window.NBIoTMacLayerView = NBIoTMacLayerView;
