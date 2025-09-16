@@ -6,26 +6,30 @@ function AnalyticsView() {
     const [chart, setChart] = React.useState(null);
 
     React.useEffect(() => {
-      lucide.createIcons();
-      
-      // Sample message analysis for KPI calculation
-      const sampleMessages = [
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
+
+      // Sample message analysis for KPI calculation – safe fallback if decoder missing
+      const sampleMessages = window.SrsranMessageDecoder && window.MessageAnalyzer ? [
         SrsranMessageDecoder.parseLogMessage('[PHY] [I] [931.6] PDSCH: rnti=0x4601 h_id=0 k1=4 prb=[0,87) symb=[1,14) mod=QPSK rv=0 tbs=309 t=135.5us'),
         SrsranMessageDecoder.parseLogMessage('[MAC] [I] [938.5] DL PDU: ue=0 rnti=0x4601 size=169: SDU: lcid=1 nof_sdus=1 total_size=55'),
         SrsranMessageDecoder.parseLogMessage('[PHY] [E] [932.1] PUCCH decode failed: rnti=0x4601 format=1'),
         SrsranMessageDecoder.parseLogMessage('[PHY] [I] [934.8] PUCCH: rnti=0x4601 format=1 prb1=4 prb2=na symb=[0,14) cs=0 occ=0 sr=no metric=0.1 sinr=-23.6dB t=56.2us')
-      ];
-      
-      const analysis = MessageAnalyzer.analyzeMessages(sampleMessages);
-      setAnalysisData(analysis);
+      ] : [];
+
+      if (window.MessageAnalyzer) {
+        const analysis = window.MessageAnalyzer.analyzeMessages(sampleMessages);
+        setAnalysisData(analysis);
+      }
       
       // Initialize chart
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         const ctx = document.getElementById('analyticsChart');
         if (ctx && window.Chart) {
           const ChartJS = window.Chart;
           if (chart) chart.destroy();
-          
+
           const newChart = new ChartJS(ctx, {
             type: 'line',
             data: {
@@ -46,6 +50,14 @@ function AnalyticsView() {
           setChart(newChart);
         }
       }, 100);
+
+      // Cleanup chart on unmount
+      return () => {
+        clearTimeout(timer);
+        if (chart) {
+          chart.destroy();
+        }
+      };
     }, []);
 
     const metrics = React.useMemo(() => {
