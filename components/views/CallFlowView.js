@@ -5,7 +5,9 @@ function CallFlowView() {
     const [selectedFlow, setSelectedFlow] = React.useState(null);
 
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
       
       // Sample call flows for demonstration
       const sampleFlows = [
@@ -134,7 +136,7 @@ function CallFlowView() {
           React.createElement('div', {
             key: 'messages',
             className: 'space-y-2 mt-4'
-          }, selectedFlow.messages.map((msg, idx) =>
+          }, (selectedFlow.messages || []).map((msg, idx) =>
             React.createElement('div', {
               key: idx,
               className: 'text-xs text-gray-600 flex items-center space-x-2'

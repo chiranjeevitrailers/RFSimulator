@@ -13,8 +13,8 @@ function AmfAnalyzerView() {
       try {
         if (window.LogProcessor) {
           const logProcessor = new window.LogProcessor();
-          const unsubscribe = logProcessor.subscribe((logs) => {
-            const amfLogs = logs.filter(log => 
+          const unsubscribe = logProcessor.subscribe((logs = []) => {
+            const amfLogs = (Array.isArray(logs) ? logs : []).filter(log => 
               (log.source === 'Open5GS' && log.component === 'amf') ||
               log.message?.includes('AMF') ||
               log.message?.includes('Registration') ||
@@ -96,12 +96,14 @@ function AmfAnalyzerView() {
         React.createElement('h3', { key: 'title', className: 'text-lg font-semibold mb-4' }, 
           'Recent AMF Messages'),
         React.createElement('div', { key: 'message-list', className: 'space-y-2 max-h-64 overflow-y-auto' },
-          (amfLogs.slice(-10) || []).map((log, index) =>
-            React.createElement('div', {
-              key: index,
+          (amfLogs.slice(-10) || []).map((log, index) => {
+            const k = log.id ?? log.timestamp ?? index;
+            const timeStr = new Date(log.timestamp || Date.now()).toLocaleTimeString();
+            return React.createElement('div', {
+              key: k,
               className: 'p-3 bg-gray-50 rounded text-sm border-l-4 border-blue-500'
-            }, `${log.timestamp || 'N/A'} - ${log.message || 'No message'}`)
-          )
+            }, `${timeStr} - ${log.message || 'No message'}`);
+          })
         )
       ])
     ]);

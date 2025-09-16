@@ -2,7 +2,9 @@
 function ImsLayerView() {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [logs, setLogs] = React.useState([]);
@@ -68,7 +70,7 @@ function ImsLayerView() {
       React.createElement('div', {
         key: 'content',
         className: 'flex-1 overflow-auto p-6'
-      }, React.createElement(IMSStats, { logs }))
+      }, React.createElement(window.IMSStats || (()=>null), { logs }))
     ]);
 
   } catch (error) {
@@ -79,6 +81,8 @@ function ImsLayerView() {
     }, 'ImsLayerView Error');
   }
 }
+
+ImsLayerView.defaultProps = {};
 
 // Export ImsLayerView component
 window.ImsLayerView = ImsLayerView;

@@ -4,9 +4,13 @@ function DashboardView({ appState, onStateChange }) {
     const [analysisData, setAnalysisData] = React.useState(null);
     
     React.useEffect(() => {
-      lucide.createIcons();
-      
-      // Simulate analyzed messages
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
+
+      // Simulate analyzed messages only if decoder exists
+      if (!window.SrsranMessageDecoder || !window.MessageAnalyzer) return;
+
       const sampleMessages = [
         SrsranMessageDecoder.parseLogMessage('[PHY] [I] [931.6] PDSCH: rnti=0x4601 h_id=0 k1=4 prb=[0,87) symb=[1,14) mod=QPSK rv=0 tbs=309 t=135.5us'),
         SrsranMessageDecoder.parseLogMessage('[MAC] [I] [938.5] DL PDU: ue=0 rnti=0x4601 size=169: SDU: lcid=1 nof_sdus=1 total_size=55'),
@@ -15,7 +19,7 @@ function DashboardView({ appState, onStateChange }) {
         SrsranMessageDecoder.parseLogMessage('[SCHED] [W] [933.2] High scheduling latency detected: 250us')
       ];
       
-      const analysis = MessageAnalyzer.analyzeMessages(sampleMessages);
+      const analysis = window.MessageAnalyzer.analyzeMessages(sampleMessages);
       setAnalysisData(analysis);
     }, []);
 
@@ -212,7 +216,7 @@ function DashboardView({ appState, onStateChange }) {
                 React.createElement('div', {
                   key: 'indicator',
                   className: 'w-3 h-3 rounded-full',
-                  style: { backgroundColor: SrsranMessageDecoder.getMessageTypeColor(type) }
+                  style: { backgroundColor: (window.SrsranMessageDecoder?.getMessageTypeColor(type) || '#CBD5E1') }
                 }),
                 React.createElement('span', {
                   key: 'type',
@@ -236,5 +240,10 @@ function DashboardView({ appState, onStateChange }) {
     }, 'Dashboard failed to load');
   }
 }
+
+DashboardView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.DashboardView = DashboardView;

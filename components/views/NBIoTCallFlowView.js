@@ -2,7 +2,9 @@
 function NBIoTCallFlowView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [callFlows, setCallFlows] = React.useState([]);
@@ -168,5 +170,10 @@ function NBIoTCallFlowView({ appState, onStateChange }) {
     }, 'NB-IoT Call Flow Error');
   }
 }
+
+NBIoTCallFlowView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.NBIoTCallFlowView = NBIoTCallFlowView;

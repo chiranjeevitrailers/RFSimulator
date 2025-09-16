@@ -2,7 +2,9 @@
 function NBIoTAnalyticsView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [analyticsData, setAnalyticsData] = React.useState({
@@ -115,5 +117,10 @@ function NBIoTAnalyticsView({ appState, onStateChange }) {
     }, 'NB-IoT Analytics Error');
   }
 }
+
+NBIoTAnalyticsView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.NBIoTAnalyticsView = NBIoTAnalyticsView;

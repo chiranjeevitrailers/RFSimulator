@@ -5,7 +5,9 @@ function LayerTraceView() {
     const [traceData, setTraceData] = React.useState([]);
 
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
       
       // Sample layer trace data
       const sampleTrace = {

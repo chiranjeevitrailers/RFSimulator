@@ -1,9 +1,11 @@
 // NASStats Component
 function NASStats({ logs, stats }) {
   try {
-    const nasLogs = logs.filter(log => 
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const nasLogs = safeLogs.filter(log => 
       log.protocol === 'NAS' || log.component === 'NAS' ||
-      log.layer === 'nas' || log.message?.includes('NAS')
+      log.layer === 'nas' || (log.message || '').toUpperCase().includes('NAS')
     );
     
     const nasStats = React.useMemo(() => {
@@ -15,7 +17,7 @@ function NASStats({ logs, stats }) {
       let failures = 0;
       
       nasLogs.forEach(log => {
-        const msg = log.message.toLowerCase();
+        const msg = (log.message || '').toLowerCase();
         if (msg.includes('registration')) registrationRequests++;
         if (msg.includes('authentication')) authenticationRequests++;
         if (msg.includes('pdu session')) pduSessions++;
@@ -177,6 +179,10 @@ function NASStats({ logs, stats }) {
     }, 'NASStats Error');
   }
 }
+
+NASStats.defaultProps = {
+  logs: []
+};
 
 // Export NASStats component
 window.NASStats = NASStats;

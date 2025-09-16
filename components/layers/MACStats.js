@@ -1,7 +1,9 @@
 // Enhanced MACStats Component with srsRAN-based metrics
 function MACStats({ logs, stats }) {
   try {
-    const macLogs = logs.filter(log =>
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const macLogs = safeLogs.filter(log =>
       log.protocol === 'MAC' || log.component === 'MAC' ||
       log.message?.includes('MAC') || log.message?.includes('SCHEDULER') ||
       log.message?.includes('HARQ')
@@ -151,7 +153,7 @@ function MACStats({ logs, stats }) {
         harqEfficiency: totalHarq > 0 ? ((harqAcks / totalHarq) * 100).toFixed(1) : '92.3'
       };
     }, [macLogs, timeRange]);
-    
+
     return React.createElement('div', {
       className: 'p-6 space-y-6',
       'data-name': 'mac-stats',
@@ -255,7 +257,7 @@ function MACStats({ logs, stats }) {
                 React.createElement('p', {
                   key: 'value',
                   className: 'text-2xl font-bold text-green-600'
-                }, macStats.ulGrants || 245)
+                }, macStats.ulGrants)
               ]),
               React.createElement('i', {
                 key: 'icon',
@@ -280,7 +282,7 @@ function MACStats({ logs, stats }) {
                 React.createElement('p', {
                   key: 'value',
                   className: 'text-2xl font-bold text-blue-600'
-                }, macStats.dlAssignments || 387)
+                }, macStats.dlAssignments)
               ]),
               React.createElement('i', {
                 key: 'icon',
@@ -799,6 +801,10 @@ function MACStats({ logs, stats }) {
     }, 'MACStats Error');
   }
 }
+
+MACStats.defaultProps = {
+  logs: []
+};
 
 // Export MACStats component
 window.MACStats = MACStats;

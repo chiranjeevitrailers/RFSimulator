@@ -2,7 +2,9 @@
 function NBIoTOverviewView({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [metrics, setMetrics] = React.useState({
@@ -173,5 +175,10 @@ function NBIoTOverviewView({ appState, onStateChange }) {
     }, 'NB-IoT Overview Error');
   }
 }
+
+NBIoTOverviewView.defaultProps = {
+  appState: {},
+  onStateChange: () => {}
+};
 
 window.NBIoTOverviewView = NBIoTOverviewView;

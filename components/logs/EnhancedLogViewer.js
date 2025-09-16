@@ -8,7 +8,8 @@ function EnhancedLogViewer({ logs, onFilterChange }) {
       search: ''
     });
 
-    const [selectedLog, setSelectedLog] = React.useState(null);
+    // Optional: expose clicked log details in the future
+    // const [selectedLog, setSelectedLog] = React.useState(null);
 
     const handleFilterChange = (key, value) => {
       try {
@@ -20,11 +21,13 @@ function EnhancedLogViewer({ logs, onFilterChange }) {
       }
     };
 
-    const filteredLogs = logs.filter(log => {
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const filteredLogs = safeLogs.filter(log => {
       try {
-        if (filters.source !== 'all' && log.source !== filters.source) return false;
-        if (filters.level !== 'all' && log.level !== filters.level) return false;
-        if (filters.interface !== 'all' && log.component !== filters.interface?.toUpperCase()) return false;
+        if (filters.source !== 'all' && (log.source || '').toLowerCase() !== filters.source.toLowerCase()) return false;
+        if (filters.level !== 'all' && (log.level || '').toLowerCase() !== filters.level.toLowerCase()) return false;
+        if (filters.interface !== 'all' && (log.component || '').toLowerCase() !== filters.interface.toLowerCase()) return false;
         if (filters.search && !log.message.toLowerCase().includes(filters.search.toLowerCase())) return false;
         return true;
       } catch (error) {
@@ -135,16 +138,16 @@ function EnhancedLogViewer({ logs, onFilterChange }) {
       }, filteredLogs.length === 0 ? React.createElement('div', {
         key: 'no-logs',
         className: 'p-8 text-center text-gray-500'
-      }, 'No logs match the current filters') : filteredLogs.slice(-50).map((log, index) =>
-        React.createElement('div', {
-          key: index,
-          className: 'flex items-start space-x-3 p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer',
-          onClick: () => setSelectedLog(log)
+      }, 'No logs match the current filters') : filteredLogs.slice(-50).map((log, index) => {
+        const logKey = log.id ?? log.timestamp ?? index;
+        return React.createElement('div', {
+          key: logKey,
+          className: 'flex items-start space-x-3 p-3 border-b border-gray-100 hover:bg-gray-50',
         }, [
           React.createElement('span', {
             key: 'timestamp',
             className: 'text-xs text-gray-500 w-20 flex-shrink-0'
-          }, new Date(log.timestamp).toLocaleTimeString()),
+          }, new Date(log.timestamp).toString() !== 'Invalid Date' ? new Date(log.timestamp).toLocaleTimeString() : '-'),
           
           React.createElement('span', {
             key: 'level',
@@ -160,8 +163,8 @@ function EnhancedLogViewer({ logs, onFilterChange }) {
             key: 'message',
             className: 'flex-1 text-sm text-gray-900'
           }, log.message)
-        ])
-      ))
+        ]);
+      }))
     ]);
 
   } catch (error) {
@@ -172,5 +175,11 @@ function EnhancedLogViewer({ logs, onFilterChange }) {
     }, 'Enhanced Log Viewer Error');
   }
 }
+
+// Default props for extra safety
+EnhancedLogViewer.defaultProps = {
+  logs: [],
+  onFilterChange: () => {}
+};
 
 window.EnhancedLogViewer = EnhancedLogViewer;
