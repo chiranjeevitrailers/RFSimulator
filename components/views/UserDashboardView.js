@@ -265,8 +265,13 @@ function UserDashboardView({ appState, onStateChange }) {
     );
 
     const ProfessionalTestingTab = () => {
-      // Check if the professional testing platform component is available
-      if (window.AdvancedTestingPlatform) {
+      // Check if the real-time testing platform component is available
+      if (window.RealTimeTestingPlatform) {
+        return React.createElement(window.RealTimeTestingPlatform, {
+          appState: appState,
+          onStateChange: onStateChange
+        });
+      } else if (window.AdvancedTestingPlatform) {
         return React.createElement(window.AdvancedTestingPlatform, {
           appState: appState,
           onStateChange: onStateChange
@@ -347,4 +352,3 @@ function UserDashboardView({ appState, onStateChange }) {
 }
 
 window.UserDashboardView = UserDashboardView;
-
