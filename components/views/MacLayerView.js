@@ -2,7 +2,9 @@
 function MacLayerView() {
   try {
     React.useEffect(() => {
-      lucide.createIcons();
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+      }
     }, []);
 
     const [logs, setLogs] = React.useState([]);
@@ -67,7 +69,7 @@ function MacLayerView() {
       React.createElement('div', {
         key: 'content',
         className: 'flex-1 overflow-auto'
-      }, React.createElement(MACStats, { logs, stats: macStats }))
+      }, React.createElement((window.MACStats || (()=>null)), { logs, stats: macStats }))
     ]);
 
   } catch (error) {
@@ -78,6 +80,8 @@ function MacLayerView() {
     }, 'MacLayerView Error');
   }
 }
+
+MacLayerView.defaultProps = {};
 
 // Export MacLayerView component
 window.MacLayerView = MacLayerView;
