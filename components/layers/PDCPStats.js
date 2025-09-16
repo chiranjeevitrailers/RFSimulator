@@ -1,7 +1,9 @@
 // PDCPStats Component
 function PDCPStats({ logs, stats }) {
   try {
-    const pdcpLogs = logs.filter(log => 
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const pdcpLogs = safeLogs.filter(log => 
       log.protocol === 'PDCP' || log.component === 'PDCP'
     );
     
@@ -14,7 +16,7 @@ function PDCPStats({ logs, stats }) {
       let sequenceErrors = 0;
       
       pdcpLogs.forEach(log => {
-        const msg = log.message.toLowerCase();
+        const msg = (log.message || '').toLowerCase();
         if (msg.includes('tx') || msg.includes('transmit')) txPackets++;
         if (msg.includes('rx') || msg.includes('receive')) rxPackets++;
         if (msg.includes('encrypt') || msg.includes('cipher')) encryptedPackets++;
@@ -177,6 +179,10 @@ function PDCPStats({ logs, stats }) {
     }, 'PDCPStats Error');
   }
 }
+
+PDCPStats.defaultProps = {
+  logs: []
+};
 
 // Export PDCPStats component
 window.PDCPStats = PDCPStats;

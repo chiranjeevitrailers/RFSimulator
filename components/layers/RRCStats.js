@@ -1,7 +1,9 @@
 // Enhanced RRCStats Component with srsRAN-based RRC analysis
 function RRCStats({ logs, stats }) {
   try {
-    const rrcLogs = logs.filter(log =>
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const rrcLogs = safeLogs.filter(log =>
       log.protocol === 'RRC' || log.component === 'RRC' ||
       log.message?.includes('RRC') || log.message?.includes('rrc') ||
       log.message?.includes('connection') || log.message?.includes('handover') ||
@@ -46,42 +48,42 @@ function RRCStats({ logs, stats }) {
         const logTime = new Date(log.timestamp || log.time).getTime();
         if (logTime < startTime) return;
 
-        const msg = log.message || '';
+        const msg = (log.message || '').toLowerCase();
         messageCount++;
 
         // RRC Connection Management
-        if (msg.includes('RRCConnectionSetup') || msg.includes('connection setup')) connectionSetups++;
-        if (msg.includes('RRCConnectionSetupComplete') || msg.includes('setup complete')) connectionSetupCompletes++;
-        if (msg.includes('RRCConnectionRelease') || msg.includes('connection release')) connectionReleases++;
-        if (msg.includes('RRCConnectionReject') || msg.includes('connection reject')) connectionRejects++;
+        if (msg.includes('rrcconnectionsetup') || msg.includes('connection setup')) connectionSetups++;
+        if (msg.includes('rrcconnectionsetupcomplete') || msg.includes('setup complete')) connectionSetupCompletes++;
+        if (msg.includes('rrcconnectionrelease') || msg.includes('connection release')) connectionReleases++;
+        if (msg.includes('rrcconnectionreject') || msg.includes('connection reject')) connectionRejects++;
 
         // RRC Connection Reconfiguration
-        if (msg.includes('RRCConnectionReconfiguration') || msg.includes('reconfiguration')) reconfigurations++;
-        if (msg.includes('RRCConnectionReconfigurationComplete') || msg.includes('reconfiguration complete')) reconfigurationCompletes++;
+        if (msg.includes('rrcconnectionreconfiguration') || msg.includes('reconfiguration')) reconfigurations++;
+        if (msg.includes('rrcconnectionreconfigurationcomplete') || msg.includes('reconfiguration complete')) reconfigurationCompletes++;
 
         // Measurement Reports
-        if (msg.includes('MeasurementReport') || msg.includes('measurement report')) measurementReports++;
+        if (msg.includes('measurementreport') || msg.includes('measurement report')) measurementReports++;
 
         // Handover Procedures
-        if (msg.includes('HandoverCommand') || msg.includes('handover command')) handoverCommands++;
-        if (msg.includes('HandoverComplete') || msg.includes('handover complete')) handoverCompletes++;
+        if (msg.includes('handovercommand') || msg.includes('handover command')) handoverCommands++;
+        if (msg.includes('handovercomplete') || msg.includes('handover complete')) handoverCompletes++;
         if (msg.includes('handover') && !msg.includes('command') && !msg.includes('complete')) handovers++;
 
         // Security Procedures
-        if (msg.includes('SecurityModeCommand') || msg.includes('security mode command')) securityModeCommands++;
-        if (msg.includes('SecurityModeComplete') || msg.includes('security mode complete')) securityModeCompletes++;
+        if (msg.includes('securitymodecommand') || msg.includes('security mode command')) securityModeCommands++;
+        if (msg.includes('securitymodecomplete') || msg.includes('security mode complete')) securityModeCompletes++;
 
         // UE Capability Procedures
-        if (msg.includes('UECapabilityEnquiry') || msg.includes('capability enquiry')) ueCapabilityEnquiries++;
-        if (msg.includes('UECapabilityInformation') || msg.includes('capability information')) ueCapabilityInformations++;
+        if (msg.includes('uecapabilityenquiry') || msg.includes('capability enquiry')) ueCapabilityEnquiries++;
+        if (msg.includes('uecapabilityinformation') || msg.includes('capability information')) ueCapabilityInformations++;
 
         // System Information
-        if (msg.includes('SystemInformationBlock') || msg.includes('SIB')) systemInformationBlocks++;
-        if (msg.includes('Paging') || msg.includes('paging')) pagingMessages++;
+        if (msg.includes('systeminformationblock') || msg.includes('sib')) systemInformationBlocks++;
+        if (msg.includes('paging') || msg.includes('paging')) pagingMessages++;
 
         // Reestablishment
-        if (msg.includes('RRCConnectionReestablishmentRequest') || msg.includes('reestablishment request')) rrcConnectionReestablishmentRequests++;
-        if (msg.includes('RRCConnectionReestablishmentReject') || msg.includes('reestablishment reject')) rrcConnectionReestablishmentRejects++;
+        if (msg.includes('rrcconnectionreestablishmentrequest') || msg.includes('reestablishment request')) rrcConnectionReestablishmentRequests++;
+        if (msg.includes('rrcconnectionreestablishmentreject') || msg.includes('reestablishment reject')) rrcConnectionReestablishmentRejects++;
 
         // Processing time extraction
         const timeMatch = msg.match(/time[=:]?\s*(\d+(?:\.\d+)?)\s*(ms|us|μs)/i);
@@ -93,7 +95,7 @@ function RRCStats({ logs, stats }) {
         }
 
         // UE-specific tracking
-        const ueMatch = msg.match(/UE[=:]?\s*(\w+)/i) || msg.match(/rnti[=:]?\s*(\w+)/i);
+        const ueMatch = msg.match(/ue[=:]?\s*(\w+)/i) || msg.match(/rnti[=:]?\s*(\w+)/i);
         if (ueMatch) {
           const ueId = ueMatch[1];
           if (!ueStats.has(ueId)) {
@@ -186,7 +188,7 @@ function RRCStats({ logs, stats }) {
         reestablishmentAttempts: rrcConnectionReestablishmentRequests
       };
     }, [rrcLogs, timeRange]);
-    
+
     return React.createElement('div', {
       className: 'p-6 space-y-6',
       'data-name': 'rrc-stats',
@@ -1016,6 +1018,10 @@ function RRCStats({ logs, stats }) {
     }, 'RRCStats Error');
   }
 }
+
+RRCStats.defaultProps = {
+  logs: []
+};
 
 // Export RRCStats component
 window.RRCStats = RRCStats;

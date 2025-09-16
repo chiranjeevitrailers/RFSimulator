@@ -1,7 +1,9 @@
 // RLCStats Component
 function RLCStats({ logs, stats }) {
   try {
-    const rlcLogs = logs.filter(log => 
+    const safeLogs = Array.isArray(logs) ? logs : [];
+
+    const rlcLogs = safeLogs.filter(log => 
       log.protocol === 'RLC' || log.component === 'RLC'
     );
     
@@ -14,7 +16,7 @@ function RLCStats({ logs, stats }) {
       let bufferOverflows = 0;
       
       rlcLogs.forEach(log => {
-        const msg = log.message.toLowerCase();
+        const msg = (log.message || '').toLowerCase();
         if (msg.includes('am mode') || msg.includes(' am ')) amPackets++;
         if (msg.includes('um mode') || msg.includes(' um ')) umPackets++;
         if (msg.includes('tm mode') || msg.includes(' tm ')) tmPackets++;
@@ -177,6 +179,10 @@ function RLCStats({ logs, stats }) {
     }, 'RLCStats Error');
   }
 }
+
+RLCStats.defaultProps = {
+  logs: []
+};
 
 // Export RLCStats component
 window.RLCStats = RLCStats;
