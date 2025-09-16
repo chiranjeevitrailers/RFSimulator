@@ -19,9 +19,10 @@ function LogsView() {
     const protocolLayers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
 
     React.useEffect(() => {
+      if (!window.CLIDataBridge) return;
+
       const interval = setInterval(() => {
-        if (window.CLIDataBridge) {
-          const logs = window.CLIDataBridge.getRealtimeLogs();
+        const logs = window.CLIDataBridge.getRealtimeLogs?.() || [];
           const processedLogs = logs.map(log => {
             if (window.SrsranMessageDecoder && typeof log === 'string') {
               return window.SrsranMessageDecoder.parseLogMessage(log);
@@ -29,7 +30,6 @@ function LogsView() {
             return log;
           });
           setCliLogs(processedLogs);
-        }
       }, 1000);
       return () => clearInterval(interval);
     }, []);
@@ -151,24 +151,26 @@ function LogsView() {
         React.createElement('div', {
           key: 'body',
           className: 'divide-y max-h-96 overflow-y-auto'
-        }, filteredLogs.map((log, idx) =>
-          React.createElement('div', {
-            key: idx,
+        }, filteredLogs.map((log, idx) => {
+          const k = log.id ?? log.timestamp ?? idx;
+          const timeStr = new Date(log.timestamp || Date.now()).toLocaleTimeString();
+          return React.createElement('div', {
+            key: k,
             className: 'px-4 py-2 grid grid-cols-7 gap-2 text-xs hover:bg-gray-50 cursor-pointer',
             onClick: () => handleMessageClick(log)
           }, [
-            React.createElement('div', { key: 'time' }, new Date().toLocaleTimeString()),
+            React.createElement('div', { key: 'time' }, timeStr),
             React.createElement('span', { key: 'layer', className: 'px-2 py-1 rounded bg-purple-100 text-purple-800' }, log.layer || 'N/A'),
             React.createElement('span', { key: 'level' }, log.level || 'info'),
             React.createElement('span', { key: 'channel' }, log.channel || 'N/A'),
             React.createElement('div', { key: 'ids' }, log.rnti ? `0x${log.rnti}` : (log.ueId ? `UE${log.ueId}` : 'N/A')),
             React.createElement('span', { key: 'type' }, log.messageType || 'Generic'),
             React.createElement('div', { key: 'msg', className: 'truncate font-mono' }, log.raw || log.message || 'No message')
-          ])
-        ))
-      ]),
+          ]);
+        }))
+      ],
 
-      selectedMessage && showDecoder && React.createElement(MessageDecoder, {
+      selectedMessage && showDecoder && React.createElement((window.MessageDecoder || (()=>null)), {
         key: 'decoder',
         message: selectedMessage,
         onClose: () => { setSelectedMessage(null); setShowDecoder(false); }
