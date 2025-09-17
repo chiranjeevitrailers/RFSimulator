@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Settings, CreditCard, FileText, Key, Globe, Percent, Boxes } from 'lucide-react';
+import { Settings, CreditCard, FileText, Key, Globe, Percent, Boxes, Brain } from 'lucide-react';
 import PlansSettings from './PlansSettings';
 import PaymentGatewaySettings from './PaymentGatewaySettings';
 import ApiConfigSettings from './ApiConfigSettings';
 import TaxSettings from './TaxSettings';
 import InvoicesTable from './InvoicesTable';
+import MLInsights from './MLInsights';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('plans');
@@ -15,7 +16,8 @@ const AdminDashboard = () => {
     { id: 'api', name: 'API Configuration', icon: Key },
     { id: 'tax', name: 'Tax / GST', icon: Percent },
     { id: 'webhooks', name: 'Webhooks', icon: Globe },
-    { id: 'invoices', name: 'Invoices', icon: FileText }
+    { id: 'invoices', name: 'Invoices', icon: FileText },
+    { id: 'ml', name: 'ML Insights', icon: Brain }
   ];
 
   const renderContent = () => {
@@ -30,6 +32,8 @@ const AdminDashboard = () => {
         return <TaxSettings />;
       case 'invoices':
         return <InvoicesTable />;
+      case 'ml':
+        return <MLInsights />;
       case 'webhooks':
         return (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
