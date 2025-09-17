@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, createContext, useContext } from 'react';
+import { DataFormatAdapter } from '@/utils/DataFormatAdapter';
+import { useDataFormatAdapter } from '@/utils/DataFormatAdapterIntegration';
 
 // Data Flow Context
 interface DataFlowContextType {
@@ -8,9 +10,15 @@ interface DataFlowContextType {
   layerData: Record<string, any>;
   realTimeData: any;
   isConnected: boolean;
+  dataFormatAdapter: any;
+  adapterAvailable: boolean;
   startTestCase: (testCaseId: string) => Promise<void>;
   stopTestCase: () => void;
   subscribeToLayer: (layer: string, callback: (data: any) => void) => () => void;
+  processData: (data: any, type?: 'log' | 'layer', layer?: string) => any;
+  validateData: (data: any, type?: 'log' | 'layer', layer?: string) => boolean;
+  getSupportedLayers: () => string[];
+  getLayerStatistics: () => Record<string, any>;
 }
 
 const DataFlowContext = createContext<DataFlowContextType | null>(null);
@@ -30,10 +38,25 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [realTimeData, setRealTimeData] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [layerSubscribers, setLayerSubscribers] = useState<Record<string, Set<(data: any) => void>>>({});
+  const [dataFormatAdapter, setDataFormatAdapter] = useState<any>(null);
+  const [adapterAvailable, setAdapterAvailable] = useState(false);
+  const [layerStatistics, setLayerStatistics] = useState<Record<string, any>>({});
+  
+  // Use DataFormatAdapter hook
+  const { processLogs, processLayerData, validateData: validateDataHook, getSupportedLayers } = useDataFormatAdapter();
 
   useEffect(() => {
     const initializeDataFlow = async () => {
       try {
+        // Initialize DataFormatAdapter first
+        if (DataFormatAdapter) {
+          setDataFormatAdapter(DataFormatAdapter);
+          setAdapterAvailable(true);
+          console.log('DataFormatAdapter initialized in DataFlowProvider');
+        } else {
+          console.warn('DataFormatAdapter not available, using fallback mode');
+        }
+
         // Initialize WebSocket connection for real-time data
         if (typeof window !== 'undefined' && window.WebSocketService) {
           const wsService = new window.WebSocketService();
@@ -56,7 +79,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
         }
 
-        // Initialize Test Case Playback Service
+        // Initialize Test Case Playback Service with DataFormatAdapter
         if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
           const playbackService = new window.TestCasePlaybackService({
             databaseService: null, // Will be set when needed
@@ -64,11 +87,13 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               // Broadcast test case data to all subscribers
               broadcastToSubscribers(type, data);
             },
-            fetchImpl: fetch
+            fetchImpl: fetch,
+            dataFormatAdapter: DataFormatAdapter // Pass the adapter
           });
           
           // Store reference for later use
           (window as any).playbackService = playbackService;
+          console.log('TestCasePlaybackService initialized with DataFormatAdapter');
         }
 
         // Initialize Layer Stats Service
@@ -142,17 +167,34 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const processLogsByLayer = (logs: any[]) => {
-    const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'SIP', 'O-RAN', 'NB-IoT', 'V2X', 'NTN'];
+    const supportedLayers = getSupportedLayers();
     const logsByLayer: Record<string, any> = {};
 
-    layers.forEach(layer => {
-      logsByLayer[layer] = logs.filter(log => 
+    supportedLayers.forEach(layer => {
+      const layerLogs = logs.filter(log => 
         log.layer === layer || 
         log.protocol === layer || 
         log.component === layer ||
         log.message?.includes(layer)
       );
+      
+      // Use DataFormatAdapter if available to format logs properly
+      if (adapterAvailable && dataFormatAdapter) {
+        try {
+          logsByLayer[layer] = layerLogs.map(log => 
+            dataFormatAdapter.adaptLogForViewer(log)
+          ).filter(log => log !== null);
+        } catch (error) {
+          console.warn(`Error processing logs for layer ${layer}:`, error);
+          logsByLayer[layer] = layerLogs;
+        }
+      } else {
+        logsByLayer[layer] = layerLogs;
+      }
     });
+
+    // Update layer statistics
+    updateLayerStatistics(logsByLayer);
 
     return logsByLayer;
   };
@@ -163,17 +205,28 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Determine which layer this data belongs to
     const layer = determineLayer(data);
     if (layer) {
+      // Use DataFormatAdapter if available for proper formatting
+      let adaptedData = data;
+      if (adapterAvailable && dataFormatAdapter) {
+        try {
+          adaptedData = dataFormatAdapter.adaptForLayerView(data, layer);
+        } catch (error) {
+          console.warn(`Error adapting data for layer ${layer}:`, error);
+          adaptedData = data; // Fallback to original data
+        }
+      }
+      
       setLayerData(prev => ({
         ...prev,
         [layer]: {
           ...prev[layer],
-          ...data,
+          ...adaptedData,
           timestamp: Date.now()
         }
       }));
       
-      // Notify layer subscribers
-      notifyLayerSubscribers(layer, data);
+      // Notify layer subscribers with adapted data
+      notifyLayerSubscribers(layer, adaptedData);
     }
   };
 
@@ -288,14 +341,81 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
   };
 
+  // Helper function to update layer statistics
+  const updateLayerStatistics = (logsByLayer: Record<string, any>) => {
+    const stats: Record<string, any> = {};
+    
+    Object.keys(logsByLayer).forEach(layer => {
+      const logs = logsByLayer[layer];
+      stats[layer] = {
+        count: logs.length,
+        lastUpdate: Date.now(),
+        errorCount: logs.filter((log: any) => log.level === 'error' || log.level === 'critical').length,
+        warningCount: logs.filter((log: any) => log.level === 'warning').length,
+        infoCount: logs.filter((log: any) => log.level === 'info').length
+      };
+    });
+    
+    setLayerStatistics(stats);
+  };
+
+  // Enhanced data processing function
+  const processData = (data: any, type: 'log' | 'layer' = 'log', layer?: string) => {
+    if (!adapterAvailable || !dataFormatAdapter) {
+      return data; // Fallback to original data
+    }
+
+    try {
+      if (type === 'log') {
+        return dataFormatAdapter.adaptLogForViewer(data);
+      } else if (type === 'layer' && layer) {
+        return dataFormatAdapter.adaptForLayerView(data, layer);
+      }
+      return data;
+    } catch (error) {
+      console.warn('Error processing data:', error);
+      return data; // Fallback to original data
+    }
+  };
+
+  // Enhanced data validation function
+  const validateData = (data: any, type: 'log' | 'layer' = 'log', layer?: string) => {
+    if (!adapterAvailable || !dataFormatAdapter) {
+      return true; // Skip validation if adapter not available
+    }
+
+    try {
+      if (type === 'log') {
+        return dataFormatAdapter.validateLogEntry(data);
+      } else if (type === 'layer' && layer) {
+        return dataFormatAdapter.validateLayerData(data, layer);
+      }
+      return true;
+    } catch (error) {
+      console.warn('Error validating data:', error);
+      return false;
+    }
+  };
+
+  // Get layer statistics
+  const getLayerStatistics = () => {
+    return layerStatistics;
+  };
+
   const contextValue: DataFlowContextType = {
     testCaseData,
     layerData,
     realTimeData,
     isConnected,
+    dataFormatAdapter,
+    adapterAvailable,
     startTestCase,
     stopTestCase,
-    subscribeToLayer
+    subscribeToLayer,
+    processData,
+    validateData,
+    getSupportedLayers,
+    getLayerStatistics
   };
 
   return (
