@@ -246,8 +246,9 @@ INSERT INTO public.tax_settings (
 INSERT INTO public.users (
     id, email, full_name, role, subscription_tier, subscription_status, 
     company_name, job_title, country, is_active
-) VALUES (
-    '00000000-0000-0000-0000-000000000001',
+)
+SELECT 
+    au.id,
     'admin@5glabx.com',
     '5GLabX Admin',
     'admin',
@@ -257,7 +258,9 @@ INSERT INTO public.users (
     'System Administrator',
     'US',
     true
-) ON CONFLICT (id) DO NOTHING;
+FROM auth.users au
+WHERE au.email = 'admin@5glabx.com'
+ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================
 -- 5. SAMPLE TEST USER
@@ -266,8 +269,9 @@ INSERT INTO public.users (
 INSERT INTO public.users (
     id, email, full_name, role, subscription_tier, subscription_status, 
     company_name, job_title, country, is_active
-) VALUES (
-    '00000000-0000-0000-0000-000000000002',
+) 
+SELECT 
+    au.id,
     'test@5glabx.com',
     'Test User',
     'user',
@@ -277,7 +281,9 @@ INSERT INTO public.users (
     'Test Engineer',
     'US',
     true
-) ON CONFLICT (id) DO NOTHING;
+FROM auth.users au
+WHERE au.email = 'test@5glabx.com'
+ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================
 -- 6. SAMPLE INVOICES
@@ -288,7 +294,7 @@ INSERT INTO public.invoices (
     user_id, subscription_plan_id, amount, tax_amount, total_amount, 
     currency, status, payment_gateway, payment_intent_id
 ) VALUES (
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     (SELECT id FROM public.subscription_plans WHERE name = 'Pro'),
     99.00,
     0.00,
@@ -304,7 +310,7 @@ INSERT INTO public.invoices (
     user_id, subscription_plan_id, amount, tax_amount, total_amount, 
     currency, status, payment_gateway, payment_intent_id
 ) VALUES (
-    '00000000-0000-0000-0000-000000000001',
+    (SELECT id FROM public.users WHERE email = 'admin@5glabx.com'),
     (SELECT id FROM public.subscription_plans WHERE name = 'Enterprise'),
     299.00,
     0.00,
@@ -326,7 +332,7 @@ INSERT INTO public.test_case_executions (
     results, logs, errors, performance_data
 ) VALUES (
     (SELECT id FROM public.test_cases WHERE test_case_id = 'NR-IA-001'),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'completed',
     NOW() - INTERVAL '1 hour',
     NOW() - INTERVAL '59 minutes',
@@ -372,7 +378,7 @@ INSERT INTO public.test_case_executions (
     results, logs, errors, performance_data
 ) VALUES (
     (SELECT id FROM public.test_cases WHERE test_case_id = 'LTE-IA-001'),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'completed',
     NOW() - INTERVAL '2 hours',
     NOW() - INTERVAL '1 hour 58 minutes',
@@ -492,7 +498,7 @@ INSERT INTO public.ml_execution_events (
 ) VALUES 
 (
     (SELECT id FROM public.test_case_executions WHERE test_case_id = (SELECT id FROM public.test_cases WHERE test_case_id = 'NR-IA-001')),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'NR-IA-001',
     'NR',
     'execute',
@@ -503,7 +509,7 @@ INSERT INTO public.ml_execution_events (
 ),
 (
     (SELECT id FROM public.test_case_executions WHERE test_case_id = (SELECT id FROM public.test_cases WHERE test_case_id = 'NR-IA-001')),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'NR-IA-001',
     'NR',
     'execute',
@@ -514,7 +520,7 @@ INSERT INTO public.ml_execution_events (
 ),
 (
     (SELECT id FROM public.test_case_executions WHERE test_case_id = (SELECT id FROM public.test_cases WHERE test_case_id = 'NR-IA-001')),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'NR-IA-001',
     'NR',
     'execute',
@@ -533,7 +539,7 @@ INSERT INTO public.ml_execution_features (
     run_id, user_id, test_case_id, features
 ) VALUES (
     (SELECT id FROM public.test_case_executions WHERE test_case_id = (SELECT id FROM public.test_cases WHERE test_case_id = 'NR-IA-001')),
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'NR-IA-001',
     '{
         "num_events": 3,
@@ -590,7 +596,7 @@ INSERT INTO public.user_access_logs (
     user_id, action_type, resource_id, ip_address, user_agent, session_id
 ) VALUES 
 (
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'test_execution',
     'NR-IA-001',
     '192.168.1.100',
@@ -598,7 +604,7 @@ INSERT INTO public.user_access_logs (
     'session_1234567890'
 ),
 (
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'test_execution',
     'LTE-IA-001',
     '192.168.1.100',
@@ -615,7 +621,7 @@ INSERT INTO public.test_execution_logs (
     user_id, test_case_id, execution_time, duration_seconds, status, resource_usage
 ) VALUES 
 (
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'NR-IA-001',
     NOW() - INTERVAL '1 hour',
     60,
@@ -623,7 +629,7 @@ INSERT INTO public.test_execution_logs (
     '{"cpu_usage": 45, "memory_usage": 128, "network_usage": 1024}'
 ),
 (
-    '00000000-0000-0000-0000-000000000002',
+    (SELECT id FROM public.users WHERE email = 'test@5glabx.com'),
     'LTE-IA-001',
     NOW() - INTERVAL '2 hours',
     120,
