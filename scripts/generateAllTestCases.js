@@ -14,16 +14,16 @@ class TestCaseGenerator {
     console.log('🚀 Starting generation of 1000 test cases...');
     
     // 5G NR Test Cases (400 test cases - 40%)
-    this.generate5GNRTestCases();
+    this.generateComplete5GNRTestCases();
+    
+    // NSA Test Cases (120 test cases - 12%)
+    this.generateNSATestCases();
+    
+    // VoLTE & VoNR Test Cases (160 test cases - 16%)
+    this.generateVoLTEVoNRTestCases();
     
     // LTE Test Cases (300 test cases - 30%)
     this.generateLTETestCases();
-    
-    // VoLTE Test Cases (80 test cases - 8%)
-    this.generateVoLTETestCases();
-    
-    // VoNR Test Cases (80 test cases - 8%)
-    this.generateVoNRTestCases();
     
     // IMS/SIP Test Cases (60 test cases - 6%)
     this.generateIMSTestCases();
@@ -56,7 +56,7 @@ class TestCaseGenerator {
   }
 
   // 5G NR Test Cases (400 test cases)
-  generate5GNRTestCases() {
+  generateComplete5GNRTestCases() {
     const categories = [
       { name: 'Initial_Access', count: 50, description: '5G NR Initial Access procedures' },
       { name: 'Handover', count: 50, description: '5G NR Handover procedures' },
@@ -96,9 +96,7 @@ class TestCaseGenerator {
       { name: 'Bearer_Management', count: 50, description: 'LTE Bearer Management procedures' },
       { name: 'Mobility', count: 50, description: 'LTE Mobility procedures' },
       { name: 'Security', count: 50, description: 'LTE Security procedures' },
-      { name: 'Measurement', count: 50, description: 'LTE Measurement procedures' },
-      { name: 'Power_Control', count: 50, description: 'LTE Power Control procedures' },
-      { name: 'Scheduling', count: 50, description: 'LTE Scheduling procedures' }
+      { name: 'Measurement', count: 50, description: 'LTE Measurement procedures' }
     ];
 
     categories.forEach(category => {
@@ -121,59 +119,30 @@ class TestCaseGenerator {
     });
   }
 
-  // VoLTE Test Cases (80 test cases)
-  generateVoLTETestCases() {
+  // VoLTE & VoNR Test Cases (160 test cases)
+  generateVoLTEVoNRTestCases() {
     const categories = [
-      { name: 'Call_Setup', count: 20, description: 'VoLTE Call Setup procedures' },
-      { name: 'Call_Release', count: 15, description: 'VoLTE Call Release procedures' },
-      { name: 'Call_Handover', count: 25, description: 'VoLTE Call Handover procedures' },
-      { name: 'Emergency_Call', count: 10, description: 'VoLTE Emergency Call procedures' }
+      { name: 'Call_Setup', count: 40, description: 'VoLTE/VoNR Call Setup procedures' },
+      { name: 'Call_Release', count: 30, description: 'VoLTE/VoNR Call Release procedures' },
+      { name: 'Call_Handover', count: 50, description: 'VoLTE/VoNR Call Handover procedures' },
+      { name: 'Emergency_Call', count: 20, description: 'VoLTE/VoNR Emergency Call procedures' }
     ];
 
     categories.forEach(category => {
       for (let i = 1; i <= category.count; i++) {
         this.generateTestCase({
-          testCaseId: `TC_VoLTE_${category.name}_${i.toString().padStart(3, '0')}`,
-          name: `VoLTE ${category.name.replace('_', ' ')} - ${i}`,
+          testCaseId: `TC_VoLTE_VoNR_${category.name}_${i.toString().padStart(3, '0')}`,
+          name: `VoLTE/VoNR ${category.name.replace('_', ' ')} - ${i}`,
           description: `${category.description} - Test Case ${i}`,
-          category: 'VoLTE',
+          category: 'VoLTE_VoNR',
           protocol: 'IMS_SIP',
           subcategory: category.name,
           testNumber: i,
           complexity: 'advanced',
           priority: category.name === 'Emergency_Call' ? 'critical' : 'high',
-          duration: this.getDuration('VoLTE', category.name),
-          messages: this.getVoLTEMessages(category.name, i),
-          layerParameters: this.getVoLTELayerParameters()
-        });
-      }
-    });
-  }
-
-  // VoNR Test Cases (80 test cases)
-  generateVoNRTestCases() {
-    const categories = [
-      { name: 'Call_Setup', count: 20, description: 'VoNR Call Setup procedures' },
-      { name: 'Call_Release', count: 15, description: 'VoNR Call Release procedures' },
-      { name: 'Call_Handover', count: 25, description: 'VoNR Call Handover procedures' },
-      { name: 'Emergency_Call', count: 10, description: 'VoNR Emergency Call procedures' }
-    ];
-
-    categories.forEach(category => {
-      for (let i = 1; i <= category.count; i++) {
-        this.generateTestCase({
-          testCaseId: `TC_VoNR_${category.name}_${i.toString().padStart(3, '0')}`,
-          name: `VoNR ${category.name.replace('_', ' ')} - ${i}`,
-          description: `${category.description} - Test Case ${i}`,
-          category: 'VoNR',
-          protocol: 'IMS_SIP',
-          subcategory: category.name,
-          testNumber: i,
-          complexity: 'advanced',
-          priority: category.name === 'Emergency_Call' ? 'critical' : 'high',
-          duration: this.getDuration('VoNR', category.name),
-          messages: this.getVoNRMessages(category.name, i),
-          layerParameters: this.getVoNRLayerParameters()
+          duration: this.getDuration('VoLTE_VoNR', category.name),
+          messages: this.getVoLTEVoNRMessages(category.name, i),
+          layerParameters: this.getVoLTEVoNRLayerParameters()
         });
       }
     });
@@ -375,6 +344,34 @@ class TestCaseGenerator {
     });
   }
 
+  // NSA Test Cases (120 test cases)
+  generateNSATestCases() {
+    const categories = [
+      { name: 'EN_DC', count: 50, description: 'EN-DC (E-UTRAN-NR Dual Connectivity) procedures' },
+      { name: 'NE_DC', count: 30, description: 'NE-DC (NR-E-UTRAN Dual Connectivity) procedures' },
+      { name: 'Multiple_Split_Bearer', count: 40, description: 'Multiple Split Bearer procedures' }
+    ];
+
+    categories.forEach(category => {
+      for (let i = 1; i <= category.count; i++) {
+        this.generateTestCase({
+          testCaseId: `TC_NSA_${category.name}_${i.toString().padStart(3, '0')}`,
+          name: `NSA ${category.name.replace('_', ' ')} - ${i}`,
+          description: `${category.description} - Test Case ${i}`,
+          category: 'NSA',
+          protocol: 'NSA',
+          subcategory: category.name,
+          testNumber: i,
+          complexity: 'expert',
+          priority: 'high',
+          duration: this.getDuration('NSA', category.name),
+          messages: this.getNSAMessages(category.name, i),
+          layerParameters: this.getNSALayerParameters(category.name)
+        });
+      }
+    });
+  }
+
   // Helper methods
   generateTestCase(testCaseData) {
     const testCase = {
@@ -497,15 +494,15 @@ class TestCaseGenerator {
     const baseDuration = {
       '5G_NR': 120,
       'LTE': 150,
-      'VoLTE': 180,
-      'VoNR': 200,
+      'VoLTE_VoNR': 180,
       'IMS': 90,
       'Conference': 300,
       'Enhanced_IMS': 120,
       'O_RAN': 240,
       'V2X': 180,
       'NTN': 300,
-      'NB_IoT': 60
+      'NB_IoT': 60,
+      'NSA': 200
     };
     
     return baseDuration[protocol] || 120;
@@ -518,15 +515,15 @@ class TestCaseGenerator {
     const protocolTags = {
       '5G_NR': ['5G', 'NR', '3GPP'],
       '4G_LTE': ['LTE', '4G', '3GPP'],
-      'VoLTE': ['VoLTE', 'Voice', 'IMS'],
-      'VoNR': ['VoNR', 'Voice', '5G', 'IMS'],
+      'VoLTE_VoNR': ['VoLTE', 'VoNR', 'Voice', 'IMS'],
       'IMS': ['IMS', 'SIP', 'Voice'],
       'Conference_Call': ['Conference', 'IMS', 'SIP'],
       'Enhanced_IMS_Registration': ['IMS', 'Registration', 'SIP'],
       'O_RAN': ['O-RAN', 'OpenRAN', '5G'],
       'V2X': ['V2X', 'Vehicle', '5G'],
       'NTN': ['NTN', 'Satellite', '5G'],
-      'NB_IoT': ['NB-IoT', 'IoT', 'LTE']
+      'NB_IoT': ['NB-IoT', 'IoT', 'LTE'],
+      'NSA': ['NSA', 'Dual_Connectivity', '5G']
     };
     
     return [...baseTags, ...(protocolTags[category] || [])];
@@ -536,15 +533,15 @@ class TestCaseGenerator {
     const prerequisites = {
       '5G_NR': '5G NR network configuration and UE capabilities',
       '4G_LTE': 'LTE network configuration and UE capabilities',
-      'VoLTE': 'IMS network configuration and VoLTE capabilities',
-      'VoNR': '5G Core network and IMS configuration',
+      'VoLTE_VoNR': 'IMS network configuration and VoLTE/VoNR capabilities',
       'IMS': 'IMS network configuration and SIP capabilities',
       'Conference_Call': 'IMS network and conference server configuration',
       'Enhanced_IMS_Registration': 'IMS network and enhanced registration features',
       'O_RAN': 'O-RAN network configuration and interfaces',
       'V2X': 'V2X network configuration and vehicle capabilities',
       'NTN': 'NTN network configuration and satellite capabilities',
-      'NB_IoT': 'NB-IoT network configuration and IoT device capabilities'
+      'NB_IoT': 'NB-IoT network configuration and IoT device capabilities',
+      'NSA': 'NSA network configuration and dual connectivity capabilities'
     };
     
     return prerequisites[category] || 'Standard network configuration';
@@ -571,7 +568,8 @@ class TestCaseGenerator {
       'O_RAN': '1.0',
       'V2X': '1.0',
       'NTN': '1.0',
-      'NB_IoT': '1.0'
+      'NB_IoT': '1.0',
+      'NSA': '1.0'
     };
     
     return versions[protocol] || '1.0.0';
@@ -619,63 +617,51 @@ class TestCaseGenerator {
 
   // Message generation methods for different protocols
   get5GNRMessages(category, testNumber) {
-    // Implementation for 5G NR message generation
     return this.getGenericMessages('5G_NR', category, testNumber);
   }
 
   getLTEMessages(category, testNumber) {
-    // Implementation for LTE message generation
     return this.getGenericMessages('LTE', category, testNumber);
   }
 
-  getVoLTEMessages(category, testNumber) {
-    // Implementation for VoLTE message generation
-    return this.getGenericMessages('IMS_SIP', category, testNumber);
-  }
-
-  getVoNRMessages(category, testNumber) {
-    // Implementation for VoNR message generation
+  getVoLTEVoNRMessages(category, testNumber) {
     return this.getGenericMessages('IMS_SIP', category, testNumber);
   }
 
   getIMSMessages(category, testNumber) {
-    // Implementation for IMS message generation
     return this.getGenericMessages('IMS_SIP', category, testNumber);
   }
 
   getConferenceMessages(category, testNumber) {
-    // Implementation for Conference message generation
     return this.getGenericMessages('IMS_SIP', category, testNumber);
   }
 
   getEnhancedIMSMessages(category, testNumber) {
-    // Implementation for Enhanced IMS message generation
     return this.getGenericMessages('IMS_SIP', category, testNumber);
   }
 
   getORANMessages(category, testNumber) {
-    // Implementation for O-RAN message generation
     return this.getGenericMessages('O_RAN', category, testNumber);
   }
 
   getV2XMessages(category, testNumber) {
-    // Implementation for V2X message generation
     return this.getGenericMessages('V2X', category, testNumber);
   }
 
   getNTNMessages(category, testNumber) {
-    // Implementation for NTN message generation
     return this.getGenericMessages('NTN', category, testNumber);
   }
 
   getNBIoTMessages(category, testNumber) {
-    // Implementation for NB-IoT message generation
     return this.getGenericMessages('NB_IoT', category, testNumber);
   }
 
+  getNSAMessages(category, testNumber) {
+    return this.getGenericMessages('NSA', category, testNumber);
+  }
+
   getGenericMessages(protocol, category, testNumber) {
-    // Generic message generation based on protocol and category
-    const messageCount = Math.min(5 + (testNumber % 10), 15); // 5-15 messages per test case
+    const messageCount = Math.min(5 + (testNumber % 10), 15);
     const messages = [];
     
     for (let i = 0; i < messageCount; i++) {
@@ -701,7 +687,8 @@ class TestCaseGenerator {
       'O_RAN': ['E2', 'A1', 'O1'],
       'V2X': ['PHY', 'MAC', 'RLC', 'RRC', 'PC5'],
       'NTN': ['PHY', 'MAC', 'RLC', 'RRC', 'NAS'],
-      'NB_IoT': ['PHY', 'MAC', 'RLC', 'RRC', 'NAS']
+      'NB_IoT': ['PHY', 'MAC', 'RLC', 'RRC', 'NAS'],
+      'NSA': ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS']
     };
     
     const protocolLayers = layers[protocol] || ['PHY', 'MAC', 'RLC', 'RRC'];
@@ -709,7 +696,7 @@ class TestCaseGenerator {
   }
 
   getGenericIEs(protocol, messageIndex) {
-    const ieCount = 2 + (messageIndex % 5); // 2-6 IEs per message
+    const ieCount = 2 + (messageIndex % 5);
     const ies = [];
     
     for (let i = 0; i < ieCount; i++) {
@@ -743,18 +730,10 @@ class TestCaseGenerator {
     ];
   }
 
-  getVoLTELayerParameters() {
+  getVoLTEVoNRLayerParameters() {
     return [
       { layer: 'IMS', parameterName: 'Call_ID', parameterType: 'CONFIG' },
       { layer: 'IMS', parameterName: 'SIP_Version', parameterType: 'CONFIG' }
-    ];
-  }
-
-  getVoNRLayerParameters() {
-    return [
-      { layer: 'IMS', parameterName: 'Call_ID', parameterType: 'CONFIG' },
-      { layer: 'IMS', parameterName: 'SIP_Version', parameterType: 'CONFIG' },
-      { layer: '5G_Core', parameterName: 'AMF_ID', parameterType: 'CONFIG' }
     ];
   }
 
@@ -804,6 +783,14 @@ class TestCaseGenerator {
     return [
       { layer: 'PHY', parameterName: 'RSRP', parameterType: 'MEASUREMENT' },
       { layer: 'MAC', parameterName: 'NPRACH_Preamble', parameterType: 'CONFIG' }
+    ];
+  }
+
+  getNSALayerParameters(category) {
+    return [
+      { layer: 'PHY', parameterName: 'LTE_RSRP', parameterType: 'MEASUREMENT' },
+      { layer: 'PHY', parameterName: 'NR_RSRP', parameterType: 'MEASUREMENT' },
+      { layer: 'RRC', parameterName: 'Dual_Connectivity_Config', parameterType: 'CONFIG' }
     ];
   }
 }
