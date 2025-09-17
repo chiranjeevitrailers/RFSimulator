@@ -438,7 +438,6 @@ CREATE POLICY "Allow public read access to volte_vonr_performance_metrics" ON vo
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-GRANT SELECT ON ALL VIEWS IN SCHEMA public TO anon, authenticated;
 
 -- Sample data insertion for VoLTE test case
 INSERT INTO volte_test_cases (
