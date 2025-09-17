@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import SubscriptionGuard from './SubscriptionGuard';
 import UpgradePrompt from './UpgradePrompt';
+import AccessRestrictions from './AccessRestrictions';
+import AccessRestrictionGuard from './AccessRestrictionGuard';
 import { 
   hasTestCaseAccess, 
   hasFeatureAccess, 
@@ -16,6 +18,7 @@ import {
   ACCESS_LEVELS,
   FEATURES
 } from '../../utils/accessControl';
+import { checkAccess } from '../../utils/accessRestrictions';
 
 const TestManagementTabWithAccess = ({ user }) => {
   const [selectedTests, setSelectedTests] = useState([]);
@@ -246,7 +249,24 @@ const TestManagementTabWithAccess = ({ user }) => {
     console.log('Select category:', category);
   };
 
-  const handleRunSelected = () => {
+  const handleRunSelected = async () => {
+    // Check access restrictions first
+    const accessCheck = await checkAccess(user, 'testExecution', {
+      usageData: { testExecutions: selectedTests.length },
+      testCaseId: selectedTests[0], // Check first selected test
+      recentExecutions: [] // This would come from database
+    });
+
+    if (!accessCheck.allowed) {
+      if (accessCheck.upgradeRequired) {
+        setUpgradeTarget({ type: 'restriction', reason: accessCheck.reason, message: accessCheck.message });
+        setShowUpgradePrompt(true);
+      } else {
+        alert(accessCheck.message);
+      }
+      return;
+    }
+
     // Check if user has reached test case limit
     if (hasReachedTestCaseLimit(userTier, selectedTests.length)) {
       setUpgradeTarget({ type: 'limit', current: selectedTests.length, limit: testCaseLimit });
@@ -670,6 +690,11 @@ const TestManagementTabWithAccess = ({ user }) => {
         <div className="w-1/5 bg-white flex flex-col">
           <div className="p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Results & Analytics</h2>
+          </div>
+
+          {/* Access Restrictions */}
+          <div className="p-4 border-b border-gray-200">
+            <AccessRestrictions user={user} onUpgrade={handleUpgrade} />
           </div>
 
           {/* Recent Test Results */}
