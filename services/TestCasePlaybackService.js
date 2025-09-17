@@ -1,14 +1,35 @@
 // TestCasePlaybackService - streams test case data (messages, IEs, parameters) as if coming from live CLIs
 // This service abstracts fetching from Supabase/Next API and replays messages over the existing WebSocket
+// Enhanced with DataFormatAdapter integration for consistent data formatting
 
 class TestCasePlaybackService {
-  constructor({ databaseService, websocketBroadcast, fetchImpl }) {
+  constructor({ databaseService, websocketBroadcast, fetchImpl, dataFormatAdapter }) {
     this.databaseService = databaseService;
     this.broadcast = websocketBroadcast; // (type, source, data) => void
     this.fetch = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(window) : null);
+    this.dataFormatAdapter = dataFormatAdapter || this.#getDataFormatAdapter();
     this.currentRun = null; // { runId, testCaseId, timeline, idx, timer, startedAt }
     this.isPlaying = false;
     this.defaultDelayMs = 500; // spacing when timestamps absent
+  }
+
+  // Get DataFormatAdapter instance (supports multiple import patterns)
+  #getDataFormatAdapter() {
+    // Try different ways to access DataFormatAdapter
+    if (typeof DataFormatAdapter !== 'undefined') {
+      return DataFormatAdapter;
+    }
+    if (typeof window !== 'undefined' && window.DataFormatAdapter) {
+      return window.DataFormatAdapter;
+    }
+    if (typeof require !== 'undefined') {
+      try {
+        return require('../utils/DataFormatAdapter');
+      } catch (e) {
+        // Fallback to null if not available
+      }
+    }
+    return null;
   }
 
   async startPlayback({ testCaseId, runId, apiBaseUrl = '/api', speed = 1.0 }) {
@@ -129,15 +150,30 @@ class TestCasePlaybackService {
   }
 
   #toLogEntry(item) {
-    const timestamp = new Date().toISOString();
-    return {
-      id: Date.now() + Math.random(),
-      timestamp,
+    // Create raw log entry in format expected by DataFormatAdapter
+    const rawLogEntry = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: new Date(), // Date object, not string
+      level: this.#mapLogLevel(item.priority || 'info'), // Proper enum
       source: 'testcase',
-      level: 'I',
-      component: item.layer || 'OTHER',
-      message: `${item.name} (${item.messageType})`,
       layer: item.layer || 'OTHER',
+      protocol: item.protocol || 'UNKNOWN', // Direct field
+      message: `${item.name} (${item.messageType})`,
+      data: item.decoded || {}, // Direct field
+      messageId: item.messageId,
+      stepId: item.meta?.stepId,
+      direction: item.direction || 'UL',
+      rawData: JSON.stringify(item),
+      decodedData: item.decoded, // Direct field  
+      informationElements: item.ies || [], // Direct field
+      validationResult: item.validation,
+      performanceData: {
+        timestamp: item.atMs || Date.now(),
+        standardReference: item.meta?.standardReference,
+        executionOrder: item.order
+      },
+      // Additional fields for compatibility
+      component: item.layer || 'OTHER',
       messageType: item.messageType || 'GENERIC',
       rnti: null,
       ueId: null,
@@ -148,9 +184,170 @@ class TestCasePlaybackService {
         ies: item.ies,
         standardReference: item.meta?.standardReference,
         stepId: item.meta?.stepId
-      },
-      rawData: JSON.stringify(item)
+      }
     };
+
+    // Use DataFormatAdapter if available for consistent formatting
+    if (this.dataFormatAdapter && typeof this.dataFormatAdapter.adaptLogForViewer === 'function') {
+      try {
+        return this.dataFormatAdapter.adaptLogForViewer(rawLogEntry);
+      } catch (error) {
+        console.warn('DataFormatAdapter failed, using raw format:', error);
+        return rawLogEntry;
+      }
+    }
+    
+    // Fallback to raw format if DataFormatAdapter not available
+    return rawLogEntry;
+  }
+
+  // Map priority/level to LogViewer expected levels
+  #mapLogLevel(level) {
+    const levelStr = String(level).toLowerCase();
+    const levelMap = {
+      'critical': 'critical',
+      'error': 'error',
+      'warning': 'warning', 
+      'warn': 'warning',
+      'info': 'info',
+      'debug': 'debug'
+    };
+    return levelMap[levelStr] || 'info';
+  }
+
+  // Enhanced methods for DataFormatAdapter integration
+
+  /**
+   * Get layer-specific data for a given layer
+   * @param {string} layer - The protocol layer (PHY, MAC, RRC, etc.)
+   * @returns {Array} Array of adapted layer data
+   */
+  getLayerData(layer) {
+    if (!this.currentRun || !this.dataFormatAdapter) return [];
+    
+    const layerItems = this.currentRun.timeline.filter(item => 
+      item.layer === layer || item.layer === layer.toUpperCase()
+    );
+    
+    return layerItems.map(item => {
+      const rawData = {
+        layer: item.layer,
+        messageType: item.messageType,
+        timestamp: new Date(Date.now() + item.atMs),
+        source: 'testcase',
+        direction: item.direction,
+        protocol: item.protocol,
+        fields: {
+          decoded: item.decoded,
+          ies: item.ies,
+          direction: item.direction,
+          protocol: item.protocol
+        }
+      };
+      
+      return this.dataFormatAdapter.adaptForLayerView(rawData, layer);
+    }).filter(data => data !== null);
+  }
+
+  /**
+   * Get all processed logs in DataFormatAdapter format
+   * @returns {Array} Array of adapted log entries
+   */
+  getAllProcessedLogs() {
+    if (!this.currentRun || !this.dataFormatAdapter) return [];
+    
+    return this.currentRun.timeline.map(item => this.#toLogEntry(item));
+  }
+
+  /**
+   * Get logs filtered by criteria
+   * @param {Object} filters - Filter criteria
+   * @returns {Array} Filtered and adapted log entries
+   */
+  getFilteredLogs(filters = {}) {
+    const allLogs = this.getAllProcessedLogs();
+    
+    return allLogs.filter(log => {
+      if (filters.level && log.level !== filters.level) return false;
+      if (filters.layer && log.layer !== filters.layer) return false;
+      if (filters.protocol && log.protocol !== filters.protocol) return false;
+      if (filters.direction && log.direction !== filters.direction) return false;
+      if (filters.source && log.source !== filters.source) return false;
+      return true;
+    });
+  }
+
+  /**
+   * Get statistics about the current playback
+   * @returns {Object} Playback statistics
+   */
+  getPlaybackStatistics() {
+    if (!this.currentRun) return null;
+    
+    const timeline = this.currentRun.timeline;
+    const stats = {
+      total: timeline.length,
+      byLevel: {},
+      byLayer: {},
+      byProtocol: {},
+      byDirection: {},
+      currentPosition: this.currentRun.idx,
+      progress: timeline.length > 0 ? (this.currentRun.idx / timeline.length) * 100 : 0
+    };
+    
+    // Calculate statistics
+    timeline.forEach(item => {
+      const level = this.#mapLogLevel(item.priority || 'info');
+      stats.byLevel[level] = (stats.byLevel[level] || 0) + 1;
+      stats.byLayer[item.layer] = (stats.byLayer[item.layer] || 0) + 1;
+      stats.byProtocol[item.protocol] = (stats.byProtocol[item.protocol] || 0) + 1;
+      stats.byDirection[item.direction] = (stats.byDirection[item.direction] || 0) + 1;
+    });
+    
+    return stats;
+  }
+
+  /**
+   * Validate data format using DataFormatAdapter
+   * @param {Object} data - Data to validate
+   * @param {string} type - Type of validation ('log' or 'layer')
+   * @param {string} layer - Layer name (for layer validation)
+   * @returns {boolean} Validation result
+   */
+  validateDataFormat(data, type = 'log', layer = null) {
+    if (!this.dataFormatAdapter) return true; // Skip validation if adapter not available
+    
+    try {
+      if (type === 'log') {
+        return this.dataFormatAdapter.validateLogEntry(data);
+      } else if (type === 'layer' && layer) {
+        return this.dataFormatAdapter.validateLayerData(data, layer);
+      }
+      return true;
+    } catch (error) {
+      console.warn('Data validation failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get supported layers from DataFormatAdapter
+   * @returns {Array} Array of supported layer names
+   */
+  getSupportedLayers() {
+    if (!this.dataFormatAdapter || !this.dataFormatAdapter.getSupportedLayers) {
+      return ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
+    }
+    return this.dataFormatAdapter.getSupportedLayers();
+  }
+
+  /**
+   * Check if DataFormatAdapter is available and working
+   * @returns {boolean} True if adapter is available and functional
+   */
+  isDataFormatAdapterAvailable() {
+    return this.dataFormatAdapter !== null && 
+           typeof this.dataFormatAdapter.adaptLogForViewer === 'function';
   }
 }
 
