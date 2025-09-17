@@ -338,7 +338,6 @@ CREATE POLICY "Allow public read access to performance_metrics" ON performance_m
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-GRANT SELECT ON ALL VIEWS IN SCHEMA public TO anon, authenticated;
 
 -- Sample data for 5G NR SA Initial Access test case
 INSERT INTO test_cases (
