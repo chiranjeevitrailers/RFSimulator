@@ -15,76 +15,79 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Initial Access - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Initial Access Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Initial Access - 1', 'LTE Attach Procedure with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'),
- 'LTE', 'Multi', 'intermediate', 'initial_access', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify LTE attach procedure with normal conditions',
  'TS 36.331 Section 5.3.3', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "attach_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "attach_time": "<10s", "throughput": ">10Mbps"}'::jsonb),
 ('LTE Initial Access - 2', 'LTE Random Access Procedure', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'),
- 'LTE', 'Multi', 'intermediate', 'initial_access', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify LTE random access procedure',
  'TS 36.331 Section 5.1.1', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "rach_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "rach_time": "<100ms", "preamble_detection": ">90%"}'::jsonb),
 ('LTE Initial Access - 3', 'LTE RRC Connection Setup', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'),
- 'LTE', 'Multi', 'intermediate', 'initial_access', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify LTE RRC connection setup procedure',
  'TS 36.331 Section 5.3.3', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "rrc_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "connection_time": "<5s", "setup_success": ">90%"}'::jsonb),
 ('LTE Initial Access - 4', 'LTE Authentication and Key Agreement', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'),
- 'LTE', 'Multi', 'intermediate', 'initial_access', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify LTE authentication and key agreement procedure',
  'TS 24.301 Section 5.4.1', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "auth_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "auth_time": "<3s", "key_generation": ">95%"}'::jsonb),
 ('LTE Initial Access - 5', 'LTE Security Mode Command', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'),
- 'LTE', 'Multi', 'intermediate', 'initial_access', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify LTE security mode command procedure',
  'TS 24.301 Section 5.4.3', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "security_time": "<2s", "encryption_setup": ">95%"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Initial Access - ' || generate_series(6, 50) as name,
-    'LTE initial access procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Initial Access - ' || i as name,
+    'LTE initial access procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Initial Access') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'intermediate'
+        WHEN i % 4 = 0 THEN 'advanced'
+        WHEN i % 3 = 0 THEN 'intermediate'
         ELSE 'intermediate'
     END as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'initial_access'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'attach_procedure'
+        WHEN i % 3 = 0 THEN 'initial_access'
+        WHEN i % 4 = 0 THEN 'attach_procedure'
         ELSE 'initial_access'
     END as test_scenario,
-    'Verify LTE initial access procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE initial access procedure with scenario ' || i as test_objective,
     'TS 36.331 Section 5.3.3' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 6
+        WHEN i % 4 = 0 THEN 6
         ELSE 5
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "lte_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "attach_time": "<10s", "throughput": ">10Mbps"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "attach_time": "<10s", "throughput": ">10Mbps"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
