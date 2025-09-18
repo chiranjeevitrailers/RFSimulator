@@ -266,25 +266,22 @@ WHERE u.id IS NOT NULL AND NOT EXISTS (
 -- Insert default test execution workers if they don't exist
 INSERT INTO public.test_execution_workers (
     worker_id, worker_name, status, capabilities, max_load,
-    current_load, last_heartbeat, metadata
+    current_load, last_heartbeat
 ) VALUES
 (
     'worker-001', 'Primary Test Worker', 'active', 
     '["5G_NR", "4G_LTE", "IMS_SIP", "O_RAN", "NB_IoT", "V2X", "NTN"]'::jsonb,
-    5, 0, NOW(),
-    '{"cpu_cores": 8, "memory_gb": 16, "storage_gb": 100, "location": "us-east-1"}'::jsonb
+    5, 0, NOW()
 ),
 (
     'worker-002', 'Secondary Test Worker', 'active',
     '["5G_NR", "4G_LTE", "IMS_SIP"]'::jsonb,
-    3, 0, NOW(),
-    '{"cpu_cores": 4, "memory_gb": 8, "storage_gb": 50, "location": "us-west-2"}'::jsonb
+    3, 0, NOW()
 ),
 (
     'worker-003', 'Performance Test Worker', 'active',
     '["5G_NR", "4G_LTE"]'::jsonb,
-    2, 0, NOW(),
-    '{"cpu_cores": 16, "memory_gb": 32, "storage_gb": 200, "location": "eu-west-1"}'::jsonb
+    2, 0, NOW()
 )
 ON CONFLICT (worker_id) DO UPDATE SET
     worker_name = EXCLUDED.worker_name,
@@ -292,8 +289,7 @@ ON CONFLICT (worker_id) DO UPDATE SET
     capabilities = EXCLUDED.capabilities,
     max_load = EXCLUDED.max_load,
     current_load = EXCLUDED.current_load,
-    last_heartbeat = EXCLUDED.last_heartbeat,
-    metadata = EXCLUDED.metadata;
+    last_heartbeat = EXCLUDED.last_heartbeat;
 
 -- ==============================================
 -- 9. UPDATE TEST CASE IDS
