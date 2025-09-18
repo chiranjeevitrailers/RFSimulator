@@ -62,7 +62,11 @@ BEGIN
         COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed_executions,
         COALESCE(SUM(duration_ms), 0) as total_duration_ms,
         ROUND(AVG(duration_ms), 2) as avg_execution_time,
-        ROUND((COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100, 2) as success_rate,
+        ROUND(
+          CASE WHEN COUNT(*) = 0 THEN 0
+               ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100
+          END, 2
+        ) as success_rate,
         MAX(start_time) as last_execution
     FROM public.test_case_executions
     WHERE user_id = user_uuid;
@@ -88,7 +92,11 @@ BEGIN
         tc.category,
         tc.protocol,
         COUNT(tce.id) as execution_count,
-        ROUND((COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100, 2) as success_rate,
+        ROUND(
+          CASE WHEN COUNT(tce.id) = 0 THEN 0
+               ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+          END, 2
+        ) as success_rate,
         ROUND(AVG(tce.duration_ms), 2) as avg_duration
     FROM public.test_cases tc
     LEFT JOIN public.test_case_executions tce ON tc.id = tce.test_case_id
@@ -202,7 +210,11 @@ SELECT
     COUNT(CASE WHEN tce.status = 'completed' THEN 1 END) as successful_executions,
     COUNT(CASE WHEN tce.status = 'failed' THEN 1 END) as failed_executions,
     ROUND(AVG(tce.duration_ms), 2) as avg_duration_ms,
-    ROUND((COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100, 2) as success_rate,
+    ROUND(
+      CASE WHEN COUNT(tce.id) = 0 THEN 0
+           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+      END, 2
+    ) as success_rate,
     ROUND(MIN(tce.duration_ms), 2) as min_duration_ms,
     ROUND(MAX(tce.duration_ms), 2) as max_duration_ms
 FROM public.test_cases tc
@@ -224,7 +236,11 @@ SELECT
     COUNT(CASE WHEN tce.status = 'completed' THEN 1 END) as successful_executions,
     COUNT(CASE WHEN tce.status = 'failed' THEN 1 END) as failed_executions,
     MAX(tce.created_at) as last_execution,
-    ROUND((COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100, 2) as success_rate
+    ROUND(
+      CASE WHEN COUNT(tce.id) = 0 THEN 0
+           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+      END, 2
+    ) as success_rate
 FROM public.users u
 LEFT JOIN public.test_case_executions tce ON u.id = tce.user_id
 GROUP BY u.id, u.email, u.full_name, u.subscription_tier, u.created_at, u.last_login_at
@@ -311,7 +327,11 @@ SELECT
     COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed_executions,
     COUNT(CASE WHEN status = 'running' THEN 1 END) as running_executions,
     ROUND(AVG(duration_ms), 2) as avg_duration_ms,
-    ROUND((COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100, 2) as success_rate
+    ROUND(
+      CASE WHEN COUNT(*) = 0 THEN 0
+           ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100
+      END, 2
+    ) as success_rate
 FROM public.test_case_executions
 WHERE created_at >= NOW() - INTERVAL '30 days'
 GROUP BY DATE(created_at)
