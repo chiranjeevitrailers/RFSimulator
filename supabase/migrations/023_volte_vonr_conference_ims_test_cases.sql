@@ -418,7 +418,7 @@ SELECT
     tc.id as test_case_id,
     'sip_method' as ie_name,
     'string' as ie_type,
-    'INVITE' as ie_value,
+    to_jsonb('INVITE'::text) as ie_value,
     '494E56495445' as ie_value_hex,
     '010010010100111001010110010010010101010001000101' as ie_value_binary,
     48 as ie_size,
