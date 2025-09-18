@@ -8,76 +8,84 @@
 -- ==============================================
 
 -- VoLTE Call Setup Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoLTE Call Setup - ' || generate_series(1, 20) as name,
     'VoLTE call setup procedure test case ' || generate_series(1, 20) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoLTE Call Setup') as category_id,
+    'IMS_SIP' as category,
     'VoLTE' as protocol,
     'IMS' as layer,
     'intermediate' as complexity,
+    'functional' as test_type,
     'call_setup' as test_scenario,
     'Verify VoLTE call setup procedure' as test_objective,
     'TS 24.229 Section 5.1.1' as standard_reference,
     'Release 17' as release_version,
-    3 as expected_duration_minutes,
+    3 as duration_minutes,
     5 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "media_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "call_setup_time": "<3s", "sip_response_time": "<200ms"}'::jsonb as kpi_requirements;
 
 -- VoLTE Call Release Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoLTE Call Release - ' || generate_series(1, 15) as name,
     'VoLTE call release procedure test case ' || generate_series(1, 15) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoLTE Call Release') as category_id,
+    'IMS_SIP' as category,
     'VoLTE' as protocol,
     'IMS' as layer,
     'basic' as complexity,
+    'functional' as test_type,
     'call_release' as test_scenario,
     'Verify VoLTE call release procedure' as test_objective,
     'TS 24.229 Section 5.1.2' as standard_reference,
     'Release 17' as release_version,
-    2 as expected_duration_minutes,
+    2 as duration_minutes,
     5 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "call_release_time": "<2s"}'::jsonb as kpi_requirements;
 
 -- VoLTE Call Handover Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoLTE Call Handover - ' || generate_series(1, 25) as name,
     'VoLTE call handover procedure test case ' || generate_series(1, 25) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoLTE Call Handover') as category_id,
+    'IMS_SIP' as category,
     'VoLTE' as protocol,
     'Multi' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'call_handover' as test_scenario,
     'Verify VoLTE call handover procedure' as test_objective,
     'TS 24.229 Section 5.1.3' as standard_reference,
     'Release 17' as release_version,
-    5 as expected_duration_minutes,
+    5 as duration_minutes,
     7 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "handover_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">90%", "handover_time": "<5s", "call_drop_rate": "<1%"}'::jsonb as kpi_requirements;
 
 -- VoLTE Emergency Call Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoLTE Emergency Call - ' || generate_series(1, 10) as name,
     'VoLTE emergency call procedure test case ' || generate_series(1, 10) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoLTE Emergency Call') as category_id,
+    'IMS_SIP' as category,
     'VoLTE' as protocol,
     'Multi' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'emergency_call' as test_scenario,
     'Verify VoLTE emergency call procedure' as test_objective,
     'TS 24.229 Section 5.1.4' as standard_reference,
     'Release 17' as release_version,
-    4 as expected_duration_minutes,
+    4 as duration_minutes,
     9 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "emergency_config": "required"}'::jsonb as test_data_requirements,
@@ -88,76 +96,84 @@ SELECT
 -- ==============================================
 
 -- VoNR Call Setup Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoNR Call Setup - ' || generate_series(1, 20) as name,
     'VoNR call setup procedure test case ' || generate_series(1, 20) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoNR Call Setup') as category_id,
+    'IMS_SIP' as category,
     'VoNR' as protocol,
     'IMS' as layer,
     'intermediate' as complexity,
+    'functional' as test_type,
     'call_setup' as test_scenario,
     'Verify VoNR call setup procedure' as test_objective,
     'TS 24.229 Section 5.1.1' as standard_reference,
     'Release 17' as release_version,
-    3 as expected_duration_minutes,
+    3 as duration_minutes,
     6 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "media_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "call_setup_time": "<2.5s", "sip_response_time": "<150ms"}'::jsonb as kpi_requirements;
 
 -- VoNR Call Release Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoNR Call Release - ' || generate_series(1, 15) as name,
     'VoNR call release procedure test case ' || generate_series(1, 15) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoNR Call Release') as category_id,
+    'IMS_SIP' as category,
     'VoNR' as protocol,
     'IMS' as layer,
     'basic' as complexity,
+    'functional' as test_type,
     'call_release' as test_scenario,
     'Verify VoNR call release procedure' as test_objective,
     'TS 24.229 Section 5.1.2' as standard_reference,
     'Release 17' as release_version,
-    2 as expected_duration_minutes,
+    2 as duration_minutes,
     6 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "call_release_time": "<1.5s"}'::jsonb as kpi_requirements;
 
 -- VoNR Call Handover Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoNR Call Handover - ' || generate_series(1, 25) as name,
     'VoNR call handover procedure test case ' || generate_series(1, 25) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoNR Call Handover') as category_id,
+    'IMS_SIP' as category,
     'VoNR' as protocol,
     'Multi' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'call_handover' as test_scenario,
     'Verify VoNR call handover procedure' as test_objective,
     'TS 24.229 Section 5.1.3' as standard_reference,
     'Release 17' as release_version,
-    5 as expected_duration_minutes,
+    5 as duration_minutes,
     8 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "handover_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">90%", "handover_time": "<4s", "call_drop_rate": "<1%"}'::jsonb as kpi_requirements;
 
 -- VoNR Emergency Call Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'VoNR Emergency Call - ' || generate_series(1, 10) as name,
     'VoNR emergency call procedure test case ' || generate_series(1, 10) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'VoNR Emergency Call') as category_id,
+    'IMS_SIP' as category,
     'VoNR' as protocol,
     'Multi' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'emergency_call' as test_scenario,
     'Verify VoNR emergency call procedure' as test_objective,
     'TS 24.229 Section 5.1.4' as standard_reference,
     'Release 17' as release_version,
-    4 as expected_duration_minutes,
+    4 as duration_minutes,
     9 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "emergency_config": "required"}'::jsonb as test_data_requirements,
@@ -168,57 +184,63 @@ SELECT
 -- ==============================================
 
 -- IMS Conference Setup Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Conference Setup - ' || generate_series(1, 15) as name,
     'IMS conference call setup procedure test case ' || generate_series(1, 15) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Conference Setup') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'conference_setup' as test_scenario,
     'Verify IMS conference call setup procedure' as test_objective,
     'RFC 4579 Section 4.1' as standard_reference,
     'Release 17' as release_version,
-    5 as expected_duration_minutes,
+    5 as duration_minutes,
     7 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "conference_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">90%", "conference_setup_time": "<5s", "conference_management_time": "<2s"}'::jsonb as kpi_requirements;
 
 -- IMS Conference Management Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Conference Management - ' || generate_series(1, 20) as name,
     'IMS conference call management procedure test case ' || generate_series(1, 20) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Conference Management') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'conference_management' as test_scenario,
     'Verify IMS conference call management procedure' as test_objective,
     'RFC 4579 Section 4.2' as standard_reference,
     'Release 17' as release_version,
-    4 as expected_duration_minutes,
+    4 as duration_minutes,
     7 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "conference_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">90%", "conference_management_time": "<2s"}'::jsonb as kpi_requirements;
 
 -- IMS Conference Release Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Conference Release - ' || generate_series(1, 10) as name,
     'IMS conference call release procedure test case ' || generate_series(1, 10) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Conference Release') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'intermediate' as complexity,
+    'functional' as test_type,
     'conference_release' as test_scenario,
     'Verify IMS conference call release procedure' as test_objective,
     'RFC 4579 Section 4.3' as standard_reference,
     'Release 17' as release_version,
-    3 as expected_duration_minutes,
+    3 as duration_minutes,
     6 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required"}'::jsonb as test_data_requirements,
@@ -229,76 +251,84 @@ SELECT
 -- ==============================================
 
 -- IMS Initial Registration Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Initial Registration - ' || generate_series(1, 20) as name,
     'IMS initial registration procedure test case ' || generate_series(1, 20) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Initial Registration') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'intermediate' as complexity,
+    'functional' as test_type,
     'initial_registration' as test_scenario,
     'Verify IMS initial registration procedure' as test_objective,
     'TS 24.229 Section 5.1.1' as standard_reference,
     'Release 17' as release_version,
-    2 as expected_duration_minutes,
+    2 as duration_minutes,
     5 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "authentication_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "ims_registration_time": "<3s", "ims_authentication_time": "<1s"}'::jsonb as kpi_requirements;
 
 -- IMS Re-registration Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Re-registration - ' || generate_series(1, 15) as name,
     'IMS re-registration procedure test case ' || generate_series(1, 15) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Re-registration') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'intermediate' as complexity,
+    'functional' as test_type,
     're_registration' as test_scenario,
     'Verify IMS re-registration procedure' as test_objective,
     'TS 24.229 Section 5.1.2' as standard_reference,
     'Release 17' as release_version,
-    2 as expected_duration_minutes,
+    2 as duration_minutes,
     5 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "ims_registration_time": "<2s"}'::jsonb as kpi_requirements;
 
 -- IMS De-registration Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS De-registration - ' || generate_series(1, 10) as name,
     'IMS de-registration procedure test case ' || generate_series(1, 10) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS De-registration') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'basic' as complexity,
+    'functional' as test_type,
     'de_registration' as test_scenario,
     'Verify IMS de-registration procedure' as test_objective,
     'TS 24.229 Section 5.1.3' as standard_reference,
     'Release 17' as release_version,
-    1 as expected_duration_minutes,
+    1 as duration_minutes,
     4 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required"}'::jsonb as test_data_requirements,
     '{"success_rate": ">95%", "ims_deregistration_time": "<1s"}'::jsonb as kpi_requirements;
 
 -- IMS Emergency Registration Test Cases
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     'IMS Emergency Registration - ' || generate_series(1, 8) as name,
     'IMS emergency registration procedure test case ' || generate_series(1, 8) as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'IMS Emergency Registration') as category_id,
+    'IMS_SIP' as category,
     'IMS' as protocol,
     'IMS' as layer,
     'advanced' as complexity,
+    'functional' as test_type,
     'emergency_registration' as test_scenario,
     'Verify IMS emergency registration procedure' as test_objective,
     'TS 24.229 Section 5.1.4' as standard_reference,
     'Release 17' as release_version,
-    3 as expected_duration_minutes,
+    3 as duration_minutes,
     9 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "ims_config": "required", "emergency_config": "required"}'::jsonb as test_data_requirements,
