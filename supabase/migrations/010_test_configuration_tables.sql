@@ -202,6 +202,37 @@ ALTER TABLE public.test_configuration_sharing ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.test_configuration_versions ENABLE ROW LEVEL SECURITY;
 
 -- Test configurations RLS policies
+-- Ensure idempotent policy creation by dropping existing policies if present
+DROP POLICY IF EXISTS "Users can view their own configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Users can view public configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Users can view shared configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Users can create their own configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Users can update their own configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Users can delete their own configurations" ON public.test_configurations;
+DROP POLICY IF EXISTS "Admins can manage all configurations" ON public.test_configurations;
+
+DROP POLICY IF EXISTS "Users can view public templates" ON public.test_configuration_templates;
+DROP POLICY IF EXISTS "Users can view their own templates" ON public.test_configuration_templates;
+DROP POLICY IF EXISTS "Users can create templates" ON public.test_configuration_templates;
+DROP POLICY IF EXISTS "Users can update their own templates" ON public.test_configuration_templates;
+DROP POLICY IF EXISTS "Users can delete their own templates" ON public.test_configuration_templates;
+DROP POLICY IF EXISTS "Admins can manage all templates" ON public.test_configuration_templates;
+
+DROP POLICY IF EXISTS "Users can view their own usage" ON public.test_configuration_usage;
+DROP POLICY IF EXISTS "Users can create usage records" ON public.test_configuration_usage;
+DROP POLICY IF EXISTS "Admins can view all usage" ON public.test_configuration_usage;
+
+DROP POLICY IF EXISTS "Users can view sharing of their configurations" ON public.test_configuration_sharing;
+DROP POLICY IF EXISTS "Users can view sharing with them" ON public.test_configuration_sharing;
+DROP POLICY IF EXISTS "Users can create sharing for their configurations" ON public.test_configuration_sharing;
+DROP POLICY IF EXISTS "Users can update sharing of their configurations" ON public.test_configuration_sharing;
+DROP POLICY IF EXISTS "Users can delete sharing of their configurations" ON public.test_configuration_sharing;
+DROP POLICY IF EXISTS "Admins can manage all sharing" ON public.test_configuration_sharing;
+
+DROP POLICY IF EXISTS "Users can view versions of their configurations" ON public.test_configuration_versions;
+DROP POLICY IF EXISTS "Users can create versions for their configurations" ON public.test_configuration_versions;
+DROP POLICY IF EXISTS "Admins can manage all versions" ON public.test_configuration_versions;
+
 CREATE POLICY "Users can view their own configurations" ON public.test_configurations
     FOR SELECT USING (user_id = auth.uid());
 

@@ -183,22 +183,53 @@ CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_name ON public.test_run_m
 CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_category ON public.test_run_metrics(metric_category);
 CREATE INDEX IF NOT EXISTS idx_test_run_metrics_is_threshold ON public.test_run_metrics(is_threshold);
 
--- Indexes for alert_rules
-CREATE INDEX IF NOT EXISTS idx_alert_rules_user_id ON public.alert_rules(user_id);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alert_rules' AND column_name = 'user_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_user_id ON public.alert_rules(user_id)';
+    ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alert_rules' AND column_name = 'created_by'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_created_by ON public.alert_rules(created_by)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_alert_rules_rule_type ON public.alert_rules(rule_type);
 CREATE INDEX IF NOT EXISTS idx_alert_rules_is_active ON public.alert_rules(is_active);
 CREATE INDEX IF NOT EXISTS idx_alert_rules_severity ON public.alert_rules(severity);
 
--- Indexes for alerts
 CREATE INDEX IF NOT EXISTS idx_alerts_alert_rule_id ON public.alerts(alert_rule_id);
-CREATE INDEX IF NOT EXISTS idx_alerts_user_id ON public.alerts(user_id);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alerts' AND column_name = 'user_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alerts_user_id ON public.alerts(user_id)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_alerts_status ON public.alerts(status);
 CREATE INDEX IF NOT EXISTS idx_alerts_severity ON public.alerts(severity);
 CREATE INDEX IF NOT EXISTS idx_alerts_created_at ON public.alerts(created_at);
 
--- Indexes for security_events
 CREATE INDEX IF NOT EXISTS idx_security_events_user_id ON public.security_events(user_id);
-CREATE INDEX IF NOT EXISTS idx_security_events_event_type ON public.security_events(event_type);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'security_events' AND column_name = 'event_type'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_security_events_event_type ON public.security_events(event_type)';
+    ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'security_events' AND column_name = 'type'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_security_events_type ON public.security_events(type)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_security_events_severity ON public.security_events(severity);
 CREATE INDEX IF NOT EXISTS idx_security_events_created_at ON public.security_events(created_at);
 CREATE INDEX IF NOT EXISTS idx_security_events_ip_address ON public.security_events(ip_address);
@@ -255,6 +286,10 @@ CREATE POLICY "Users can view their own security events" ON public.security_even
 -- ==============================================
 
 -- Triggers for updated_at columns
+-- Ensure idempotency for triggers
+DROP TRIGGER IF EXISTS update_alert_rules_updated_at ON public.alert_rules;
+DROP TRIGGER IF EXISTS update_alerts_updated_at ON public.alerts;
+
 CREATE TRIGGER update_alert_rules_updated_at 
     BEFORE UPDATE ON public.alert_rules 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
