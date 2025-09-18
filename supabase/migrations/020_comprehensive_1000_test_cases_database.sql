@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS public.test_case_categories (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Ensure parent_category_id exists for legacy installs
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS parent_category_id UUID REFERENCES public.test_case_categories(id);
+
 -- ==============================================
 -- 2. ENHANCED TEST CASE DEFINITIONS
 -- ==============================================
