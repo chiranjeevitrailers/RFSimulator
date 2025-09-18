@@ -104,15 +104,23 @@ ADD COLUMN IF NOT EXISTS checksum TEXT;
 CREATE INDEX IF NOT EXISTS idx_test_run_artifacts_file_size ON public.test_run_artifacts(file_size);
 CREATE INDEX IF NOT EXISTS idx_test_run_artifacts_mime_type ON public.test_run_artifacts(mime_type);
 
--- Add missing columns to test_run_metrics for better metrics tracking
-ALTER TABLE public.test_run_metrics 
-ADD COLUMN IF NOT EXISTS metric_unit TEXT,
-ADD COLUMN IF NOT EXISTS metric_category TEXT,
-ADD COLUMN IF NOT EXISTS is_threshold BOOLEAN DEFAULT false;
+-- Add missing columns to test_run_metrics for better metrics tracking (only if table exists)
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_name = 'test_run_metrics'
+    ) THEN
+        ALTER TABLE public.test_run_metrics 
+        ADD COLUMN IF NOT EXISTS metric_unit TEXT,
+        ADD COLUMN IF NOT EXISTS metric_category TEXT,
+        ADD COLUMN IF NOT EXISTS is_threshold BOOLEAN DEFAULT false;
 
--- Create indexes for metrics
-CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_unit ON public.test_run_metrics(metric_unit);
-CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_category ON public.test_run_metrics(metric_category);
+        -- Create indexes for metrics
+        CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_unit ON public.test_run_metrics(metric_unit);
+        CREATE INDEX IF NOT EXISTS idx_test_run_metrics_metric_category ON public.test_run_metrics(metric_category);
+    END IF;
+END $$;
 
 -- Add missing columns to message_flow_analysis for better flow analysis
 ALTER TABLE public.message_flow_analysis 
