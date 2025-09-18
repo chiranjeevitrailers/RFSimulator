@@ -15,138 +15,137 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Security - %';
 -- ==============================================
 
 -- Test Case 1: Initial Authentication
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 1', 'Initial Authentication with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'authentication', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'authentication', 
  'Verify initial authentication procedure with normal conditions',
  'TS 24.501 Section 6.1.1', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "authentication_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "authentication_time": "<2s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 2: Re-authentication
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 2', 'Re-authentication with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'authentication', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'authentication', 
  'Verify re-authentication procedure with normal conditions',
  'TS 24.501 Section 6.1.1', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "reauthentication_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "authentication_time": "<2s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 3: Key Management
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 3', 'Key Management with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'key_management', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'key_management', 
  'Verify key management procedure with normal conditions',
  'TS 24.501 Section 6.1.2', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "key_management_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "key_management_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 4: Security Context Establishment
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 4', 'Security Context Establishment with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'security_context', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'security_context', 
  'Verify security context establishment procedure with normal conditions',
  'TS 24.501 Section 6.1.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "context_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "context_establishment_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 5: Security Context Modification
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 5', 'Security Context Modification with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'security_context', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'security_context', 
  'Verify security context modification procedure with normal conditions',
  'TS 24.501 Section 6.1.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "modification_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "context_modification_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 6: Integrity Protection
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 6', 'Integrity Protection with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'integrity_protection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'integrity_protection', 
  'Verify integrity protection procedure with normal conditions',
  'TS 24.501 Section 6.1.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "integrity_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "integrity_protection_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 7: Ciphering
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 7', 'Ciphering with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'ciphering', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'ciphering', 
  'Verify ciphering procedure with normal conditions',
  'TS 24.501 Section 6.1.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "ciphering_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "ciphering_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 8: Security Mode Command
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 8', 'Security Mode Command with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'security_mode', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'security_mode', 
  'Verify security mode command procedure with normal conditions',
  'TS 38.331 Section 6.3.2', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "security_mode_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "security_mode_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 9: Security Mode Complete
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 9', 'Security Mode Complete with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'security_mode', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'security_mode', 
  'Verify security mode complete procedure with normal conditions',
  'TS 38.331 Section 6.3.2', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "security_mode_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "security_mode_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Test Case 10: Security Mode Failure
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Security - 10', 'Security Mode Failure with Error Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security'),
- '5G-NR', 'Multi', 'advanced', 'security_mode', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'security_mode', 
  'Verify security mode failure procedure with error conditions',
  'TS 38.331 Section 6.3.2', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "error_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "security_mode_time": "<1s", "security_strength": "high"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Security - ' || generate_series(11, 50) as name,
-    '5G NR security procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Security - ' || i as name,
+    '5G NR security procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Security') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
+    'advanced' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
-    CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'authentication'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'key_management'
+        WHEN i % 3 = 0 THEN 'authentication'
+        WHEN i % 4 = 0 THEN 'key_management'
         ELSE 'security_context'
     END as test_scenario,
-    'Verify 5G NR security procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR security procedure with scenario ' || i as test_objective,
     'TS 24.501 Section 6.1.1' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 4
+        WHEN i % 4 = 0 THEN 4
         ELSE 3
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "security_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "security_time": "<2s", "security_strength": "high"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "security_time": "<2s", "security_strength": "high"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
