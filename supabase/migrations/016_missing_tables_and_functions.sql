@@ -298,29 +298,59 @@ CREATE POLICY "Users can view metrics from their test runs" ON public.test_run_m
         )
     );
 
--- RLS Policies for alert_rules
-CREATE POLICY "Users can view their own alert rules" ON public.alert_rules
-    FOR SELECT USING (auth.uid() = user_id);
+-- RLS Policies for alert_rules (guarded for schema differences)
+DO $$
+BEGIN
+    -- Drop existing to avoid duplicates
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view their own alert rules" ON public.alert_rules';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can create their own alert rules" ON public.alert_rules';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update their own alert rules" ON public.alert_rules';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete their own alert rules" ON public.alert_rules';
 
-CREATE POLICY "Users can create their own alert rules" ON public.alert_rules
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema='public' AND table_name='alert_rules' AND column_name='user_id'
+    ) THEN
+        EXECUTE 'CREATE POLICY "Users can view their own alert rules" ON public.alert_rules FOR SELECT USING (auth.uid() = user_id)';
+        EXECUTE 'CREATE POLICY "Users can create their own alert rules" ON public.alert_rules FOR INSERT WITH CHECK (auth.uid() = user_id)';
+        EXECUTE 'CREATE POLICY "Users can update their own alert rules" ON public.alert_rules FOR UPDATE USING (auth.uid() = user_id)';
+        EXECUTE 'CREATE POLICY "Users can delete their own alert rules" ON public.alert_rules FOR DELETE USING (auth.uid() = user_id)';
+    ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema='public' AND table_name='alert_rules' AND column_name='created_by'
+    ) THEN
+        EXECUTE 'CREATE POLICY "Users can view their own alert rules" ON public.alert_rules FOR SELECT USING (auth.uid() = created_by)';
+        EXECUTE 'CREATE POLICY "Users can create their own alert rules" ON public.alert_rules FOR INSERT WITH CHECK (auth.uid() = created_by)';
+        EXECUTE 'CREATE POLICY "Users can update their own alert rules" ON public.alert_rules FOR UPDATE USING (auth.uid() = created_by)';
+        EXECUTE 'CREATE POLICY "Users can delete their own alert rules" ON public.alert_rules FOR DELETE USING (auth.uid() = created_by)';
+    END IF;
+END $$;
 
-CREATE POLICY "Users can update their own alert rules" ON public.alert_rules
-    FOR UPDATE USING (auth.uid() = user_id);
+-- RLS Policies for alerts (only if user_id column exists)
+DO $$
+BEGIN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view their own alerts" ON public.alerts';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update their own alerts" ON public.alerts';
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema='public' AND table_name='alerts' AND column_name='user_id'
+    ) THEN
+        EXECUTE 'CREATE POLICY "Users can view their own alerts" ON public.alerts FOR SELECT USING (auth.uid() = user_id)';
+        EXECUTE 'CREATE POLICY "Users can update their own alerts" ON public.alerts FOR UPDATE USING (auth.uid() = user_id)';
+    END IF;
+END $$;
 
-CREATE POLICY "Users can delete their own alert rules" ON public.alert_rules
-    FOR DELETE USING (auth.uid() = user_id);
-
--- RLS Policies for alerts
-CREATE POLICY "Users can view their own alerts" ON public.alerts
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own alerts" ON public.alerts
-    FOR UPDATE USING (auth.uid() = user_id);
-
--- RLS Policies for security_events
-CREATE POLICY "Users can view their own security events" ON public.security_events
-    FOR SELECT USING (auth.uid() = user_id);
+-- RLS Policies for security_events (only if user_id column exists)
+DO $$
+BEGIN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view their own security events" ON public.security_events';
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema='public' AND table_name='security_events' AND column_name='user_id'
+    ) THEN
+        EXECUTE 'CREATE POLICY "Users can view their own security events" ON public.security_events FOR SELECT USING (auth.uid() = user_id)';
+    END IF;
+END $$;
 
 -- ==============================================
 -- 6. CREATE TRIGGERS FOR UPDATED_AT
