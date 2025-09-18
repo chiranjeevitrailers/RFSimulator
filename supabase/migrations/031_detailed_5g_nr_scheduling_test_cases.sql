@@ -15,9 +15,9 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Scheduling - %';
 -- ==============================================
 
 -- Test Case 1: Downlink Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 1', 'Downlink Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
  '5G-NR', 'Multi', 'advanced', 'scheduling', 
  'Verify downlink scheduling procedure with normal conditions',
  'TS 38.214 Section 5.1', 'Release 17', 4, 4, 'semi_automated',
@@ -25,9 +25,9 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 2: Uplink Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 2', 'Uplink Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
  '5G-NR', 'Multi', 'advanced', 'scheduling', 
  'Verify uplink scheduling procedure with normal conditions',
  'TS 38.214 Section 5.2', 'Release 17', 4, 4, 'semi_automated',
@@ -35,9 +35,9 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 3: PDSCH Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 3', 'PDSCH Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
  '5G-NR', 'Multi', 'advanced', 'scheduling', 
  'Verify PDSCH scheduling procedure with normal conditions',
  'TS 38.214 Section 5.1.1', 'Release 17', 4, 4, 'semi_automated',
@@ -45,9 +45,9 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 4: PUSCH Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 4', 'PUSCH Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
  '5G-NR', 'Multi', 'advanced', 'scheduling', 
  'Verify PUSCH scheduling procedure with normal conditions',
  'TS 38.214 Section 5.2.1', 'Release 17', 4, 4, 'semi_automated',
@@ -55,9 +55,9 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 5: PDCCH Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 5', 'PDCCH Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
  '5G-NR', 'Multi', 'advanced', 'scheduling', 
  'Verify PDCCH scheduling procedure with normal conditions',
  'TS 38.214 Section 5.1.2', 'Release 17', 4, 4, 'semi_automated',
@@ -115,11 +115,12 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
  '{"success_rate": ">90%", "scheduling_efficiency": ">85%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     '5G NR Scheduling - ' || generate_series(11, 50) as name,
     '5G NR scheduling procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
     CASE 
