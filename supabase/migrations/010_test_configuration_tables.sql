@@ -6,7 +6,7 @@
 -- ==============================================
 
 CREATE TABLE IF NOT EXISTS public.test_configurations (
-    id TEXT PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
     test_case_id UUID REFERENCES public.test_cases(id) ON DELETE CASCADE,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS public.test_configuration_templates (
 
 CREATE TABLE IF NOT EXISTS public.test_configuration_usage (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    configuration_id TEXT NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
+    configuration_id UUID NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     test_case_id UUID REFERENCES public.test_cases(id) ON DELETE SET NULL,
     execution_id UUID REFERENCES public.test_case_executions(id) ON DELETE SET NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS public.test_configuration_usage (
 
 CREATE TABLE IF NOT EXISTS public.test_configuration_sharing (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    configuration_id TEXT NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
+    configuration_id UUID NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
     shared_by UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     shared_with UUID REFERENCES public.users(id) ON DELETE CASCADE,
     
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS public.test_configuration_sharing (
 
 CREATE TABLE IF NOT EXISTS public.test_configuration_versions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    configuration_id TEXT NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
+    configuration_id UUID NOT NULL REFERENCES public.test_configurations(id) ON DELETE CASCADE,
     version_number TEXT NOT NULL,
     
     -- Version Data
@@ -378,7 +378,7 @@ CREATE TRIGGER update_test_configuration_sharing_updated_at
 -- ==============================================
 
 -- Function to get configuration usage statistics
-CREATE OR REPLACE FUNCTION get_configuration_usage_stats(config_id text)
+CREATE OR REPLACE FUNCTION get_configuration_usage_stats(config_id uuid)
 RETURNS jsonb AS $$
 DECLARE
     result jsonb;
@@ -429,7 +429,7 @@ $$ LANGUAGE plpgsql;
 
 -- Function to create configuration version
 CREATE OR REPLACE FUNCTION create_configuration_version(
-    config_id text,
+    config_id uuid,
     version_num text,
     config_data jsonb,
     change_summary text,
