@@ -65,50 +65,50 @@ INSERT INTO public.test_cases (name, description, category_id, category, protoco
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 6: PUCCH Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 6', 'PUCCH Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
- '5G-NR', 'Multi', 'advanced', 'scheduling', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
+ '5G-NR', 'Multi', 'advanced', 'performance', 'scheduling', 
  'Verify PUCCH scheduling procedure with normal conditions',
  'TS 38.214 Section 5.2.2', 'Release 17', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "pucch_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 7: SRS Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 7', 'SRS Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
- '5G-NR', 'Multi', 'advanced', 'scheduling', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
+ '5G-NR', 'Multi', 'advanced', 'performance', 'scheduling', 
  'Verify SRS scheduling procedure with normal conditions',
  'TS 38.214 Section 5.2.3', 'Release 17', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "srs_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 8: PRACH Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 8', 'PRACH Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
- '5G-NR', 'Multi', 'advanced', 'scheduling', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
+ '5G-NR', 'Multi', 'advanced', 'performance', 'scheduling', 
  'Verify PRACH scheduling procedure with normal conditions',
  'TS 38.214 Section 5.2.4', 'Release 17', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "prach_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 9: SSB Scheduling
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 9', 'SSB Scheduling with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
- '5G-NR', 'Multi', 'advanced', 'scheduling', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
+ '5G-NR', 'Multi', 'advanced', 'performance', 'scheduling', 
  'Verify SSB scheduling procedure with normal conditions',
  'TS 38.214 Section 5.1.3', 'Release 17', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "ssb_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb);
 
 -- Test Case 10: Scheduling Failure
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Scheduling - 10', 'Scheduling Failure with Error Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'),
- '5G-NR', 'Multi', 'advanced', 'scheduling', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling'), '5G_NR',
+ '5G-NR', 'Multi', 'advanced', 'performance', 'scheduling', 
  'Verify scheduling failure procedure with error conditions',
  'TS 38.214 Section 5.1.4', 'Release 17', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "error_config": "required"}'::jsonb,
@@ -117,38 +117,35 @@ INSERT INTO public.test_cases (name, description, category_id, protocol, layer, 
 -- Generate remaining test cases (11-50) using a loop
 INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Scheduling - ' || generate_series(11, 50) as name,
-    '5G NR scheduling procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Scheduling - ' || i as name,
+    '5G NR scheduling procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Scheduling') as category_id,
     '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
-    CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
+    'advanced' as complexity,
     'performance' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'scheduling'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'scheduling_optimization'
+        WHEN i % 3 = 0 THEN 'scheduling'
+        WHEN i % 4 = 0 THEN 'scheduling_optimization'
         ELSE 'scheduling'
     END as test_scenario,
-    'Verify 5G NR scheduling procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR scheduling procedure with scenario ' || i as test_objective,
     'TS 38.214 Section 5.1' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 5
+        WHEN i % 4 = 0 THEN 5
         ELSE 4
     END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "scheduling_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "scheduling_efficiency": ">90%", "scheduling_time": "<1ms"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
