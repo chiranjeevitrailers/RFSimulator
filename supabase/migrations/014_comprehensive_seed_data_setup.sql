@@ -31,32 +31,35 @@ ON CONFLICT (name) DO UPDATE SET
 
 -- Insert subscription plans if they don't exist
 INSERT INTO public.subscription_plans (
-    name, display_name, description, price_monthly, price_yearly, 
-    max_test_cases, max_concurrent_executions, max_storage_gb, 
-    features, is_active, sort_order
+    name, display_name, description, price_monthly, price_yearly,
+    features, limits, is_active, sort_order
 ) VALUES
 (
     'free', 'Free Plan', 'Basic access to 5GLabX platform with limited test cases',
-    0.00, 0.00, 10, 1, 1,
+    0.00, 0.00,
     '["Basic test cases", "Limited executions", "Community support"]'::jsonb,
+    '{"max_test_cases": 10, "max_concurrent_executions": 1, "max_storage_gb": 1}'::jsonb,
     true, 1
 ),
 (
     'pro', 'Pro Plan', 'Professional access with advanced test cases and features',
-    99.00, 990.00, 100, 5, 10,
+    99.00, 990.00,
     '["All test cases", "Priority execution", "Advanced analytics", "Email support", "API access"]'::jsonb,
+    '{"max_test_cases": 100, "max_concurrent_executions": 5, "max_storage_gb": 10}'::jsonb,
     true, 2
 ),
 (
     'enterprise', 'Enterprise Plan', 'Full enterprise access with unlimited resources',
-    499.00, 4990.00, -1, -1, 100,
+    499.00, 4990.00,
     '["Unlimited test cases", "Unlimited executions", "Custom test cases", "Dedicated support", "SLA guarantee", "On-premise deployment"]'::jsonb,
+    '{"max_test_cases": -1, "max_concurrent_executions": -1, "max_storage_gb": 100}'::jsonb,
     true, 3
 ),
 (
     'custom', 'Custom Plan', 'Tailored solution for specific enterprise needs',
-    0.00, 0.00, -1, -1, -1,
+    0.00, 0.00,
     '["Custom pricing", "Custom features", "Dedicated support", "Custom SLA"]'::jsonb,
+    '{"max_test_cases": -1, "max_concurrent_executions": -1, "max_storage_gb": -1}'::jsonb,
     true, 4
 )
 ON CONFLICT (name) DO UPDATE SET
@@ -64,9 +67,7 @@ ON CONFLICT (name) DO UPDATE SET
     description = EXCLUDED.description,
     price_monthly = EXCLUDED.price_monthly,
     price_yearly = EXCLUDED.price_yearly,
-    max_test_cases = EXCLUDED.max_test_cases,
-    max_concurrent_executions = EXCLUDED.max_concurrent_executions,
-    max_storage_gb = EXCLUDED.max_storage_gb,
+    limits = EXCLUDED.limits,
     features = EXCLUDED.features,
     is_active = EXCLUDED.is_active,
     sort_order = EXCLUDED.sort_order;
