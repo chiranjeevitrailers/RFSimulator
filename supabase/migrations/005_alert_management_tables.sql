@@ -15,10 +15,14 @@ CREATE TABLE IF NOT EXISTS alert_templates (
     tags TEXT[] NOT NULL DEFAULT '{}',
     notification_channels TEXT[] NOT NULL DEFAULT '{}',
     escalation_policy JSONB,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
+
+-- Ensure column exists when re-running on existing databases
+ALTER TABLE alert_templates ADD COLUMN IF NOT EXISTS enabled BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- Alert Actions Table
 CREATE TABLE IF NOT EXISTS alert_actions (
