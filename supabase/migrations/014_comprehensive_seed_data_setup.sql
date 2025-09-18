@@ -101,23 +101,23 @@ ON CONFLICT (key) DO UPDATE SET
 -- 4. FEATURE FLAGS SEED DATA
 -- ==============================================
 
--- Insert feature flags if they don't exist
-INSERT INTO public.feature_flags (name, description, is_enabled, rollout_percentage, target_users) VALUES
-('test_suites', 'Test Suites functionality', true, 100, 'all'),
-('protocol_analyzer', 'Protocol Analyzer dashboard', true, 100, 'all'),
-('advanced_analytics', 'Advanced analytics and reporting', true, 100, 'pro,enterprise'),
-('api_access', 'API access for integrations', true, 100, 'pro,enterprise'),
-('custom_test_cases', 'Custom test case creation', true, 100, 'enterprise'),
-('real_time_execution', 'Real-time test execution', true, 100, 'all'),
-('batch_execution', 'Batch test execution', true, 100, 'pro,enterprise'),
-('test_scheduling', 'Automated test scheduling', true, 100, 'pro,enterprise'),
-('export_functionality', 'Export test results', true, 100, 'all'),
-('collaboration_features', 'Team collaboration features', true, 100, 'pro,enterprise')
+-- Insert feature flags if they don't exist (use target_roles TEXT[] per schema)
+INSERT INTO public.feature_flags (name, description, is_enabled, rollout_percentage, target_roles) VALUES
+('test_suites', 'Test Suites functionality', true, 100, '{"all"}'),
+('protocol_analyzer', 'Protocol Analyzer dashboard', true, 100, '{"all"}'),
+('advanced_analytics', 'Advanced analytics and reporting', true, 100, '{"pro","enterprise"}'),
+('api_access', 'API access for integrations', true, 100, '{"pro","enterprise"}'),
+('custom_test_cases', 'Custom test case creation', true, 100, '{"enterprise"}'),
+('real_time_execution', 'Real-time test execution', true, 100, '{"all"}'),
+('batch_execution', 'Batch test execution', true, 100, '{"pro","enterprise"}'),
+('test_scheduling', 'Automated test scheduling', true, 100, '{"pro","enterprise"}'),
+('export_functionality', 'Export test results', true, 100, '{"all"}'),
+('collaboration_features', 'Team collaboration features', true, 100, '{"pro","enterprise"}')
 ON CONFLICT (name) DO UPDATE SET
     description = EXCLUDED.description,
     is_enabled = EXCLUDED.is_enabled,
     rollout_percentage = EXCLUDED.rollout_percentage,
-    target_users = EXCLUDED.target_users;
+    target_roles = EXCLUDED.target_roles;
 
 -- ==============================================
 -- 5. DEFAULT TEST CONFIGURATIONS
