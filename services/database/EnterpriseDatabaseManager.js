@@ -439,7 +439,11 @@ class EnterpriseDatabaseManager {
         protocol,
         generation,
         COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage
+        ROUND(
+          CASE WHEN SUM(COUNT(*)) OVER() = 0 THEN 0
+               ELSE COUNT(*) * 100.0 / NULLIF(SUM(COUNT(*)) OVER(), 0)
+          END, 2
+        ) as percentage
       FROM logs 
       WHERE ${timeCondition}
       ${filterConditions ? `AND ${filterConditions}` : ''}
@@ -456,7 +460,11 @@ class EnterpriseDatabaseManager {
       SELECT 
         compliance,
         COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage
+        ROUND(
+          CASE WHEN SUM(COUNT(*)) OVER() = 0 THEN 0
+               ELSE COUNT(*) * 100.0 / NULLIF(SUM(COUNT(*)) OVER(), 0)
+          END, 2
+        ) as percentage
       FROM logs 
       WHERE ${timeCondition}
       ${filterConditions ? `AND ${filterConditions}` : ''}
