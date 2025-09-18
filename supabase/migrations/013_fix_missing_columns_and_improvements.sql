@@ -83,6 +83,10 @@ ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT false;
 CREATE INDEX IF NOT EXISTS idx_test_suite_collections_category ON public.test_suite_collections(category);
 CREATE INDEX IF NOT EXISTS idx_test_suite_collections_tags ON public.test_suite_collections USING GIN(tags);
 
+-- Add missing column to system_settings to support category-based organization
+ALTER TABLE public.system_settings 
+ADD COLUMN IF NOT EXISTS category TEXT;
+
 -- Add missing columns to test_execution_workers for better worker management
 ALTER TABLE public.test_execution_workers 
 ADD COLUMN IF NOT EXISTS cpu_usage DECIMAL(5,2) DEFAULT 0,

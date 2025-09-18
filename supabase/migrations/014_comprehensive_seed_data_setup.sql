@@ -77,6 +77,9 @@ ON CONFLICT (name) DO UPDATE SET
 -- ==============================================
 
 -- Insert system settings if they don't exist
+-- Ensure system_settings has category column
+ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS category TEXT;
+
 INSERT INTO public.system_settings (key, value, description, category, is_public) VALUES
 ('platform_name', '5GLabX', 'Platform name displayed to users', 'general', true),
 ('platform_version', '1.0.0', 'Current platform version', 'general', true),
