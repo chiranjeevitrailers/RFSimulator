@@ -265,11 +265,11 @@ WHERE u.id IS NOT NULL AND NOT EXISTS (
 
 -- Insert default test execution workers if they don't exist
 INSERT INTO public.test_execution_workers (
-    worker_id, name, status, capabilities, max_concurrent_tests, 
+    worker_id, worker_name, status, capabilities, max_load,
     current_load, last_heartbeat, metadata
 ) VALUES
 (
-    'worker-001', 'Primary Test Worker', 'active',
+    'worker-001', 'Primary Test Worker', 'active', 
     '["5G_NR", "4G_LTE", "IMS_SIP", "O_RAN", "NB_IoT", "V2X", "NTN"]'::jsonb,
     5, 0, NOW(),
     '{"cpu_cores": 8, "memory_gb": 16, "storage_gb": 100, "location": "us-east-1"}'::jsonb
@@ -287,10 +287,10 @@ INSERT INTO public.test_execution_workers (
     '{"cpu_cores": 16, "memory_gb": 32, "storage_gb": 200, "location": "eu-west-1"}'::jsonb
 )
 ON CONFLICT (worker_id) DO UPDATE SET
-    name = EXCLUDED.name,
+    worker_name = EXCLUDED.worker_name,
     status = EXCLUDED.status,
     capabilities = EXCLUDED.capabilities,
-    max_concurrent_tests = EXCLUDED.max_concurrent_tests,
+    max_load = EXCLUDED.max_load,
     current_load = EXCLUDED.current_load,
     last_heartbeat = EXCLUDED.last_heartbeat,
     metadata = EXCLUDED.metadata;
