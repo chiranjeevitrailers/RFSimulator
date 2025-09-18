@@ -81,8 +81,8 @@ ON CONFLICT (name) DO UPDATE SET
 ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS category TEXT;
 
 INSERT INTO public.system_settings (key, value, description, category, is_public) VALUES
-('platform_name', to_jsonb('5GLabX'), 'Platform name displayed to users', 'general', true),
-('platform_version', to_jsonb('1.0.0'), 'Current platform version', 'general', true),
+('platform_name', to_jsonb('5GLabX'::text), 'Platform name displayed to users', 'general', true),
+('platform_version', to_jsonb('1.0.0'::text), 'Current platform version', 'general', true),
 ('max_file_upload_size_mb', to_jsonb(100), 'Maximum file upload size in MB', 'limits', false),
 ('max_concurrent_executions', to_jsonb(10), 'Maximum concurrent test executions', 'limits', false),
 ('default_execution_timeout_minutes', to_jsonb(30), 'Default execution timeout in minutes', 'execution', false),
