@@ -36,6 +36,10 @@ CREATE TABLE IF NOT EXISTS public.alert_rules (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Ensure compatibility with earlier schema where alert_rules lacked rule_type
+ALTER TABLE public.alert_rules 
+ADD COLUMN IF NOT EXISTS rule_type TEXT;
+
 -- Alerts table
 CREATE TABLE IF NOT EXISTS public.alerts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -197,7 +201,16 @@ BEGIN
         EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_created_by ON public.alert_rules(created_by)';
     END IF;
 END $$;
-CREATE INDEX IF NOT EXISTS idx_alert_rules_rule_type ON public.alert_rules(rule_type);
+-- Create rule_type index only if column exists
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alert_rules' AND column_name = 'rule_type'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_rule_type ON public.alert_rules(rule_type)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_alert_rules_is_active ON public.alert_rules(is_active);
 CREATE INDEX IF NOT EXISTS idx_alert_rules_severity ON public.alert_rules(severity);
 
