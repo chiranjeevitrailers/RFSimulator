@@ -24,6 +24,16 @@ CREATE TABLE IF NOT EXISTS public.test_case_categories (
 ALTER TABLE public.test_case_categories
 ADD COLUMN IF NOT EXISTS parent_category_id UUID REFERENCES public.test_case_categories(id);
 
+-- Ensure new array/text columns exist for legacy installs
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS protocol_focus TEXT[];
+
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS layer_focus TEXT[];
+
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS standard_references TEXT[];
+
 -- ==============================================
 -- 2. ENHANCED TEST CASE DEFINITIONS
 -- ==============================================
