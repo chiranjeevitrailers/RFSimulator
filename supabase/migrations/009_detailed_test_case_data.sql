@@ -120,6 +120,11 @@ CREATE TABLE IF NOT EXISTS public.test_case_layer_parameters (
     UNIQUE(test_case_id, layer)
 );
 
+-- Ensure compliance_level column exists for legacy tables
+ALTER TABLE public.test_case_layer_parameters 
+ADD COLUMN IF NOT EXISTS compliance_level TEXT NOT NULL DEFAULT 'full' 
+    CHECK (compliance_level IN ('basic', 'enhanced', 'full'));
+
 -- ==============================================
 -- 4. PROTOCOL SPECIFIC DATA TABLES
 -- ==============================================
