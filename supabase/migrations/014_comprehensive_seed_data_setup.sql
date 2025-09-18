@@ -126,42 +126,52 @@ ON CONFLICT (name) DO UPDATE SET
 -- Insert default test configurations if they don't exist
 INSERT INTO public.test_configurations (
     name, description, category, protocol, version, configuration_data, 
-    is_template, is_public, is_default, created_by
+    is_template, is_public, is_default, user_id, created_by
 ) VALUES
 (
     'Default 5G NR Configuration',
     'Standard configuration for 5G NR test cases',
     '5G_NR', 'NR', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
+    true, true, true,
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Default 4G LTE Configuration',
     'Standard configuration for 4G LTE test cases',
     '4G_LTE', 'LTE', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
+    true, true, true,
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Default IMS/SIP Configuration',
     'Standard configuration for IMS/SIP test cases',
     'IMS_SIP', 'SIP', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
+    true, true, true,
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Performance Test Configuration',
     'Configuration optimized for performance testing',
     '5G_NR', 'NR', '1.0',
     '{"time_acceleration": 10.0, "log_level": "basic", "capture_mode": "performance", "output_format": "json"}'::jsonb,
-    true, true, false, null
+    true, true, false,
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Debug Configuration',
     'Configuration with maximum logging for debugging',
     '5G_NR', 'NR', '1.0',
     '{"time_acceleration": 0.1, "log_level": "verbose", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, false, null
+    true, true, false,
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
+    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 )
 ON CONFLICT (name, user_id) DO UPDATE SET
     description = EXCLUDED.description,
