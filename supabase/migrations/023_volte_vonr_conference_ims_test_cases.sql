@@ -446,17 +446,33 @@ LIMIT 1;
 -- ==============================================
 
 -- Insert VoLTE Call Setup Layer Parameters for first test case
-INSERT INTO public.test_case_layer_parameters (test_case_id, layer, parameter_name, parameter_type, parameter_value, parameter_unit, context, source, standard_reference, parameter_library_id, parameter_variant, parameter_priority, parameter_condition, parameter_validation_rules, parameter_measurement_criteria, parameter_relationship, parameter_dependencies, parameter_alternatives, parameter_accuracy, parameter_precision, parameter_resolution, parameter_calibration, parameter_measurement_method)
+INSERT INTO public.test_case_layer_parameters (
+    test_case_id,
+    layer,
+    layer_configuration,
+    layer_capabilities,
+    performance_metrics,
+    parameter_library_id,
+    parameter_variant,
+    parameter_priority,
+    parameter_condition,
+    parameter_validation_rules,
+    parameter_measurement_criteria,
+    parameter_relationship,
+    parameter_dependencies,
+    parameter_alternatives,
+    parameter_accuracy,
+    parameter_precision,
+    parameter_resolution,
+    parameter_calibration,
+    parameter_measurement_method
+)
 SELECT 
     tc.id as test_case_id,
     'IMS' as layer,
-    'call_setup_time' as parameter_name,
-    'measurement' as parameter_type,
-    2000 as parameter_value,
-    'ms' as parameter_unit,
-    'performance' as context,
-    'measured' as source,
-    'TS 24.229 Section 5.1.1' as standard_reference,
+    '{"parameter_name":"call_setup_time","context":"performance","unit":"ms"}'::jsonb as layer_configuration,
+    '{}'::jsonb as layer_capabilities,
+    '{"call_setup_time": {"value": 2000, "unit": "ms"}}'::jsonb as performance_metrics,
     (SELECT id FROM public.layer_parameter_library WHERE parameter_name = 'call_setup_time' AND protocol = 'VoLTE') as parameter_library_id,
     'standard' as parameter_variant,
     5 as parameter_priority,
