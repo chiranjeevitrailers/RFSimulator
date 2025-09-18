@@ -15,138 +15,141 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR PDU Session - %';
 -- ==============================================
 
 -- Test Case 1: Basic PDU Session Establishment
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 1', 'Basic PDU Session Establishment with IPv4', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify basic PDU session establishment procedure with IPv4',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "pdu_session_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 2: PDU Session Establishment with IPv6
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 2', 'PDU Session Establishment with IPv6', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with IPv6',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "ipv6_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 3: PDU Session Establishment with IPv4v6
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 3', 'PDU Session Establishment with IPv4v6', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with IPv4v6',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "ipv4v6_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 4: PDU Session Establishment with Ethernet
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 4', 'PDU Session Establishment with Ethernet', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with Ethernet',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "ethernet_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 5: PDU Session Establishment with Unstructured
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 5', 'PDU Session Establishment with Unstructured', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with Unstructured',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "unstructured_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 6: PDU Session Modification
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 6', 'PDU Session Modification with QoS Change', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_modification', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_modification', 
  'Verify PDU session modification procedure with QoS change',
  'TS 24.501 Section 6.4.2', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "qos_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "modification_time": "<2s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 7: PDU Session Release
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 7', 'PDU Session Release with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'basic', 'pdu_session_release', 
+ '5G_NR', '5G-NR', 'Multi', 'beginner', 'functional', 'pdu_session_release', 
  'Verify PDU session release procedure with normal conditions',
  'TS 24.501 Section 6.4.3', 'Release 17', 1, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "release_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "release_time": "<1s"}'::jsonb);
 
 -- Test Case 8: PDU Session Establishment with URSP
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 8', 'PDU Session Establishment with URSP', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with URSP',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "ursp_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 9: PDU Session Establishment with Network Slicing
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 9', 'PDU Session Establishment with Network Slicing', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with network slicing',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "slicing_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Test Case 10: PDU Session Establishment with QoS Flow
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR PDU Session - 10', 'PDU Session Establishment with QoS Flow', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session'),
- '5G-NR', 'Multi', 'intermediate', 'pdu_session_establishment', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'pdu_session_establishment', 
  'Verify PDU session establishment procedure with QoS flow',
  'TS 24.501 Section 6.4.1', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "qos_flow_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR PDU Session - ' || generate_series(11, 50) as name,
-    '5G NR PDU session procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR PDU Session - ' || i as name,
+    '5G NR PDU session procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR PDU Session') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'intermediate'
+        WHEN i % 4 = 0 THEN 'advanced'
+        WHEN i % 3 = 0 THEN 'intermediate'
         ELSE 'intermediate'
     END as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'pdu_session_modification'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'pdu_session_release'
+        WHEN i % 3 = 0 THEN 'pdu_session_modification'
+        WHEN i % 4 = 0 THEN 'pdu_session_release'
         ELSE 'pdu_session_establishment'
     END as test_scenario,
-    'Verify 5G NR PDU session procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR PDU session procedure with scenario ' || i as test_objective,
     'TS 24.501 Section 6.4.1' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 1
+        WHEN i % 4 = 0 THEN 1
         ELSE 2
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "establishment_time": "<3s", "throughput": ">100Mbps"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
