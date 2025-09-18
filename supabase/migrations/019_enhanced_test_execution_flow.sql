@@ -287,7 +287,7 @@ BEGIN
         COUNT(CASE WHEN ivr.is_valid = true THEN 1 END) as valid_count,
         COUNT(CASE WHEN ivr.is_valid = false THEN 1 END) as invalid_count,
         COUNT(CASE WHEN array_length(ivr.validation_warnings, 1) > 0 THEN 1 END) as warning_count,
-        ROUND((COUNT(CASE WHEN ivr.is_valid = true THEN 1 END)::DECIMAL / COUNT(*)) * 100, 2) as compliance_rate
+        ROUND(CASE WHEN COUNT(*) = 0 THEN 0 ELSE (COUNT(CASE WHEN ivr.is_valid = true THEN 1 END)::DECIMAL / COUNT(*)) * 100 END, 2) as compliance_rate
     FROM public.ie_validation_results ivr
     WHERE ivr.test_run_id = p_test_run_id
     GROUP BY ivr.ie_name
@@ -314,7 +314,7 @@ BEGIN
         COUNT(CASE WHEN lpa.is_within_spec = true THEN 1 END) as within_spec_count,
         COUNT(CASE WHEN lpa.is_within_spec = false THEN 1 END) as out_of_spec_count,
         ROUND(AVG(ABS(lpa.value_variance)), 4) as avg_variance,
-        ROUND((COUNT(CASE WHEN lpa.is_within_spec = true THEN 1 END)::DECIMAL / COUNT(*)) * 100, 2) as performance_score
+        ROUND(CASE WHEN COUNT(*) = 0 THEN 0 ELSE (COUNT(CASE WHEN lpa.is_within_spec = true THEN 1 END)::DECIMAL / COUNT(*)) * 100 END, 2) as performance_score
     FROM public.layer_parameter_analysis lpa
     WHERE lpa.test_run_id = p_test_run_id
     GROUP BY lpa.layer

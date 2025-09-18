@@ -335,7 +335,9 @@ BEGIN
         'successRate', (
             SELECT CASE 
                 WHEN COUNT(*) > 0 THEN 
-                    (COUNT(*) FILTER (WHERE status = 'completed')::DECIMAL / COUNT(*)) * 100 
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE (COUNT(*) FILTER (WHERE status = 'completed')::DECIMAL / COUNT(*)) * 100
+                    END
                 ELSE 0 
             END
             FROM backup_jobs 
