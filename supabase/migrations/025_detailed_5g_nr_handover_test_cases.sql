@@ -15,134 +15,133 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Handover - %';
 -- ==============================================
 
 -- Test Case 1: Xn-based Intra-gNB Handover
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 1', 'Xn-based Intra-gNB Handover with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify Xn-based intra-gNB handover procedure with normal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "xn_interface_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Test Case 2: Xn-based Inter-gNB Handover
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 2', 'Xn-based Inter-gNB Handover with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify Xn-based inter-gNB handover procedure with normal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "xn_interface_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Test Case 3: N2-based Handover
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 3', 'N2-based Handover with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify N2-based handover procedure with normal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "n2_interface_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Test Case 4: Conditional Handover
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 4', 'Conditional Handover with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify conditional handover procedure with normal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "conditional_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Test Case 5: Dual Active Protocol Stack (DAPS) Handover
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 5', 'Dual Active Protocol Stack (DAPS) Handover', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify DAPS handover procedure with normal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "daps_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<10ms"}'::jsonb);
 
 -- Test Case 6: Handover with Weak Signal
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 6', 'Handover with Weak Signal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify handover procedure under weak signal conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "weak_signal_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "handover_latency": "<150ms", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 7: Handover with High Mobility
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 7', 'Handover with High Mobility Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify handover procedure under high mobility conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "high_mobility_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "handover_latency": "<150ms", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 8: Handover with Interference
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 8', 'Handover with Interference Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify handover procedure under interference conditions',
  'TS 38.331 Section 9.2.3', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "interference_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "handover_latency": "<150ms", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 9: Handover with Load Balancing
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 9', 'Handover with Load Balancing', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify handover procedure for load balancing',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "load_balancing_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Test Case 10: Handover with QoS Requirements
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Handover - 10', 'Handover with QoS Requirements', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover'),
- '5G-NR', 'Multi', 'advanced', 'handover', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify handover procedure with QoS requirements',
  'TS 38.331 Section 9.2.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "qos_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Handover - ' || generate_series(11, 50) as name,
-    '5G NR handover procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Handover - ' || i as name,
+    '5G NR handover procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Handover') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
-    CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
+    'advanced' as complexity,
+    'functional' as test_type,
     'handover' as test_scenario,
-    'Verify 5G NR handover procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR handover procedure with scenario ' || i as test_objective,
     'TS 38.331 Section 9.2.3' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 4
+        WHEN i % 4 = 0 THEN 4
         ELSE 3
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "source_gnb_config": "required", "target_gnb_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "handover_latency": "<100ms", "interruption_time": "<50ms"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
