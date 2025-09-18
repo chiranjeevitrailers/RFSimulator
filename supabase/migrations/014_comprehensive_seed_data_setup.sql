@@ -163,7 +163,7 @@ INSERT INTO public.test_configurations (
     '{"time_acceleration": 0.1, "log_level": "verbose", "capture_mode": "full", "output_format": "json"}'::jsonb,
     true, true, false, null
 )
-ON CONFLICT (name, created_by) DO UPDATE SET
+ON CONFLICT (name, user_id) DO UPDATE SET
     description = EXCLUDED.description,
     category = EXCLUDED.category,
     protocol = EXCLUDED.protocol,
