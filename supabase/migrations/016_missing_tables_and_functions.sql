@@ -211,7 +211,21 @@ BEGIN
         EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_rule_type ON public.alert_rules(rule_type)';
     END IF;
 END $$;
-CREATE INDEX IF NOT EXISTS idx_alert_rules_is_active ON public.alert_rules(is_active);
+-- Create active/enabled index depending on available column
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alert_rules' AND column_name = 'is_active'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_is_active ON public.alert_rules(is_active)';
+    ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alert_rules' AND column_name = 'enabled'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alert_rules_enabled ON public.alert_rules(enabled)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_alert_rules_severity ON public.alert_rules(severity);
 
 CREATE INDEX IF NOT EXISTS idx_alerts_alert_rule_id ON public.alerts(alert_rule_id);
