@@ -347,7 +347,11 @@ SELECT
     tc.complexity,
     COUNT(tce.id) as execution_count,
     COUNT(CASE WHEN tce.status = 'completed' THEN 1 END) as successful_executions,
-    ROUND((COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100, 2) as success_rate,
+    ROUND(
+      CASE WHEN COUNT(tce.id) = 0 THEN 0
+           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(tce.id), 0)) * 100
+      END, 2
+    ) as success_rate,
     ROUND(AVG(tce.duration_ms), 2) as avg_duration_ms,
     MAX(tce.created_at) as last_execution
 FROM public.test_cases tc
