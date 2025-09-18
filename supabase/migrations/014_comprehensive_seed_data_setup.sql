@@ -124,147 +124,140 @@ ON CONFLICT (name) DO UPDATE SET
 -- ==============================================
 
 -- Insert default test configurations if they don't exist
+-- Insert each default config for admin if admin exists and config not present
 INSERT INTO public.test_configurations (
-    name, description, category, protocol, version, configuration_data, 
+    name, description, category, protocol, version, configuration_data,
     is_template, is_public, is_default, user_id, created_by
-) VALUES
-(
-    'Default 5G NR Configuration',
-    'Standard configuration for 5G NR test cases',
-    '5G_NR', 'NR', '1.0',
-    '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true,
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
-),
-(
-    'Default 4G LTE Configuration',
-    'Standard configuration for 4G LTE test cases',
-    '4G_LTE', 'LTE', '1.0',
-    '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true,
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
-),
-(
-    'Default IMS/SIP Configuration',
-    'Standard configuration for IMS/SIP test cases',
-    'IMS_SIP', 'SIP', '1.0',
-    '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true,
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
-),
-(
-    'Performance Test Configuration',
-    'Configuration optimized for performance testing',
-    '5G_NR', 'NR', '1.0',
-    '{"time_acceleration": 10.0, "log_level": "basic", "capture_mode": "performance", "output_format": "json"}'::jsonb,
-    true, true, false,
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
-),
-(
-    'Debug Configuration',
-    'Configuration with maximum logging for debugging',
-    '5G_NR', 'NR', '1.0',
-    '{"time_acceleration": 0.1, "log_level": "verbose", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, false,
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1),
-    (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 )
-ON CONFLICT (name, user_id) DO UPDATE SET
-    description = EXCLUDED.description,
-    category = EXCLUDED.category,
-    protocol = EXCLUDED.protocol,
-    version = EXCLUDED.version,
-    configuration_data = EXCLUDED.configuration_data,
-    is_template = EXCLUDED.is_template,
-    is_public = EXCLUDED.is_public,
-    is_default = EXCLUDED.is_default;
+SELECT 'Default 5G NR Configuration', 'Standard configuration for 5G NR test cases',
+       '5G_NR', 'NR', '1.0', '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
+       true, true, true, u.id, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_configurations c WHERE c.name = 'Default 5G NR Configuration' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_configurations (
+    name, description, category, protocol, version, configuration_data,
+    is_template, is_public, is_default, user_id, created_by
+)
+SELECT 'Default 4G LTE Configuration', 'Standard configuration for 4G LTE test cases',
+       '4G_LTE', 'LTE', '1.0', '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
+       true, true, true, u.id, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_configurations c WHERE c.name = 'Default 4G LTE Configuration' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_configurations (
+    name, description, category, protocol, version, configuration_data,
+    is_template, is_public, is_default, user_id, created_by
+)
+SELECT 'Default IMS/SIP Configuration', 'Standard configuration for IMS/SIP test cases',
+       'IMS_SIP', 'SIP', '1.0', '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
+       true, true, true, u.id, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_configurations c WHERE c.name = 'Default IMS/SIP Configuration' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_configurations (
+    name, description, category, protocol, version, configuration_data,
+    is_template, is_public, is_default, user_id, created_by
+)
+SELECT 'Performance Test Configuration', 'Configuration optimized for performance testing',
+       '5G_NR', 'NR', '1.0', '{"time_acceleration": 10.0, "log_level": "basic", "capture_mode": "performance", "output_format": "json"}'::jsonb,
+       true, true, false, u.id, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_configurations c WHERE c.name = 'Performance Test Configuration' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_configurations (
+    name, description, category, protocol, version, configuration_data,
+    is_template, is_public, is_default, user_id, created_by
+)
+SELECT 'Debug Configuration', 'Configuration with maximum logging for debugging',
+       '5G_NR', 'NR', '1.0', '{"time_acceleration": 0.1, "log_level": "verbose", "capture_mode": "full", "output_format": "json"}'::jsonb,
+       true, true, false, u.id, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_configurations c WHERE c.name = 'Debug Configuration' AND c.user_id = u.id
+);
 
 -- ==============================================
 -- 6. DEFAULT TEST RUN CONFIGURATIONS
 -- ==============================================
 
 -- Insert default test run configurations if they don't exist
-INSERT INTO public.test_run_configs (
-    name, description, test_ids, execution_mode, configuration, 
-    is_template, is_public, user_id
-) VALUES
-(
-    'Quick Test Suite',
-    'Fast execution of basic test cases',
-    '{}'::uuid[], 'simulation',
-    '{"time_acceleration": 5.0, "parallel_execution": true, "stop_on_failure": false}'::jsonb,
-    true, true, null
-),
-(
-    'Comprehensive Test Suite',
-    'Complete test execution with detailed analysis',
-    '{}'::uuid[], 'simulation',
-    '{"time_acceleration": 1.0, "parallel_execution": false, "stop_on_failure": true, "detailed_logging": true}'::jsonb,
-    true, true, null
-),
-(
-    'Performance Test Suite',
-    'Performance-focused test execution',
-    '{}'::uuid[], 'simulation',
-    '{"time_acceleration": 10.0, "parallel_execution": true, "performance_monitoring": true}'::jsonb,
-    true, true, null
-)
-ON CONFLICT (name, user_id) DO UPDATE SET
-    description = EXCLUDED.description,
-    test_ids = EXCLUDED.test_ids,
-    execution_mode = EXCLUDED.execution_mode,
-    configuration = EXCLUDED.configuration,
-    is_template = EXCLUDED.is_template,
-    is_public = EXCLUDED.is_public;
+-- Insert default run configs only if admin exists and not already present
+INSERT INTO public.test_run_configs (name, description, test_ids, execution_mode, configuration, is_template, is_public, user_id)
+SELECT 'Quick Test Suite', 'Fast execution of basic test cases', '{}'::uuid[], 'simulation',
+       '{"time_acceleration": 5.0, "parallel_execution": true, "stop_on_failure": false}'::jsonb,
+       true, true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs r WHERE r.name = 'Quick Test Suite' AND r.user_id = u.id
+);
+
+INSERT INTO public.test_run_configs (name, description, test_ids, execution_mode, configuration, is_template, is_public, user_id)
+SELECT 'Comprehensive Test Suite', 'Complete test execution with detailed analysis', '{}'::uuid[], 'simulation',
+       '{"time_acceleration": 1.0, "parallel_execution": false, "stop_on_failure": true, "detailed_logging": true}'::jsonb,
+       true, true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs r WHERE r.name = 'Comprehensive Test Suite' AND r.user_id = u.id
+);
+
+INSERT INTO public.test_run_configs (name, description, test_ids, execution_mode, configuration, is_template, is_public, user_id)
+SELECT 'Performance Test Suite', 'Performance-focused test execution', '{}'::uuid[], 'simulation',
+       '{"time_acceleration": 10.0, "parallel_execution": true, "performance_monitoring": true}'::jsonb,
+       true, true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs r WHERE r.name = 'Performance Test Suite' AND r.user_id = u.id
+);
 
 -- ==============================================
 -- 7. DEFAULT TEST SUITE COLLECTIONS
 -- ==============================================
 
 -- Insert default test suite collections if they don't exist
-INSERT INTO public.test_suite_collections (
-    name, description, test_ids, category, tags, is_public, user_id
-) VALUES
-(
-    '5G NR Basic Tests',
-    'Basic 5G NR test cases for initial validation',
-    '{}'::uuid[], '5G_NR', '{"basic", "5g", "nr", "initial"}'::text[],
-    true, null
-),
-(
-    '4G LTE Basic Tests',
-    'Basic 4G LTE test cases for initial validation',
-    '{}'::uuid[], '4G_LTE', '{"basic", "4g", "lte", "initial"}'::text[],
-    true, null
-),
-(
-    'IMS/SIP Basic Tests',
-    'Basic IMS/SIP test cases for voice services',
-    '{}'::uuid[], 'IMS_SIP', '{"basic", "ims", "sip", "voice"}'::text[],
-    true, null
-),
-(
-    'Performance Test Suite',
-    'Performance-focused test cases across all protocols',
-    '{}'::uuid[], 'CUSTOM', '{"performance", "stress", "load"}'::text[],
-    true, null
-),
-(
-    'Security Test Suite',
-    'Security-focused test cases for all protocols',
-    '{}'::uuid[], 'CUSTOM', '{"security", "authentication", "encryption"}'::text[],
-    true, null
-)
-ON CONFLICT (name, user_id) DO UPDATE SET
-    description = EXCLUDED.description,
-    test_ids = EXCLUDED.test_ids,
-    category = EXCLUDED.category,
-    tags = EXCLUDED.tags,
-    is_public = EXCLUDED.is_public;
+-- Insert default collections only if admin exists and not already present
+INSERT INTO public.test_suite_collections (name, description, test_ids, category, tags, is_public, user_id)
+SELECT '5G NR Basic Tests', 'Basic 5G NR test cases for initial validation', '{}'::uuid[], '5G_NR', '{"basic","5g","nr","initial"}'::text[], true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections c WHERE c.name = '5G NR Basic Tests' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_suite_collections (name, description, test_ids, category, tags, is_public, user_id)
+SELECT '4G LTE Basic Tests', 'Basic 4G LTE test cases for initial validation', '{}'::uuid[], '4G_LTE', '{"basic","4g","lte","initial"}'::text[], true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections c WHERE c.name = '4G LTE Basic Tests' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_suite_collections (name, description, test_ids, category, tags, is_public, user_id)
+SELECT 'IMS/SIP Basic Tests', 'Basic IMS/SIP test cases for voice services', '{}'::uuid[], 'IMS_SIP', '{"basic","ims","sip","voice"}'::text[], true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections c WHERE c.name = 'IMS/SIP Basic Tests' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_suite_collections (name, description, test_ids, category, tags, is_public, user_id)
+SELECT 'Performance Test Suite', 'Performance-focused test cases across all protocols', '{}'::uuid[], 'CUSTOM', '{"performance","stress","load"}'::text[], true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections c WHERE c.name = 'Performance Test Suite' AND c.user_id = u.id
+);
+
+INSERT INTO public.test_suite_collections (name, description, test_ids, category, tags, is_public, user_id)
+SELECT 'Security Test Suite', 'Security-focused test cases for all protocols', '{}'::uuid[], 'CUSTOM', '{"security","authentication","encryption"}'::text[], true, u.id
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) u
+WHERE u.id IS NOT NULL AND NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections c WHERE c.name = 'Security Test Suite' AND c.user_id = u.id
+);
 
 -- ==============================================
 -- 8. DEFAULT TEST EXECUTION WORKERS
