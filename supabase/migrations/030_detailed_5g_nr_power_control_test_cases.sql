@@ -45,109 +45,107 @@ INSERT INTO public.test_cases (name, description, category_id, category, protoco
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 4: PUCCH Power Control
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 4', 'PUCCH Power Control with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify PUCCH power control procedure with normal conditions',
  'TS 38.213 Section 7.1.2', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "pucch_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 5: SRS Power Control
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 5', 'SRS Power Control with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify SRS power control procedure with normal conditions',
  'TS 38.213 Section 7.1.3', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "srs_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 6: PRACH Power Control
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 6', 'PRACH Power Control with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify PRACH power control procedure with normal conditions',
  'TS 38.213 Section 7.1.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "prach_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 7: TPC Command Processing
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 7', 'TPC Command Processing with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify TPC command processing procedure with normal conditions',
  'TS 38.213 Section 7.1.5', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "tpc_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 8: Power Headroom Reporting
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 8', 'Power Headroom Reporting with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify power headroom reporting procedure with normal conditions',
  'TS 38.213 Section 7.1.6', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "phr_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 9: Power Control Loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 9', 'Power Control Loop with Normal Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'),
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify power control loop procedure with normal conditions',
  'TS 38.213 Section 7.1.7', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "loop_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Test Case 10: Power Control Failure
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Power Control - 10', 'Power Control Failure with Error Conditions', 
- (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'),
- '5G-NR', 'Multi', 'intermediate', 'power_control', 
+ (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control'), '5G_NR',
+ '5G-NR', 'Multi', 'intermediate', 'performance', 'power_control', 
  'Verify power control failure procedure with error conditions',
  'TS 38.213 Section 7.1.8', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "error_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Power Control - ' || generate_series(11, 50) as name,
-    '5G NR power control procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Power Control - ' || i as name,
+    '5G NR power control procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Power Control') as category_id,
     '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
+    'intermediate' as complexity,
+    'performance' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'intermediate'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'intermediate'
-        ELSE 'intermediate'
-    END as complexity,
-    CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'power_control'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'power_control_loop'
+        WHEN i % 3 = 0 THEN 'power_control'
+        WHEN i % 4 = 0 THEN 'power_control_loop'
         ELSE 'power_control'
     END as test_scenario,
-    'Verify 5G NR power control procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR power control procedure with scenario ' || i as test_objective,
     'TS 38.213 Section 7.1' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 4
+        WHEN i % 4 = 0 THEN 4
         ELSE 3
     END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "power_control_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "power_accuracy": "±1dB", "power_control_time": "<100ms"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
