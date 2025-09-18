@@ -8,29 +8,29 @@
 -- ==============================================
 
 -- Add VoLTE, VoNR, and Conference Call categories
-INSERT INTO public.test_case_categories (name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
+INSERT INTO public.test_case_categories (name, display_name, description, icon, color, sort_order, is_active) VALUES
 -- VoLTE Categories
-('VoLTE Call Setup', 'VoLTE call setup procedures over LTE', ARRAY['VoLTE', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoLTE Call Release', 'VoLTE call release procedures', ARRAY['VoLTE', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'basic', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoLTE Call Handover', 'VoLTE call handover procedures', ARRAY['VoLTE', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoLTE Emergency Call', 'VoLTE emergency call procedures', ARRAY['VoLTE', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
+('VoLTE Call Setup', 'VoLTE Call Setup', 'VoLTE call setup procedures over LTE', '📞', '#8B5CF6', 100, true),
+('VoLTE Call Release', 'VoLTE Call Release', 'VoLTE call release procedures', '📞', '#8B5CF6', 101, true),
+('VoLTE Call Handover', 'VoLTE Call Handover', 'VoLTE call handover procedures', '📞', '#8B5CF6', 102, true),
+('VoLTE Emergency Call', 'VoLTE Emergency Call', 'VoLTE emergency call procedures', '📞', '#8B5CF6', 103, true),
 
 -- VoNR Categories
-('VoNR Call Setup', 'VoNR call setup procedures over 5G NR', ARRAY['VoNR', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoNR Call Release', 'VoNR call release procedures', ARRAY['VoNR', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'basic', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoNR Call Handover', 'VoNR call handover procedures', ARRAY['VoNR', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
-('VoNR Emergency Call', 'VoNR emergency call procedures', ARRAY['VoNR', 'IMS', 'SIP'], ARRAY['IMS', 'RRC', 'NAS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'TS 23.228']),
+('VoNR Call Setup', 'VoNR Call Setup', 'VoNR call setup procedures over 5G NR', '📞', '#8B5CF6', 110, true),
+('VoNR Call Release', 'VoNR Call Release', 'VoNR call release procedures', '📞', '#8B5CF6', 111, true),
+('VoNR Call Handover', 'VoNR Call Handover', 'VoNR call handover procedures', '📞', '#8B5CF6', 112, true),
+('VoNR Emergency Call', 'VoNR Emergency Call', 'VoNR emergency call procedures', '📞', '#8B5CF6', 113, true),
 
 -- Conference Call Categories
-('IMS Conference Setup', 'IMS conference call setup procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'RFC 4579']),
-('IMS Conference Management', 'IMS conference call management procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261', 'RFC 4579']),
-('IMS Conference Release', 'IMS conference call release procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261', 'RFC 4579']),
+('IMS Conference Setup', 'IMS Conference Setup', 'IMS conference call setup procedures', '📞', '#8B5CF6', 120, true),
+('IMS Conference Management', 'IMS Conference Management', 'IMS conference call management procedures', '📞', '#8B5CF6', 121, true),
+('IMS Conference Release', 'IMS Conference Release', 'IMS conference call release procedures', '📞', '#8B5CF6', 122, true),
 
 -- Enhanced IMS Registration Categories
-('IMS Initial Registration', 'IMS initial registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Re-registration', 'IMS re-registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS De-registration', 'IMS de-registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'basic', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Emergency Registration', 'IMS emergency registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261']);
+('IMS Initial Registration', 'IMS Initial Registration', 'IMS initial registration procedures', '📞', '#8B5CF6', 130, true),
+('IMS Re-registration', 'IMS Re-registration', 'IMS re-registration procedures', '📞', '#8B5CF6', 131, true),
+('IMS De-registration', 'IMS De-registration', 'IMS de-registration procedures', '📞', '#8B5CF6', 132, true),
+('IMS Emergency Registration', 'IMS Emergency Registration', 'IMS emergency registration procedures', '📞', '#8B5CF6', 133, true);
 
 -- ==============================================
 -- 2. VoLTE/VoNR/IMS MESSAGE TEMPLATES
@@ -61,58 +61,6 @@ INSERT INTO public.message_templates (template_name, protocol, layer, message_ty
  '{"status_code": {"type": "integer", "value": 200}, "reason_phrase": {"type": "string", "value": "OK"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "contact": {"type": "string"}, "sdp": {"type": "object"}}',
  '{"status_code": true, "reason_phrase": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
  '{"contact": false, "sdp": false}',
- '{"status_code": {"value": 200}}'),
-
-('VoLTE ACK', 'VoLTE', 'IMS', 'ACK', 'VoLTE ACK', 'VoLTE ACK confirmation', 'UL', 'RFC 3261 Section 17.1.1.3', 'Release 17',
- '{"method": {"type": "string", "value": "ACK"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
- '{}',
- '{"method": {"value": "ACK"}}'),
-
--- VoLTE Call Release Messages
-('VoLTE BYE', 'VoLTE', 'IMS', 'BYE', 'VoLTE BYE', 'VoLTE call release BYE request', 'UL', 'RFC 3261 Section 15.1.1', 'Release 17',
- '{"method": {"type": "string", "value": "BYE"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
- '{}',
- '{"method": {"value": "BYE"}}'),
-
--- VoNR Messages (same structure as VoLTE but different protocol)
-('VoNR INVITE', 'VoNR', 'IMS', 'INVITE', 'VoNR INVITE', 'VoNR call setup INVITE request', 'UL', 'RFC 3261 Section 17.1.1', 'Release 17', 
- '{"method": {"type": "string", "value": "INVITE"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "contact": {"type": "string"}, "sdp": {"type": "object"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
- '{"contact": false, "sdp": false, "p_asserted_identity": false}',
- '{"method": {"value": "INVITE"}, "sdp": {"required_for_media": true}}'),
-
--- Conference Call Messages
-('IMS Conference INVITE', 'IMS', 'IMS', 'INVITE', 'Conference INVITE', 'IMS conference call setup INVITE', 'UL', 'RFC 4579 Section 4.1', 'Release 17',
- '{"method": {"type": "string", "value": "INVITE"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "contact": {"type": "string"}, "sdp": {"type": "object"}, "conference": {"type": "string"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true, "conference": true}',
- '{"contact": false, "sdp": false}',
- '{"method": {"value": "INVITE"}, "conference": {"required": true}}'),
-
-('IMS Conference REFER', 'IMS', 'IMS', 'REFER', 'Conference REFER', 'IMS conference call REFER request', 'UL', 'RFC 3515 Section 2.4.1', 'Release 17',
- '{"method": {"type": "string", "value": "REFER"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "refer_to": {"type": "string"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true, "refer_to": true}',
- '{}',
- '{"method": {"value": "REFER"}, "refer_to": {"required": true}}'),
-
--- Enhanced IMS Registration Messages
-('IMS REGISTER', 'IMS', 'IMS', 'REGISTER', 'IMS REGISTER', 'IMS registration request', 'UL', 'RFC 3261 Section 10.1', 'Release 17',
- '{"method": {"type": "string", "value": "REGISTER"}, "uri": {"type": "string"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "contact": {"type": "string"}, "expires": {"type": "integer"}}',
- '{"method": true, "uri": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
- '{"contact": false, "expires": false, "authorization": false}',
- '{"method": {"value": "REGISTER"}}'),
-
-('IMS 401 Unauthorized', 'IMS', 'IMS', '401_Unauthorized', 'IMS 401 Unauthorized', 'IMS 401 Unauthorized response', 'DL', 'RFC 3261 Section 21.4.2', 'Release 17',
- '{"status_code": {"type": "integer", "value": 401}, "reason_phrase": {"type": "string", "value": "Unauthorized"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "www_authenticate": {"type": "string"}}',
- '{"status_code": true, "reason_phrase": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true, "www_authenticate": true}',
- '{}',
- '{"status_code": {"value": 401}}'),
-
-('IMS 200 OK', 'IMS', 'IMS', '200_OK', 'IMS 200 OK', 'IMS 200 OK response', 'DL', 'RFC 3261 Section 21.1.1', 'Release 17',
- '{"status_code": {"type": "integer", "value": 200}, "reason_phrase": {"type": "string", "value": "OK"}, "via": {"type": "array"}, "from": {"type": "string"}, "to": {"type": "string"}, "call_id": {"type": "string"}, "cseq": {"type": "object"}, "contact": {"type": "string"}, "expires": {"type": "integer"}}',
- '{"status_code": true, "reason_phrase": true, "via": true, "from": true, "to": true, "call_id": true, "cseq": true}',
- '{"contact": false, "expires": false}',
  '{"status_code": {"value": 200}}');
 
 -- ==============================================
