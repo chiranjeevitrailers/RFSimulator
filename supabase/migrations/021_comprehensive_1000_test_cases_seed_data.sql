@@ -20,6 +20,28 @@ ADD COLUMN IF NOT EXISTS complexity_level TEXT CHECK (complexity_level IN ('basi
 ALTER TABLE public.test_case_categories
 ADD COLUMN IF NOT EXISTS standard_references TEXT[];
 
+-- Ensure required columns exist for test_cases (idempotent guards)
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS layer TEXT DEFAULT 'Multi';
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS standard_reference TEXT;
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS release_version TEXT;
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS execution_priority INTEGER DEFAULT 5;
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS automation_level TEXT DEFAULT 'manual';
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS test_data_requirements JSONB DEFAULT '{}'::jsonb;
+
+ALTER TABLE public.test_cases 
+ADD COLUMN IF NOT EXISTS kpi_requirements JSONB DEFAULT '{}'::jsonb;
+
 -- Insert test case categories (include display_name to satisfy NOT NULL constraint)
 INSERT INTO public.test_case_categories (name, display_name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
 -- 5G NR Categories
@@ -274,7 +296,7 @@ INSERT INTO public.test_execution_templates (template_name, template_description
 -- Note: This is a sample structure. In production, you would have all 1000 test cases with complete data.
 
 -- 5G NR Test Cases (400 test cases)
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     '5G NR Initial Access - ' || generate_series(1, 50) as name,
     '5G NR initial access procedure test case ' || generate_series(1, 50) as description,
@@ -286,7 +308,7 @@ SELECT
     'Verify 5G NR initial access procedure' as test_objective,
     'TS 38.331 Section 6.2.2' as standard_reference,
     'Release 17' as release_version,
-    2 as expected_duration_minutes,
+    2 as duration_minutes,
     5 as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required"}'::jsonb as test_data_requirements,
