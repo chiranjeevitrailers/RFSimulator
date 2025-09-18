@@ -15,76 +15,75 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Handover - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Handover Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Handover - 1', 'X2-based Intra-eNB Handover', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'),
- 'LTE', 'Multi', 'advanced', 'handover', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify X2-based intra-eNB handover procedure',
  'TS 36.331 Section 5.4.3', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell": "required", "target_cell": "required", "x2_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_time": "<100ms", "interruption_time": "<50ms"}'::jsonb),
 ('LTE Handover - 2', 'S1-based Inter-eNB Handover', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'),
- 'LTE', 'Multi', 'advanced', 'handover', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify S1-based inter-eNB handover procedure',
  'TS 36.331 Section 5.4.3', 'Release 15', 8, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell": "required", "target_cell": "required", "s1_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_time": "<200ms", "interruption_time": "<100ms"}'::jsonb),
 ('LTE Handover - 3', 'Intra-frequency Handover', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'),
- 'LTE', 'Multi', 'advanced', 'handover', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify intra-frequency handover procedure',
  'TS 36.331 Section 5.4.3', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "frequency_config": "required", "measurement_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_time": "<80ms", "interruption_time": "<40ms"}'::jsonb),
 ('LTE Handover - 4', 'Inter-frequency Handover', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'),
- 'LTE', 'Multi', 'advanced', 'handover', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify inter-frequency handover procedure',
  'TS 36.331 Section 5.4.3', 'Release 15', 7, 4, 'semi_automated',
  '{"ue_capabilities": "required", "frequency_config": "required", "measurement_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "handover_time": "<150ms", "interruption_time": "<75ms"}'::jsonb),
 ('LTE Handover - 5', 'Inter-RAT Handover to UMTS', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'),
- 'LTE', 'Multi', 'advanced', 'handover', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'handover', 
  'Verify inter-RAT handover to UMTS procedure',
  'TS 36.331 Section 5.4.3', 'Release 15', 10, 4, 'semi_automated',
  '{"ue_capabilities": "required", "lte_config": "required", "umts_config": "required", "inter_rat_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "handover_time": "<500ms", "interruption_time": "<250ms"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Handover - ' || generate_series(6, 50) as name,
-    'LTE handover procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Handover - ' || i as name,
+    'LTE handover procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Handover') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
+    'advanced' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
-    CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'handover'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'mobility'
+        WHEN i % 3 = 0 THEN 'handover'
+        WHEN i % 4 = 0 THEN 'mobility'
         ELSE 'handover'
     END as test_scenario,
-    'Verify LTE handover procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE handover procedure with scenario ' || i as test_objective,
     'TS 36.331 Section 5.4.3' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 8
+        WHEN i % 4 = 0 THEN 8
         ELSE 6
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "source_cell": "required", "target_cell": "required", "handover_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "handover_time": "<200ms", "interruption_time": "<100ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "handover_time": "<200ms", "interruption_time": "<100ms"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
