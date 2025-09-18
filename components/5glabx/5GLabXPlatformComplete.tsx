@@ -9,6 +9,7 @@ import {
   Satellite, Network, Server, Phone, MapPin, Wave, FileText, Gear,
   QuestionMark, Export, Import, Info
 } from 'lucide-react';
+import LogViewer from '@/components/logs/LogViewer';
 
 // Dashboard View Component
 const DashboardView: React.FC = () => {
@@ -470,9 +471,17 @@ const FiveGLabXPlatformComplete: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <div className="p-6"><h1 className="text-2xl font-bold text-gray-900">Logs Viewer</h1></div>;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
+        );
       case 'enhanced-logs':
-        return <EnhancedLogsView />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
+        );
       case 'layer-trace':
         return <LayerTraceView />;
       case 'callflow':

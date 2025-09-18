@@ -42,6 +42,7 @@ import {
   Export,
   Import
 } from 'lucide-react';
+import LogViewer from '@/components/logs/LogViewer';
 
 // Simple Dashboard View Component
 const DashboardView: React.FC = () => {
@@ -476,7 +477,17 @@ const FiveGLabXPlatformStable: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <LogsView />;
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="basic" />
+          </div>
+        );
+      case 'enhanced-logs':
+        return (
+          <div className="p-4 h-full overflow-hidden">
+            <LogViewer executionId="live" testCaseId="" userId="demo" mode="enhanced" />
+          </div>
+        );
       case 'test-suites':
         return <TestSuitesView />;
       default:
