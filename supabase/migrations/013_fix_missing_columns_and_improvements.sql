@@ -206,8 +206,8 @@ BEGIN
         dm.layer,
         COUNT(*) as message_count,
         ROUND(AVG(dm.processing_time_ms), 2) as avg_processing_time,
-        ROUND((COUNT(CASE WHEN dm.validation_status = 'invalid' THEN 1 END)::NUMERIC / COUNT(*)) * 100, 2) as error_rate,
-        ROUND((COUNT(CASE WHEN dm.validation_status = 'warning' THEN 1 END)::NUMERIC / COUNT(*)) * 100, 2) as warning_rate,
+        ROUND(CASE WHEN COUNT(*) = 0 THEN 0 ELSE (COUNT(CASE WHEN dm.validation_status = 'invalid' THEN 1 END)::NUMERIC / COUNT(*)) * 100 END, 2) as error_rate,
+        ROUND(CASE WHEN COUNT(*) = 0 THEN 0 ELSE (COUNT(CASE WHEN dm.validation_status = 'warning' THEN 1 END)::NUMERIC / COUNT(*)) * 100 END, 2) as warning_rate,
         ROUND(SUM(dm.message_size) / 1024.0 / 1024.0, 2) as throughput_mbps
     FROM public.decoded_messages dm
     WHERE dm.test_run_id = test_run_uuid
@@ -367,7 +367,7 @@ SELECT
     COUNT(CASE WHEN tce.status = 'completed' THEN 1 END) as successful_executions,
     COUNT(CASE WHEN tce.status = 'failed' THEN 1 END) as failed_executions,
     ROUND(AVG(tce.duration_ms), 2) as avg_execution_time,
-    ROUND((COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100, 2) as success_rate
+    ROUND(CASE WHEN COUNT(tce.id) = 0 THEN 0 ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100 END, 2) as success_rate
 FROM public.test_cases tc
 LEFT JOIN public.test_case_executions tce ON tc.id = tce.test_case_id
 WHERE tc.is_active = true
