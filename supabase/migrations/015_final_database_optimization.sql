@@ -106,7 +106,7 @@ RETURNS TABLE (
     metric_name TEXT,
     metric_value NUMERIC,
     metric_unit TEXT,
-    timestamp TIMESTAMP WITH TIME ZONE
+    metric_timestamp TIMESTAMP WITH TIME ZONE
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -236,7 +236,7 @@ SELECT
     'active_users' as metric_name,
     COUNT(DISTINCT user_id) as metric_value,
     'count' as metric_unit,
-    NOW() as timestamp
+    NOW() as metric_timestamp
 FROM public.test_case_executions
 WHERE created_at >= NOW() - INTERVAL '1 day'
 
@@ -246,7 +246,7 @@ SELECT
     'running_executions' as metric_name,
     COUNT(*) as metric_value,
     'count' as metric_unit,
-    NOW() as timestamp
+    NOW() as metric_timestamp
 FROM public.test_case_executions
 WHERE status = 'running'
 
@@ -256,7 +256,7 @@ SELECT
     'queued_executions' as metric_name,
     COUNT(*) as metric_value,
     'count' as metric_unit,
-    NOW() as timestamp
+    NOW() as metric_timestamp
 FROM public.test_run_queue
 WHERE status = 'queued'
 
@@ -266,7 +266,7 @@ SELECT
     'active_workers' as metric_name,
     COUNT(*) as metric_value,
     'count' as metric_unit,
-    NOW() as timestamp
+    NOW() as metric_timestamp
 FROM public.test_execution_workers
 WHERE status = 'active'
 
@@ -276,7 +276,7 @@ SELECT
     'avg_execution_time' as metric_name,
     ROUND(AVG(duration_ms), 2) as metric_value,
     'milliseconds' as metric_unit,
-    NOW() as timestamp
+    NOW() as metric_timestamp
 FROM public.test_case_executions
 WHERE status = 'completed'
 AND created_at >= NOW() - INTERVAL '1 day';
