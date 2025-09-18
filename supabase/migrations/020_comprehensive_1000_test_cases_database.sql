@@ -34,6 +34,10 @@ ADD COLUMN IF NOT EXISTS layer_focus TEXT[];
 ALTER TABLE public.test_case_categories
 ADD COLUMN IF NOT EXISTS standard_references TEXT[];
 
+-- Ensure complexity_level exists with valid values
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS complexity_level TEXT CHECK (complexity_level IN ('basic', 'intermediate', 'advanced', 'expert'));
+
 -- ==============================================
 -- 2. ENHANCED TEST CASE DEFINITIONS
 -- ==============================================
