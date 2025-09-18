@@ -81,16 +81,16 @@ ON CONFLICT (name) DO UPDATE SET
 ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS category TEXT;
 
 INSERT INTO public.system_settings (key, value, description, category, is_public) VALUES
-('platform_name', '5GLabX', 'Platform name displayed to users', 'general', true),
-('platform_version', '1.0.0', 'Current platform version', 'general', true),
-('max_file_upload_size_mb', '100', 'Maximum file upload size in MB', 'limits', false),
-('max_concurrent_executions', '10', 'Maximum concurrent test executions', 'limits', false),
-('default_execution_timeout_minutes', '30', 'Default execution timeout in minutes', 'execution', false),
-('enable_analytics', 'true', 'Enable user analytics collection', 'privacy', false),
-('enable_crash_reporting', 'true', 'Enable crash reporting', 'privacy', false),
-('maintenance_mode', 'false', 'Enable maintenance mode', 'system', true),
-('registration_enabled', 'true', 'Allow new user registrations', 'auth', true),
-('email_verification_required', 'true', 'Require email verification for new users', 'auth', false)
+('platform_name', to_jsonb('5GLabX'), 'Platform name displayed to users', 'general', true),
+('platform_version', to_jsonb('1.0.0'), 'Current platform version', 'general', true),
+('max_file_upload_size_mb', to_jsonb(100), 'Maximum file upload size in MB', 'limits', false),
+('max_concurrent_executions', to_jsonb(10), 'Maximum concurrent test executions', 'limits', false),
+('default_execution_timeout_minutes', to_jsonb(30), 'Default execution timeout in minutes', 'execution', false),
+('enable_analytics', to_jsonb(true), 'Enable user analytics collection', 'privacy', false),
+('enable_crash_reporting', to_jsonb(true), 'Enable crash reporting', 'privacy', false),
+('maintenance_mode', to_jsonb(false), 'Enable maintenance mode', 'system', true),
+('registration_enabled', to_jsonb(true), 'Allow new user registrations', 'auth', true),
+('email_verification_required', to_jsonb(true), 'Require email verification for new users', 'auth', false)
 ON CONFLICT (key) DO UPDATE SET
     value = EXCLUDED.value,
     description = EXCLUDED.description,
