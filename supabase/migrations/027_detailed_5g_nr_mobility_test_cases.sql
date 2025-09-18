@@ -15,138 +15,137 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Mobility - %';
 -- ==============================================
 
 -- Test Case 1: Cell Reselection (Idle Mode)
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 1', 'Cell Reselection in Idle Mode with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure in idle mode with normal conditions',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "mobility_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 2: Cell Reselection (Connected Mode)
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 2', 'Cell Reselection in Connected Mode with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure in connected mode with normal conditions',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "mobility_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 3: Cell Reselection with High Priority
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 3', 'Cell Reselection with High Priority Cell', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure with high priority cell',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "priority_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 4: Cell Reselection with Low Priority
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 4', 'Cell Reselection with Low Priority Cell', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure with low priority cell',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "priority_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 5: Cell Reselection with Equal Priority
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 5', 'Cell Reselection with Equal Priority Cell', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure with equal priority cell',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "priority_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 6: Cell Reselection with Weak Signal
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 6', 'Cell Reselection with Weak Signal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure under weak signal conditions',
  'TS 38.331 Section 5.2.4', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "weak_signal_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "reselection_time": "<3s", "interruption_time": "<200ms"}'::jsonb);
 
 -- Test Case 7: Cell Reselection with High Mobility
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 7', 'Cell Reselection with High Mobility Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure under high mobility conditions',
  'TS 38.331 Section 5.2.4', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "high_mobility_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "reselection_time": "<3s", "interruption_time": "<200ms"}'::jsonb);
 
 -- Test Case 8: Cell Reselection with Interference
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 8', 'Cell Reselection with Interference Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure under interference conditions',
  'TS 38.331 Section 5.2.4', 'Release 17', 4, 5, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "interference_config": "required"}'::jsonb,
  '{"success_rate": ">90%", "reselection_time": "<3s", "interruption_time": "<200ms"}'::jsonb);
 
 -- Test Case 9: Cell Reselection with Load Balancing
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 9', 'Cell Reselection with Load Balancing', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure for load balancing',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "load_balancing_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Test Case 10: Cell Reselection with QoS Requirements
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Mobility - 10', 'Cell Reselection with QoS Requirements', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility'),
- '5G-NR', 'Multi', 'advanced', 'cell_reselection', 
+ '5G_NR', '5G-NR', 'Multi', 'advanced', 'functional', 'cell_reselection', 
  'Verify cell reselection procedure with QoS requirements',
  'TS 38.331 Section 5.2.4', 'Release 17', 3, 4, 'semi_automated',
  '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "qos_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Mobility - ' || generate_series(11, 50) as name,
-    '5G NR mobility procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Mobility - ' || i as name,
+    '5G NR mobility procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Mobility') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
+    'advanced' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
-    CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'cell_reselection'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'mobility_management'
+        WHEN i % 3 = 0 THEN 'cell_reselection'
+        WHEN i % 4 = 0 THEN 'mobility_management'
         ELSE 'cell_reselection'
     END as test_scenario,
-    'Verify 5G NR mobility procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR mobility procedure with scenario ' || i as test_objective,
     'TS 38.331 Section 5.2.4' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 4
+        WHEN i % 4 = 0 THEN 4
         ELSE 3
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "source_cell_config": "required", "target_cell_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "reselection_time": "<2s", "interruption_time": "<100ms"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
