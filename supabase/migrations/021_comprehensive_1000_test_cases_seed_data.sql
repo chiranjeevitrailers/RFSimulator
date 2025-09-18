@@ -20,51 +20,51 @@ ADD COLUMN IF NOT EXISTS complexity_level TEXT CHECK (complexity_level IN ('basi
 ALTER TABLE public.test_case_categories
 ADD COLUMN IF NOT EXISTS standard_references TEXT[];
 
--- Insert test case categories
-INSERT INTO public.test_case_categories (name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
+-- Insert test case categories (include display_name to satisfy NOT NULL constraint)
+INSERT INTO public.test_case_categories (name, display_name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
 -- 5G NR Categories
-('5G NR Initial Access', '5G NR initial access procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 38.331', 'TS 38.211', 'TS 24.501']),
-('5G NR Handover', '5G NR handover procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 38.300']),
-('5G NR PDU Session', '5G NR PDU session management', ARRAY['5G-NR'], ARRAY['RRC', 'NAS', 'PDCP'], 'intermediate', ARRAY['TS 38.331', 'TS 24.501']),
-('5G NR Mobility', '5G NR mobility procedures', ARRAY['5G-NR'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 24.501']),
-('5G NR Security', '5G NR security procedures', ARRAY['5G-NR'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 24.501']),
-('5G NR Measurement', '5G NR measurement procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 38.331', 'TS 38.215']),
-('5G NR Power Control', '5G NR power control procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 38.331', 'TS 38.213']),
-('5G NR Scheduling', '5G NR scheduling procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC'], 'advanced', ARRAY['TS 38.331', 'TS 38.214']),
+('5G NR Initial Access', '5G NR Initial Access', '5G NR initial access procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 38.331', 'TS 38.211', 'TS 24.501']),
+('5G NR Handover', '5G NR Handover', '5G NR handover procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 38.300']),
+('5G NR PDU Session', '5G NR PDU Session', '5G NR PDU session management', ARRAY['5G-NR'], ARRAY['RRC', 'NAS', 'PDCP'], 'intermediate', ARRAY['TS 38.331', 'TS 24.501']),
+('5G NR Mobility', '5G NR Mobility', '5G NR mobility procedures', ARRAY['5G-NR'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 24.501']),
+('5G NR Security', '5G NR Security', '5G NR security procedures', ARRAY['5G-NR'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 38.331', 'TS 24.501']),
+('5G NR Measurement', '5G NR Measurement', '5G NR measurement procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 38.331', 'TS 38.215']),
+('5G NR Power Control', '5G NR Power Control', '5G NR power control procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 38.331', 'TS 38.213']),
+('5G NR Scheduling', '5G NR Scheduling', '5G NR scheduling procedures', ARRAY['5G-NR'], ARRAY['PHY', 'MAC'], 'advanced', ARRAY['TS 38.331', 'TS 38.214']),
 
 -- LTE Categories
-('LTE Initial Access', 'LTE initial access procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 36.331', 'TS 36.211', 'TS 24.301']),
-('LTE Handover', 'LTE handover procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 36.300']),
-('LTE Bearer Management', 'LTE bearer management procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS', 'PDCP'], 'intermediate', ARRAY['TS 36.331', 'TS 24.301']),
-('LTE Mobility', 'LTE mobility procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 24.301']),
-('LTE Security', 'LTE security procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 24.301']),
-('LTE Measurement', 'LTE measurement procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.214']),
-('LTE Power Control', 'LTE power control procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.213']),
-('LTE Scheduling', 'LTE scheduling procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC'], 'advanced', ARRAY['TS 36.331', 'TS 36.213']),
+('LTE Initial Access', 'LTE Initial Access', 'LTE initial access procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 36.331', 'TS 36.211', 'TS 24.301']),
+('LTE Handover', 'LTE Handover', 'LTE handover procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 36.300']),
+('LTE Bearer Management', 'LTE Bearer Management', 'LTE bearer management procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS', 'PDCP'], 'intermediate', ARRAY['TS 36.331', 'TS 24.301']),
+('LTE Mobility', 'LTE Mobility', 'LTE mobility procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 24.301']),
+('LTE Security', 'LTE Security', 'LTE security procedures', ARRAY['LTE'], ARRAY['RRC', 'NAS'], 'advanced', ARRAY['TS 36.331', 'TS 24.301']),
+('LTE Measurement', 'LTE Measurement', 'LTE measurement procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.214']),
+('LTE Power Control', 'LTE Power Control', 'LTE power control procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.213']),
+('LTE Scheduling', 'LTE Scheduling', 'LTE scheduling procedures', ARRAY['LTE'], ARRAY['PHY', 'MAC'], 'advanced', ARRAY['TS 36.331', 'TS 36.213']),
 
 -- IMS/SIP Categories
-('IMS Registration', 'IMS registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Call Setup', 'IMS call setup procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Call Release', 'IMS call release procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'basic', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Supplementary Services', 'IMS supplementary services', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261']),
-('IMS Emergency Services', 'IMS emergency services', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261']),
+('IMS Registration', 'IMS Registration', 'IMS registration procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
+('IMS Call Setup', 'IMS Call Setup', 'IMS call setup procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'intermediate', ARRAY['TS 24.229', 'RFC 3261']),
+('IMS Call Release', 'IMS Call Release', 'IMS call release procedures', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'basic', ARRAY['TS 24.229', 'RFC 3261']),
+('IMS Supplementary Services', 'IMS Supplementary Services', 'IMS supplementary services', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261']),
+('IMS Emergency Services', 'IMS Emergency Services', 'IMS emergency services', ARRAY['IMS', 'SIP'], ARRAY['IMS'], 'advanced', ARRAY['TS 24.229', 'RFC 3261']),
 
 -- O-RAN Categories
-('O-RAN E2 Interface', 'O-RAN E2 interface procedures', ARRAY['O-RAN'], ARRAY['E2'], 'advanced', ARRAY['O-RAN.WG3.E2AP', 'O-RAN.WG3.E2SM']),
-('O-RAN A1 Interface', 'O-RAN A1 interface procedures', ARRAY['O-RAN'], ARRAY['A1'], 'advanced', ARRAY['O-RAN.WG2.A1AP']),
-('O-RAN O1 Interface', 'O-RAN O1 interface procedures', ARRAY['O-RAN'], ARRAY['O1'], 'advanced', ARRAY['O-RAN.WG4.O1']),
+('O-RAN E2 Interface', 'O-RAN E2 Interface', 'O-RAN E2 interface procedures', ARRAY['O-RAN'], ARRAY['E2'], 'advanced', ARRAY['O-RAN.WG3.E2AP', 'O-RAN.WG3.E2SM']),
+('O-RAN A1 Interface', 'O-RAN A1 Interface', 'O-RAN A1 interface procedures', ARRAY['O-RAN'], ARRAY['A1'], 'advanced', ARRAY['O-RAN.WG2.A1AP']),
+('O-RAN O1 Interface', 'O-RAN O1 Interface', 'O-RAN O1 interface procedures', ARRAY['O-RAN'], ARRAY['O1'], 'advanced', ARRAY['O-RAN.WG4.O1']),
 
 -- V2X Categories
-('V2X PC5 Interface', 'V2X PC5 interface procedures', ARRAY['V2X'], ARRAY['PC5'], 'advanced', ARRAY['TS 23.285', 'TS 36.331']),
-('V2X Uu Interface', 'V2X Uu interface procedures', ARRAY['V2X'], ARRAY['Uu'], 'advanced', ARRAY['TS 23.285', 'TS 36.331']),
+('V2X PC5 Interface', 'V2X PC5 Interface', 'V2X PC5 interface procedures', ARRAY['V2X'], ARRAY['PC5'], 'advanced', ARRAY['TS 23.285', 'TS 36.331']),
+('V2X Uu Interface', 'V2X Uu Interface', 'V2X Uu interface procedures', ARRAY['V2X'], ARRAY['Uu'], 'advanced', ARRAY['TS 23.285', 'TS 36.331']),
 
 -- NTN Categories
-('NTN Initial Access', 'NTN initial access procedures', ARRAY['NTN'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'expert', ARRAY['TS 38.331', 'TS 38.211']),
-('NTN Handover', 'NTN handover procedures', ARRAY['NTN'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'expert', ARRAY['TS 38.331', 'TS 38.300']),
+('NTN Initial Access', 'NTN Initial Access', 'NTN initial access procedures', ARRAY['NTN'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'expert', ARRAY['TS 38.331', 'TS 38.211']),
+('NTN Handover', 'NTN Handover', 'NTN handover procedures', ARRAY['NTN'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'expert', ARRAY['TS 38.331', 'TS 38.300']),
 
 -- NB-IoT Categories
-('NB-IoT Initial Access', 'NB-IoT initial access procedures', ARRAY['NB-IoT'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 36.331', 'TS 36.211']),
-('NB-IoT Data Transmission', 'NB-IoT data transmission procedures', ARRAY['NB-IoT'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.213']);
+('NB-IoT Initial Access', 'NB-IoT Initial Access', 'NB-IoT initial access procedures', ARRAY['NB-IoT'], ARRAY['PHY', 'MAC', 'RRC', 'NAS'], 'intermediate', ARRAY['TS 36.331', 'TS 36.211']),
+('NB-IoT Data Transmission', 'NB-IoT Data Transmission', 'NB-IoT data transmission procedures', ARRAY['NB-IoT'], ARRAY['PHY', 'MAC', 'RRC'], 'intermediate', ARRAY['TS 36.331', 'TS 36.213']);
 
 -- ==============================================
 -- 2. MESSAGE TEMPLATES
