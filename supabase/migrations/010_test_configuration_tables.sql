@@ -361,14 +361,18 @@ CREATE POLICY "Admins can manage all versions" ON public.test_configuration_vers
 -- ==============================================
 
 -- Create triggers for updated_at on all tables
+-- Ensure idempotent trigger creation
+DROP TRIGGER IF EXISTS update_test_configurations_updated_at ON public.test_configurations;
 CREATE TRIGGER update_test_configurations_updated_at 
     BEFORE UPDATE ON public.test_configurations 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_test_configuration_templates_updated_at ON public.test_configuration_templates;
 CREATE TRIGGER update_test_configuration_templates_updated_at 
     BEFORE UPDATE ON public.test_configuration_templates 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_test_configuration_sharing_updated_at ON public.test_configuration_sharing;
 CREATE TRIGGER update_test_configuration_sharing_updated_at 
     BEFORE UPDATE ON public.test_configuration_sharing 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
