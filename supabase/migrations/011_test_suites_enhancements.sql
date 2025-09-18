@@ -242,54 +242,83 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_test_run_configs_updated_at ON public.test_run_configs;
 CREATE TRIGGER update_test_run_configs_updated_at 
     BEFORE UPDATE ON public.test_run_configs 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_test_run_schedules_updated_at ON public.test_run_schedules;
 CREATE TRIGGER update_test_run_schedules_updated_at 
     BEFORE UPDATE ON public.test_run_schedules 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_test_suite_collections_updated_at ON public.test_suite_collections;
 CREATE TRIGGER update_test_suite_collections_updated_at 
     BEFORE UPDATE ON public.test_suite_collections 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_test_execution_workers_updated_at ON public.test_execution_workers;
 CREATE TRIGGER update_test_execution_workers_updated_at 
     BEFORE UPDATE ON public.test_execution_workers 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert some sample test run configurations
-INSERT INTO public.test_run_configs (name, description, user_id, test_ids, execution_mode, configuration, is_template) VALUES
-('5G NR Basic Tests', 'Basic 5G NR initial access and handover tests', 'mock-user-id', 
- ARRAY(SELECT id FROM public.test_cases WHERE category = '5G_NR' LIMIT 5), 
- 'simulation', 
- '{"time_acceleration": 2, "log_level": "detailed"}', 
- true),
-('LTE Performance Tests', 'LTE performance and stress tests', 'mock-user-id',
- ARRAY(SELECT id FROM public.test_cases WHERE category = '4G_LTE' AND test_type = 'performance' LIMIT 3),
- 'realtime',
- '{"time_acceleration": 1, "log_level": "verbose"}',
- true),
-('Security Test Suite', 'Comprehensive security testing across all protocols', 'mock-user-id',
- ARRAY(SELECT id FROM public.test_cases WHERE test_type = 'security' LIMIT 10),
- 'simulation',
- '{"time_acceleration": 3, "log_level": "detailed", "capture_mode": "full"}',
- true);
+-- Insert sample run configs for an admin user if present; skip otherwise and avoid duplicates by name
+INSERT INTO public.test_run_configs (name, description, user_id, test_ids, execution_mode, configuration, is_template)
+SELECT '5G NR Basic Tests', 'Basic 5G NR initial access and handover tests', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE category = '5G_NR' LIMIT 5),
+       'simulation', '{"time_acceleration": 2, "log_level": "detailed"}', true
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs WHERE name = '5G NR Basic Tests'
+);
+
+INSERT INTO public.test_run_configs (name, description, user_id, test_ids, execution_mode, configuration, is_template)
+SELECT 'LTE Performance Tests', 'LTE performance and stress tests', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE category = '4G_LTE' AND test_type = 'performance' LIMIT 3),
+       'realtime', '{"time_acceleration": 1, "log_level": "verbose"}', true
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs WHERE name = 'LTE Performance Tests'
+);
+
+INSERT INTO public.test_run_configs (name, description, user_id, test_ids, execution_mode, configuration, is_template)
+SELECT 'Security Test Suite', 'Comprehensive security testing across all protocols', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE test_type = 'security' LIMIT 10),
+       'simulation', '{"time_acceleration": 3, "log_level": "detailed", "capture_mode": "full"}', true
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_run_configs WHERE name = 'Security Test Suite'
+);
 
 -- Insert some sample test suite collections
-INSERT INTO public.test_suite_collections (name, description, user_id, test_ids, tags, is_public, is_featured) VALUES
-('5G NR Complete Suite', 'Complete 5G NR test case collection', 'mock-user-id',
- ARRAY(SELECT id FROM public.test_cases WHERE category = '5G_NR'),
- ARRAY['5G', 'NR', 'complete', 'professional'],
- true, true),
-('LTE Core Tests', 'Essential LTE test cases', 'mock-user-id',
- ARRAY(SELECT id FROM public.test_cases WHERE category = '4G_LTE' AND complexity IN ('beginner', 'intermediate')),
- ARRAY['LTE', '4G', 'core', 'essential'],
- true, false),
-('Performance Benchmark', 'Performance testing across all protocols', 'mock-user-id',
- ARRAY(SELECT id FROM public.test_cases WHERE test_type = 'performance'),
- ARRAY['performance', 'benchmark', 'all-protocols'],
- true, true);
+-- Insert sample collections for an admin user if present; avoid duplicates by name
+INSERT INTO public.test_suite_collections (name, description, user_id, test_ids, tags, is_public, is_featured)
+SELECT '5G NR Complete Suite', 'Complete 5G NR test case collection', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE category = '5G_NR'),
+       ARRAY['5G', 'NR', 'complete', 'professional'], true, true
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections WHERE name = '5G NR Complete Suite'
+);
+
+INSERT INTO public.test_suite_collections (name, description, user_id, test_ids, tags, is_public, is_featured)
+SELECT 'LTE Core Tests', 'Essential LTE test cases', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE category = '4G_LTE' AND complexity IN ('beginner', 'intermediate')),
+       ARRAY['LTE', '4G', 'core', 'essential'], true, false
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections WHERE name = 'LTE Core Tests'
+);
+
+INSERT INTO public.test_suite_collections (name, description, user_id, test_ids, tags, is_public, is_featured)
+SELECT 'Performance Benchmark', 'Performance testing across all protocols', u.id,
+       ARRAY(SELECT id FROM public.test_cases WHERE test_type = 'performance'),
+       ARRAY['performance', 'benchmark', 'all-protocols'], true, true
+FROM (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1) AS u
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.test_suite_collections WHERE name = 'Performance Benchmark'
+);
 
 -- Insert sample test execution worker
 INSERT INTO public.test_execution_workers (worker_id, worker_name, status, capabilities, max_load) VALUES
