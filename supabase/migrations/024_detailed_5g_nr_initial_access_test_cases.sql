@@ -120,34 +120,35 @@ INSERT INTO public.test_cases (name, description, category_id, category, protoco
 -- Generate remaining test cases (11-50) using a loop
 INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Initial Access - ' || generate_series(11, 50) as name,
-    '5G NR initial access procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Initial Access - ' || i as name,
+    '5G NR initial access procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access') as category_id,
     '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'intermediate'
+        WHEN i % 4 = 0 THEN 'advanced'
+        WHEN i % 3 = 0 THEN 'intermediate'
         ELSE 'beginner'
     END as complexity,
     'functional' as test_type,
     'initial_access' as test_scenario,
-    'Verify 5G NR initial access procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR initial access procedure with scenario ' || i as test_objective,
     'TS 38.331 Section 6.2.2' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 3
+        WHEN i % 4 = 0 THEN 3
         ELSE 2
     END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "latency": "<5s", "rsrp": ">-100dBm"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "latency": "<5s", "rsrp": ">-100dBm"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
