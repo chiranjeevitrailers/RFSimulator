@@ -57,14 +57,35 @@ ALTER TABLE public.expected_message_flows ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expected_information_elements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expected_layer_parameters ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view expected message flows" ON public.expected_message_flows
-    FOR SELECT USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE schemaname = 'public' AND tablename = 'expected_message_flows' 
+      AND policyname = 'Users can view expected message flows'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can view expected message flows" ON public.expected_message_flows FOR SELECT USING (true)';
+  END IF;
+END $$;
 
-CREATE POLICY "Users can view expected IEs" ON public.expected_information_elements
-    FOR SELECT USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE schemaname = 'public' AND tablename = 'expected_information_elements' 
+      AND policyname = 'Users can view expected IEs'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can view expected IEs" ON public.expected_information_elements FOR SELECT USING (true)';
+  END IF;
+END $$;
 
-CREATE POLICY "Users can view expected layer params" ON public.expected_layer_parameters
-    FOR SELECT USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE schemaname = 'public' AND tablename = 'expected_layer_parameters' 
+      AND policyname = 'Users can view expected layer params'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can view expected layer params" ON public.expected_layer_parameters FOR SELECT USING (true)';
+  END IF;
+END $$;
 
 DO $$ BEGIN
     RAISE NOTICE '✅ Expected artifacts tables created (expected_message_flows, expected_information_elements, expected_layer_parameters).';
