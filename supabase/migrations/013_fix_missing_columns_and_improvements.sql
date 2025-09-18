@@ -349,7 +349,7 @@ SELECT
     COUNT(CASE WHEN dm.validation_status = 'valid' THEN 1 END) as valid_messages,
     COUNT(CASE WHEN dm.validation_status = 'invalid' THEN 1 END) as invalid_messages,
     COUNT(CASE WHEN dm.validation_status = 'warning' THEN 1 END) as warning_messages,
-    ROUND((COUNT(CASE WHEN dm.validation_status = 'valid' THEN 1 END)::NUMERIC / COUNT(*)) * 100, 2) as success_rate
+    ROUND(CASE WHEN COUNT(*) = 0 THEN 0 ELSE (COUNT(CASE WHEN dm.validation_status = 'valid' THEN 1 END)::NUMERIC / COUNT(*)) * 100 END, 2) as success_rate
 FROM public.decoded_messages dm
 GROUP BY dm.layer
 ORDER BY dm.layer;

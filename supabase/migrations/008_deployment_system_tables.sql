@@ -356,7 +356,7 @@ BEGIN
             SELECT CASE 
                 WHEN COUNT(*) > 0 THEN 
                     CASE WHEN COUNT(*) = 0 THEN 0
-                         ELSE (COUNT(*) FILTER (WHERE status = 'completed')::DECIMAL / COUNT(*)) * 100
+                         ELSE (COUNT(*) FILTER (WHERE status = 'completed')::DECIMAL / NULLIF(COUNT(*), 0)) * 100
                     END 
                 ELSE 0 
             END
