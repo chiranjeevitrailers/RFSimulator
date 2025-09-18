@@ -7,6 +7,19 @@
 -- 1. TEST CASE CATEGORIES
 -- ==============================================
 
+-- Ensure required columns exist for categories (idempotent guards)
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS protocol_focus TEXT[];
+
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS layer_focus TEXT[];
+
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS complexity_level TEXT CHECK (complexity_level IN ('basic', 'intermediate', 'advanced', 'expert'));
+
+ALTER TABLE public.test_case_categories
+ADD COLUMN IF NOT EXISTS standard_references TEXT[];
+
 -- Insert test case categories
 INSERT INTO public.test_case_categories (name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
 -- 5G NR Categories
