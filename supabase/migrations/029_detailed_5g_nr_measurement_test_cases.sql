@@ -15,138 +15,137 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Measurement - %';
 -- ==============================================
 
 -- Test Case 1: RSRP Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 1', 'RSRP Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify RSRP measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.1', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "rsrp_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 2: RSRQ Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 2', 'RSRQ Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify RSRQ measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "rsrq_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 3: SINR Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 3', 'SINR Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify SINR measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.3', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "sinr_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 4: RSSI Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 4', 'RSSI Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify RSSI measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.4', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "rssi_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 5: CQI Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 5', 'CQI Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify CQI measurement procedure with normal conditions',
  'TS 38.214 Section 5.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "cqi_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 6: RI Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 6', 'RI Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify RI measurement procedure with normal conditions',
  'TS 38.214 Section 5.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "ri_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 7: PMI Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 7', 'PMI Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify PMI measurement procedure with normal conditions',
  'TS 38.214 Section 5.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "pmi_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 8: CSI Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 8', 'CSI Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify CSI measurement procedure with normal conditions',
  'TS 38.214 Section 5.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "csi_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 9: Timing Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 9', 'Timing Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify timing measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.5', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "timing_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1μs", "measurement_time": "<500ms"}'::jsonb);
 
 -- Test Case 10: Frequency Measurement
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Measurement - 10', 'Frequency Measurement with Normal Conditions', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement'),
- '5G-NR', 'Multi', 'intermediate', 'measurement', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify frequency measurement procedure with normal conditions',
  'TS 38.215 Section 5.1.6', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "frequency_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_accuracy": "±1Hz", "measurement_time": "<500ms"}'::jsonb);
 
 -- Generate remaining test cases (11-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    '5G NR Measurement - ' || generate_series(11, 50) as name,
-    '5G NR measurement procedure test case ' || generate_series(11, 50) || ' with various scenarios' as description,
+    '5G NR Measurement - ' || i as name,
+    '5G NR measurement procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Measurement') as category_id,
+    '5G_NR' as category,
     '5G-NR' as protocol,
     'Multi' as layer,
+    'intermediate' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'intermediate'
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'intermediate'
-        ELSE 'intermediate'
-    END as complexity,
-    CASE 
-        WHEN generate_series(11, 50) % 3 = 0 THEN 'measurement'
-        WHEN generate_series(11, 50) % 4 = 0 THEN 'measurement_reporting'
+        WHEN i % 3 = 0 THEN 'measurement'
+        WHEN i % 4 = 0 THEN 'measurement_reporting'
         ELSE 'measurement'
     END as test_scenario,
-    'Verify 5G NR measurement procedure with scenario ' || generate_series(11, 50) as test_objective,
+    'Verify 5G NR measurement procedure with scenario ' || i as test_objective,
     'TS 38.215 Section 5.1.1' as standard_reference,
     'Release 17' as release_version,
     CASE 
-        WHEN generate_series(11, 50) % 4 = 0 THEN 3
+        WHEN i % 4 = 0 THEN 3
         ELSE 2
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(11, 50) % 5 = 0 THEN 3
-        WHEN generate_series(11, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required", "scenario_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "measurement_accuracy": "±1dB", "measurement_time": "<500ms"}'::jsonb as kpi_requirements
+FROM generate_series(11, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT DETAILED MESSAGE FLOWS FOR EACH TEST CASE
