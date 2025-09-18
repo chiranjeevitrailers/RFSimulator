@@ -228,7 +228,21 @@ BEGIN
 END $$;
 CREATE INDEX IF NOT EXISTS idx_alert_rules_severity ON public.alert_rules(severity);
 
-CREATE INDEX IF NOT EXISTS idx_alerts_alert_rule_id ON public.alerts(alert_rule_id);
+-- Create alert rule FK index based on existing column name (compat with legacy 'rule_id')
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alerts' AND column_name = 'alert_rule_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alerts_alert_rule_id ON public.alerts(alert_rule_id)';
+    ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'alerts' AND column_name = 'rule_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_alerts_rule_id ON public.alerts(rule_id)';
+    END IF;
+END $$;
 DO $$
 BEGIN
     IF EXISTS (
