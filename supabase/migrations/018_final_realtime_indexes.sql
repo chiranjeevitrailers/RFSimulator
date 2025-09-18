@@ -36,5 +36,5 @@ BEGIN
     RAISE NOTICE '✅ Final real-time indexes migration completed successfully!';
     RAISE NOTICE '📈 Added missing timestamp index for test_case_messages';
     RAISE NOTICE '⚡ Added additional performance indexes for real-time simulation';
-    RAISE NOTICE '🎯 Database is now 100% ready for real-time simulation!';
+    RAISE NOTICE '🎯 Database is now 100%% ready for real-time simulation!';
 END $$;
