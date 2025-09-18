@@ -133,21 +133,21 @@ INSERT INTO public.test_configurations (
     'Standard configuration for 5G NR test cases',
     '5G_NR', 'NR', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, null
+    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Default 4G LTE Configuration',
     'Standard configuration for 4G LTE test cases',
     '4G_LTE', 'LTE', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, null
+    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Default IMS/SIP Configuration',
     'Standard configuration for IMS/SIP test cases',
     'IMS_SIP', 'SIP', '1.0',
     '{"time_acceleration": 1.0, "log_level": "detailed", "capture_mode": "full", "output_format": "json"}'::jsonb,
-    true, true, true, null
+    true, true, true, (SELECT id FROM public.users WHERE role = 'admin' LIMIT 1)
 ),
 (
     'Performance Test Configuration',
