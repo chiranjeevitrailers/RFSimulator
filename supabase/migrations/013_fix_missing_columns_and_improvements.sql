@@ -73,6 +73,10 @@ ADD COLUMN IF NOT EXISTS usage_count INTEGER DEFAULT 0;
 CREATE INDEX IF NOT EXISTS idx_test_run_configs_version ON public.test_run_configs(version);
 CREATE INDEX IF NOT EXISTS idx_test_run_configs_is_default ON public.test_run_configs(is_default);
 
+-- Ensure test_configurations has created_by column for audit/ownership
+ALTER TABLE public.test_configurations 
+ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES public.users(id) ON DELETE SET NULL;
+
 -- Add missing columns to test_suite_collections for better organization
 ALTER TABLE public.test_suite_collections 
 ADD COLUMN IF NOT EXISTS category TEXT,
