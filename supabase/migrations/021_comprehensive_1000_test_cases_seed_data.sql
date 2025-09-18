@@ -7,40 +7,7 @@
 -- 1. TEST CASE CATEGORIES
 -- ==============================================
 
--- Ensure required columns exist for categories (idempotent guards)
-ALTER TABLE public.test_case_categories
-ADD COLUMN IF NOT EXISTS protocol_focus TEXT[];
-
-ALTER TABLE public.test_case_categories
-ADD COLUMN IF NOT EXISTS layer_focus TEXT[];
-
-ALTER TABLE public.test_case_categories
-ADD COLUMN IF NOT EXISTS complexity_level TEXT CHECK (complexity_level IN ('basic', 'intermediate', 'advanced', 'expert'));
-
-ALTER TABLE public.test_case_categories
-ADD COLUMN IF NOT EXISTS standard_references TEXT[];
-
--- Ensure required columns exist for test_cases (idempotent guards)
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS layer TEXT DEFAULT 'Multi';
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS standard_reference TEXT;
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS release_version TEXT;
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS execution_priority INTEGER DEFAULT 5;
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS automation_level TEXT DEFAULT 'manual';
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS test_data_requirements JSONB DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.test_cases 
-ADD COLUMN IF NOT EXISTS kpi_requirements JSONB DEFAULT '{}'::jsonb;
+-- Note: DDL guards are handled in migrations. This seed file performs inserts only.
 
 -- Insert test case categories (include display_name to satisfy NOT NULL constraint)
 INSERT INTO public.test_case_categories (name, display_name, description, protocol_focus, layer_focus, complexity_level, standard_references) VALUES
