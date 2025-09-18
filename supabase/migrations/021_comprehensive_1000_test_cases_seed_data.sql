@@ -185,41 +185,41 @@ INSERT INTO public.information_element_library (ie_name, ie_type, protocol, laye
 -- Insert comprehensive layer parameter library
 INSERT INTO public.layer_parameter_library (parameter_name, parameter_type, layer, protocol, parameter_category, parameter_description, data_type, unit, default_value, min_value, max_value, standard_reference, release_version) VALUES
 -- 5G NR PHY Parameters
-('rsrp', 'measurement', 'PHY', '5G-NR', 'radio', 'Reference Signal Received Power', 'integer', 'dBm', -80, -140, -44, 'TS 38.215 Section 5.1.1', 'Release 17'),
-('rsrq', 'measurement', 'PHY', '5G-NR', 'radio', 'Reference Signal Received Quality', 'integer', 'dB', -10, -19, 3, 'TS 38.215 Section 5.1.2', 'Release 17'),
-('sinr', 'measurement', 'PHY', '5G-NR', 'radio', 'Signal to Interference plus Noise Ratio', 'integer', 'dB', 15, -23, 40, 'TS 38.215 Section 5.1.3', 'Release 17'),
-('cqi', 'measurement', 'PHY', '5G-NR', 'radio', 'Channel Quality Indicator', 'integer', 'index', 8, 0, 15, 'TS 38.214 Section 5.2.2', 'Release 17'),
-('pmi', 'measurement', 'PHY', '5G-NR', 'radio', 'Precoding Matrix Indicator', 'integer', 'index', 0, 0, 63, 'TS 38.214 Section 5.2.2', 'Release 17'),
-('ri', 'measurement', 'PHY', '5G-NR', 'radio', 'Rank Indicator', 'integer', 'index', 1, 1, 4, 'TS 38.214 Section 5.2.2', 'Release 17'),
+('rsrp', 'measurement', 'PHY', '5G-NR', 'radio', 'Reference Signal Received Power', 'integer', 'dBm', to_jsonb(-80), to_jsonb(-140), to_jsonb(-44), 'TS 38.215 Section 5.1.1', 'Release 17'),
+('rsrq', 'measurement', 'PHY', '5G-NR', 'radio', 'Reference Signal Received Quality', 'integer', 'dB', to_jsonb(-10), to_jsonb(-19), to_jsonb(3), 'TS 38.215 Section 5.1.2', 'Release 17'),
+('sinr', 'measurement', 'PHY', '5G-NR', 'radio', 'Signal to Interference plus Noise Ratio', 'integer', 'dB', to_jsonb(15), to_jsonb(-23), to_jsonb(40), 'TS 38.215 Section 5.1.3', 'Release 17'),
+('cqi', 'measurement', 'PHY', '5G-NR', 'radio', 'Channel Quality Indicator', 'integer', 'index', to_jsonb(8), to_jsonb(0), to_jsonb(15), 'TS 38.214 Section 5.2.2', 'Release 17'),
+('pmi', 'measurement', 'PHY', '5G-NR', 'radio', 'Precoding Matrix Indicator', 'integer', 'index', to_jsonb(0), to_jsonb(0), to_jsonb(63), 'TS 38.214 Section 5.2.2', 'Release 17'),
+('ri', 'measurement', 'PHY', '5G-NR', 'radio', 'Rank Indicator', 'integer', 'index', to_jsonb(1), to_jsonb(1), to_jsonb(4), 'TS 38.214 Section 5.2.2', 'Release 17'),
 
 -- 5G NR MAC Parameters
-('harq_process_id', 'configuration', 'MAC', '5G-NR', 'configuration', 'HARQ Process Identifier', 'integer', 'process_id', 0, 0, 15, 'TS 38.321 Section 5.4.2', 'Release 17'),
-('ndi', 'configuration', 'MAC', '5G-NR', 'configuration', 'New Data Indicator', 'boolean', 'flag', false, false, true, 'TS 38.321 Section 5.4.2', 'Release 17'),
-('rv', 'configuration', 'MAC', '5G-NR', 'configuration', 'Redundancy Version', 'integer', 'version', 0, 0, 3, 'TS 38.321 Section 5.4.2', 'Release 17'),
-('mcs', 'configuration', 'MAC', '5G-NR', 'configuration', 'Modulation and Coding Scheme', 'integer', 'index', 10, 0, 27, 'TS 38.214 Section 5.1.3', 'Release 17'),
+('harq_process_id', 'configuration', 'MAC', '5G-NR', 'configuration', 'HARQ Process Identifier', 'integer', 'process_id', to_jsonb(0), to_jsonb(0), to_jsonb(15), 'TS 38.321 Section 5.4.2', 'Release 17'),
+('ndi', 'configuration', 'MAC', '5G-NR', 'configuration', 'New Data Indicator', 'boolean', 'flag', to_jsonb(false), to_jsonb(false), to_jsonb(true), 'TS 38.321 Section 5.4.2', 'Release 17'),
+('rv', 'configuration', 'MAC', '5G-NR', 'configuration', 'Redundancy Version', 'integer', 'version', to_jsonb(0), to_jsonb(0), to_jsonb(3), 'TS 38.321 Section 5.4.2', 'Release 17'),
+('mcs', 'configuration', 'MAC', '5G-NR', 'configuration', 'Modulation and Coding Scheme', 'integer', 'index', to_jsonb(10), to_jsonb(0), to_jsonb(27), 'TS 38.214 Section 5.1.3', 'Release 17'),
 
 -- 5G NR RRC Parameters
-('rrc_transaction_id', 'configuration', 'RRC', '5G-NR', 'configuration', 'RRC Transaction Identifier', 'integer', 'transaction_id', 0, 0, 3, 'TS 38.331 Section 6.2.2', 'Release 17'),
-('radio_bearer_config', 'configuration', 'RRC', '5G-NR', 'configuration', 'Radio Bearer Configuration', 'object', 'config', '{}', '{}', '{}', 'TS 38.331 Section 6.3.2', 'Release 17'),
-('measurement_config', 'configuration', 'RRC', '5G-NR', 'configuration', 'Measurement Configuration', 'object', 'config', '{}', '{}', '{}', 'TS 38.331 Section 6.3.5', 'Release 17'),
-('security_config', 'configuration', 'RRC', '5G-NR', 'security', 'Security Configuration', 'object', 'config', '{}', '{}', '{}', 'TS 38.331 Section 6.3.2', 'Release 17'),
+('rrc_transaction_id', 'configuration', 'RRC', '5G-NR', 'configuration', 'RRC Transaction Identifier', 'integer', 'transaction_id', to_jsonb(0), to_jsonb(0), to_jsonb(3), 'TS 38.331 Section 6.2.2', 'Release 17'),
+('radio_bearer_config', 'configuration', 'RRC', '5G-NR', 'configuration', 'Radio Bearer Configuration', 'object', 'config', '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, 'TS 38.331 Section 6.3.2', 'Release 17'),
+('measurement_config', 'configuration', 'RRC', '5G-NR', 'configuration', 'Measurement Configuration', 'object', 'config', '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, 'TS 38.331 Section 6.3.5', 'Release 17'),
+('security_config', 'configuration', 'RRC', '5G-NR', 'security', 'Security Configuration', 'object', 'config', '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, 'TS 38.331 Section 6.3.2', 'Release 17'),
 
 -- 5G NR NAS Parameters
-('security_context', 'configuration', 'NAS', '5G-NR', 'security', 'Security Context', 'object', 'context', '{"integrity_protection": "enabled", "ciphering": "enabled", "key_set_id": 0}', '{}', '{}', 'TS 24.501 Section 8.2.1', 'Release 17'),
-('5g_guti', 'identity', 'NAS', '5G-NR', 'mobility', '5G Globally Unique Temporary Identity', 'string', 'identity', '', '', '', 'TS 24.501 Section 8.2.2', 'Release 17'),
-('allowed_nssai', 'configuration', 'NAS', '5G-NR', 'configuration', 'Allowed Network Slice Selection Assistance Information', 'array', 'nssai', '[]', '[]', '[]', 'TS 24.501 Section 8.2.2', 'Release 17'),
-('registration_type', 'configuration', 'NAS', '5G-NR', 'mobility', 'Registration Type', 'enumerated', 'type', 'initial', 'initial', 'emergency', 'TS 24.501 Section 8.2.1', 'Release 17'),
+('security_context', 'configuration', 'NAS', '5G-NR', 'security', 'Security Context', 'object', 'context', '{"integrity_protection": "enabled", "ciphering": "enabled", "key_set_id": 0}'::jsonb, '{}'::jsonb, '{}'::jsonb, 'TS 24.501 Section 8.2.1', 'Release 17'),
+('5g_guti', 'identity', 'NAS', '5G-NR', 'mobility', '5G Globally Unique Temporary Identity', 'string', 'identity', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'TS 24.501 Section 8.2.2', 'Release 17'),
+('allowed_nssai', 'configuration', 'NAS', '5G-NR', 'configuration', 'Allowed Network Slice Selection Assistance Information', 'array', 'nssai', '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, 'TS 24.501 Section 8.2.2', 'Release 17'),
+('registration_type', 'configuration', 'NAS', '5G-NR', 'mobility', 'Registration Type', 'enumerated', 'type', to_jsonb('initial'::text), to_jsonb('initial'::text), to_jsonb('emergency'::text), 'TS 24.501 Section 8.2.1', 'Release 17'),
 
 -- LTE Parameters
-('rsrp_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Reference Signal Received Power', 'integer', 'dBm', -80, -140, -44, 'TS 36.214 Section 5.1.1', 'Release 14'),
-('rsrq_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Reference Signal Received Quality', 'integer', 'dB', -10, -19, 3, 'TS 36.214 Section 5.1.2', 'Release 14'),
-('cqi_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Channel Quality Indicator', 'integer', 'index', 8, 0, 15, 'TS 36.213 Section 7.2.3', 'Release 14'),
+('rsrp_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Reference Signal Received Power', 'integer', 'dBm', to_jsonb(-80), to_jsonb(-140), to_jsonb(-44), 'TS 36.214 Section 5.1.1', 'Release 14'),
+('rsrq_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Reference Signal Received Quality', 'integer', 'dB', to_jsonb(-10), to_jsonb(-19), to_jsonb(3), 'TS 36.214 Section 5.1.2', 'Release 14'),
+('cqi_lte', 'measurement', 'PHY', 'LTE', 'radio', 'LTE Channel Quality Indicator', 'integer', 'index', to_jsonb(8), to_jsonb(0), to_jsonb(15), 'TS 36.213 Section 7.2.3', 'Release 14'),
 
 -- IMS Parameters
-('sip_contact', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP Contact header', 'string', 'uri', '', '', '', 'RFC 3261 Section 20.10', 'Release 17'),
-('sip_expires', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP Expires header', 'integer', 'seconds', 3600, 0, 4294967295, 'RFC 3261 Section 20.19', 'Release 17'),
-('sip_call_id', 'identity', 'IMS', 'IMS', 'identity', 'SIP Call-ID header', 'string', 'call_id', '', '', '', 'RFC 3261 Section 20.8', 'Release 17'),
-('sip_cseq', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP CSeq header', 'object', 'cseq', '{"method": "", "sequence": 0}', '{}', '{}', 'RFC 3261 Section 20.16', 'Release 17');
+('sip_contact', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP Contact header', 'string', 'uri', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'RFC 3261 Section 20.10', 'Release 17'),
+('sip_expires', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP Expires header', 'integer', 'seconds', to_jsonb(3600), to_jsonb(0), to_jsonb(4294967295), 'RFC 3261 Section 20.19', 'Release 17'),
+('sip_call_id', 'identity', 'IMS', 'IMS', 'identity', 'SIP Call-ID header', 'string', 'call_id', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'RFC 3261 Section 20.8', 'Release 17'),
+('sip_cseq', 'configuration', 'IMS', 'IMS', 'configuration', 'SIP CSeq header', 'object', 'cseq', '{"method": "", "sequence": 0}'::jsonb, '{}'::jsonb, '{}'::jsonb, 'RFC 3261 Section 20.16', 'Release 17');
 
 -- ==============================================
 -- 5. TEST EXECUTION TEMPLATES
