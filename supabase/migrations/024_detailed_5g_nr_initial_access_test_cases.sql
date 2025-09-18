@@ -15,40 +15,40 @@ DELETE FROM public.test_cases WHERE name LIKE '5G NR Initial Access - %';
 -- ==============================================
 
 -- Test Case 1: Basic Initial Access
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Initial Access - 1', 'Basic 5G NR Initial Access with Normal RRC Setup', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access'),
- '5G-NR', 'Multi', 'basic', 'initial_access', 
+ '5G_NR', '5G-NR', 'Multi', 'beginner', 'functional', 'initial_access', 
  'Verify basic 5G NR initial access procedure with normal RRC setup',
  'TS 38.331 Section 6.2.2', 'Release 17', 2, 5, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "cell_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "latency": "<5s", "rsrp": ">-100dBm"}'::jsonb);
 
 -- Test Case 2: Initial Access with Emergency
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Initial Access - 2', '5G NR Initial Access with Emergency Establishment Cause', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access'),
- '5G-NR', 'Multi', 'intermediate', 'initial_access', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify 5G NR initial access with emergency establishment cause',
  'TS 38.331 Section 6.2.2', 'Release 17', 2, 3, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "emergency_config": "required"}'::jsonb,
  '{"success_rate": ">98%", "latency": "<3s", "rsrp": ">-100dBm"}'::jsonb);
 
 -- Test Case 3: Initial Access with High Priority
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Initial Access - 3', '5G NR Initial Access with High Priority Access', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access'),
- '5G-NR', 'Multi', 'intermediate', 'initial_access', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify 5G NR initial access with high priority access',
  'TS 38.331 Section 6.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "priority_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "latency": "<4s", "rsrp": ">-100dBm"}'::jsonb);
 
 -- Test Case 4: Initial Access with MPS Priority
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('5G NR Initial Access - 4', '5G NR Initial Access with MPS Priority Access', 
  (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access'),
- '5G-NR', 'Multi', 'intermediate', 'initial_access', 
+ '5G_NR', '5G-NR', 'Multi', 'intermediate', 'functional', 'initial_access', 
  'Verify 5G NR initial access with MPS priority access',
  'TS 38.331 Section 6.2.2', 'Release 17', 2, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "mps_config": "required"}'::jsonb,
