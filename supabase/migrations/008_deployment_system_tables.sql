@@ -48,10 +48,14 @@ CREATE TABLE IF NOT EXISTS environments (
     health JSONB NOT NULL DEFAULT '{}',
     resources JSONB NOT NULL DEFAULT '{}',
     monitoring JSONB NOT NULL DEFAULT '{}',
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
+
+-- Ensure column exists on re-runs
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS enabled BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- Deployment Pipelines Table
 CREATE TABLE IF NOT EXISTS deployment_pipelines (
@@ -151,6 +155,7 @@ CREATE INDEX IF NOT EXISTS idx_deployments_version ON deployments(version);
 CREATE INDEX IF NOT EXISTS idx_environments_type ON environments(type);
 CREATE INDEX IF NOT EXISTS idx_environments_status ON environments(status);
 CREATE INDEX IF NOT EXISTS idx_environments_url ON environments(url);
+CREATE INDEX IF NOT EXISTS idx_environments_enabled ON environments(enabled);
 
 CREATE INDEX IF NOT EXISTS idx_deployment_pipelines_enabled ON deployment_pipelines(enabled);
 
