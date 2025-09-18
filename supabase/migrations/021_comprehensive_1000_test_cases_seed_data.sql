@@ -263,14 +263,14 @@ INSERT INTO public.test_execution_templates (template_name, template_description
 -- Note: This is a sample structure. In production, you would have all 1000 test cases with complete data.
 
 -- 5G NR Test Cases (400 test cases)
-INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, protocol_layers, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
     '5G NR Initial Access - ' || generate_series(1, 50) as name,
     '5G NR initial access procedure test case ' || generate_series(1, 50) as description,
     (SELECT id FROM public.test_case_categories WHERE name = '5G NR Initial Access') as category_id,
     '5G_NR' as category,
     '5G-NR' as protocol,
-    'Multi' as layer,
+    '{"Multi"}'::text[] as protocol_layers,
     'intermediate' as complexity,
     'functional' as test_type,
     'initial_access' as test_scenario,
