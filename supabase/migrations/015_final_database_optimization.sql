@@ -64,7 +64,7 @@ BEGIN
         ROUND(AVG(duration_ms), 2) as avg_execution_time,
         ROUND(
           CASE WHEN COUNT(*) = 0 THEN 0
-               ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100
+               ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(*), 0)) * 100
           END, 2
         ) as success_rate,
         MAX(start_time) as last_execution
@@ -94,7 +94,7 @@ BEGIN
         COUNT(tce.id) as execution_count,
         ROUND(
           CASE WHEN COUNT(tce.id) = 0 THEN 0
-               ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+               ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(tce.id), 0)) * 100
           END, 2
         ) as success_rate,
         ROUND(AVG(tce.duration_ms), 2) as avg_duration
@@ -212,7 +212,7 @@ SELECT
     ROUND(AVG(tce.duration_ms), 2) as avg_duration_ms,
     ROUND(
       CASE WHEN COUNT(tce.id) = 0 THEN 0
-           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(tce.id), 0)) * 100
       END, 2
     ) as success_rate,
     ROUND(MIN(tce.duration_ms), 2) as min_duration_ms,
@@ -238,7 +238,7 @@ SELECT
     MAX(tce.created_at) as last_execution,
     ROUND(
       CASE WHEN COUNT(tce.id) = 0 THEN 0
-           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / COUNT(tce.id)) * 100
+           ELSE (COUNT(CASE WHEN tce.status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(tce.id), 0)) * 100
       END, 2
     ) as success_rate
 FROM public.users u
@@ -329,7 +329,7 @@ SELECT
     ROUND(AVG(duration_ms), 2) as avg_duration_ms,
     ROUND(
       CASE WHEN COUNT(*) = 0 THEN 0
-           ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / COUNT(*)) * 100
+           ELSE (COUNT(CASE WHEN status = 'completed' THEN 1 END)::NUMERIC / NULLIF(COUNT(*), 0)) * 100
       END, 2
     ) as success_rate
 FROM public.test_case_executions
