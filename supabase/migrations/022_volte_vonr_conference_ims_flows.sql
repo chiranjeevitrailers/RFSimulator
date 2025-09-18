@@ -99,35 +99,35 @@ INSERT INTO public.information_element_library (ie_name, ie_type, protocol, laye
 -- VoLTE/VoNR/IMS Layer Parameters
 INSERT INTO public.layer_parameter_library (parameter_name, parameter_type, layer, protocol, parameter_category, parameter_description, data_type, unit, default_value, min_value, max_value, standard_reference, release_version) VALUES
 -- VoLTE/VoNR Parameters
-('call_setup_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE call setup time', 'integer', 'ms', 2000, 0, 10000, 'TS 24.229 Section 5.1.1', 'Release 17'),
-('call_release_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE call release time', 'integer', 'ms', 1000, 0, 5000, 'TS 24.229 Section 5.1.2', 'Release 17'),
-('media_negotiation_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE media negotiation time', 'integer', 'ms', 500, 0, 2000, 'TS 24.229 Section 5.1.3', 'Release 17'),
-('sip_response_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'SIP response time for VoLTE', 'integer', 'ms', 100, 0, 1000, 'RFC 3261 Section 17.1.1', 'Release 17'),
-('audio_codec', 'configuration', 'IMS', 'VoLTE', 'media', 'Audio codec for VoLTE call', 'string', 'codec', 'AMR-WB', 'AMR', 'EVS', 'TS 26.114 Section 5.1', 'Release 17'),
-('video_codec', 'configuration', 'IMS', 'VoLTE', 'media', 'Video codec for VoLTE call', 'string', 'codec', 'H.264', 'H.263', 'H.265', 'TS 26.114 Section 5.2', 'Release 17'),
-('rtp_payload_type', 'configuration', 'IMS', 'VoLTE', 'media', 'RTP payload type for VoLTE', 'integer', 'type', 96, 0, 127, 'RFC 3551 Section 6', 'Release 17'),
-('rtp_port', 'configuration', 'IMS', 'VoLTE', 'media', 'RTP port for VoLTE media', 'integer', 'port', 5004, 1024, 65535, 'RFC 3550 Section 5.1', 'Release 17'),
-('rtcp_port', 'configuration', 'IMS', 'VoLTE', 'media', 'RTCP port for VoLTE media', 'integer', 'port', 5005, 1024, 65535, 'RFC 3550 Section 5.1', 'Release 17'),
+('call_setup_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE call setup time', 'integer', 'ms', to_jsonb(2000), to_jsonb(0), to_jsonb(10000), 'TS 24.229 Section 5.1.1', 'Release 17'),
+('call_release_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE call release time', 'integer', 'ms', to_jsonb(1000), to_jsonb(0), to_jsonb(5000), 'TS 24.229 Section 5.1.2', 'Release 17'),
+('media_negotiation_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'VoLTE media negotiation time', 'integer', 'ms', to_jsonb(500), to_jsonb(0), to_jsonb(2000), 'TS 24.229 Section 5.1.3', 'Release 17'),
+('sip_response_time', 'measurement', 'IMS', 'VoLTE', 'performance', 'SIP response time for VoLTE', 'integer', 'ms', to_jsonb(100), to_jsonb(0), to_jsonb(1000), 'RFC 3261 Section 17.1.1', 'Release 17'),
+('audio_codec', 'configuration', 'IMS', 'VoLTE', 'media', 'Audio codec for VoLTE call', 'string', 'codec', to_jsonb('AMR-WB'::text), to_jsonb('AMR'::text), to_jsonb('EVS'::text), 'TS 26.114 Section 5.1', 'Release 17'),
+('video_codec', 'configuration', 'IMS', 'VoLTE', 'media', 'Video codec for VoLTE call', 'string', 'codec', to_jsonb('H.264'::text), to_jsonb('H.263'::text), to_jsonb('H.265'::text), 'TS 26.114 Section 5.2', 'Release 17'),
+('rtp_payload_type', 'configuration', 'IMS', 'VoLTE', 'media', 'RTP payload type for VoLTE', 'integer', 'type', to_jsonb(96), to_jsonb(0), to_jsonb(127), 'RFC 3551 Section 6', 'Release 17'),
+('rtp_port', 'configuration', 'IMS', 'VoLTE', 'media', 'RTP port for VoLTE media', 'integer', 'port', to_jsonb(5004), to_jsonb(1024), to_jsonb(65535), 'RFC 3550 Section 5.1', 'Release 17'),
+('rtcp_port', 'configuration', 'IMS', 'VoLTE', 'media', 'RTCP port for VoLTE media', 'integer', 'port', to_jsonb(5005), to_jsonb(1024), to_jsonb(65535), 'RFC 3550 Section 5.1', 'Release 17'),
 
 -- VoNR Parameters (same as VoLTE but for 5G NR)
-('vonr_call_setup_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR call setup time', 'integer', 'ms', 1500, 0, 8000, 'TS 24.229 Section 5.1.1', 'Release 17'),
-('vonr_call_release_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR call release time', 'integer', 'ms', 800, 0, 4000, 'TS 24.229 Section 5.1.2', 'Release 17'),
-('vonr_media_negotiation_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR media negotiation time', 'integer', 'ms', 400, 0, 1500, 'TS 24.229 Section 5.1.3', 'Release 17'),
-('vonr_sip_response_time', 'measurement', 'IMS', 'VoNR', 'performance', 'SIP response time for VoNR', 'integer', 'ms', 80, 0, 800, 'RFC 3261 Section 17.1.1', 'Release 17'),
+('vonr_call_setup_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR call setup time', 'integer', 'ms', to_jsonb(1500), to_jsonb(0), to_jsonb(8000), 'TS 24.229 Section 5.1.1', 'Release 17'),
+('vonr_call_release_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR call release time', 'integer', 'ms', to_jsonb(800), to_jsonb(0), to_jsonb(4000), 'TS 24.229 Section 5.1.2', 'Release 17'),
+('vonr_media_negotiation_time', 'measurement', 'IMS', 'VoNR', 'performance', 'VoNR media negotiation time', 'integer', 'ms', to_jsonb(400), to_jsonb(0), to_jsonb(1500), 'TS 24.229 Section 5.1.3', 'Release 17'),
+('vonr_sip_response_time', 'measurement', 'IMS', 'VoNR', 'performance', 'SIP response time for VoNR', 'integer', 'ms', to_jsonb(80), to_jsonb(0), to_jsonb(800), 'RFC 3261 Section 17.1.1', 'Release 17'),
 
 -- Conference Call Parameters
-('conference_setup_time', 'measurement', 'IMS', 'IMS', 'performance', 'Conference call setup time', 'integer', 'ms', 3000, 0, 15000, 'RFC 4579 Section 4.1', 'Release 17'),
-('conference_management_time', 'measurement', 'IMS', 'IMS', 'performance', 'Conference call management time', 'integer', 'ms', 1000, 0, 5000, 'RFC 4579 Section 4.2', 'Release 17'),
-('conference_participants', 'configuration', 'IMS', 'IMS', 'conference', 'Number of conference participants', 'integer', 'count', 3, 2, 100, 'RFC 4579 Section 4.1', 'Release 17'),
-('conference_uri', 'configuration', 'IMS', 'IMS', 'conference', 'Conference URI for conference calls', 'string', 'uri', '', '', '', 'RFC 4579 Section 4.1', 'Release 17'),
+('conference_setup_time', 'measurement', 'IMS', 'IMS', 'performance', 'Conference call setup time', 'integer', 'ms', to_jsonb(3000), to_jsonb(0), to_jsonb(15000), 'RFC 4579 Section 4.1', 'Release 17'),
+('conference_management_time', 'measurement', 'IMS', 'IMS', 'performance', 'Conference call management time', 'integer', 'ms', to_jsonb(1000), to_jsonb(0), to_jsonb(5000), 'RFC 4579 Section 4.2', 'Release 17'),
+('conference_participants', 'configuration', 'IMS', 'IMS', 'conference', 'Number of conference participants', 'integer', 'count', to_jsonb(3), to_jsonb(2), to_jsonb(100), 'RFC 4579 Section 4.1', 'Release 17'),
+('conference_uri', 'configuration', 'IMS', 'IMS', 'conference', 'Conference URI for conference calls', 'string', 'uri', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'RFC 4579 Section 4.1', 'Release 17'),
 
 -- Enhanced IMS Registration Parameters
-('ims_registration_time', 'measurement', 'IMS', 'IMS', 'performance', 'IMS registration time', 'integer', 'ms', 1500, 0, 10000, 'TS 24.229 Section 5.1.1', 'Release 17'),
-('ims_authentication_time', 'measurement', 'IMS', 'IMS', 'performance', 'IMS authentication time', 'integer', 'ms', 500, 0, 2000, 'TS 24.229 Section 5.1.2', 'Release 17'),
-('ims_registration_expires', 'configuration', 'IMS', 'IMS', 'registration', 'IMS registration expires time', 'integer', 'seconds', 3600, 60, 86400, 'RFC 3261 Section 20.19', 'Release 17'),
-('ims_contact_expires', 'configuration', 'IMS', 'IMS', 'registration', 'IMS contact expires time', 'integer', 'seconds', 3600, 60, 86400, 'RFC 3261 Section 20.10', 'Release 17'),
-('ims_public_user_identity', 'identity', 'IMS', 'IMS', 'registration', 'IMS public user identity', 'string', 'identity', '', '', '', 'TS 23.228 Section 4.1', 'Release 17'),
-('ims_private_user_identity', 'identity', 'IMS', 'IMS', 'registration', 'IMS private user identity', 'string', 'identity', '', '', '', 'TS 23.228 Section 4.1', 'Release 17');
+('ims_registration_time', 'measurement', 'IMS', 'IMS', 'performance', 'IMS registration time', 'integer', 'ms', to_jsonb(1500), to_jsonb(0), to_jsonb(10000), 'TS 24.229 Section 5.1.1', 'Release 17'),
+('ims_authentication_time', 'measurement', 'IMS', 'IMS', 'performance', 'IMS authentication time', 'integer', 'ms', to_jsonb(500), to_jsonb(0), to_jsonb(2000), 'TS 24.229 Section 5.1.2', 'Release 17'),
+('ims_registration_expires', 'configuration', 'IMS', 'IMS', 'registration', 'IMS registration expires time', 'integer', 'seconds', to_jsonb(3600), to_jsonb(60), to_jsonb(86400), 'RFC 3261 Section 20.19', 'Release 17'),
+('ims_contact_expires', 'configuration', 'IMS', 'IMS', 'registration', 'IMS contact expires time', 'integer', 'seconds', to_jsonb(3600), to_jsonb(60), to_jsonb(86400), 'RFC 3261 Section 20.10', 'Release 17'),
+('ims_public_user_identity', 'identity', 'IMS', 'IMS', 'registration', 'IMS public user identity', 'string', 'identity', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'TS 23.228 Section 4.1', 'Release 17'),
+('ims_private_user_identity', 'identity', 'IMS', 'IMS', 'registration', 'IMS private user identity', 'string', 'identity', to_jsonb(''::text), to_jsonb(''::text), to_jsonb(''::text), 'TS 23.228 Section 4.1', 'Release 17');
 
 -- ==============================================
 -- 5. VoLTE/VoNR/IMS TEST EXECUTION TEMPLATES
