@@ -149,8 +149,8 @@ ANALYZE public.test_execution_workers;
 CREATE OR REPLACE VIEW public.index_usage_stats AS
 SELECT 
     schemaname,
-    tablename,
-    indexname,
+    relname AS tablename,
+    indexrelname AS indexname,
     idx_tup_read,
     idx_tup_fetch,
     idx_scan,
@@ -168,10 +168,10 @@ ORDER BY idx_scan DESC;
 CREATE OR REPLACE VIEW public.table_size_stats AS
 SELECT 
     schemaname,
-    tablename,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size,
-    pg_size_pretty(pg_relation_size(schemaname||'.'||tablename)) as table_size,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename)) as index_size,
+    relname AS tablename,
+    pg_size_pretty(pg_total_relation_size((schemaname||'.'||relname)::regclass)) as total_size,
+    pg_size_pretty(pg_relation_size((schemaname||'.'||relname)::regclass)) as table_size,
+    pg_size_pretty(pg_total_relation_size((schemaname||'.'||relname)::regclass) - pg_relation_size((schemaname||'.'||relname)::regclass)) as index_size,
     n_tup_ins as inserts,
     n_tup_upd as updates,
     n_tup_del as deletes,
@@ -179,7 +179,7 @@ SELECT
     n_dead_tup as dead_tuples
 FROM pg_stat_user_tables
 WHERE schemaname = 'public'
-ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+ORDER BY pg_total_relation_size((schemaname||'.'||relname)::regclass) DESC;
 
 -- Grant permissions for monitoring views
 GRANT SELECT ON public.index_usage_stats TO authenticated;
