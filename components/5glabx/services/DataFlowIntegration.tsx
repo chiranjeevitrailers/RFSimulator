@@ -144,16 +144,49 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // Listen for Test Manager postMessage events
         const handlePostMessage = (event: MessageEvent) => {
-          if (event.data.type === '5GLABX_TEST_DATA') {
-            console.log('📡 5GLabX received test data broadcast:', event.data);
-            const processedData = {
-              timestamp: Date.now(),
-              testCaseId: event.data.testCaseId,
-              source: event.data.source,
-              ...event.data.data
-            };
-            setRealTimeData(processedData);
-            distributeDataToLayers(processedData);
+          if (event.data.type === '5GLABX_TEST_DATA' || event.data.type === '5GLABX_TEST_EXECUTION') {
+            console.log('📡 5GLabX received test data broadcast:', event.data.type, event.data.testCaseId);
+            
+            if (event.data.type === '5GLABX_TEST_EXECUTION') {
+              // Handle complete test execution data
+              const { testCaseId, testCaseData } = event.data;
+              setTestCaseData(testCaseData);
+              
+              // Process messages immediately for live display
+              if (testCaseData.expectedMessages) {
+                addLog('INFO', `Processing ${testCaseData.expectedMessages.length} messages for live display`);
+                testCaseData.expectedMessages.forEach((message: any, index: number) => {
+                  setTimeout(() => {
+                    const liveData = {
+                      timestamp: Date.now(),
+                      testCaseId,
+                      layer: message.layer,
+                      protocol: message.protocol,
+                      messageType: message.messageType,
+                      messageName: message.messageName,
+                      direction: message.direction,
+                      payload: message.messagePayload,
+                      ies: testCaseData.expectedInformationElements || [],
+                      layerParams: testCaseData.expectedLayerParameters || []
+                    };
+                    
+                    setRealTimeData(liveData);
+                    distributeDataToLayers(liveData);
+                    console.log(`📊 5GLabX processing message ${index + 1}: ${message.messageName}`);
+                  }, index * 500); // Faster message processing
+                });
+              }
+            } else {
+              // Handle individual data broadcasts
+              const processedData = {
+                timestamp: Date.now(),
+                testCaseId: event.data.testCaseId,
+                source: event.data.source,
+                ...event.data.data
+              };
+              setRealTimeData(processedData);
+              distributeDataToLayers(processedData);
+            }
           }
         };
 
