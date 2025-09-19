@@ -90,11 +90,13 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           // Start real-time processing
           if (testCaseData.expectedMessages) {
             console.log(`📊 Processing ${testCaseData.expectedMessages.length} expected messages`);
-            // Process each message through the data flow
+            // Process each message through the data flow with proper format conversion
             testCaseData.expectedMessages.forEach((message: any, index: number) => {
               setTimeout(() => {
-                const processedData = {
-                  timestamp: Date.now(),
+                // Create base data from Supabase format
+                const baseData = {
+                  id: message.id,
+                  timestampMs: message.timestampMs || (Date.now() + index * 1000),
                   testCaseId,
                   runId,
                   layer: message.layer,
@@ -102,18 +104,39 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   messageType: message.messageType,
                   messageName: message.messageName,
                   direction: message.direction,
-                  payload: message.messagePayload,
+                  messagePayload: message.messagePayload,
                   ies: testCaseData.expectedInformationElements?.filter((ie: any) => 
-                    ie.ieName.includes(message.messageType) || ie.ieType === message.messageType
+                    ie.ieName?.includes(message.messageType) || ie.ieType === message.messageType
                   ) || [],
                   layerParams: testCaseData.expectedLayerParameters?.filter((param: any) => 
                     param.layer === message.layer
                   ) || []
                 };
+
+                // Convert to different frontend formats using DataFormatAdapter
+                const convertedData = {
+                  // For LogsView
+                  logsView: window.DataFormatAdapter ? 
+                    window.DataFormatAdapter.adaptLogForViewer(baseData) : 
+                    this.fallbackLogsFormat(baseData),
+                    
+                  // For EnhancedLogsView  
+                  enhancedLogsView: window.DataFormatAdapter ? 
+                    window.DataFormatAdapter.adaptForEnhancedLogsView(baseData) :
+                    this.fallbackEnhancedFormat(baseData),
+                    
+                  // For Layer-specific views
+                  layerView: window.DataFormatAdapter ? 
+                    window.DataFormatAdapter.adaptForLayerView(baseData, message.layer) :
+                    this.fallbackLayerFormat(baseData, message.layer),
+                    
+                  // Original data for reference
+                  original: baseData
+                };
                 
-                // Distribute to layers
-                distributeDataToLayers(processedData);
-                setRealTimeData(processedData);
+                // Distribute to layers with converted formats
+                distributeDataToLayers(convertedData);
+                setRealTimeData(convertedData);
               }, index * 1000); // Spread messages over time
             });
           }
