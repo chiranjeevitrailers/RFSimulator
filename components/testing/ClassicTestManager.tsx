@@ -29,10 +29,10 @@ const ClassicTestManager: React.FC = () => {
       name: '5G NR',
       expanded: true,
       children: [
-        { id: '5gnr-functional', name: 'Functional', count: 0 },
-        { id: '5gnr-performance', name: 'Performance', count: 0 },
-        { id: '5gnr-rf', name: 'RF', count: 0 },
-        { id: '5gnr-stability', name: 'Stability', count: 0 }
+        { id: '5gnr-functional', name: 'Functional', count: 3 },
+        { id: '5gnr-performance', name: 'Performance', count: 2 },
+        { id: '5gnr-rf', name: 'RF', count: 2 },
+        { id: '5gnr-stability', name: 'Stability', count: 1 }
       ]
     },
     {
@@ -40,10 +40,10 @@ const ClassicTestManager: React.FC = () => {
       name: '4G LTE',
       expanded: true,
       children: [
-        { id: 'lte-functional', name: 'Functional', count: 0 },
-        { id: 'lte-performance', name: 'Performance', count: 0 },
-        { id: 'lte-rf', name: 'RF', count: 0 },
-        { id: 'lte-stability', name: 'Stability', count: 0 }
+        { id: 'lte-functional', name: 'Functional', count: 3 },
+        { id: 'lte-performance', name: 'Performance', count: 2 },
+        { id: 'lte-rf', name: 'RF', count: 1 },
+        { id: 'lte-stability', name: 'Stability', count: 1 }
       ]
     },
     {
@@ -51,8 +51,8 @@ const ClassicTestManager: React.FC = () => {
       name: 'IMS/VoLTE/VoNR',
       expanded: true,
       children: [
-        { id: 'ims-functional', name: 'Functional', count: 0 },
-        { id: 'ims-performance-stability', name: 'Performance/Stability', count: 0 }
+        { id: 'ims-functional', name: 'Functional', count: 3 },
+        { id: 'ims-performance-stability', name: 'Performance/Stability', count: 2 }
       ]
     },
     {
@@ -60,8 +60,8 @@ const ClassicTestManager: React.FC = () => {
       name: 'O-RAN',
       expanded: true,
       children: [
-        { id: 'oran-functional', name: 'Functional', count: 0 },
-        { id: 'oran-performance', name: 'Performance', count: 0 }
+        { id: 'oran-functional', name: 'Functional', count: 3 },
+        { id: 'oran-performance', name: 'Performance', count: 2 }
       ]
     },
     {
@@ -69,8 +69,8 @@ const ClassicTestManager: React.FC = () => {
       name: 'NB-IoT',
       expanded: true,
       children: [
-        { id: 'nbiot-functional', name: 'Functional', count: 0 },
-        { id: 'nbiot-performance', name: 'Performance', count: 0 }
+        { id: 'nbiot-functional', name: 'Functional', count: 3 },
+        { id: 'nbiot-performance', name: 'Performance', count: 2 }
       ]
     },
     {
@@ -78,8 +78,8 @@ const ClassicTestManager: React.FC = () => {
       name: 'V2X',
       expanded: true,
       children: [
-        { id: 'v2x-functional', name: 'Functional', count: 0 },
-        { id: 'v2x-performance', name: 'Performance', count: 0 }
+        { id: 'v2x-functional', name: 'Functional', count: 3 },
+        { id: 'v2x-performance', name: 'Performance', count: 2 }
       ]
     },
     {
@@ -87,8 +87,8 @@ const ClassicTestManager: React.FC = () => {
       name: 'NTN',
       expanded: true,
       children: [
-        { id: 'ntn-functional', name: 'Functional', count: 0 },
-        { id: 'ntn-performance', name: 'Performance', count: 0 }
+        { id: 'ntn-functional', name: 'Functional', count: 3 },
+        { id: 'ntn-performance', name: 'Performance', count: 2 }
       ]
     },
     {
@@ -96,10 +96,10 @@ const ClassicTestManager: React.FC = () => {
       name: 'GCF Certification',
       expanded: true,
       children: [
-        { id: 'gcf-3gpp-conformance', name: '3GPP Conformance', count: 0 },
-        { id: 'gcf-protocol', name: 'Protocol', count: 0 },
-        { id: 'gcf-rf', name: 'RF', count: 0 },
-        { id: 'gcf-performance', name: 'Performance', count: 0 }
+        { id: 'gcf-3gpp-conformance', name: '3GPP Conformance', count: 3 },
+        { id: 'gcf-protocol', name: 'Protocol', count: 3 },
+        { id: 'gcf-rf', name: 'RF', count: 2 },
+        { id: 'gcf-performance', name: 'Performance', count: 1 }
       ]
     },
     {
@@ -107,10 +107,10 @@ const ClassicTestManager: React.FC = () => {
       name: 'PTCRB Certification',
       expanded: true,
       children: [
-        { id: 'ptcrb-3gpp-conformance', name: '3GPP Conformance', count: 0 },
-        { id: 'ptcrb-protocol', name: 'Protocol', count: 0 },
-        { id: 'ptcrb-rf', name: 'RF', count: 0 },
-        { id: 'ptcrb-performance', name: 'Performance', count: 0 }
+        { id: 'ptcrb-3gpp-conformance', name: '3GPP Conformance', count: 3 },
+        { id: 'ptcrb-protocol', name: 'Protocol', count: 3 },
+        { id: 'ptcrb-rf', name: 'RF', count: 2 },
+        { id: 'ptcrb-performance', name: 'Performance', count: 1 }
       ]
     }
   ]);
@@ -221,7 +221,7 @@ const ClassicTestManager: React.FC = () => {
       '5G_NR': [
         {
           id: '5G-001',
-          name: '5G NR Initial Access',
+          name: '5G NR Initial Access Procedure',
           component: '5G_NR',
           status: 'Not Started',
           iterations: 'Never',
@@ -229,6 +229,30 @@ const ClassicTestManager: React.FC = () => {
           lastRun: 'N/A',
           duration: '-',
           priority: 'High',
+          selected: false
+        },
+        {
+          id: '5G-002',
+          name: '5G NR Handover Test',
+          component: '5G_NR',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: '5G-003',
+          name: '5G NR PDU Session Establishment',
+          component: '5G_NR',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
           selected: false
         }
       ],
@@ -243,6 +267,220 @@ const ClassicTestManager: React.FC = () => {
           lastRun: 'N/A',
           duration: '-',
           priority: 'High',
+          selected: false
+        },
+        {
+          id: 'LTE-002',
+          name: 'LTE Handover Test',
+          component: '4G_LTE',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'LTE-003',
+          name: 'LTE Bearer Management',
+          component: '4G_LTE',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
+          selected: false
+        }
+      ],
+      'IMS': [
+        {
+          id: 'IMS-001',
+          name: 'VoLTE Call Setup',
+          component: 'IMS',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'IMS-002',
+          name: 'VoNR Call Establishment',
+          component: 'IMS',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'IMS-003',
+          name: 'SIP Registration Test',
+          component: 'IMS',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
+          selected: false
+        }
+      ],
+      'O_RAN': [
+        {
+          id: 'ORAN-001',
+          name: 'O-RAN Fronthaul Interface Test',
+          component: 'O_RAN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'ORAN-002',
+          name: 'O-RAN RIC Integration Test',
+          component: 'O_RAN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'ORAN-003',
+          name: 'O-RAN xApp Deployment Test',
+          component: 'O_RAN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
+          selected: false
+        }
+      ],
+      'NB_IoT': [
+        {
+          id: 'NBIOT-001',
+          name: 'NB-IoT Device Attach',
+          component: 'NB_IoT',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'NBIOT-002',
+          name: 'NB-IoT Data Transmission',
+          component: 'NB_IoT',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'NBIOT-003',
+          name: 'NB-IoT Power Saving Mode',
+          component: 'NB_IoT',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
+          selected: false
+        }
+      ],
+      'V2X': [
+        {
+          id: 'V2X-001',
+          name: 'V2X PC5 Interface Test',
+          component: 'V2X',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'V2X-002',
+          name: 'V2X Vehicle-to-Vehicle Communication',
+          component: 'V2X',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'V2X-003',
+          name: 'V2X Emergency Message Test',
+          component: 'V2X',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Critical',
+          selected: false
+        }
+      ],
+      'NTN': [
+        {
+          id: 'NTN-001',
+          name: 'NTN Satellite Connection Test',
+          component: 'NTN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'NTN-002',
+          name: 'NTN Beam Switching Test',
+          component: 'NTN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'NTN-003',
+          name: 'NTN Handover Between Satellites',
+          component: 'NTN',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Medium',
           selected: false
         }
       ]
@@ -423,15 +661,15 @@ const ClassicTestManager: React.FC = () => {
         </div>
 
         {/* Test Suites */}
-        <div className="p-4 flex-1">
+        <div className="p-4 flex-1 overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-300">Test Suites</h3>
             <button className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700">+ Add Test Suite</button>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-96 overflow-y-auto">
             {testSuites.map(suite => (
               <div key={suite.id} className="space-y-1">
-                <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer" onClick={() => { setSelectedDomain(suite.name); setSelectedCategoryType(null); loadDomainCases(suite.name); }}>
+                <div className={`flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer ${selectedDomain === suite.name ? 'bg-gray-700 border-l-2 border-blue-500' : ''}`} onClick={() => { setSelectedDomain(suite.name); setSelectedCategoryType(null); loadDomainCases(suite.name); }}>
                   <div className="flex items-center space-x-2">
                     <i data-lucide={suite.expanded ? 'chevron-down' : 'chevron-right'} className="w-4 h-4"></i>
                     <span className="text-sm">{suite.name}</span>
