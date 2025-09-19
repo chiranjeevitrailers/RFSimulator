@@ -1,26 +1,32 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Activity, BarChart3, Grid, ListChecks } from 'lucide-react';
+import { Activity, BarChart3, Grid } from 'lucide-react';
 
 // Reuse existing rich views already implemented in the codebase
 import TestSuitesView from '@/components/5glabx/views/TestSuitesView';
 import TestExecutionDashboard from '@/components/simulation/TestExecutionDashboard';
 import AnalyticsView from '@/components/5glabx/views/AnalyticsView';
+import ProfessionalTestManager from '@/components/testing/ProfessionalTestManager';
 
-type TabKey = 'library' | 'execute' | 'analytics';
+type TabKey = 'manager' | 'library' | 'execute' | 'analytics';
 
 const tabs: { key: TabKey; label: string; icon: any }[] = [
+  { key: 'manager', label: 'Test Manager', icon: Activity },
   { key: 'library', label: 'Test Library', icon: Grid },
   { key: 'execute', label: 'Execution', icon: Activity },
   { key: 'analytics', label: 'Analytics', icon: BarChart3 }
 ];
 
 const TestDashboard: React.FC<{ userId?: string }> = ({ userId = 'demo-user' }) => {
-  const [active, setActive] = useState<TabKey>('library');
+  const [active, setActive] = useState<TabKey>('manager');
 
   const renderActive = () => {
     switch (active) {
+      case 'manager':
+        return (
+          <ProfessionalTestManager />
+        );
       case 'library':
         return (
           <div className="min-h-[600px]">
