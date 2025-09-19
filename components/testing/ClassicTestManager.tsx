@@ -583,22 +583,108 @@ const ClassicTestManager: React.FC = () => {
     setIsRunning(true);
     addLog('INFO', `Starting test execution: ${id}`);
     try {
-      // Use single-run API (batch also supported)
-      await fetch('/api/tests/run', {
+      // 1. Start test execution via API
+      const executionResponse = await fetch('/api/tests/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test_ids: [id], execution_mode: 'simulation' })
       });
-      addLog('INFO', `Execution started for ${id}`);
+      
+      if (!executionResponse.ok) {
+        throw new Error(`Execution API failed: ${executionResponse.status}`);
+      }
+      
+      const executionData = await executionResponse.json();
+      addLog('INFO', `Execution started for ${id}, RunId: ${executionData.run_id || 'unknown'}`);
+      
+      // 2. Fetch comprehensive test case data (messages, IEs, layer parameters)
+      addLog('INFO', `Fetching comprehensive test case data for ${id}...`);
+      const testDataResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(id)}&includeTemplates=true`);
+      
+      if (!testDataResponse.ok) {
+        addLog('WARN', `Failed to fetch test case data: ${testDataResponse.status}, continuing with basic execution`);
+      } else {
+        const testDataPayload = await testDataResponse.json();
+        const testCaseData = testDataPayload.data;
+        
+        addLog('INFO', `Comprehensive test data fetched: ${testCaseData.expectedMessages?.length || 0} messages, ${testCaseData.expectedInformationElements?.length || 0} IEs, ${testCaseData.expectedLayerParameters?.length || 0} layer parameters`);
+        
+        // 3. Feed data to 5GLabX backend via TestCasePlaybackService
+        if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
+          try {
+            addLog('INFO', `Starting 5GLabX playback service for test case ${id}...`);
+            
+            // Initialize playback service if not already done
+            if (!window.playbackServiceInstance) {
+              window.playbackServiceInstance = new window.TestCasePlaybackService({
+                databaseService: null,
+                websocketBroadcast: (type: string, source: string, data: any) => {
+                  // Broadcast to 5GLabX frontend
+                  if (typeof window !== 'undefined' && window.postMessage) {
+                    window.postMessage({
+                      type: '5GLABX_TEST_DATA',
+                      source: source,
+                      testCaseId: id,
+                      data: data
+                    }, '*');
+                  }
+                  addLog('DEBUG', `Broadcasting ${type} data from ${source} to 5GLabX`);
+                },
+                fetchImpl: fetch,
+                dataFormatAdapter: window.DataFormatAdapter || null
+              });
+            }
+            
+            // Start playback with the fetched test case data
+            const playbackResult = await window.playbackServiceInstance.startPlayback({
+              testCaseId: id,
+              runId: executionData.run_id || `run_${Date.now()}`,
+              apiBaseUrl: '/api',
+              speed: 1.0
+            });
+            
+            addLog('INFO', `5GLabX playback started successfully: ${playbackResult.count} messages queued`);
+            
+            // Notify 5GLabX platform about test execution
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
+                detail: {
+                  testCaseId: id,
+                  runId: executionData.run_id,
+                  testCaseData: testCaseData,
+                  playbackResult: playbackResult
+                }
+              }));
+            }
+            
+          } catch (playbackError) {
+            addLog('WARN', `5GLabX playback failed: ${playbackError}, continuing with standard execution`);
+          }
+        } else {
+          addLog('WARN', '5GLabX TestCasePlaybackService not available, continuing with standard execution');
+        }
+      }
+      
+      // 4. Update UI status
       setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: 'Running' } : t));
+      
+      // 5. Simulate execution completion (in real implementation, this would come from backend)
       setTimeout(() => {
         const passed = Math.random() >= 0.2;
         setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: passed ? 'Completed' : 'Failed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t));
         addLog(passed ? 'INFO' : 'ERROR', `Execution ${passed ? 'passed' : 'failed'} for ${id}`);
+        
+        // Stop 5GLabX playback
+        if (window.playbackServiceInstance) {
+          window.playbackServiceInstance.stopPlayback();
+          addLog('INFO', '5GLabX playback stopped');
+        }
+        
         setIsRunning(false);
-      }, 3000);
+      }, 8000); // Extended time to allow 5GLabX playback
+      
     } catch (e) {
-      addLog('ERROR', `Failed to start execution: ${id}`);
+      addLog('ERROR', `Failed to start execution: ${e}`);
       setIsRunning(false);
     }
   };

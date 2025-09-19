@@ -79,6 +79,75 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
         }
 
+        // Listen for Test Manager execution events
+        const handleTestCaseExecution = (event: CustomEvent) => {
+          const { testCaseId, runId, testCaseData, playbackResult } = event.detail;
+          console.log('🔗 5GLabX received test case execution from Test Manager:', testCaseId);
+          
+          // Update test case data
+          setTestCaseData(testCaseData);
+          
+          // Start real-time processing
+          if (testCaseData.expectedMessages) {
+            console.log(`📊 Processing ${testCaseData.expectedMessages.length} expected messages`);
+            // Process each message through the data flow
+            testCaseData.expectedMessages.forEach((message: any, index: number) => {
+              setTimeout(() => {
+                const processedData = {
+                  timestamp: Date.now(),
+                  testCaseId,
+                  runId,
+                  layer: message.layer,
+                  protocol: message.protocol,
+                  messageType: message.messageType,
+                  messageName: message.messageName,
+                  direction: message.direction,
+                  payload: message.messagePayload,
+                  ies: testCaseData.expectedInformationElements?.filter((ie: any) => 
+                    ie.ieName.includes(message.messageType) || ie.ieType === message.messageType
+                  ) || [],
+                  layerParams: testCaseData.expectedLayerParameters?.filter((param: any) => 
+                    param.layer === message.layer
+                  ) || []
+                };
+                
+                // Distribute to layers
+                distributeDataToLayers(processedData);
+                setRealTimeData(processedData);
+              }, index * 1000); // Spread messages over time
+            });
+          }
+        };
+
+        // Listen for Test Manager postMessage events
+        const handlePostMessage = (event: MessageEvent) => {
+          if (event.data.type === '5GLABX_TEST_DATA') {
+            console.log('📡 5GLabX received test data broadcast:', event.data);
+            const processedData = {
+              timestamp: Date.now(),
+              testCaseId: event.data.testCaseId,
+              source: event.data.source,
+              ...event.data.data
+            };
+            setRealTimeData(processedData);
+            distributeDataToLayers(processedData);
+          }
+        };
+
+        // Add event listeners
+        if (typeof window !== 'undefined') {
+          window.addEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+          window.addEventListener('message', handlePostMessage);
+        }
+
+        // Cleanup function
+        return () => {
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+            window.removeEventListener('message', handlePostMessage);
+          }
+        };
+
         // Initialize Test Case Playback Service with DataFormatAdapter
         if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
           const playbackService = new window.TestCasePlaybackService({

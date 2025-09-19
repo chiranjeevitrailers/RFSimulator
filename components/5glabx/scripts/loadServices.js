@@ -1,6 +1,12 @@
 // Load all services and components into window object
 // This script ensures all JavaScript services are available for React components
 
+// Load DataFormatAdapter first (needed by other services)
+import('/utils/DataFormatAdapter.js').then(module => {
+  window.DataFormatAdapter = module.default || module.DataFormatAdapter;
+  console.log('DataFormatAdapter loaded into window object');
+});
+
 // Load core services
 import('/services/WebSocketService.js').then(module => {
   window.WebSocketService = module.default || module.WebSocketService;
