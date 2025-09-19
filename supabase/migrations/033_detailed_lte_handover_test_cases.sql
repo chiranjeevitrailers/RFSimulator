@@ -92,28 +92,28 @@ FROM generate_series(6, 50) AS s(i);
 -- Message flows for Test Case 1: X2-based Intra-eNB Handover
 INSERT INTO public.expected_message_flows (test_case_id, message_sequence, message_type, message_name, protocol, layer, direction, delay_ms, message_description, standard_reference, release_version) VALUES
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 1, 'MeasurementReport', 'Measurement Report', 'LTE', 'RRC', 'UL', 0, 'Measurement report triggering handover', 'TS 36.331 Section 5.5.5', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 2, 'HandoverRequest', 'Handover Request', 'LTE', 'X2AP', 'X2', 50, 'X2 handover request message', 'TS 36.423 Section 8.1.1', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 3, 'HandoverRequestAcknowledge', 'Handover Request Acknowledge', 'LTE', 'X2AP', 'X2', 100, 'X2 handover request acknowledge message', 'TS 36.423 Section 8.1.2', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 2, 'HandoverRequest', 'Handover Request', 'LTE', 'X2AP', 'DL', 50, 'X2 handover request message', 'TS 36.423 Section 8.1.1', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 3, 'HandoverRequestAcknowledge', 'Handover Request Acknowledge', 'LTE', 'X2AP', 'DL', 100, 'X2 handover request acknowledge message', 'TS 36.423 Section 8.1.2', 'Release 15'),
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 4, 'RRCConnectionReconfiguration', 'RRC Connection Reconfiguration', 'LTE', 'RRC', 'DL', 150, 'RRC connection reconfiguration with mobility control info', 'TS 36.331 Section 5.3.5', 'Release 15'),
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 5, 'RRCConnectionReconfigurationComplete', 'RRC Connection Reconfiguration Complete', 'LTE', 'RRC', 'UL', 200, 'RRC connection reconfiguration complete message', 'TS 36.331 Section 5.3.5', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 6, 'SNStatusTransfer', 'SN Status Transfer', 'LTE', 'X2AP', 'X2', 250, 'SN status transfer message', 'TS 36.423 Section 8.1.3', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 7, 'UEContextRelease', 'UE Context Release', 'LTE', 'X2AP', 'X2', 300, 'UE context release message', 'TS 36.423 Section 8.1.4', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 8, 'PathSwitchRequest', 'Path Switch Request', 'LTE', 'S1AP', 'S1', 350, 'Path switch request message', 'TS 36.413 Section 8.1.1', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 9, 'PathSwitchRequestAcknowledge', 'Path Switch Request Acknowledge', 'LTE', 'S1AP', 'S1', 400, 'Path switch request acknowledge message', 'TS 36.413 Section 8.1.2', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 10, 'UEContextReleaseCommand', 'UE Context Release Command', 'LTE', 'S1AP', 'S1', 450, 'UE context release command message', 'TS 36.413 Section 8.1.3', 'Release 15');
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 6, 'SNStatusTransfer', 'SN Status Transfer', 'LTE', 'X2AP', 'DL', 250, 'SN status transfer message', 'TS 36.423 Section 8.1.3', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 7, 'UEContextRelease', 'UE Context Release', 'LTE', 'X2AP', 'DL', 300, 'UE context release message', 'TS 36.423 Section 8.1.4', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 8, 'PathSwitchRequest', 'Path Switch Request', 'LTE', 'S1AP', 'DL', 350, 'Path switch request message', 'TS 36.413 Section 8.1.1', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 9, 'PathSwitchRequestAcknowledge', 'Path Switch Request Acknowledge', 'LTE', 'S1AP', 'DL', 400, 'Path switch request acknowledge message', 'TS 36.413 Section 8.1.2', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 1'), 10, 'UEContextReleaseCommand', 'UE Context Release Command', 'LTE', 'S1AP', 'DL', 450, 'UE context release command message', 'TS 36.413 Section 8.1.3', 'Release 15');
 
 -- Message flows for Test Case 2: S1-based Inter-eNB Handover
 INSERT INTO public.expected_message_flows (test_case_id, message_sequence, message_type, message_name, protocol, layer, direction, delay_ms, message_description, standard_reference, release_version) VALUES
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 1, 'MeasurementReport', 'Measurement Report', 'LTE', 'RRC', 'UL', 0, 'Measurement report triggering handover', 'TS 36.331 Section 5.5.5', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 2, 'HandoverRequired', 'Handover Required', 'LTE', 'S1AP', 'S1', 50, 'S1 handover required message', 'TS 36.413 Section 8.1.1', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 3, 'HandoverRequest', 'Handover Request', 'LTE', 'S1AP', 'S1', 100, 'S1 handover request message', 'TS 36.413 Section 8.1.2', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 4, 'HandoverRequestAcknowledge', 'Handover Request Acknowledge', 'LTE', 'S1AP', 'S1', 200, 'S1 handover request acknowledge message', 'TS 36.413 Section 8.1.3', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 5, 'HandoverCommand', 'Handover Command', 'LTE', 'S1AP', 'S1', 250, 'S1 handover command message', 'TS 36.413 Section 8.1.4', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 2, 'HandoverRequired', 'Handover Required', 'LTE', 'S1AP', 'DL', 50, 'S1 handover required message', 'TS 36.413 Section 8.1.1', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 3, 'HandoverRequest', 'Handover Request', 'LTE', 'S1AP', 'DL', 100, 'S1 handover request message', 'TS 36.413 Section 8.1.2', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 4, 'HandoverRequestAcknowledge', 'Handover Request Acknowledge', 'LTE', 'S1AP', 'DL', 200, 'S1 handover request acknowledge message', 'TS 36.413 Section 8.1.3', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 5, 'HandoverCommand', 'Handover Command', 'LTE', 'S1AP', 'DL', 250, 'S1 handover command message', 'TS 36.413 Section 8.1.4', 'Release 15'),
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 6, 'RRCConnectionReconfiguration', 'RRC Connection Reconfiguration', 'LTE', 'RRC', 'DL', 300, 'RRC connection reconfiguration with mobility control info', 'TS 36.331 Section 5.3.5', 'Release 15'),
 ((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 7, 'RRCConnectionReconfigurationComplete', 'RRC Connection Reconfiguration Complete', 'LTE', 'RRC', 'UL', 400, 'RRC connection reconfiguration complete message', 'TS 36.331 Section 5.3.5', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 8, 'HandoverNotify', 'Handover Notify', 'LTE', 'S1AP', 'S1', 450, 'S1 handover notify message', 'TS 36.413 Section 8.1.5', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 9, 'UEContextReleaseCommand', 'UE Context Release Command', 'LTE', 'S1AP', 'S1', 500, 'UE context release command message', 'TS 36.413 Section 8.1.6', 'Release 15'),
-((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 10, 'UEContextReleaseComplete', 'UE Context Release Complete', 'LTE', 'S1AP', 'S1', 550, 'UE context release complete message', 'TS 36.413 Section 8.1.7', 'Release 15');
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 8, 'HandoverNotify', 'Handover Notify', 'LTE', 'S1AP', 'DL', 450, 'S1 handover notify message', 'TS 36.413 Section 8.1.5', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 9, 'UEContextReleaseCommand', 'UE Context Release Command', 'LTE', 'S1AP', 'DL', 500, 'UE context release command message', 'TS 36.413 Section 8.1.6', 'Release 15'),
+((SELECT id FROM public.test_cases WHERE name = 'LTE Handover - 2'), 10, 'UEContextReleaseComplete', 'UE Context Release Complete', 'LTE', 'S1AP', 'DL', 550, 'UE context release complete message', 'TS 36.413 Section 8.1.7', 'Release 15');
 
 -- ==============================================
 -- 4. INSERT INFORMATION ELEMENTS
