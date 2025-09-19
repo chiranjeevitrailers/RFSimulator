@@ -94,6 +94,8 @@ const ClassicTestManager: React.FC = () => {
   ]);
 
   const [isRunning, setIsRunning] = React.useState(false);
+  const [selectedDomain, setSelectedDomain] = React.useState<string | null>(null);
+  const [selectedCategoryType, setSelectedCategoryType] = React.useState<string | null>(null);
   const [logs, setLogs] = React.useState<{ timestamp: string; level: 'INFO'|'ERROR'|'WARN'|'DEBUG'; message: string }[]>([
     { timestamp: new Date().toLocaleString(), level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
     { timestamp: new Date().toLocaleString(), level: 'INFO', message: 'Loading component configurations' },
@@ -112,33 +114,47 @@ const ClassicTestManager: React.FC = () => {
     selected: false
   }]);
 
+  const DOMAIN_TO_DB_CATEGORY: Record<string, string> = {
+    '5G NR': '5G_NR',
+    '4G LTE': '4G_LTE',
+    'IMS/VoLTE/VoNR': 'IMS_SIP',
+    'O-RAN': 'O_RAN',
+    'NB-IoT': 'NB_IoT',
+    'V2X': 'V2X',
+    'NTN': 'NTN'
+  };
+
+  const loadDomainCases = async (domainLabel: string) => {
+    const dbCategory = DOMAIN_TO_DB_CATEGORY[domainLabel] || undefined;
+    const query = dbCategory ? `/api/test-cases/comprehensive?category=${encodeURIComponent(dbCategory)}&limit=200` : '/api/test-cases/comprehensive?limit=100';
+    try {
+      const res = await fetch(query);
+      if (!res.ok) return;
+      const json = await res.json();
+      const raw = (json?.data?.testCases || []) as any[];
+      const cases = raw.map((t: any) => ({
+        id: t.id || t.test_case_id || 'unknown',
+        name: t.name,
+        component: t.category || t.protocol || domainLabel,
+        status: 'Not Started',
+        iterations: 'Never',
+        successRate: 'N/A',
+        lastRun: 'N/A',
+        duration: '-',
+        priority: t.priority || '',
+        selected: false,
+        test_type: (t.test_type || '').toString().toLowerCase()
+      })) as any[];
+      setTestCases(cases as TestCaseRow[]);
+      addLog('INFO', `Loaded ${cases.length} ${domainLabel} test cases`);
+    } catch (e) {
+      addLog('WARN', `Failed loading ${domainLabel} test cases; using defaults`);
+    }
+  };
+
   React.useEffect(() => {
-    // Try loading real cases from backend; fallback stays if API not configured
-    (async () => {
-      try {
-        const res = await fetch('/api/test-cases/comprehensive?limit=25');
-        if (!res.ok) return;
-        const json = await res.json();
-        const cases = (json?.data?.testCases || []).map((t: any) => ({
-          id: t.id || t.test_case_id || 'unknown',
-          name: t.name,
-          component: t.category || t.protocol || 'eNodeB',
-          status: 'Not Started',
-          iterations: 'Never',
-          successRate: 'N/A',
-          lastRun: 'N/A',
-          duration: '-',
-          priority: t.priority || '',
-          selected: false
-        })) as TestCaseRow[];
-        if (Array.isArray(cases) && cases.length > 0) {
-          setTestCases(cases);
-          addLog('INFO', `Loaded ${cases.length} test cases from backend`);
-        }
-      } catch (e) {
-        addLog('WARN', 'Backend not reachable, using default test cases');
-      }
-    })();
+    loadDomainCases('5G NR');
+    setSelectedDomain('5G NR');
   }, []);
 
   const addLog = (level: 'INFO'|'ERROR'|'WARN'|'DEBUG', message: string) => {
@@ -162,8 +178,9 @@ const ClassicTestManager: React.FC = () => {
       addLog('INFO', `Execution started for ${id}`);
       setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: 'Running' } : t));
       setTimeout(() => {
-        setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: 'Completed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t));
-        addLog('INFO', `Execution completed for ${id}`);
+        const passed = Math.random() >= 0.2;
+        setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: passed ? 'Completed' : 'Failed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t));
+        addLog(passed ? 'INFO' : 'ERROR', `Execution ${passed ? 'passed' : 'failed'} for ${id}`);
         setIsRunning(false);
       }, 3000);
     } catch (e) {
@@ -183,7 +200,11 @@ const ClassicTestManager: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test_ids: ids, execution_mode: 'simulation' })
       });
-      ids.forEach((id, i) => setTimeout(() => setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: 'Completed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t)), 1000 * (i + 1)));
+      ids.forEach((id, i) => setTimeout(() => {
+        const passed = Math.random() >= 0.2;
+        setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: passed ? 'Completed' : 'Failed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t));
+        addLog(passed ? 'INFO' : 'ERROR', `Execution ${passed ? 'passed' : 'failed'} for ${id}`);
+      }, 800 * (i + 1)));
       setTimeout(() => { setIsRunning(false); addLog('INFO', 'Batch execution completed'); }, 1500 * ids.length);
     } catch (e) {
       addLog('ERROR', 'Batch execution failed');
@@ -191,7 +212,7 @@ const ClassicTestManager: React.FC = () => {
     }
   };
 
-  const statusClass = (s: string) => s === 'Completed' ? 'bg-green-100 text-green-800' : s === 'Running' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800';
+  const statusClass = (s: string) => s === 'Completed' ? 'bg-green-100 text-green-800' : s === 'Running' ? 'bg-blue-100 text-blue-800' : s === 'Failed' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
   const levelClass = (l: string) => l === 'ERROR' ? 'bg-red-500' : l === 'WARN' ? 'bg-yellow-500' : l === 'DEBUG' ? 'bg-gray-500' : 'bg-blue-500';
 
   return (
@@ -234,7 +255,7 @@ const ClassicTestManager: React.FC = () => {
           <div className="space-y-1">
             {testSuites.map(suite => (
               <div key={suite.id} className="space-y-1">
-                <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer">
+                <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer" onClick={() => { setSelectedDomain(suite.name); setSelectedCategoryType(null); loadDomainCases(suite.name); }}>
                   <div className="flex items-center space-x-2">
                     <i data-lucide={suite.expanded ? 'chevron-down' : 'chevron-right'} className="w-4 h-4"></i>
                     <span className="text-sm">{suite.name}</span>
@@ -243,7 +264,7 @@ const ClassicTestManager: React.FC = () => {
                 {suite.expanded && (
                   <div className="ml-4 space-y-1">
                     {suite.children.map((child: any) => (
-                      <div key={child.id} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer">
+                      <div key={child.id} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer" onClick={() => setSelectedCategoryType(child.name)}>
                         <span className="text-sm text-gray-300">{child.name}</span>
                         {child.count > 0 && <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">{child.count}</span>}
                       </div>
@@ -288,7 +309,19 @@ const ClassicTestManager: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {testCases.map(tc => (
+                {testCases
+                  .filter((tc: any) => {
+                    if (!selectedCategoryType) return true;
+                    const type = (tc as any).test_type || '';
+                    const wanted = selectedCategoryType.toLowerCase();
+                    // "Performance/Stability" should match either
+                    if (wanted.includes('/')) {
+                      const parts = wanted.split('/');
+                      return parts.some(p => type.includes(p.trim()));
+                    }
+                    return type.includes(wanted);
+                  })
+                  .map(tc => (
                   <tr key={tc.id} className="hover:bg-gray-50">
                     <td className="px-4 py-2"><input type="checkbox" className="form-checkbox" checked={!!tc.selected} onChange={() => toggleTestSelection(tc.id)} /></td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900">{tc.name}</td>
