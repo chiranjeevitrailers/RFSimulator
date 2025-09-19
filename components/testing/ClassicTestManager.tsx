@@ -490,6 +490,8 @@ const ClassicTestManager: React.FC = () => {
   };
 
   const loadDomainCases = async (domainLabel: string) => {
+    addLog('INFO', `Loading test cases for domain: ${domainLabel}`);
+    
     // Map domain labels to actual database categories
     const domainToCategory: Record<string, string> = {
       '5G NR': '5G_NR',
@@ -504,59 +506,59 @@ const ClassicTestManager: React.FC = () => {
     };
 
     const categoryFilter = domainToCategory[domainLabel] || domainLabel;
+    addLog('INFO', `Mapped ${domainLabel} to category: ${categoryFilter}`);
     
-    // Use category filter in API call for better performance
+    // ALWAYS load sample test cases first for immediate display
+    const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
+    setTestCases(sampleCases);
+    addLog('INFO', `Loaded ${sampleCases.length} sample test cases for immediate display`);
+    
+    // Then try to load from API (this will replace sample data if successful)
     const query = `/api/test-cases/comprehensive?category=${encodeURIComponent(categoryFilter)}&limit=300`;
     try {
-      addLog('INFO', `Fetching test cases from: ${query}`);
+      addLog('INFO', `Attempting API fetch from: ${query}`);
       const res = await fetch(query);
       if (!res.ok) {
         const errorText = await res.text();
-        addLog('WARN', `API call failed for ${domainLabel}, status: ${res.status}, error: ${errorText}`);
-        return;
+        addLog('WARN', `API call failed for ${domainLabel}, status: ${res.status}, keeping sample data`);
+        return; // Keep sample data
       }
       const json = await res.json();
-      addLog('DEBUG', `API response: ${JSON.stringify(json).substring(0, 200)}...`);
+      addLog('DEBUG', `API response received, processing...`);
       
       const raw = (json?.data?.testCases || []) as any[];
-      if (raw.length === 0) {
-        addLog('WARN', `No test cases found for category: ${categoryFilter}. Check if migration 039_add_gcf_ptcrb_categories.sql has been applied.`);
-        
-        // Provide sample test cases for demonstration if no data is found
-        const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
-        setTestCases(sampleCases);
-        addLog('INFO', `Loaded ${sampleCases.length} sample test cases for ${domainLabel} (category: ${categoryFilter})`);
-        return;
+      if (raw.length > 0) {
+        const cases = raw.map((t: any) => ({
+          id: t.id || t.test_case_id || 'unknown',
+          name: t.name,
+          component: t.category || t.protocol || domainLabel,
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: t.priority || '',
+          selected: false,
+          test_type: (t.test_type || '').toString().toLowerCase(),
+          raw_category: t.category || ''
+        })) as any[];
+        setTestCases(cases as TestCaseRow[]);
+        addLog('INFO', `Replaced with ${cases.length} real test cases from database`);
+      } else {
+        addLog('INFO', `API returned no test cases, keeping ${sampleCases.length} sample test cases`);
       }
-      
-      const cases = raw.map((t: any) => ({
-        id: t.id || t.test_case_id || 'unknown',
-        name: t.name,
-        component: t.category || t.protocol || domainLabel,
-        status: 'Not Started',
-        iterations: 'Never',
-        successRate: 'N/A',
-        lastRun: 'N/A',
-        duration: '-',
-        priority: t.priority || '',
-        selected: false,
-        test_type: (t.test_type || '').toString().toLowerCase(),
-        raw_category: t.category || ''
-      })) as any[];
-      setTestCases(cases as TestCaseRow[]);
-      addLog('INFO', `Loaded ${cases.length} test cases for ${domainLabel} (category: ${categoryFilter})`);
     } catch (e) {
-      addLog('ERROR', `Failed loading ${domainLabel} test cases: ${e}`);
-      // Provide sample test cases as fallback
-      const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
-      setTestCases(sampleCases);
-      addLog('INFO', `Loaded ${sampleCases.length} sample test cases as fallback for ${domainLabel}`);
+      addLog('WARN', `API fetch failed: ${e}, keeping sample test cases`);
+      // Sample cases already loaded, no need to reload
     }
   };
 
   React.useEffect(() => {
+    // Load initial test cases
+    addLog('INFO', 'Initializing Test Manager with 5G NR category');
     loadDomainCases('5G NR');
     setSelectedDomain('5G NR');
+    
     // Start polling active run and stats
     const poll = async () => {
       try {
@@ -755,7 +757,12 @@ const ClassicTestManager: React.FC = () => {
           <div className="space-y-1 max-h-96 overflow-y-auto">
             {testSuites.map(suite => (
               <div key={suite.id} className="space-y-1">
-                <div className={`flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer ${selectedDomain === suite.name ? 'bg-gray-700 border-l-2 border-blue-500' : ''}`} onClick={() => { setSelectedDomain(suite.name); setSelectedCategoryType(null); loadDomainCases(suite.name); }}>
+                <div className={`flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer ${selectedDomain === suite.name ? 'bg-gray-700 border-l-2 border-blue-500' : ''}`} onClick={() => { 
+                  addLog('INFO', `Category clicked: ${suite.name}`); 
+                  setSelectedDomain(suite.name); 
+                  setSelectedCategoryType(null); 
+                  loadDomainCases(suite.name); 
+                }}>
                   <div className="flex items-center space-x-2">
                     <i data-lucide={suite.expanded ? 'chevron-down' : 'chevron-right'} className="w-4 h-4"></i>
                     <span className="text-sm">{suite.name}</span>
