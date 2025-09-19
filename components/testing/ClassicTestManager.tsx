@@ -94,6 +94,8 @@ const ClassicTestManager: React.FC = () => {
   ]);
 
   const [isRunning, setIsRunning] = React.useState(false);
+  const [activeRun, setActiveRun] = React.useState<any>(null);
+  const [stats, setStats] = React.useState<any>(null);
   const [selectedDomain, setSelectedDomain] = React.useState<string | null>(null);
   const [selectedCategoryType, setSelectedCategoryType] = React.useState<string | null>(null);
   const [logs, setLogs] = React.useState<{ timestamp: string; level: 'INFO'|'ERROR'|'WARN'|'DEBUG'; message: string }[]>([
@@ -155,6 +157,18 @@ const ClassicTestManager: React.FC = () => {
   React.useEffect(() => {
     loadDomainCases('5G NR');
     setSelectedDomain('5G NR');
+    // Start polling active run and stats
+    const poll = async () => {
+      try {
+        const ar = await fetch('/api/tests/runs/active').then(r => r.ok ? r.json() : null);
+        setActiveRun(ar);
+        const st = await fetch('/api/tests/stats').then(r => r.ok ? r.json() : null);
+        setStats(st);
+      } catch (_) {}
+    };
+    poll();
+    const id = setInterval(poll, 3000);
+    return () => clearInterval(id);
   }, []);
 
   const addLog = (level: 'INFO'|'ERROR'|'WARN'|'DEBUG', message: string) => {
@@ -349,22 +363,61 @@ const ClassicTestManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Automation Log */}
-        <div className="flex-1 bg-white p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Automation Log</h2>
-            <div className="flex items-center space-x-2">
-              <button className="bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-700" onClick={() => setLogs([])}>Clear</button>
+        {/* Right Side: Automation Log + Running Tests + Recent Stats */}
+        <div className="flex-1 grid grid-rows-2 gap-4 p-4 bg-white">
+          {/* Automation Log */}
+          <div className="border rounded p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Automation Log</h2>
+              <div className="flex items-center space-x-2">
+                <button className="bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-700" onClick={() => setLogs([])}>Clear</button>
+              </div>
+            </div>
+            <div className="bg-black text-white p-4 rounded font-mono text-sm h-56 overflow-y-auto">
+              {logs.map((log, idx) => (
+                <div key={idx} className="flex items-start space-x-2 mb-1">
+                  <span className="text-blue-400">[{log.timestamp}]</span>
+                  <span className={`px-2 py-1 rounded text-xs font-bold ${levelClass(log.level)} text-white`}>{log.level}</span>
+                  <span className="text-white">{log.message}</span>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="bg-black text-white p-4 rounded font-mono text-sm h-64 overflow-y-auto">
-            {logs.map((log, idx) => (
-              <div key={idx} className="flex items-start space-x-2 mb-1">
-                <span className="text-blue-400">[{log.timestamp}]</span>
-                <span className={`px-2 py-1 rounded text-xs font-bold ${levelClass(log.level)} text-white`}>{log.level}</span>
-                <span className="text-white">{log.message}</span>
-              </div>
-            ))}
+
+          {/* Running Tests + Recent Results */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="border rounded p-4">
+              <h3 className="text-md font-semibold text-gray-900 mb-3">Running Tests</h3>
+              {activeRun ? (
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-700">Status:</span>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs">{activeRun.status}</span>
+                  </div>
+                  <div className="flex items-center justify-between"><span className="text-gray-700">Progress:</span><span>{Math.round(activeRun.progress || 0)}%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${Math.round(activeRun.progress || 0)}%` }}></div>
+                  </div>
+                  {activeRun.current_test && (
+                    <div className="text-gray-700">Current: {activeRun.current_test}</div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">No active runs</div>
+              )}
+            </div>
+            <div className="border rounded p-4">
+              <h3 className="text-md font-semibold text-gray-900 mb-3">Recent Results</h3>
+              {stats ? (
+                <div className="text-sm text-gray-700 space-y-1">
+                  <div>Total Tests: {stats.total_tests}</div>
+                  <div>Recent Runs (7d): {stats.recent_runs}</div>
+                  <div>Success Rate: {stats.success_rate?.toFixed?.(1) || 0}%</div>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">Loading stats...</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
