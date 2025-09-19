@@ -64,20 +64,97 @@ import ServiceIntegration from './services/ServiceIntegration';
 import { DataFlowProvider } from './services/DataFlowIntegration';
 import { APIProvider } from './services/APIIntegration';
 
+// Load services script
+if (typeof window !== 'undefined') {
+  import('./scripts/loadServices.js').then(() => {
+    console.log('5GLabX services loading initiated');
+  }).catch(error => {
+    console.warn('Failed to load 5GLabX services:', error);
+  });
+}
+
 // Import components
 import TestCaseDataFlow from './components/TestCaseDataFlow';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
+  const [testManagerData, setTestManagerData] = React.useState<any>(null);
+  const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
+
+  React.useEffect(() => {
+    // Listen for test manager execution events
+    const handleTestCaseExecution = (event: CustomEvent) => {
+      setTestManagerData(event.detail);
+      setLastUpdate(new Date());
+    };
+
+    // Listen for test data broadcasts
+    const handlePostMessage = (event: MessageEvent) => {
+      if (event.data.type === '5GLABX_TEST_DATA') {
+        setTestManagerData(event.data);
+        setLastUpdate(new Date());
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+      window.addEventListener('message', handlePostMessage);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+        window.removeEventListener('message', handlePostMessage);
+      }
+    };
+  }, []);
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">5GLabX Protocol Analyzer Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-sm text-gray-600">System Online</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-gray-600">System Online</span>
+          </div>
+          {testManagerData && (
+            <div className="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-blue-700">Live Test Data</span>
+            </div>
+          )}
         </div>
       </div>
+      
+      {testManagerData && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-blue-900">🔗 Test Manager Integration</h3>
+            <span className="text-sm text-blue-600">
+              Last Update: {lastUpdate?.toLocaleTimeString()}
+            </span>
+          </div>
+          <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <span className="text-blue-600 font-medium">Test Case:</span>
+              <div className="text-blue-900">{testManagerData.testCaseId || 'N/A'}</div>
+            </div>
+            <div>
+              <span className="text-blue-600 font-medium">Messages:</span>
+              <div className="text-blue-900">{testManagerData.testCaseData?.expectedMessages?.length || 0}</div>
+            </div>
+            <div>
+              <span className="text-blue-600 font-medium">IEs:</span>
+              <div className="text-blue-900">{testManagerData.testCaseData?.expectedInformationElements?.length || 0}</div>
+            </div>
+            <div>
+              <span className="text-blue-600 font-medium">Layer Params:</span>
+              <div className="text-blue-900">{testManagerData.testCaseData?.expectedLayerParameters?.length || 0}</div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg border shadow-sm">
