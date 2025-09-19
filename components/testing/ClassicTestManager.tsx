@@ -24,9 +24,73 @@ const ClassicTestManager: React.FC = () => {
   ]);
 
   const [testSuites] = React.useState([
-    { id: '5g-nr', name: '5G NR Test Suites', expanded: true, children: [{ id: 'lte-functional', name: 'Functional', count: 1 }] },
-    { id: '4g-lte', name: '4G LTE Test Suites', expanded: true, children: [] },
-    { id: 'core-network', name: 'Core Network Test Suites', expanded: false, children: [] }
+    {
+      id: '5g-nr',
+      name: '5G NR',
+      expanded: true,
+      children: [
+        { id: '5gnr-functional', name: 'Functional', count: 0 },
+        { id: '5gnr-performance', name: 'Performance', count: 0 },
+        { id: '5gnr-rf', name: 'RF', count: 0 },
+        { id: '5gnr-stability', name: 'Stability', count: 0 }
+      ]
+    },
+    {
+      id: '4g-lte',
+      name: '4G LTE',
+      expanded: true,
+      children: [
+        { id: 'lte-functional', name: 'Functional', count: 0 },
+        { id: 'lte-performance', name: 'Performance', count: 0 },
+        { id: 'lte-rf', name: 'RF', count: 0 },
+        { id: 'lte-stability', name: 'Stability', count: 0 }
+      ]
+    },
+    {
+      id: 'ims',
+      name: 'IMS/VoLTE/VoNR',
+      expanded: true,
+      children: [
+        { id: 'ims-functional', name: 'Functional', count: 0 },
+        { id: 'ims-performance-stability', name: 'Performance/Stability', count: 0 }
+      ]
+    },
+    {
+      id: 'oran',
+      name: 'O-RAN',
+      expanded: true,
+      children: [
+        { id: 'oran-functional', name: 'Functional', count: 0 },
+        { id: 'oran-performance', name: 'Performance', count: 0 }
+      ]
+    },
+    {
+      id: 'nbiot',
+      name: 'NB-IoT',
+      expanded: true,
+      children: [
+        { id: 'nbiot-functional', name: 'Functional', count: 0 },
+        { id: 'nbiot-performance', name: 'Performance', count: 0 }
+      ]
+    },
+    {
+      id: 'v2x',
+      name: 'V2X',
+      expanded: true,
+      children: [
+        { id: 'v2x-functional', name: 'Functional', count: 0 },
+        { id: 'v2x-performance', name: 'Performance', count: 0 }
+      ]
+    },
+    {
+      id: 'ntn',
+      name: 'NTN',
+      expanded: true,
+      children: [
+        { id: 'ntn-functional', name: 'Functional', count: 0 },
+        { id: 'ntn-performance', name: 'Performance', count: 0 }
+      ]
+    }
   ]);
 
   const [isRunning, setIsRunning] = React.useState(false);
