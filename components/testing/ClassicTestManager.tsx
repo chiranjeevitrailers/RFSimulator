@@ -90,6 +90,28 @@ const ClassicTestManager: React.FC = () => {
         { id: 'ntn-functional', name: 'Functional', count: 0 },
         { id: 'ntn-performance', name: 'Performance', count: 0 }
       ]
+    },
+    {
+      id: 'gcf',
+      name: 'GCF Certification',
+      expanded: true,
+      children: [
+        { id: 'gcf-3gpp-conformance', name: '3GPP Conformance', count: 0 },
+        { id: 'gcf-protocol', name: 'Protocol', count: 0 },
+        { id: 'gcf-rf', name: 'RF', count: 0 },
+        { id: 'gcf-performance', name: 'Performance', count: 0 }
+      ]
+    },
+    {
+      id: 'ptcrb',
+      name: 'PTCRB Certification',
+      expanded: true,
+      children: [
+        { id: 'ptcrb-3gpp-conformance', name: '3GPP Conformance', count: 0 },
+        { id: 'ptcrb-protocol', name: 'Protocol', count: 0 },
+        { id: 'ptcrb-rf', name: 'RF', count: 0 },
+        { id: 'ptcrb-performance', name: 'Performance', count: 0 }
+      ]
     }
   ]);
 
