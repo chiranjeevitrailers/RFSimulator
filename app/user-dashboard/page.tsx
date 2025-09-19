@@ -13,9 +13,7 @@ import {
   Shield,
   Monitor
 } from 'lucide-react';
-import TestSuitesView from '@/components/5glabx/views/TestSuitesView';
-import AnalyticsView from '@/components/5glabx/views/AnalyticsView';
-import TestDashboard from '@/components/testing/TestDashboard';
+import ProfessionalTestManager from '@/components/testing/ProfessionalTestManager';
 import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformMinimal';
 
 const UserDashboard: React.FC = () => {
@@ -58,15 +56,15 @@ const UserDashboard: React.FC = () => {
                   Overview
                 </button>
                 <button
-                  onClick={() => setActiveTab('test-dashboard')}
+                  onClick={() => setActiveTab('test-manager')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'test-dashboard'
+                    activeTab === 'test-manager'
                       ? 'bg-primary-100 text-primary-700'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4 inline mr-2" />
-                  Test Dashboard
+                  Test Manager
                 </button>
                 <button
                   onClick={() => setActiveTab('5glabx-platform')}
@@ -79,17 +77,7 @@ const UserDashboard: React.FC = () => {
                   <Monitor className="w-4 h-4 inline mr-2" />
                   5GLabX Platform
                 </button>
-                <button
-                  onClick={() => setActiveTab('test-suites')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === 'test-suites'
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Shield className="w-4 h-4 inline mr-2" />
-                  Test Suites
-                </button>
+                
                 <button
                   onClick={() => setActiveTab('settings')}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -171,33 +159,22 @@ const UserDashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'test-dashboard' && (
+        {activeTab === 'test-manager' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Test Dashboard</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Professional Test Manager</h2>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Live</span>
+                <span className="text-sm text-gray-600">Online</span>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <TestDashboard userId={user.id} />
+              <ProfessionalTestManager />
             </div>
           </div>
         )}
 
-        {activeTab === 'test-suites' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Test Suites</h2>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="min-h-[600px]">
-                <TestSuitesView appState={{}} onStateChange={() => {}} />
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         {activeTab === 'settings' && (
           <div className="space-y-6">
