@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Required for static export
-import { createClient } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = supabaseAdmin!;
     
     // Get total test counts
     const { count: totalTests } = await supabase
