@@ -116,6 +116,8 @@ interface TestSuitesStats {
     'NB_IoT': number;
     'V2X': number;
     'NTN': number;
+    'GCF': number;
+    'PTCRB': number;
   };
   test_types: {
     functional: number;
@@ -144,7 +146,9 @@ const TestSuitesDashboard: React.FC = () => {
       'O_RAN': 0,
       'NB_IoT': 0,
       'V2X': 0,
-      'NTN': 0
+      'NTN': 0,
+      'GCF': 0,
+      'PTCRB': 0
     },
     test_types: {
       functional: 0,
@@ -287,6 +291,8 @@ const TestSuitesDashboard: React.FC = () => {
       case 'NB_IoT': return <Satellite className="w-4 h-4" />;
       case 'V2X': return <Car className="w-4 h-4" />;
       case 'NTN': return <Globe className="w-4 h-4" />;
+      case 'GCF': return <Shield className="w-4 h-4" />;
+      case 'PTCRB': return <Award className="w-4 h-4" />;
       default: return <Monitor className="w-4 h-4" />;
     }
   };
