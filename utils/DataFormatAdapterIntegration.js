@@ -3,6 +3,7 @@
  * Shows how to integrate DataFormatAdapter with existing components
  */
 
+import React from 'react';
 import DataFormatAdapter from './DataFormatAdapter.js';
 
 /**
@@ -332,15 +333,7 @@ export function useDataFormatAdapter() {
   };
 }
 
-// Export all integration classes
-export {
-  LogViewerIntegration,
-  LayerViewIntegration,
-  TestCaseIntegration,
-  RealTimeIntegration,
-  MLIntegration,
-  IntegrationUtils
-};
+// Named exports are already provided via class/function export declarations above.
 
 export default {
   LogViewerIntegration,
