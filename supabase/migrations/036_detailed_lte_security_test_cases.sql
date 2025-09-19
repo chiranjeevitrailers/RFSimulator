@@ -15,76 +15,75 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Security - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Security Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Security - 1', 'EPS Authentication and Key Agreement (AKA)', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'),
- 'LTE', 'Multi', 'advanced', 'security', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'security', 
  'Verify EPS authentication and key agreement procedure',
  'TS 24.301 Section 5.4.1', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "auth_time": "<3s", "key_generation": ">95%"}'::jsonb),
 ('LTE Security - 2', 'NAS Security Mode Command', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'),
- 'LTE', 'Multi', 'advanced', 'security', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'security', 
  'Verify NAS security mode command procedure',
  'TS 24.301 Section 5.4.3', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "security_time": "<2s", "encryption_setup": ">95%"}'::jsonb),
 ('LTE Security - 3', 'AS Security Mode Command', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'),
- 'LTE', 'Multi', 'advanced', 'security', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'security', 
  'Verify AS security mode command procedure',
  'TS 36.331 Section 5.3.4', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "security_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "security_time": "<2s", "as_security": ">95%"}'::jsonb),
 ('LTE Security - 4', 'Key Derivation and Management', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'),
- 'LTE', 'Multi', 'advanced', 'security', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'security', 
  'Verify key derivation and management procedure',
  'TS 33.401 Section 6.2', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "key_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "key_derivation_time": "<1s", "key_management": ">95%"}'::jsonb),
 ('LTE Security - 5', 'Security Context Establishment', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'),
- 'LTE', 'Multi', 'advanced', 'security', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'security', 
  'Verify security context establishment procedure',
  'TS 33.401 Section 6.3', 'Release 15', 7, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "context_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "context_time": "<4s", "context_establishment": ">95%"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Security - ' || generate_series(6, 50) as name,
-    'LTE security procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Security - ' || i as name,
+    'LTE security procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Security') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
+    'advanced' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
-    CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'security'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'authentication'
+        WHEN i % 3 = 0 THEN 'security'
+        WHEN i % 4 = 0 THEN 'authentication'
         ELSE 'security'
     END as test_scenario,
-    'Verify LTE security procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE security procedure with scenario ' || i as test_objective,
     'TS 24.301 Section 5.4.1' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 8
+        WHEN i % 4 = 0 THEN 8
         ELSE 6
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "security_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "security_time": "<3s", "security_success": ">95%"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "security_time": "<3s", "security_success": ">95%"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
