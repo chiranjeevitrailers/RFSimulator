@@ -15,76 +15,75 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Mobility - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Mobility Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Mobility - 1', 'Tracking Area Update (TAU) Procedure', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'),
- 'LTE', 'Multi', 'advanced', 'mobility', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'mobility', 
  'Verify tracking area update procedure',
  'TS 24.301 Section 5.3.3', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "mobility_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "tau_time": "<5s", "mobility_success": ">90%"}'::jsonb),
 ('LTE Mobility - 2', 'Service Request Procedure', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'),
- 'LTE', 'Multi', 'advanced', 'mobility', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'mobility', 
  'Verify service request procedure',
  'TS 24.301 Section 5.6.1', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "service_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "service_request_time": "<3s", "connection_establishment": ">90%"}'::jsonb),
 ('LTE Mobility - 3', 'Cell Reselection Procedure', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'),
- 'LTE', 'Multi', 'advanced', 'mobility', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'mobility', 
  'Verify cell reselection procedure',
  'TS 36.331 Section 5.2.4', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "reselection_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reselection_time": "<2s", "cell_change": ">90%"}'::jsonb),
 ('LTE Mobility - 4', 'RRC Connection Reestablishment', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'),
- 'LTE', 'Multi', 'advanced', 'mobility', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'mobility', 
  'Verify RRC connection reestablishment procedure',
  'TS 36.331 Section 5.3.7', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "reestablishment_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "reestablishment_time": "<3s", "connection_recovery": ">90%"}'::jsonb),
 ('LTE Mobility - 5', 'RRC Connection Release', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'),
- 'LTE', 'Multi', 'advanced', 'mobility', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility'), '4G_LTE',
+ 'LTE', 'Multi', 'advanced', 'functional', 'mobility', 
  'Verify RRC connection release procedure',
  'TS 36.331 Section 5.3.8', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "release_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "release_time": "<1s", "resource_cleanup": ">95%"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Mobility - ' || generate_series(6, 50) as name,
-    'LTE mobility procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Mobility - ' || i as name,
+    'LTE mobility procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Mobility') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
+    'advanced' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'advanced'
-        ELSE 'advanced'
-    END as complexity,
-    CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'mobility'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'connection_management'
+        WHEN i % 3 = 0 THEN 'mobility'
+        WHEN i % 4 = 0 THEN 'connection_management'
         ELSE 'mobility'
     END as test_scenario,
-    'Verify LTE mobility procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE mobility procedure with scenario ' || i as test_objective,
     'TS 36.331 Section 5.3.3' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 7
+        WHEN i % 4 = 0 THEN 7
         ELSE 5
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "mobility_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "mobility_time": "<5s", "mobility_success": ">90%"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "mobility_time": "<5s", "mobility_success": ">90%"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
