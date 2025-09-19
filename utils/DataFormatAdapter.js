@@ -13,14 +13,13 @@ class DataFormatAdapter {
 
     return {
       id: logEntry.id || `${Date.now()}-${Math.random()}`,
-      timestamp: typeof logEntry.timestamp === 'string' 
-        ? new Date(logEntry.timestamp) 
-        : logEntry.timestamp,
-      level: this.mapLogLevel(logEntry.level),
+      timestamp: this.convertTimestampForLogsView(logEntry.timestampMs || logEntry.timestamp),
+      level: this.mapLogLevel(logEntry.level) || 'I',
+      component: logEntry.layer || logEntry.component || 'OTHER',
+      message: this.formatMessageForLogsView(logEntry),
+      type: logEntry.messageType || logEntry.messageName || 'GENERIC',
       source: logEntry.source || 'testcase',
-      layer: logEntry.layer || logEntry.component || 'OTHER',
-      protocol: logEntry.protocol || logEntry.fields?.protocol || logEntry.messageType || 'UNKNOWN',
-      message: logEntry.message || 'No message',
+      protocol: logEntry.protocol || logEntry.fields?.protocol || 'UNKNOWN',
       data: logEntry.data || logEntry.fields?.decoded || {},
       messageId: logEntry.messageId || logEntry.fields?.messageId,
       stepId: logEntry.stepId || logEntry.fields?.stepId,
@@ -34,6 +33,81 @@ class DataFormatAdapter {
         standardReference: logEntry.fields?.standardReference || logEntry.meta?.standardReference
       }
     };
+  }
+
+  /**
+   * Convert timestamp for LogsView format (expects "931.6" format)
+   */
+  static convertTimestampForLogsView(timestampMs) {
+    if (!timestampMs) return (Date.now() / 1000).toFixed(1);
+    if (typeof timestampMs === 'string') return timestampMs;
+    return (timestampMs / 1000).toFixed(1);
+  }
+
+  /**
+   * Format message for LogsView (expects descriptive string)
+   */
+  static formatMessageForLogsView(logEntry) {
+    const messageType = logEntry.messageType || logEntry.messageName || 'GENERIC';
+    const payload = logEntry.messagePayload || logEntry.payload || {};
+    
+    // Create descriptive message based on message type and payload
+    let message = messageType;
+    
+    // Add key payload information
+    const payloadStr = this.formatPayloadAsString(payload);
+    if (payloadStr) {
+      message += `: ${payloadStr}`;
+    }
+    
+    return message;
+  }
+
+  /**
+   * Adapt data for EnhancedLogsView component
+   */
+  static adaptForEnhancedLogsView(logEntry) {
+    if (!logEntry) return null;
+
+    return {
+      id: logEntry.id || `${Date.now()}-${Math.random()}`,
+      timestamp: this.convertTimestampForEnhancedView(logEntry.timestampMs || logEntry.timestamp),
+      direction: logEntry.direction || 'DL',
+      layer: logEntry.layer || 'OTHER',
+      channel: this.extractChannel(logEntry),
+      sfn: this.extractSfn(logEntry),
+      messageType: logEntry.messageType || logEntry.messageName || 'GENERIC',
+      rnti: this.extractRnti(logEntry),
+      message: logEntry.messageName || logEntry.messageType || 'Message',
+      rawData: this.formatPayloadAsHex(logEntry.messagePayload || logEntry.payload),
+      ies: this.formatIEsAsString(logEntry.ies || logEntry.informationElements || []),
+      source: logEntry.source || 'testcase'
+    };
+  }
+
+  /**
+   * Convert timestamp for EnhancedLogsView format (expects "10:00:00.123" format)
+   */
+  static convertTimestampForEnhancedView(timestampMs) {
+    if (!timestampMs) return new Date().toLocaleTimeString() + '.123';
+    if (typeof timestampMs === 'string') return timestampMs;
+    
+    const date = new Date(timestampMs);
+    const ms = timestampMs % 1000;
+    return date.toLocaleTimeString() + '.' + ms.toString().padStart(3, '0');
+  }
+
+  /**
+   * Format IEs as string for EnhancedLogsView
+   */
+  static formatIEsAsString(ies) {
+    if (!Array.isArray(ies) || ies.length === 0) return 'No IEs';
+    
+    return ies.map(ie => {
+      const name = ie.ieName || ie.name || 'Unknown';
+      const value = ie.ieValue || ie.value || 'N/A';
+      return `${name}=${value}`;
+    }).join(', ');
   }
 
   /**
@@ -499,6 +573,115 @@ class DataFormatAdapter {
     };
     
     return mappings[layer.toUpperCase()] || [];
+  }
+
+  /**
+   * Extract channel from message data
+   */
+  static extractChannel(logEntry) {
+    const messageType = logEntry.messageType || logEntry.messageName || '';
+    const payload = logEntry.messagePayload || logEntry.payload || {};
+    
+    // Map message types to channels
+    if (messageType.includes('PDSCH') || messageType.includes('DL-SCH')) return 'PDSCH';
+    if (messageType.includes('PUSCH') || messageType.includes('UL-SCH')) return 'PUSCH';
+    if (messageType.includes('PUCCH')) return 'PUCCH';
+    if (messageType.includes('PRACH')) return 'PRACH';
+    if (messageType.includes('PBCH') || messageType.includes('MIB')) return 'PBCH';
+    if (messageType.includes('PDCCH')) return 'PDCCH';
+    
+    return payload.channel || 'OTHER';
+  }
+
+  /**
+   * Extract SFN from message data
+   */
+  static extractSfn(logEntry) {
+    const payload = logEntry.messagePayload || logEntry.payload || {};
+    return payload.sfn || payload.systemFrameNumber || Math.floor(Math.random() * 1024).toString();
+  }
+
+  /**
+   * Extract RNTI from message data
+   */
+  static extractRnti(logEntry) {
+    const payload = logEntry.messagePayload || logEntry.payload || {};
+    if (payload.rnti) return payload.rnti;
+    if (payload.c_rnti) return payload.c_rnti;
+    if (payload.si_rnti) return 'SI-RNTI';
+    if (payload.ra_rnti) return 'RA-RNTI';
+    return 'C-RNTI';
+  }
+
+  /**
+   * Format payload as hex string
+   */
+  static formatPayloadAsHex(payload) {
+    if (!payload) return '00 00 00 00';
+    if (typeof payload === 'string') return payload;
+    
+    // Convert object to hex representation
+    const str = JSON.stringify(payload);
+    let hex = '';
+    for (let i = 0; i < str.length && i < 20; i++) {
+      hex += str.charCodeAt(i).toString(16).padStart(2, '0') + ' ';
+    }
+    return hex.trim() || '00 00 00 00';
+  }
+
+  /**
+   * Format payload as descriptive string
+   */
+  static formatPayloadAsString(payload) {
+    if (!payload) return '';
+    if (typeof payload === 'string') return payload;
+    
+    // Extract key-value pairs for display
+    const keyValues = [];
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        keyValues.push(`${key}=${value}`);
+      }
+    });
+    
+    return keyValues.join(' ');
+  }
+
+  /**
+   * Format IEs as string for EnhancedLogsView
+   */
+  static formatIEsAsString(ies) {
+    if (!Array.isArray(ies) || ies.length === 0) return 'No IEs';
+    
+    return ies.map(ie => {
+      const name = ie.ieName || ie.ie_name || ie.name || 'Unknown';
+      const value = ie.ieValue || ie.ie_value || ie.value || 'N/A';
+      return `${name}=${value}`;
+    }).join(', ');
+  }
+
+  /**
+   * Find numeric value in decoded data or IEs
+   */
+  static findNumericValue(decoded, ies, keys) {
+    // Check decoded data first
+    for (const key of keys) {
+      if (decoded[key] !== undefined && !isNaN(decoded[key])) {
+        return parseFloat(decoded[key]);
+      }
+    }
+    
+    // Check IEs
+    for (const ie of ies) {
+      for (const key of keys) {
+        if (ie.name === key || ie.ie_name === key || ie.ieName === key) {
+          const value = ie.value || ie.ie_value || ie.ieValue;
+          if (!isNaN(value)) return parseFloat(value);
+        }
+      }
+    }
+    
+    return null;
   }
 }
 
