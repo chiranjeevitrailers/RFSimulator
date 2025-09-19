@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Required for static export
-import { createClient } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = supabaseAdmin!;
     
     // Get user from request (you'll need to implement auth)
     // For now, using a mock user ID

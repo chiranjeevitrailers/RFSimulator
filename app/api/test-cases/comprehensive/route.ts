@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Required for static export
-import { createClient } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 /**
  * Comprehensive Test Cases API
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const includeData = searchParams.get('includeData') === 'true';
 
-    const supabase = createClient();
+    const supabase = supabaseAdmin!;
 
     console.log(`🔍 Fetching comprehensive test cases - Category: ${category}, Protocol: ${protocol}, Layer: ${layer}`);
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       .from('test_cases')
       .select(`
         *,
-        test_case_categories!inner(name, description, protocol_focus, layer_focus),
+        test_case_categories(name, description, protocol_focus, layer_focus),
         test_case_messages(
           id, step_id, step_order, timestamp_ms, direction, layer, protocol,
           message_type, message_name, message_description, standard_reference,
@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (category) {
-      query = query.eq('test_case_categories.name', category);
+      // Filter directly on test_cases.category to avoid category-name mismatches
+      query = query.eq('category', category);
     }
     if (protocol) {
       query = query.eq('protocol', protocol);
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
       .select('id', { count: 'exact', head: true });
 
     if (category) {
-      countQuery = countQuery.eq('test_case_categories.name', category);
+      countQuery = countQuery.eq('category', category);
     }
     if (protocol) {
       countQuery = countQuery.eq('protocol', protocol);
