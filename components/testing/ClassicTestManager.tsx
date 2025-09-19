@@ -140,14 +140,157 @@ const ClassicTestManager: React.FC = () => {
 
   const normalize = (s: string) => (s || '').replace(/[_\s-]/g, '').toUpperCase();
 
+  const getSampleTestCases = (categoryFilter: string, domainLabel: string): TestCaseRow[] => {
+    const sampleCases: Record<string, TestCaseRow[]> = {
+      'GCF': [
+        {
+          id: 'GCF-001',
+          name: 'GCF RRC Connection Establishment',
+          component: 'GCF',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'GCF-002',
+          name: 'GCF NAS Authentication',
+          component: 'GCF',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'GCF-003',
+          name: 'GCF RF Transmitter Test',
+          component: 'GCF',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Critical',
+          selected: false
+        }
+      ],
+      'PTCRB': [
+        {
+          id: 'PTCRB-001',
+          name: 'PTCRB RRC Protocol Conformance',
+          component: 'PTCRB',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'PTCRB-002',
+          name: 'PTCRB NAS EMM Procedures',
+          component: 'PTCRB',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        },
+        {
+          id: 'PTCRB-003',
+          name: 'PTCRB Band-Specific RF Tests',
+          component: 'PTCRB',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'Critical',
+          selected: false
+        }
+      ],
+      '5G_NR': [
+        {
+          id: '5G-001',
+          name: '5G NR Initial Access',
+          component: '5G_NR',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        }
+      ],
+      '4G_LTE': [
+        {
+          id: 'LTE-001',
+          name: 'LTE Attach Procedure',
+          component: '4G_LTE',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '-',
+          priority: 'High',
+          selected: false
+        }
+      ]
+    };
+    
+    return sampleCases[categoryFilter] || [];
+  };
+
   const loadDomainCases = async (domainLabel: string) => {
-    // Fetch a broader list to avoid server-side category mismatches; filter on client
-    const query = '/api/test-cases/comprehensive?limit=300';
+    // Map domain labels to actual database categories
+    const domainToCategory: Record<string, string> = {
+      '5G NR': '5G_NR',
+      '4G LTE': '4G_LTE', 
+      'IMS/VoLTE/VoNR': 'IMS',
+      'O-RAN': 'O_RAN',
+      'NB-IoT': 'NB_IoT',
+      'V2X': 'V2X',
+      'NTN': 'NTN',
+      'GCF Certification': 'GCF',
+      'PTCRB Certification': 'PTCRB'
+    };
+
+    const categoryFilter = domainToCategory[domainLabel] || domainLabel;
+    
+    // Use category filter in API call for better performance
+    const query = `/api/test-cases/comprehensive?category=${encodeURIComponent(categoryFilter)}&limit=300`;
     try {
+      addLog('INFO', `Fetching test cases from: ${query}`);
       const res = await fetch(query);
-      if (!res.ok) return;
+      if (!res.ok) {
+        const errorText = await res.text();
+        addLog('WARN', `API call failed for ${domainLabel}, status: ${res.status}, error: ${errorText}`);
+        return;
+      }
       const json = await res.json();
+      addLog('DEBUG', `API response: ${JSON.stringify(json).substring(0, 200)}...`);
+      
       const raw = (json?.data?.testCases || []) as any[];
+      if (raw.length === 0) {
+        addLog('WARN', `No test cases found for category: ${categoryFilter}. Check if migration 039_add_gcf_ptcrb_categories.sql has been applied.`);
+        
+        // Provide sample test cases for demonstration if no data is found
+        const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
+        setTestCases(sampleCases);
+        addLog('INFO', `Loaded ${sampleCases.length} sample test cases for ${domainLabel} (category: ${categoryFilter})`);
+        return;
+      }
+      
       const cases = raw.map((t: any) => ({
         id: t.id || t.test_case_id || 'unknown',
         name: t.name,
@@ -163,9 +306,13 @@ const ClassicTestManager: React.FC = () => {
         raw_category: t.category || ''
       })) as any[];
       setTestCases(cases as TestCaseRow[]);
-      addLog('INFO', `Loaded ${cases.length} test cases; filtering for ${domainLabel}`);
+      addLog('INFO', `Loaded ${cases.length} test cases for ${domainLabel} (category: ${categoryFilter})`);
     } catch (e) {
-      addLog('WARN', `Failed loading ${domainLabel} test cases; using defaults`);
+      addLog('ERROR', `Failed loading ${domainLabel} test cases: ${e}`);
+      // Provide sample test cases as fallback
+      const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
+      setTestCases(sampleCases);
+      addLog('INFO', `Loaded ${sampleCases.length} sample test cases as fallback for ${domainLabel}`);
     }
   };
 
@@ -340,17 +487,17 @@ const ClassicTestManager: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {testCases
                   .filter((tc: any) => {
-                    // Domain filter (match codes or labels)
-                    if (selectedDomain) {
-                      const dom = normalize(selectedDomain);
-                      const comp = normalize(tc.component || tc.raw_category || '');
-                      if (!comp.includes(dom)) return false;
-                    }
-                    // Subcategory/test type filter
+                    // Since we now filter by category in the API call, 
+                    // we mainly need to handle subcategory/test type filtering
+                    
+                    // If no subcategory is selected, show all test cases from the selected domain
                     if (!selectedCategoryType) return true;
+                    
+                    // Subcategory/test type filter
                     const type = (tc as any).test_type || '';
                     // If DB doesn't have test_type, don't hide the row
                     if (!type) return true;
+                    
                     const wanted = selectedCategoryType.toLowerCase();
                     if (wanted.includes('/')) {
                       const parts = wanted.split('/');
