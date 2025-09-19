@@ -508,48 +508,76 @@ const ClassicTestManager: React.FC = () => {
     const categoryFilter = domainToCategory[domainLabel] || domainLabel;
     addLog('INFO', `Mapped ${domainLabel} to category: ${categoryFilter}`);
     
-    // ALWAYS load sample test cases first for immediate display
-    const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
-    setTestCases(sampleCases);
-    addLog('INFO', `Loaded ${sampleCases.length} sample test cases for immediate display`);
+    // Try multiple API approaches to find the real test cases
+    const queries = [
+      `/api/test-cases/simple?category=${encodeURIComponent(categoryFilter)}&limit=300`, // Simple API without complex filters
+      `/api/tests?protocol=${encodeURIComponent(categoryFilter)}&limit=300`, // Primary API with category filter
+      `/api/test-cases/comprehensive?category=${encodeURIComponent(categoryFilter)}&limit=300`, // Comprehensive API
+      `/api/test-cases/simple?limit=300` // Get all simple and filter client-side
+    ];
     
-    // Then try to load from API (this will replace sample data if successful)
-    const query = `/api/test-cases/comprehensive?category=${encodeURIComponent(categoryFilter)}&limit=300`;
-    try {
-      addLog('INFO', `Attempting API fetch from: ${query}`);
-      const res = await fetch(query);
-      if (!res.ok) {
-        const errorText = await res.text();
-        addLog('WARN', `API call failed for ${domainLabel}, status: ${res.status}, keeping sample data`);
-        return; // Keep sample data
+    let foundRealData = false;
+    
+    for (const query of queries) {
+      try {
+        addLog('INFO', `Trying API: ${query}`);
+        const res = await fetch(query);
+        if (!res.ok) {
+          addLog('WARN', `API ${query} failed with status: ${res.status}`);
+          continue;
+        }
+        
+        const json = await res.json();
+        addLog('DEBUG', `API response keys: ${Object.keys(json).join(', ')}`);
+        
+        // Try different response structures
+        let raw = json?.data?.testCases || json?.tests || json?.data || [];
+        if (!Array.isArray(raw)) raw = [];
+        
+        // Filter by category if we got all test cases
+        if (query.includes('limit=300') && !query.includes('category=')) {
+          raw = raw.filter((t: any) => 
+            t.category === categoryFilter || 
+            t.protocol === categoryFilter ||
+            (t.category && t.category.includes(categoryFilter.split('_')[0]))
+          );
+        }
+        
+        addLog('INFO', `Found ${raw.length} test cases from API`);
+        
+        if (raw.length > 0) {
+          const cases = raw.map((t: any) => ({
+            id: t.id || t.test_case_id || `tc_${Date.now()}_${Math.random()}`,
+            name: t.name || `Test Case ${t.test_case_id || 'Unknown'}`,
+            component: t.category || t.protocol || domainLabel,
+            status: 'Not Started',
+            iterations: 'Never',
+            successRate: 'N/A',
+            lastRun: 'N/A',
+            duration: t.duration_seconds ? `${Math.floor(t.duration_seconds/60)}m ${t.duration_seconds%60}s` : '-',
+            priority: t.priority || 'Medium',
+            selected: false,
+            test_type: (t.test_type || '').toString().toLowerCase(),
+            raw_category: t.category || ''
+          })) as any[];
+          
+          setTestCases(cases as TestCaseRow[]);
+          addLog('INFO', `✅ Loaded ${cases.length} REAL test cases for ${domainLabel}`);
+          foundRealData = true;
+          break;
+        }
+      } catch (e) {
+        addLog('WARN', `API ${query} failed: ${e}`);
+        continue;
       }
-      const json = await res.json();
-      addLog('DEBUG', `API response received, processing...`);
-      
-      const raw = (json?.data?.testCases || []) as any[];
-      if (raw.length > 0) {
-        const cases = raw.map((t: any) => ({
-          id: t.id || t.test_case_id || 'unknown',
-          name: t.name,
-          component: t.category || t.protocol || domainLabel,
-          status: 'Not Started',
-          iterations: 'Never',
-          successRate: 'N/A',
-          lastRun: 'N/A',
-          duration: '-',
-          priority: t.priority || '',
-          selected: false,
-          test_type: (t.test_type || '').toString().toLowerCase(),
-          raw_category: t.category || ''
-        })) as any[];
-        setTestCases(cases as TestCaseRow[]);
-        addLog('INFO', `Replaced with ${cases.length} real test cases from database`);
-      } else {
-        addLog('INFO', `API returned no test cases, keeping ${sampleCases.length} sample test cases`);
-      }
-    } catch (e) {
-      addLog('WARN', `API fetch failed: ${e}, keeping sample test cases`);
-      // Sample cases already loaded, no need to reload
+    }
+    
+    // If no real data found, use sample data as fallback
+    if (!foundRealData) {
+      addLog('WARN', `No real test cases found in database for ${categoryFilter}, using sample data`);
+      const sampleCases = getSampleTestCases(categoryFilter, domainLabel);
+      setTestCases(sampleCases);
+      addLog('INFO', `Loaded ${sampleCases.length} sample test cases as fallback`);
     }
   };
 
