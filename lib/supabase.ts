@@ -1,20 +1,25 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createSbClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
-// Export createClient function for use in API routes
-export { createClient };
+// Helper: create a configured client using env vars (public anon)
+export const createClient = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error('Supabase env vars missing');
+  return createSbClient(url, key);
+};
 
 // Only create client if we have valid environment variables
 export const supabase = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key' 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createSbClient(supabaseUrl, supabaseAnonKey)
   : null;
 
 // Admin client for server-side operations
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key';
 export const supabaseAdmin = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseServiceKey !== 'placeholder-service-key'
-  ? createClient(supabaseUrl, supabaseServiceKey, {
+  ? createSbClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
