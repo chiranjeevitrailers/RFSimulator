@@ -15,76 +15,79 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Bearer Management - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Bearer Management Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Bearer Management - 1', 'Default EPS Bearer Establishment', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'),
- 'LTE', 'Multi', 'intermediate', 'bearer_management', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'bearer_management', 
  'Verify default EPS bearer establishment procedure',
  'TS 24.301 Section 6.5.1', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "bearer_setup_time": "<3s", "throughput": ">10Mbps"}'::jsonb),
 ('LTE Bearer Management - 2', 'Dedicated EPS Bearer Establishment', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'),
- 'LTE', 'Multi', 'intermediate', 'bearer_management', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'bearer_management', 
  'Verify dedicated EPS bearer establishment procedure',
  'TS 24.301 Section 6.5.2', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "bearer_setup_time": "<4s", "throughput": ">50Mbps"}'::jsonb),
 ('LTE Bearer Management - 3', 'EPS Bearer Modification', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'),
- 'LTE', 'Multi', 'intermediate', 'bearer_management', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'bearer_management', 
  'Verify EPS bearer modification procedure',
  'TS 24.301 Section 6.5.3', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "bearer_modification_time": "<2s", "qos_update": ">90%"}'::jsonb),
 ('LTE Bearer Management - 4', 'EPS Bearer Deactivation', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'),
- 'LTE', 'Multi', 'intermediate', 'bearer_management', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'bearer_management', 
  'Verify EPS bearer deactivation procedure',
  'TS 24.301 Section 6.5.4', 'Release 15', 4, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "bearer_deactivation_time": "<1s", "resource_cleanup": ">95%"}'::jsonb),
 ('LTE Bearer Management - 5', 'EPS Bearer Context Activation', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'),
- 'LTE', 'Multi', 'intermediate', 'bearer_management', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'bearer_management', 
  'Verify EPS bearer context activation procedure',
  'TS 24.301 Section 6.5.5', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "context_activation_time": "<2s", "bearer_establishment": ">95%"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Bearer Management - ' || generate_series(6, 50) as name,
-    'LTE bearer management procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Bearer Management - ' || i as name,
+    'LTE bearer management procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Bearer Management') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'advanced'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'intermediate'
+        WHEN i % 4 = 0 THEN 'advanced'
+        WHEN i % 3 = 0 THEN 'intermediate'
         ELSE 'intermediate'
     END as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'bearer_management'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'qos_management'
+        WHEN i % 3 = 0 THEN 'bearer_management'
+        WHEN i % 4 = 0 THEN 'qos_management'
         ELSE 'bearer_management'
     END as test_scenario,
-    'Verify LTE bearer management procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE bearer management procedure with scenario ' || i as test_objective,
     'TS 24.301 Section 6.5.1' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 7
+        WHEN i % 4 = 0 THEN 7
         ELSE 5
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "bearer_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "bearer_setup_time": "<3s", "throughput": ">10Mbps"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "bearer_setup_time": "<3s", "throughput": ">10Mbps"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
