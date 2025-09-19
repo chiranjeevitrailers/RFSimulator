@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import TestSuitesView from '@/components/5glabx/views/TestSuitesView';
 import AnalyticsView from '@/components/5glabx/views/AnalyticsView';
+import TestDashboard from '@/components/testing/TestDashboard';
 import FiveGLabXPlatform from '@/components/5glabx/5GLabXPlatformMinimal';
 
 const UserDashboard: React.FC = () => {
@@ -180,9 +181,7 @@ const UserDashboard: React.FC = () => {
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="min-h-[600px]">
-                <AnalyticsView appState={{}} onStateChange={() => {}} />
-              </div>
+              <TestDashboard userId={user.id} />
             </div>
           </div>
         )}
