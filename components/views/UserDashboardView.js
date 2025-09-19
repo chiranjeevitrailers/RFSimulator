@@ -265,19 +265,7 @@ function UserDashboardView({ appState, onStateChange }) {
     );
 
     const ProfessionalTestingTab = () => {
-      // Check if the real-time testing platform component is available
-      if (window.RealTimeTestingPlatform) {
-        return React.createElement(window.RealTimeTestingPlatform, {
-          appState: appState,
-          onStateChange: onStateChange
-        });
-      } else if (window.AdvancedTestingPlatform) {
-        return React.createElement(window.AdvancedTestingPlatform, {
-          appState: appState,
-          onStateChange: onStateChange
-        });
-      } else {
-        return React.createElement('div', { className: 'space-y-4' }, [
+      return React.createElement('div', { className: 'space-y-4' }, [
           React.createElement('div', { key: 'hdr', className: 'bg-white border rounded-lg p-4 flex items-center justify-between' }, [
             React.createElement('h3', { key: 't', className: 'text-lg font-semibold' }, 'Professional Testing Platform'),
             React.createElement('span', { key: 'st', className: 'text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700' }, 'QXDM/Keysight-like Interface')
@@ -307,7 +295,6 @@ function UserDashboardView({ appState, onStateChange }) {
             ])
           ])
         ]);
-      }
     };
 
     const SettingsTab = () => (
