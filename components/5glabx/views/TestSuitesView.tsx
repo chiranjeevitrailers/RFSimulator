@@ -239,6 +239,90 @@ const TestSuitesView: React.FC<{
       icon: Phone,
       color: 'purple',
       tags: ['VoLTE', 'VoNR', 'IMS', 'Conference', 'SIP']
+    },
+    {
+      id: 'gcf-3gpp-conformance',
+      name: 'GCF 3GPP Conformance',
+      description: 'GCF (Global Certification Forum) 3GPP conformance test suite for device certification including protocol conformance, RF performance, and interoperability tests.',
+      category: 'GCF',
+      testCount: 75,
+      status: 'active',
+      lastRun: '2024-01-14 10:30:00',
+      successRate: 98.7,
+      avgDuration: '8m 45s',
+      icon: Shield,
+      color: 'orange',
+      tags: ['GCF', '3GPP', 'Conformance', 'Certification', 'Protocol', 'RF']
+    },
+    {
+      id: 'gcf-protocol-testing',
+      name: 'GCF Protocol Testing',
+      description: 'GCF protocol testing suite covering RRC, NAS, and signaling procedures for device certification compliance.',
+      category: 'GCF',
+      testCount: 45,
+      status: 'active',
+      lastRun: '2024-01-13 14:15:00',
+      successRate: 97.1,
+      avgDuration: '6m 20s',
+      icon: Network,
+      color: 'orange',
+      tags: ['GCF', 'Protocol', 'RRC', 'NAS', 'Signaling', 'Certification']
+    },
+    {
+      id: 'gcf-rf-performance',
+      name: 'GCF RF Performance',
+      description: 'GCF RF performance test suite including transmitter characteristics, receiver performance, and EMC compliance tests.',
+      category: 'GCF',
+      testCount: 35,
+      status: 'active',
+      lastRun: '2024-01-12 16:45:00',
+      successRate: 96.3,
+      avgDuration: '12m 10s',
+      icon: Settings,
+      color: 'orange',
+      tags: ['GCF', 'RF', 'Performance', 'EMC', 'Transmitter', 'Receiver']
+    },
+    {
+      id: 'ptcrb-3gpp-conformance',
+      name: 'PTCRB 3GPP Conformance',
+      description: 'PTCRB (PCS Type Certification Review Board) 3GPP conformance test suite for North American carrier certification including protocol and RF tests.',
+      category: 'PTCRB',
+      testCount: 85,
+      status: 'active',
+      lastRun: '2024-01-15 09:20:00',
+      successRate: 98.2,
+      avgDuration: '9m 30s',
+      icon: Shield,
+      color: 'indigo',
+      tags: ['PTCRB', '3GPP', 'Conformance', 'Certification', 'North America', 'Carrier']
+    },
+    {
+      id: 'ptcrb-protocol-testing',
+      name: 'PTCRB Protocol Testing',
+      description: 'PTCRB protocol testing suite covering LTE and 5G NR protocol conformance for carrier acceptance testing.',
+      category: 'PTCRB',
+      testCount: 55,
+      status: 'active',
+      lastRun: '2024-01-14 11:40:00',
+      successRate: 97.8,
+      avgDuration: '7m 15s',
+      icon: Network,
+      color: 'indigo',
+      tags: ['PTCRB', 'Protocol', 'LTE', '5G NR', 'Carrier', 'Acceptance']
+    },
+    {
+      id: 'ptcrb-rf-performance',
+      name: 'PTCRB RF Performance',
+      description: 'PTCRB RF performance test suite including band-specific tests, spurious emissions, and SAR compliance for North American markets.',
+      category: 'PTCRB',
+      testCount: 40,
+      status: 'active',
+      lastRun: '2024-01-13 13:25:00',
+      successRate: 95.9,
+      avgDuration: '11m 50s',
+      icon: Settings,
+      color: 'indigo',
+      tags: ['PTCRB', 'RF', 'Performance', 'SAR', 'Spurious', 'Band-specific']
     }
   ]);
 
@@ -247,7 +331,7 @@ const TestSuitesView: React.FC<{
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [runningTests, setRunningTests] = useState<Set<string>>(new Set());
 
-  const categories = ['all', '5G NR', '4G LTE', 'IMS'];
+  const categories = ['all', '5G NR', '4G LTE', 'IMS', 'GCF', 'PTCRB'];
   const statuses = ['all', 'active', 'inactive', 'running'];
 
   const filteredTestSuites = testSuites.filter(suite => {
@@ -268,6 +352,10 @@ const TestSuitesView: React.FC<{
         return 'bg-green-100 text-green-600 border-green-200';
       case 'purple':
         return 'bg-purple-100 text-purple-600 border-purple-200';
+      case 'orange':
+        return 'bg-orange-100 text-orange-600 border-orange-200';
+      case 'indigo':
+        return 'bg-indigo-100 text-indigo-600 border-indigo-200';
       default:
         return 'bg-gray-100 text-gray-600 border-gray-200';
     }
