@@ -116,19 +116,11 @@ const ClassicTestManager: React.FC = () => {
     selected: false
   }]);
 
-  const DOMAIN_TO_DB_CATEGORY: Record<string, string> = {
-    '5G NR': '5G_NR',
-    '4G LTE': '4G_LTE',
-    'IMS/VoLTE/VoNR': 'IMS_SIP',
-    'O-RAN': 'O_RAN',
-    'NB-IoT': 'NB_IoT',
-    'V2X': 'V2X',
-    'NTN': 'NTN'
-  };
+  const normalize = (s: string) => (s || '').replace(/[_\s-]/g, '').toUpperCase();
 
   const loadDomainCases = async (domainLabel: string) => {
-    const dbCategory = DOMAIN_TO_DB_CATEGORY[domainLabel] || undefined;
-    const query = dbCategory ? `/api/test-cases/comprehensive?category=${encodeURIComponent(dbCategory)}&limit=200` : '/api/test-cases/comprehensive?limit=100';
+    // Fetch a broader list to avoid server-side category mismatches; filter on client
+    const query = '/api/test-cases/comprehensive?limit=300';
     try {
       const res = await fetch(query);
       if (!res.ok) return;
@@ -145,10 +137,11 @@ const ClassicTestManager: React.FC = () => {
         duration: '-',
         priority: t.priority || '',
         selected: false,
-        test_type: (t.test_type || '').toString().toLowerCase()
+        test_type: (t.test_type || '').toString().toLowerCase(),
+        raw_category: t.category || ''
       })) as any[];
       setTestCases(cases as TestCaseRow[]);
-      addLog('INFO', `Loaded ${cases.length} ${domainLabel} test cases`);
+      addLog('INFO', `Loaded ${cases.length} test cases; filtering for ${domainLabel}`);
     } catch (e) {
       addLog('WARN', `Failed loading ${domainLabel} test cases; using defaults`);
     }
@@ -325,10 +318,16 @@ const ClassicTestManager: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {testCases
                   .filter((tc: any) => {
+                    // Domain filter (match codes or labels)
+                    if (selectedDomain) {
+                      const dom = normalize(selectedDomain);
+                      const comp = normalize(tc.component || tc.raw_category || '');
+                      if (!comp.includes(dom)) return false;
+                    }
+                    // Subcategory/test type filter
                     if (!selectedCategoryType) return true;
                     const type = (tc as any).test_type || '';
                     const wanted = selectedCategoryType.toLowerCase();
-                    // "Performance/Stability" should match either
                     if (wanted.includes('/')) {
                       const parts = wanted.split('/');
                       return parts.some(p => type.includes(p.trim()));
