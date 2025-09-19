@@ -90,7 +90,8 @@ const DashboardView: React.FC = () => {
 
     // Listen for test data broadcasts
     const handlePostMessage = (event: MessageEvent) => {
-      if (event.data.type === '5GLABX_TEST_DATA') {
+      if (event.data.type === '5GLABX_TEST_DATA' || event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('🎯 5GLabX Dashboard received test data:', event.data.type);
         setTestManagerData(event.data);
         setLastUpdate(new Date());
       }
