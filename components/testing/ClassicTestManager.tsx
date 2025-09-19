@@ -327,6 +327,8 @@ const ClassicTestManager: React.FC = () => {
                     // Subcategory/test type filter
                     if (!selectedCategoryType) return true;
                     const type = (tc as any).test_type || '';
+                    // If DB doesn't have test_type, don't hide the row
+                    if (!type) return true;
                     const wanted = selectedCategoryType.toLowerCase();
                     if (wanted.includes('/')) {
                       const parts = wanted.split('/');
