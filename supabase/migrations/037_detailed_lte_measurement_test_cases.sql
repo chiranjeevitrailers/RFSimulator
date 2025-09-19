@@ -15,76 +15,75 @@ DELETE FROM public.test_cases WHERE name LIKE 'LTE Measurement - %';
 -- ==============================================
 
 -- Test Cases 1-10: Basic Measurement Scenarios
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) VALUES
 ('LTE Measurement - 1', 'RSRP and RSRQ Measurement Configuration', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'),
- 'LTE', 'Multi', 'intermediate', 'measurement', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify RSRP and RSRQ measurement configuration and reporting',
  'TS 36.331 Section 5.5.4', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "measurement_time": "<2s", "measurement_accuracy": ">90%"}'::jsonb),
 ('LTE Measurement - 2', 'Intra-frequency Cell Search and Measurement', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'),
- 'LTE', 'Multi', 'intermediate', 'measurement', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify intra-frequency cell search and measurement procedure',
  'TS 36.331 Section 5.5.4.1', 'Release 15', 6, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "cell_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "search_time": "<3s", "cell_detection": ">90%"}'::jsonb),
 ('LTE Measurement - 3', 'Inter-frequency Cell Search and Measurement', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'),
- 'LTE', 'Multi', 'intermediate', 'measurement', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify inter-frequency cell search and measurement procedure',
  'TS 36.331 Section 5.5.4.2', 'Release 15', 7, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "frequency_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "search_time": "<4s", "frequency_scan": ">90%"}'::jsonb),
 ('LTE Measurement - 4', 'Inter-RAT Cell Search and Measurement', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'),
- 'LTE', 'Multi', 'intermediate', 'measurement', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify inter-RAT cell search and measurement procedure',
  'TS 36.331 Section 5.5.4.3', 'Release 15', 8, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "rat_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "search_time": "<5s", "rat_detection": ">90%"}'::jsonb),
 ('LTE Measurement - 5', 'Measurement Report Configuration', 
- (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'),
- 'LTE', 'Multi', 'intermediate', 'measurement', 
+ (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement'), '4G_LTE',
+ 'LTE', 'Multi', 'intermediate', 'functional', 'measurement', 
  'Verify measurement report configuration and triggering',
  'TS 36.331 Section 5.5.5', 'Release 15', 5, 4, 'semi_automated',
  '{"ue_capabilities": "required", "network_config": "required", "report_config": "required"}'::jsonb,
  '{"success_rate": ">95%", "report_time": "<1s", "report_accuracy": ">95%"}'::jsonb);
 
 -- Generate remaining test cases (6-50) using a loop
-INSERT INTO public.test_cases (name, description, category_id, protocol, layer, complexity, test_scenario, test_objective, standard_reference, release_version, expected_duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
+INSERT INTO public.test_cases (name, description, category_id, category, protocol, layer, complexity, test_type, test_scenario, test_objective, standard_reference, release_version, duration_minutes, execution_priority, automation_level, test_data_requirements, kpi_requirements) 
 SELECT 
-    'LTE Measurement - ' || generate_series(6, 50) as name,
-    'LTE measurement procedure test case ' || generate_series(6, 50) || ' with various scenarios' as description,
+    'LTE Measurement - ' || i as name,
+    'LTE measurement procedure test case ' || i || ' with various scenarios' as description,
     (SELECT id FROM public.test_case_categories WHERE name = 'LTE Measurement') as category_id,
+    '4G_LTE' as category,
     'LTE' as protocol,
     'Multi' as layer,
+    'intermediate' as complexity,
+    'functional' as test_type,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'intermediate'
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'intermediate'
-        ELSE 'intermediate'
-    END as complexity,
-    CASE 
-        WHEN generate_series(6, 50) % 3 = 0 THEN 'measurement'
-        WHEN generate_series(6, 50) % 4 = 0 THEN 'cell_search'
+        WHEN i % 3 = 0 THEN 'measurement'
+        WHEN i % 4 = 0 THEN 'cell_search'
         ELSE 'measurement'
     END as test_scenario,
-    'Verify LTE measurement procedure with scenario ' || generate_series(6, 50) as test_objective,
+    'Verify LTE measurement procedure with scenario ' || i as test_objective,
     'TS 36.331 Section 5.5.4' as standard_reference,
     'Release 15' as release_version,
     CASE 
-        WHEN generate_series(6, 50) % 4 = 0 THEN 6
+        WHEN i % 4 = 0 THEN 6
         ELSE 5
-    END as expected_duration_minutes,
+    END as duration_minutes,
     CASE 
-        WHEN generate_series(6, 50) % 5 = 0 THEN 3
-        WHEN generate_series(6, 50) % 3 = 0 THEN 4
+        WHEN i % 5 = 0 THEN 3
+        WHEN i % 3 = 0 THEN 4
         ELSE 5
     END as execution_priority,
     'semi_automated' as automation_level,
     '{"ue_capabilities": "required", "network_config": "required", "measurement_config": "required"}'::jsonb as test_data_requirements,
-    '{"success_rate": ">95%", "measurement_time": "<3s", "measurement_success": ">90%"}'::jsonb as kpi_requirements;
+    '{"success_rate": ">95%", "measurement_time": "<3s", "measurement_success": ">90%"}'::jsonb as kpi_requirements
+FROM generate_series(6, 50) AS s(i);
 
 -- ==============================================
 -- 3. INSERT MESSAGE FLOWS FOR KEY TEST CASES
