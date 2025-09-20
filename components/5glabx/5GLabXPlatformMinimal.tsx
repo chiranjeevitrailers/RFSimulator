@@ -94,9 +94,6 @@ import NasLayerViewTSX from './views/NasLayerViewTSX';
 // Import protocol layer data test component
 import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
 
-// Import Protocol Analyzer Dashboard
-import ProtocolAnalyzerDashboard from './views/ProtocolAnalyzerDashboard';
-import RealisticCallFlowView from './views/RealisticCallFlowView';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -420,7 +417,6 @@ const Sidebar: React.FC<{
   // Menu items
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity, active: currentView === 'dashboard' },
-    { id: 'protocol-analyzer', label: 'Protocol Analyzer', icon: Activity, badge: 'LIVE' },
     { id: 'test-case-data-flow', label: 'Test Case Data Flow', icon: Database },
     { id: 'logs', label: 'Logs Viewer', icon: FileText },
     { id: 'enhanced-logs', label: 'Enhanced Logs', icon: Search },
@@ -638,8 +634,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
     switch (currentView) {
       case 'dashboard':
         return <DashboardView />;
-      case 'protocol-analyzer':
-        return <ProtocolAnalyzerDashboard />;
       case 'test-case-data-flow':
         return <TestCaseDataFlow />;
       case 'logs':
@@ -651,7 +645,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'layer-trace':
         return <LayerTraceView appState={{}} onStateChange={() => {}} />;
       case 'callflow':
-        return <RealisticCallFlowView />;
+        return <CallFlowView appState={{}} onStateChange={() => {}} />;
       case 'analytics':
         return <AnalyticsView appState={{}} onStateChange={() => {}} />;
       case 'protocol-layer-test':
