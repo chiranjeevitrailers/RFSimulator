@@ -591,11 +591,14 @@ const ClassicTestManager: React.FC = () => {
             priority: t.priority || 'Medium',
             selected: false,
             test_type: (t.test_type || '').toString().toLowerCase(),
-            raw_category: t.category || ''
+            raw_category: t.category || '',
+            // Store real database ID for API calls
+            realDatabaseId: t.id || t.test_case_id
           })) as any[];
           
           setTestCases(cases as TestCaseRow[]);
           addLog('INFO', `✅ Loaded ${cases.length} REAL test cases for ${domainLabel}`);
+          addLog('INFO', `Sample real IDs: ${cases.slice(0, 3).map(c => c.realDatabaseId || c.id).join(', ')}`);
           foundRealData = true;
           break;
         }
@@ -734,7 +737,12 @@ const ClassicTestManager: React.FC = () => {
 
   const handleRunTest = async (id: string) => {
     setIsRunning(true);
-    addLog('INFO', `Starting test execution: ${id}`);
+    
+    // Find the test case to get real database ID if available
+    const testCase = testCases.find(tc => tc.id === id);
+    const realId = (testCase as any)?.realDatabaseId || id;
+    
+    addLog('INFO', `Starting test execution: ${id} (Database ID: ${realId})`);
     try {
       // 1. Start test execution via API
       const executionResponse = await fetch('/api/tests/run', {
@@ -751,16 +759,60 @@ const ClassicTestManager: React.FC = () => {
       addLog('INFO', `Execution started for ${id}, RunId: ${executionData.run_id || 'unknown'}`);
       
       // 2. Fetch comprehensive test case data (messages, IEs, layer parameters)
-      addLog('INFO', `Fetching comprehensive test case data for ${id}...`);
-      const testDataResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(id)}&includeTemplates=true`);
+      addLog('INFO', `Fetching comprehensive test case data for ${realId}...`);
+      addLog('DEBUG', `API URL: /api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}&includeTemplates=true`);
+      
+      const testDataResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}&includeTemplates=true`);
       
       if (!testDataResponse.ok) {
-        addLog('WARN', `Failed to fetch test case data: ${testDataResponse.status}, continuing with basic execution`);
+        const errorText = await testDataResponse.text();
+        addLog('ERROR', `Failed to fetch test case data: ${testDataResponse.status} - ${errorText.substring(0, 200)}`);
+        
+        // Try alternative APIs to find the test case
+        addLog('INFO', `Trying alternative APIs to find test case ${id}...`);
+        
+        try {
+          // Try simple API
+          const simpleResponse = await fetch(`/api/test-cases/simple?limit=10`);
+          if (simpleResponse.ok) {
+            const simpleData = await simpleResponse.json();
+            addLog('INFO', `Simple API returned ${simpleData.data?.testCases?.length || 0} test cases`);
+            if (simpleData.data?.testCases?.length > 0) {
+              const sampleIds = simpleData.data.testCases.slice(0, 3).map((tc: any) => tc.id || tc.test_case_id);
+              addLog('INFO', `Sample real test case IDs from database: ${sampleIds.join(', ')}`);
+            }
+          }
+          
+          // Try tests API
+          const testsResponse = await fetch('/api/tests?limit=5');
+          if (testsResponse.ok) {
+            const testsData = await testsResponse.json();
+            addLog('INFO', `Tests API returned ${testsData.tests?.length || 0} test cases`);
+            if (testsData.tests?.length > 0) {
+              const realIds = testsData.tests.slice(0, 3).map((tc: any) => tc.id || tc.test_case_id);
+              addLog('INFO', `Real test case IDs from database: ${realIds.join(', ')}`);
+            }
+          }
+        } catch (altError) {
+          addLog('WARN', `Alternative API check failed: ${altError}`);
+        }
+        
+        addLog('WARN', `Using sample data for 5GLabX integration since test case ${id} not found in database`);
       } else {
         const testDataPayload = await testDataResponse.json();
         const testCaseData = testDataPayload.data;
         
-        addLog('INFO', `Comprehensive test data fetched: ${testCaseData.expectedMessages?.length || 0} messages, ${testCaseData.expectedInformationElements?.length || 0} IEs, ${testCaseData.expectedLayerParameters?.length || 0} layer parameters`);
+        if (testCaseData && testCaseData.testCase) {
+          addLog('INFO', `✅ REAL test case data fetched from Supabase for ${id}:`);
+          addLog('INFO', `  - Test Case Name: ${testCaseData.testCase.name}`);
+          addLog('INFO', `  - Expected Messages: ${testCaseData.expectedMessages?.length || 0}`);
+          addLog('INFO', `  - Information Elements: ${testCaseData.expectedInformationElements?.length || 0}`);
+          addLog('INFO', `  - Layer Parameters: ${testCaseData.expectedLayerParameters?.length || 0}`);
+          addLog('INFO', `  - Protocol: ${testCaseData.testCase.protocol}`);
+          addLog('INFO', `  - Category: ${testCaseData.testCase.category}`);
+        } else {
+          addLog('WARN', `API returned success but no test case data found for ${id}`);
+        }
         
         // 3. Feed data to 5GLabX backend - ENHANCED INTEGRATION
         addLog('INFO', `Integrating with 5GLabX platform for test case ${id}...`);
