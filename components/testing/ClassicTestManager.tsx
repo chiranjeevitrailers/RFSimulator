@@ -120,10 +120,13 @@ const ClassicTestManager: React.FC = () => {
       icon: '🏆',
       color: '#F97316',
       children: [
+        { id: 'gcf-functional', name: 'Functional', count: 0 },
+        { id: 'gcf-performance', name: 'Performance', count: 0 },
+        { id: 'gcf-rf', name: 'RF', count: 0 },
+        { id: 'gcf-stability', name: 'Stability', count: 0 },
         { id: 'gcf-3gpp-conformance', name: '3GPP Conformance', count: 0 },
         { id: 'gcf-protocol', name: 'Protocol', count: 0 },
-        { id: 'gcf-rf', name: 'RF', count: 0 },
-        { id: 'gcf-performance', name: 'Performance', count: 0 }
+        { id: 'gcf-interoperability', name: 'Interoperability', count: 0 }
       ]
     },
     {
@@ -134,10 +137,13 @@ const ClassicTestManager: React.FC = () => {
       icon: '🥇',
       color: '#6366F1',
       children: [
+        { id: 'ptcrb-functional', name: 'Functional', count: 0 },
+        { id: 'ptcrb-performance', name: 'Performance', count: 0 },
+        { id: 'ptcrb-rf', name: 'RF', count: 0 },
+        { id: 'ptcrb-stability', name: 'Stability', count: 0 },
         { id: 'ptcrb-3gpp-conformance', name: '3GPP Conformance', count: 0 },
         { id: 'ptcrb-protocol', name: 'Protocol', count: 0 },
-        { id: 'ptcrb-rf', name: 'RF', count: 0 },
-        { id: 'ptcrb-performance', name: 'Performance', count: 0 }
+        { id: 'ptcrb-interoperability', name: 'Interoperability', count: 0 }
       ]
     }
   ]);
@@ -625,8 +631,26 @@ const ClassicTestManager: React.FC = () => {
           'NB-IoT': { total: 59, functional: 30, performance: 29 },
           'V2X': { total: 59, functional: 30, performance: 29 },
           'NTN': { total: 22, functional: 11, performance: 11 },
-          'GCF Certification': { total: 9, '3gpp_conformance': 3, protocol: 3, rf: 2, performance: 1 },
-          'PTCRB Certification': { total: 9, '3gpp_conformance': 3, protocol: 3, rf: 2, performance: 1 }
+          'GCF Certification': { 
+            total: 9, 
+            functional: 2, 
+            performance: 2, 
+            rf: 2, 
+            stability: 1, 
+            '3gpp_conformance': 1, 
+            protocol: 1, 
+            interoperability: 0 
+          },
+          'PTCRB Certification': { 
+            total: 9, 
+            functional: 2, 
+            performance: 2, 
+            rf: 2, 
+            stability: 1, 
+            '3gpp_conformance': 1, 
+            protocol: 1, 
+            interoperability: 0 
+          }
         };
 
         setTestSuites(prevSuites => prevSuites.map(suite => {
@@ -637,14 +661,28 @@ const ClassicTestManager: React.FC = () => {
             totalCount: counts.total,
             children: suite.children.map((child: any) => {
               // Map child names to count keys
-              const childKey = child.name.toLowerCase().replace(/[^a-z]/g, '_');
-              const mappedKey = childKey.includes('3gpp') ? '3gpp_conformance' : 
-                              childKey.includes('performance_stability') ? 'performance/stability' :
-                              childKey.replace('_', '');
+              let mappedCount = 0;
+              const childName = child.name.toLowerCase();
+              
+              if (childName.includes('3gpp') || childName.includes('conformance')) {
+                mappedCount = counts['3gpp_conformance'] || counts.conformance || 0;
+              } else if (childName.includes('functional')) {
+                mappedCount = counts.functional || 0;
+              } else if (childName.includes('performance')) {
+                mappedCount = counts.performance || counts['performance/stability'] || 0;
+              } else if (childName.includes('rf')) {
+                mappedCount = counts.rf || 0;
+              } else if (childName.includes('stability')) {
+                mappedCount = counts.stability || 0;
+              } else if (childName.includes('protocol')) {
+                mappedCount = counts.protocol || 0;
+              } else {
+                mappedCount = counts[childName] || 0;
+              }
               
               return {
                 ...child,
-                count: counts[mappedKey] || counts[child.name.toLowerCase()] || 0
+                count: mappedCount
               };
             })
           };
@@ -1044,12 +1082,36 @@ const ClassicTestManager: React.FC = () => {
                     <td className="px-4 py-2 text-sm text-gray-500">{tc.duration}</td>
                     <td className="px-4 py-2 text-sm text-gray-500">{tc.priority}</td>
                     <td className="px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        <button className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700" onClick={() => handleRunTest(tc.id)} disabled={isRunning}>
-                          <i data-lucide="play" className="w-4 h-4"></i>
+                      <div className="flex items-center space-x-1">
+                        <button 
+                          className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 flex items-center space-x-1 transition-colors disabled:bg-gray-400" 
+                          onClick={() => handleRunTest(tc.id)} 
+                          disabled={isRunning}
+                          title="Run Test"
+                        >
+                          <i data-lucide="play" className="w-3 h-3"></i>
+                          <span>Run</span>
                         </button>
-                        <button className="bg-gray-600 text-white p-1 rounded hover:bg-gray-700">
-                          <i data-lucide="eye" className="w-4 h-4"></i>
+                        <button 
+                          className="bg-yellow-600 text-white px-2 py-1 rounded text-xs hover:bg-yellow-700 flex items-center space-x-1 transition-colors"
+                          title="Pause Test"
+                        >
+                          <i data-lucide="pause" className="w-3 h-3"></i>
+                          <span>Pause</span>
+                        </button>
+                        <button 
+                          className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 flex items-center space-x-1 transition-colors"
+                          title="Stop Test"
+                        >
+                          <i data-lucide="square" className="w-3 h-3"></i>
+                          <span>Stop</span>
+                        </button>
+                        <button 
+                          className="bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 flex items-center space-x-1 transition-colors"
+                          title="View Details"
+                        >
+                          <i data-lucide="eye" className="w-3 h-3"></i>
+                          <span>View</span>
                         </button>
                       </div>
                     </td>
