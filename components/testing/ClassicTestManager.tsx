@@ -1095,8 +1095,9 @@ const ClassicTestManager: React.FC = () => {
           // 3. Feed REAL data to 5GLabX backend
           addLog('INFO', `🔗 Starting 5GLabX integration with REAL Supabase data...`);
           
-          // Send real data to 5GLabX
+          // Send real data to 5GLabX with multiple methods
           if (typeof window !== 'undefined') {
+            // Method 1: PostMessage (for cross-tab communication)
             window.postMessage({
               type: '5GLABX_TEST_EXECUTION',
               testCaseId: realId,
@@ -1108,6 +1109,7 @@ const ClassicTestManager: React.FC = () => {
               apiUsed: apiUsed
             }, '*');
             
+            // Method 2: CustomEvent (for same-page communication)
             window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
               detail: {
                 testCaseId: realId,
@@ -1118,7 +1120,43 @@ const ClassicTestManager: React.FC = () => {
               }
             }));
             
-            addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
+            // Method 3: Direct global variable (guaranteed to work)
+            (window as any).latestTestCaseData = {
+              type: '5GLABX_TEST_EXECUTION',
+              testCaseId: realId,
+              runId: executionData.run_id,
+              testCaseData: testCaseData,
+              timestamp: Date.now(),
+              dataSource: 'REAL_SUPABASE',
+              apiUsed: apiUsed
+            };
+            
+            // Method 4: LocalStorage (persists across tabs)
+            try {
+              localStorage.setItem('5glabx_test_data', JSON.stringify({
+                type: '5GLABX_TEST_EXECUTION',
+                testCaseId: realId,
+                testCaseData: testCaseData,
+                timestamp: Date.now(),
+                dataSource: 'REAL_SUPABASE'
+              }));
+              addLog('INFO', `✅ Stored test data in localStorage for 5GLabX`);
+            } catch (storageError) {
+              addLog('WARN', `LocalStorage failed: ${storageError}`);
+            }
+            
+            // Method 5: Force trigger event on document
+            document.dispatchEvent(new CustomEvent('5glabxTestData', {
+              detail: {
+                testCaseId: realId,
+                testCaseData: testCaseData,
+                timestamp: Date.now(),
+                dataSource: 'REAL_SUPABASE'
+              }
+            }));
+            
+            addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via 5 methods: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
+            addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, GlobalVariable, LocalStorage, DocumentEvent`);
           }
         } else {
           addLog('WARN', `${apiUsed} API returned success but no test case data found for ${realId}`);
