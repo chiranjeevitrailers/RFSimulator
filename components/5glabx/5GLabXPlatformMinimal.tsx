@@ -7,7 +7,7 @@ import {
   RefreshCw, Plus, Search, Filter, Calendar, Clock, TrendingUp,
   AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
   Satellite, Network, Server, Phone, MapPin, FileText, HelpCircle,
-  Radio
+  Radio, Package2, User, Smartphone
 } from 'lucide-react';
 
 // Import existing components from codebase
@@ -83,6 +83,10 @@ import SimpleDataDisplay from './components/SimpleDataDisplay';
 // Import working TSX layer views
 import PhyLayerViewTSX from './views/PhyLayerViewTSX';
 import MacLayerViewTSX from './views/MacLayerViewTSX';
+import RlcLayerViewTSX from './views/RlcLayerViewTSX';
+import PdcpLayerViewTSX from './views/PdcpLayerViewTSX';
+import RrcLayerViewTSX from './views/RrcLayerViewTSX';
+import NasLayerViewTSX from './views/NasLayerViewTSX';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -410,7 +414,11 @@ const Sidebar: React.FC<{
 
   const layerItems = [
     { id: 'phy-layer', label: 'PHY Layer', icon: Radio, badge: 'LIVE' },
-    { id: 'mac-layer', label: 'MAC Layer', icon: Layers, badge: 'LIVE' }
+    { id: 'mac-layer', label: 'MAC Layer', icon: Layers, badge: 'LIVE' },
+    { id: 'rlc-layer', label: 'RLC Layer', icon: Package2, badge: 'LIVE' },
+    { id: 'pdcp-layer', label: 'PDCP Layer', icon: Shield, badge: 'LIVE' },
+    { id: 'rrc-layer', label: 'RRC Layer', icon: Smartphone, badge: 'LIVE' },
+    { id: 'nas-layer', label: 'NAS Layer', icon: User, badge: 'LIVE' }
   ];
 
   const oranItems = [
@@ -627,6 +635,14 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'mac-layer':
         return <MacLayerViewTSX appState={{}} onStateChange={() => {}} />;
+      case 'rlc-layer':
+        return <RlcLayerViewTSX appState={{}} onStateChange={() => {}} />;
+      case 'pdcp-layer':
+        return <PdcpLayerViewTSX appState={{}} onStateChange={() => {}} />;
+      case 'rrc-layer':
+        return <RrcLayerViewTSX appState={{}} onStateChange={() => {}} />;
+      case 'nas-layer':
+        return <NasLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'oran-overview':
         return <OranOverviewView appState={{}} onStateChange={() => {}} />;
       case 'oran-interfaces':
