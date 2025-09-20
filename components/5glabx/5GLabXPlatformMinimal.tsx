@@ -62,7 +62,6 @@ import {
 
 // Import service integration
 import ServiceIntegration from './services/ServiceIntegration';
-import { DataFlowProvider } from './services/DataFlowIntegration';
 import { APIProvider } from './services/APIIntegration';
 
 // Load services script
@@ -96,6 +95,10 @@ import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
 import DataFlowDebugger from './components/DataFlowDebugger';
 import TestDataGenerator from './components/TestDataGenerator';
 import IntegrationTester from './components/IntegrationTester';
+import LogsViewEnhanced from './views/LogsViewEnhanced';
+import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced';
+import PhyLayerViewEnhanced from './views/PhyLayerViewEnhanced';
+import { DataFlowProvider } from './providers/DataFlowProvider';
 
 
 // Enhanced Dashboard View
@@ -434,13 +437,19 @@ const Sidebar: React.FC<{
     { id: 'callflow', label: 'Call Flow', icon: Phone }
   ];
 
-  const analyticsItems = [
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' },
-    { id: 'protocol-layer-test', label: 'Protocol Layer Test', icon: Activity, badge: 'NEW' },
-    { id: 'data-flow-debugger', label: 'Data Flow Debugger', icon: Activity, badge: 'DEBUG' },
-    { id: 'test-data-generator', label: 'Test Data Generator', icon: Database, badge: 'GEN' },
-    { id: 'integration-tester', label: 'Integration Tester', icon: CheckCircle, badge: 'TEST' }
-  ];
+    const analyticsItems = [
+      { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' },
+      { id: 'protocol-layer-test', label: 'Protocol Layer Test', icon: Activity, badge: 'NEW' },
+      { id: 'data-flow-debugger', label: 'Data Flow Debugger', icon: Activity, badge: 'DEBUG' },
+      { id: 'test-data-generator', label: 'Test Data Generator', icon: Database, badge: 'GEN' },
+      { id: 'integration-tester', label: 'Integration Tester', icon: CheckCircle, badge: 'TEST' }
+    ];
+
+    const enhancedViewsItems = [
+      { id: 'logs-enhanced', label: 'Enhanced Logs', icon: FileText, badge: 'ENHANCED' },
+      { id: 'logs-advanced', label: 'Advanced Logs', icon: FileText, badge: 'ADVANCED' },
+      { id: 'phy-enhanced', label: 'Enhanced PHY', icon: Radio, badge: 'ENHANCED' }
+    ];
 
   const layerItems = [
     { id: 'phy-layer', label: 'PHY Layer', icon: Radio, badge: 'LIVE' },
@@ -548,6 +557,14 @@ const Sidebar: React.FC<{
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ANALYTICS</h3>
           <div className="space-y-1">
             {analyticsItems.map(renderMenuItem)}
+          </div>
+        </div>
+
+        {/* Enhanced Views */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ENHANCED VIEWS</h3>
+          <div className="space-y-1">
+            {enhancedViewsItems.map(renderMenuItem)}
           </div>
         </div>
 
@@ -669,6 +686,12 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <TestDataGenerator />;
       case 'integration-tester':
         return <IntegrationTester />;
+      case 'logs-enhanced':
+        return <LogsViewEnhanced appState={{}} onStateChange={() => {}} />;
+      case 'logs-advanced':
+        return <EnhancedLogsViewAdvanced appState={{}} onStateChange={() => {}} />;
+      case 'phy-enhanced':
+        return <PhyLayerViewEnhanced appState={{}} onStateChange={() => {}} />;
       case 'phy-layer':
         return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'mac-layer':
