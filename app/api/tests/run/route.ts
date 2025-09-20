@@ -29,30 +29,43 @@ export async function POST(request: NextRequest) {
     // Generate run ID
     const runId = uuidv4();
     
-    // Calculate estimated duration
-    const { data: testCases } = await supabase
-      .from('test_cases')
-      .select('duration_minutes')
-      .in('id', test_ids);
+    // Calculate estimated duration - handle both duration_minutes and duration_seconds
+    let estimatedDuration = 5; // Default 5 minutes
+    try {
+      const { data: testCases, error: durationError } = await supabase
+        .from('test_cases')
+        .select('duration_minutes, duration_seconds, test_case_id, id')
+        .or(`id.in.(${test_ids.map(id => `"${id}"`).join(',')}),test_case_id.in.(${test_ids.map(id => `"${id}"`).join(',')})`);
+      
+      if (durationError) {
+        console.warn('Duration fetch error:', durationError.message);
+      } else if (testCases && testCases.length > 0) {
+        estimatedDuration = testCases.reduce((sum, test) => {
+          const duration = test.duration_minutes || (test.duration_seconds ? Math.ceil(test.duration_seconds / 60) : 5);
+          return sum + duration;
+        }, 0);
+      }
+    } catch (durationErr) {
+      console.warn('Duration calculation failed, using default:', durationErr);
+    }
     
-    const estimatedDuration = testCases?.reduce((sum, test) => sum + (test.duration_minutes || 5), 0) || 0;
-    
-    // Create test run record
+    // Create test run record - use simpler structure to avoid field mismatch
     const { data: testRun, error: runError } = await supabase
       .from('test_case_executions')
       .insert({
         id: runId,
         user_id: userId,
         status: 'queued',
-        execution_mode,
-        configuration: {
+        execution_mode: execution_mode,
+        // Use JSONB for configuration to avoid field issues
+        configuration: JSON.stringify({
           input_files,
           time_acceleration,
           log_level,
-          capture_mode
-        },
-        estimated_duration_minutes: estimatedDuration,
-        test_case_ids: test_ids
+          capture_mode,
+          estimated_duration_minutes: estimatedDuration,
+          test_case_ids: test_ids
+        })
       })
       .select()
       .single();

@@ -928,15 +928,37 @@ const ClassicTestManager: React.FC = () => {
     
     addLog('INFO', `Starting test execution: ${id} (Database ID: ${realId})`);
     try {
-      // 1. Start test execution via API
-      const executionResponse = await fetch('/api/tests/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ test_ids: [id], execution_mode: 'simulation' })
-      });
+      // 1. Start test execution via API (try multiple endpoints)
+      let executionResponse;
       
-      if (!executionResponse.ok) {
-        throw new Error(`Execution API failed: ${executionResponse.status}`);
+      try {
+        // Try primary API first
+        executionResponse = await fetch('/api/tests/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ test_ids: [realId], execution_mode: 'simulation' })
+        });
+        
+        if (!executionResponse.ok) {
+          addLog('WARN', `Primary execution API failed: ${executionResponse.status}, trying simple API...`);
+          
+          // Try simple API as fallback
+          executionResponse = await fetch('/api/tests/run-simple', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ test_ids: [realId], execution_mode: 'simulation' })
+          });
+          
+          if (!executionResponse.ok) {
+            throw new Error(`Both execution APIs failed: ${executionResponse.status}`);
+          } else {
+            addLog('INFO', `✅ Simple execution API succeeded`);
+          }
+        } else {
+          addLog('INFO', `✅ Primary execution API succeeded`);
+        }
+      } catch (apiError) {
+        throw new Error(`Execution API failed: ${apiError}`);
       }
       
       const executionData = await executionResponse.json();
