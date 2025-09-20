@@ -93,6 +93,68 @@ const LayerTraceView: React.FC<{
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Listen for Test Manager data injection
+  useEffect(() => {
+    const handleTestManagerData = (event: MessageEvent) => {
+      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 Layer Trace: Received test manager data:', event.data.testCaseId);
+        const { testCaseData } = event.data;
+        
+        if (testCaseData && testCaseData.expectedMessages) {
+          testCaseData.expectedMessages.forEach((message: any, index: number) => {
+            setTimeout(() => {
+              const traceEntry = {
+                id: Date.now() + index,
+                timestamp: (Date.now() / 1000 + index * 0.5).toFixed(1),
+                layer: message.layer || 'RRC',
+                direction: message.direction || 'DL',
+                message: `${message.messageName}: ${JSON.stringify(message.messagePayload || {})}`,
+                status: 'success',
+                duration: '150us',
+                source: 'TestManager',
+                testCaseId: event.data.testCaseId
+              };
+              
+              setTraceData(prev => [...prev.slice(-99), traceEntry]);
+              console.log(`📊 Layer Trace: Added message ${index + 1} - ${message.messageName}`);
+            }, index * 500);
+          });
+        }
+      }
+    };
+
+    const handleDirectTraceUpdate = (event: CustomEvent) => {
+      console.log('📊 Layer Trace: Direct update received:', event.detail);
+      const logData = event.detail;
+      
+      const traceEntry = {
+        id: logData.id || Date.now(),
+        timestamp: logData.timestamp || (Date.now() / 1000).toFixed(1),
+        layer: logData.layer || 'RRC',
+        direction: logData.direction || 'DL',
+        message: logData.message || `${logData.messageType}: ${JSON.stringify(logData.payload || {})}`,
+        status: 'success',
+        duration: '150us',
+        source: 'TestManager'
+      };
+      
+      setTraceData(prev => [...prev.slice(-99), traceEntry]);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleTestManagerData);
+      window.addEventListener('layerTraceUpdate', handleDirectTraceUpdate as EventListener);
+      console.log('✅ Layer Trace: Event listeners registered for Test Manager integration');
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('message', handleTestManagerData);
+        window.removeEventListener('layerTraceUpdate', handleDirectTraceUpdate as EventListener);
+      }
+    };
+  }, []);
+
   const layers = ['all', 'PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'];
   const directions = ['all', 'DL', 'UL'];
   const statuses = ['all', 'success', 'error', 'warning'];

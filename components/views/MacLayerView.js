@@ -10,8 +10,56 @@ function MacLayerView() {
     const [logs, setLogs] = React.useState([]);
     const [macStats, setMacStats] = React.useState({});
 
-    // Load MAC logs
+    // Load MAC logs and listen for Test Manager data
     React.useEffect(() => {
+      // Listen for Test Manager data
+      const handleTestManagerData = (event) => {
+        if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+          console.log('📊 MAC Layer: Received test manager data:', event.data.testCaseId);
+          const { testCaseData } = event.data;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            const macMessages = testCaseData.expectedMessages.filter(msg => 
+              msg.layer === 'MAC' || msg.messageType.includes('MAC')
+            );
+            
+            if (macMessages.length > 0) {
+              console.log(`📊 MAC Layer: Processing ${macMessages.length} MAC messages`);
+              const macLogs = macMessages.map((msg, idx) => ({
+                id: Date.now() + idx,
+                timestamp: (Date.now() / 1000 + idx * 0.5).toFixed(1),
+                layer: 'MAC',
+                message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
+                source: 'TestManager',
+                fields: msg.messagePayload
+              }));
+              setLogs(prev => [...prev.slice(-50), ...macLogs]);
+            }
+          }
+        }
+      };
+
+      const handleMacLayerUpdate = (event) => {
+        if (event.detail && event.detail.layer === 'MAC') {
+          console.log('📊 MAC Layer: Direct update received');
+          const macLog = {
+            id: Date.now(),
+            timestamp: (Date.now() / 1000).toFixed(1),
+            layer: 'MAC',
+            message: event.detail.message || `${event.detail.messageType}: ${JSON.stringify(event.detail.payload || {})}`,
+            source: 'TestManager',
+            fields: event.detail.payload || event.detail.data
+          };
+          setLogs(prev => [...prev.slice(-99), macLog]);
+        }
+      };
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('message', handleTestManagerData);
+        window.addEventListener('maclayerupdate', handleMacLayerUpdate);
+        console.log('✅ MAC Layer: Event listeners registered for Test Manager integration');
+      }
+
       try {
         if (window.LogProcessor) {
           const logProcessor = new window.LogProcessor();
@@ -28,12 +76,24 @@ function MacLayerView() {
             const cliBridge = new window.CLIDataBridge();
             cliBridge.startCollection(['srsran', 'open5gs']).catch(() => {});
           }
-          return unsubscribe;
+          return () => {
+            unsubscribe();
+            if (typeof window !== 'undefined') {
+              window.removeEventListener('message', handleTestManagerData);
+              window.removeEventListener('maclayerupdate', handleMacLayerUpdate);
+            }
+          };
         } else {
           const interval = setInterval(() => {
             setLogs([]);
           }, 1000);
-          return () => clearInterval(interval);
+          return () => {
+            clearInterval(interval);
+            if (typeof window !== 'undefined') {
+              window.removeEventListener('message', handleTestManagerData);
+              window.removeEventListener('maclayerupdate', handleMacLayerUpdate);
+            }
+          };
         }
       } catch (error) {
         console.error('MAC CLI integration failed:', error);
