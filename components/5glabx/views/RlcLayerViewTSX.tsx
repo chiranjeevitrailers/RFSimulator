@@ -5,20 +5,18 @@ import {
   Activity, BarChart3, Package2, Layers, TrendingUp, 
   Monitor, Network, Grid, Zap, ArrowUpDown
 } from 'lucide-react';
+import { protocolLayerDataService, ProtocolLayerMessage, LayerSpecificData } from '../services/ProtocolLayerDataService';
 
 const RlcLayerViewTSX: React.FC<{
   appState?: any;
   onStateChange?: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [rlcData, setRlcData] = useState({
-    amModeStats: { txPdus: 0, rxPdus: 0, retransmissions: 0, sequenceNumber: 0 },
-    umModeStats: { txPdus: 0, rxPdus: 0, outOfOrder: 0, duplicates: 0 },
-    bufferStats: { txBuffer: 0, rxBuffer: 0, statusReports: 0 },
-    performanceStats: { throughput: 0, latency: 0, errorRate: 0, efficiency: 95.5 }
-  });
-
+  const [rlcData, setRlcData] = useState<LayerSpecificData>({});
+  const [messages, setMessages] = useState<ProtocolLayerMessage[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('🔗 RLC Layer TSX: Initializing...');
@@ -44,25 +42,25 @@ const RlcLayerViewTSX: React.FC<{
             amModeStats: {
               txPdus: rlcMessages.filter((m: any) => m.direction === 'UL').length * 15,
               rxPdus: rlcMessages.filter((m: any) => m.direction === 'DL').length * 12,
-              retransmissions: Math.floor(Math.random() * 5),
-              sequenceNumber: Math.floor(Math.random() * 1024)
+              retransmissions: 0,
+              sequenceNumber: 0
             },
             umModeStats: {
               txPdus: rlcMessages.length * 8,
               rxPdus: rlcMessages.length * 7,
-              outOfOrder: Math.floor(Math.random() * 3),
-              duplicates: Math.floor(Math.random() * 2)
+              outOfOrder: 0,
+              duplicates: 0
             },
             bufferStats: {
-              txBuffer: Math.floor(Math.random() * 2048),
-              rxBuffer: Math.floor(Math.random() * 1024),
-              statusReports: Math.floor(Math.random() * 10)
+              txBuffer: 0,
+              rxBuffer: 0,
+              statusReports: 0
             },
             performanceStats: {
-              throughput: 80 + Math.random() * 40,
-              latency: 1 + Math.random() * 3,
-              errorRate: Math.random() * 2,
-              efficiency: 90 + Math.random() * 10
+              throughput: 80 + 0,
+              latency: 1 + 0,
+              errorRate: 0,
+              efficiency: 90 + 0
             }
           }));
 

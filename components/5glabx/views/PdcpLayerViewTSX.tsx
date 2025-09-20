@@ -44,23 +44,23 @@ const PdcpLayerViewTSX: React.FC<{
             securityStats: {
               cipheringEnabled: true,
               integrityEnabled: true,
-              keyRefresh: Math.floor(Math.random() * 5)
+              keyRefresh: 0
             },
             sequenceStats: {
-              dlSequence: Math.floor(Math.random() * 4095),
-              ulSequence: Math.floor(Math.random() * 4095),
+              dlSequence: 0,
+              ulSequence: 0,
               maxSequence: 4095
             },
             compressionStats: {
-              enabled: Math.random() > 0.5,
-              ratio: 10 + Math.random() * 20,
-              savedBytes: Math.floor(Math.random() * 1000)
+              enabled: 0,
+              ratio: 10 + 0,
+              savedBytes: 0
             },
             performanceStats: {
-              throughput: 75 + Math.random() * 35,
-              latency: 0.5 + Math.random() * 2,
-              packetLoss: Math.random() * 1,
-              efficiency: 95 + Math.random() * 5
+              throughput: 75 + 0,
+              latency: 0.5 + 0,
+              packetLoss: 0,
+              efficiency: 95 + 0
             }
           }));
 
