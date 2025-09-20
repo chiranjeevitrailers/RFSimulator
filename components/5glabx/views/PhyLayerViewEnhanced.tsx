@@ -26,7 +26,7 @@ const PhyLayerViewEnhanced: React.FC<{
     setCurrentExecutionId(executionId);
     
     try {
-      console.log(`📡 PHY Layer TSX: Fetching real data for execution: ${executionId}`);
+      console.log(`📡 PHY Layer Enhanced: Fetching real data for execution: ${executionId}`);
       
       const { messages: phyMessages, stats, layerSpecificData } = 
         await protocolLayerDataService.fetchLayerData(executionId, 'PHY');
@@ -50,10 +50,10 @@ const PhyLayerViewEnhanced: React.FC<{
       setLogs(phyLogs);
       setIsConnected(true);
       
-      console.log(`✅ PHY Layer TSX: Loaded ${phyMessages.length} real PHY messages`);
+      console.log(`✅ PHY Layer Enhanced: Loaded ${phyMessages.length} real PHY messages`);
       
     } catch (error) {
-      console.error('❌ PHY Layer TSX: Error fetching real data:', error);
+      console.error('❌ PHY Layer Enhanced: Error fetching real data:', error);
       setIsConnected(false);
     } finally {
       setIsLoading(false);
@@ -61,15 +61,15 @@ const PhyLayerViewEnhanced: React.FC<{
   };
 
   useEffect(() => {
-    console.log('📡 PHY Layer TSX: Initializing...');
+    console.log('📡 PHY Layer Enhanced: Initializing...');
 
     // Enhanced data loading with fallback mechanisms
     const loadPhyData = () => {
-      console.log('🔍 PHY Layer: Attempting to load data from multiple sources...');
+      console.log('🔍 PHY Layer Enhanced: Attempting to load data from multiple sources...');
 
       // Method 1: Check global variable
       if ((window as any).latestTestCaseData) {
-        console.log('✅ PHY Layer: Found data in global variable');
+        console.log('✅ PHY Layer Enhanced: Found data in global variable');
         processPhyData((window as any).latestTestCaseData);
         return;
       }
@@ -79,22 +79,22 @@ const PhyLayerViewEnhanced: React.FC<{
         const storedData = localStorage.getItem('5glabx_test_data');
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          console.log('✅ PHY Layer: Found data in localStorage');
+          console.log('✅ PHY Layer Enhanced: Found data in localStorage');
           processPhyData(parsedData);
           return;
         }
       } catch (e) {
-        console.warn('⚠️ PHY Layer: Failed to parse localStorage data:', e);
+        console.warn('⚠️ PHY Layer Enhanced: Failed to parse localStorage data:', e);
       }
 
-      console.log('⚠️ PHY Layer: No test data found in fallback sources');
+      console.log('⚠️ PHY Layer Enhanced: No test data found in fallback sources');
     };
 
     // Process PHY data
     const processPhyData = (data: any) => {
       try {
         if (data && data.type === '5GLABX_TEST_EXECUTION' && data.testCaseData) {
-          console.log('📡 PHY Layer processing test case data:', {
+          console.log('📡 PHY Layer Enhanced processing test case data:', {
             testCaseId: data.testCaseId,
             testCaseName: data.testCaseData.testCase?.name,
             messageCount: data.testCaseData.expectedMessages?.length || 0
@@ -108,7 +108,7 @@ const PhyLayerViewEnhanced: React.FC<{
               msg.messageType?.includes('PDSCH') || msg.messageType?.includes('PUSCH')
             );
 
-            console.log(`📡 PHY Layer: Processing ${phyMessages.length} expected PHY messages`);
+            console.log(`📡 PHY Layer Enhanced: Processing ${phyMessages.length} expected PHY messages`);
 
             // Add expected PHY logs
             const phyLogs = phyMessages.map((msg: any, idx: number) => ({
@@ -124,13 +124,13 @@ const PhyLayerViewEnhanced: React.FC<{
             setLogs(prev => [...phyLogs, ...prev.slice(0, 19)]);
             setIsConnected(true);
           } else {
-            console.warn('⚠️ PHY Layer: No expectedMessages found in testCaseData');
+            console.warn('⚠️ PHY Layer Enhanced: No expectedMessages found in testCaseData');
           }
         } else {
-          console.warn('⚠️ PHY Layer: Invalid data format received');
+          console.warn('⚠️ PHY Layer Enhanced: Invalid data format received');
         }
       } catch (error) {
-        console.error('❌ PHY Layer: Error processing test data:', error);
+        console.error('❌ PHY Layer Enhanced: Error processing test data:', error);
       }
     };
 
@@ -138,7 +138,7 @@ const PhyLayerViewEnhanced: React.FC<{
     const handleTestManagerData = (event: MessageEvent) => {
       try {
         if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
-          console.log('📡 PHY Layer TSX: Received test manager data:', event.data.testCaseId);
+          console.log('📡 PHY Layer Enhanced: Received test manager data:', event.data.testCaseId);
           processPhyData(event.data);
 
           const { executionId } = event.data;
@@ -149,14 +149,14 @@ const PhyLayerViewEnhanced: React.FC<{
           }
         }
       } catch (error) {
-        console.error('❌ PHY Layer: Error handling test manager data:', error);
+        console.error('❌ PHY Layer Enhanced: Error handling test manager data:', error);
       }
     };
 
     // Listen for direct PHY updates
     const handlePhyUpdate = (event: CustomEvent) => {
       try {
-        console.log('📡 PHY Layer TSX: Direct update received:', event.detail);
+        console.log('📡 PHY Layer Enhanced: Direct update received:', event.detail);
         if (event.detail && event.detail.layer === 'PHY') {
           const phyLog = {
             id: Date.now(),
@@ -170,14 +170,14 @@ const PhyLayerViewEnhanced: React.FC<{
           setLogs(prev => [phyLog, ...prev.slice(0, 19)]);
         }
       } catch (error) {
-        console.error('❌ PHY Layer: Error handling direct PHY update:', error);
+        console.error('❌ PHY Layer Enhanced: Error handling direct PHY update:', error);
       }
     };
 
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('phylayerupdate', handlePhyUpdate as EventListener);
-      console.log('✅ PHY Layer TSX: Event listeners registered');
+      console.log('✅ PHY Layer Enhanced: Event listeners registered');
 
       // Try to load existing data immediately
       setTimeout(() => {
@@ -207,7 +207,7 @@ const PhyLayerViewEnhanced: React.FC<{
     <div className="p-6 space-y-6" data-layer="PHY">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">PHY Layer Analysis</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Enhanced PHY Layer Analysis</h1>
           <p className="text-gray-600 mt-1">5G NR Physical Layer Protocol Analysis & Monitoring</p>
         </div>
         <div className="flex items-center space-x-2">

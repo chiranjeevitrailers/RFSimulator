@@ -53,14 +53,14 @@ const EnhancedLogsViewAdvanced: React.FC<{
 
   // Listen for Test Manager data injection
   useEffect(() => {
-    console.log('🔍 Enhanced Logs: Initializing event listeners...');
+    console.log('🔍 Enhanced Logs Advanced: Initializing event listeners...');
 
     const handleTestManagerData = (event: MessageEvent) => {
       try {
-        console.log('📊 Enhanced Logs: Event received:', event.data?.type, event.data?.testCaseId);
+        console.log('📊 Enhanced Logs Advanced: Event received:', event.data?.type, event.data?.testCaseId);
 
         if (event.data && (event.data.type === '5GLABX_TEST_EXECUTION' || event.data.type === '5GLABX_WEBSOCKET_DATA')) {
-          console.log('📊 Enhanced Logs: Processing test manager data:', event.data.testCaseId);
+          console.log('📊 Enhanced Logs Advanced: Processing test manager data:', event.data.testCaseId);
           const { testCaseData } = event.data;
 
           if (testCaseData && testCaseData.expectedMessages && Array.isArray(testCaseData.expectedMessages)) {
@@ -85,24 +85,24 @@ const EnhancedLogsViewAdvanced: React.FC<{
                   };
 
                   setLogs(prev => [...prev.slice(-99), enhancedLog]);
-                  console.log(`📊 Enhanced Logs: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
+                  console.log(`📊 Enhanced Logs Advanced: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
                 } catch (error) {
-                  console.error(`❌ Enhanced Logs: Error processing message ${index}:`, error);
+                  console.error(`❌ Enhanced Logs Advanced: Error processing message ${index}:`, error);
                 }
               }, index * 200); // Faster processing
             });
           } else {
-            console.warn('⚠️ Enhanced Logs: No expectedMessages found in testCaseData');
+            console.warn('⚠️ Enhanced Logs Advanced: No expectedMessages found in testCaseData');
           }
         }
       } catch (error) {
-        console.error('❌ Enhanced Logs: Error handling test manager data:', error);
+        console.error('❌ Enhanced Logs Advanced: Error handling test manager data:', error);
       }
     };
 
     const handleDirectLogUpdate = (event: CustomEvent) => {
       try {
-        console.log('📊 Enhanced Logs: Direct update received:', event.detail);
+        console.log('📊 Enhanced Logs Advanced: Direct update received:', event.detail);
         const logData = event.detail;
 
         const enhancedLog = {
@@ -121,9 +121,9 @@ const EnhancedLogsViewAdvanced: React.FC<{
         };
 
         setLogs(prev => [...prev.slice(-99), enhancedLog]);
-        console.log('📊 Enhanced Logs: Added direct log entry:', enhancedLog.message);
+        console.log('📊 Enhanced Logs Advanced: Added direct log entry:', enhancedLog.message);
       } catch (error) {
-        console.error('❌ Enhanced Logs: Error handling direct log update:', error);
+        console.error('❌ Enhanced Logs Advanced: Error handling direct log update:', error);
       }
     };
 
@@ -132,7 +132,7 @@ const EnhancedLogsViewAdvanced: React.FC<{
       try {
         // Check global variable
         if ((window as any).latestTestCaseData) {
-          console.log('✅ Enhanced Logs: Found data in global variable');
+          console.log('✅ Enhanced Logs Advanced: Found data in global variable');
           handleTestManagerData({ data: (window as any).latestTestCaseData } as MessageEvent);
           return;
         }
@@ -141,19 +141,19 @@ const EnhancedLogsViewAdvanced: React.FC<{
         const storedData = localStorage.getItem('5glabx_test_data');
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          console.log('✅ Enhanced Logs: Found data in localStorage');
+          console.log('✅ Enhanced Logs Advanced: Found data in localStorage');
           handleTestManagerData({ data: parsedData } as MessageEvent);
           return;
         }
       } catch (error) {
-        console.error('❌ Enhanced Logs: Error loading existing data:', error);
+        console.error('❌ Enhanced Logs Advanced: Error loading existing data:', error);
       }
     };
 
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('enhancedLogsUpdate', handleDirectLogUpdate as EventListener);
-      console.log('✅ Enhanced Logs: Event listeners registered for Test Manager integration');
+      console.log('✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration');
 
       // Load existing data immediately
       setTimeout(() => {
@@ -248,10 +248,10 @@ const EnhancedLogsViewAdvanced: React.FC<{
   };
 
   return (
-    <div className="p-6 space-y-6" data-component="EnhancedLogsView">
+    <div className="p-6 space-y-6" data-component="EnhancedLogsViewAdvanced">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Enhanced Logs</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Advanced Enhanced Logs</h1>
         <p className="text-gray-600 mt-1">Real-time log viewer with comprehensive filtering and message decoding</p>
       </div>
 

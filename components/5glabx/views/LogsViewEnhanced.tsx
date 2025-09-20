@@ -120,15 +120,15 @@ const LogsViewEnhanced: React.FC<{
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    console.log('🔍 LogsView: Initializing event listeners...');
+    console.log('🔍 LogsView Enhanced: Initializing event listeners...');
 
     // Enhanced data loading with multiple fallback mechanisms
     const loadTestData = () => {
-      console.log('🔍 LogsView: Attempting to load test data from multiple sources...');
+      console.log('🔍 LogsView Enhanced: Attempting to load test data from multiple sources...');
 
       // Method 1: Check global variable
       if ((window as any).latestTestCaseData) {
-        console.log('✅ LogsView: Found data in global variable');
+        console.log('✅ LogsView Enhanced: Found data in global variable');
         processTestData((window as any).latestTestCaseData);
         return;
       }
@@ -138,23 +138,23 @@ const LogsViewEnhanced: React.FC<{
         const storedData = localStorage.getItem('5glabx_test_data');
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          console.log('✅ LogsView: Found data in localStorage');
+          console.log('✅ LogsView Enhanced: Found data in localStorage');
           processTestData(parsedData);
           return;
         }
       } catch (e) {
-        console.warn('⚠️ LogsView: Failed to parse localStorage data:', e);
+        console.warn('⚠️ LogsView Enhanced: Failed to parse localStorage data:', e);
       }
 
       // Method 3: Check for recent events
-      console.log('⚠️ LogsView: No test data found in fallback sources');
+      console.log('⚠️ LogsView Enhanced: No test data found in fallback sources');
     };
 
     // Process test data
     const processTestData = (data: any) => {
       try {
         if (data && data.type === '5GLABX_TEST_EXECUTION' && data.testCaseData) {
-          console.log('📊 LogsView processing test case data:', {
+          console.log('📊 LogsView Enhanced processing test case data:', {
             testCaseId: data.testCaseId,
             testCaseName: data.testCaseData.testCase?.name,
             messageCount: data.testCaseData.expectedMessages?.length || 0,
@@ -193,39 +193,39 @@ const LogsViewEnhanced: React.FC<{
                   };
 
                   setLogs(prev => [...prev.slice(-99), newLog]); // Keep last 100 logs
-                  console.log(`📊 LogsView: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
+                  console.log(`📊 LogsView Enhanced: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
                 } catch (error) {
-                  console.error(`❌ LogsView: Error processing message ${index}:`, error);
+                  console.error(`❌ LogsView Enhanced: Error processing message ${index}:`, error);
                 }
               }, index * 200); // Faster processing - 200ms intervals
             });
           } else {
-            console.warn('⚠️ LogsView: No expectedMessages found in testCaseData');
+            console.warn('⚠️ LogsView Enhanced: No expectedMessages found in testCaseData');
           }
         } else {
-          console.warn('⚠️ LogsView: Invalid data format received:', data);
+          console.warn('⚠️ LogsView Enhanced: Invalid data format received:', data);
         }
       } catch (error) {
-        console.error('❌ LogsView: Error processing test data:', error);
+        console.error('❌ LogsView Enhanced: Error processing test data:', error);
       }
     };
 
     // Listen for Test Manager test execution data
     const handleTestCaseData = (event: MessageEvent) => {
       try {
-        console.log('📊 LogsView received test case data for analysis:', event.data?.testCaseId);
+        console.log('📊 LogsView Enhanced received test case data for analysis:', event.data?.testCaseId);
         if (event.data) {
           processTestData(event.data);
         }
       } catch (error) {
-        console.error('❌ LogsView: Error handling test case data:', error);
+        console.error('❌ LogsView Enhanced: Error handling test case data:', error);
       }
     };
 
     // Listen for log analysis events
     const handleLogAnalysis = (event: CustomEvent) => {
       try {
-        console.log('🔬 LogsView received log analysis data:', event.detail);
+        console.log('🔬 LogsView Enhanced received log analysis data:', event.detail);
         const { messages, testCaseId } = event.detail;
 
         if (Array.isArray(messages)) {
@@ -245,20 +245,20 @@ const LogsViewEnhanced: React.FC<{
 
                 setLogs(prev => [...prev.slice(-99), analysisLog]);
               } catch (error) {
-                console.error(`❌ LogsView: Error processing analysis message ${index}:`, error);
+                console.error(`❌ LogsView Enhanced: Error processing analysis message ${index}:`, error);
               }
             }, index * 150); // Faster analysis processing
           });
         }
       } catch (error) {
-        console.error('❌ LogsView: Error handling log analysis:', error);
+        console.error('❌ LogsView Enhanced: Error handling log analysis:', error);
       }
     };
 
     // Listen for direct log updates
     const handleDirectLogUpdate = (event: CustomEvent) => {
       try {
-        console.log('📊 LogsView: Direct log update received:', event.detail);
+        console.log('📊 LogsView Enhanced: Direct log update received:', event.detail);
         const logData = event.detail;
 
         const newLog = {
@@ -272,9 +272,9 @@ const LogsViewEnhanced: React.FC<{
         };
 
         setLogs(prev => [...prev.slice(-99), newLog]);
-        console.log('📊 LogsView: Added direct log entry:', newLog.message);
+        console.log('📊 LogsView Enhanced: Added direct log entry:', newLog.message);
       } catch (error) {
-        console.error('❌ LogsView: Error handling direct log update:', error);
+        console.error('❌ LogsView Enhanced: Error handling direct log update:', error);
       }
     };
 
@@ -284,7 +284,7 @@ const LogsViewEnhanced: React.FC<{
       window.addEventListener('message', handleTestCaseData);
       window.addEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
       window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
-      console.log('✅ LogsView: All event listeners registered for Test Manager integration');
+      console.log('✅ LogsView Enhanced: All event listeners registered for Test Manager integration');
 
       // Try to load existing data immediately
       setTimeout(() => {
@@ -355,9 +355,9 @@ const LogsViewEnhanced: React.FC<{
   };
 
   return (
-    <div className="p-6 space-y-6" data-component="LogsView">
+    <div className="p-6 space-y-6" data-component="LogsViewEnhanced">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Logs Viewer</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Enhanced Logs Viewer</h1>
         <div className="flex items-center space-x-2">
           <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
             <RefreshCw className="w-4 h-4 mr-2" />
