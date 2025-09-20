@@ -1157,6 +1157,50 @@ const ClassicTestManager: React.FC = () => {
             
             addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via 5 methods: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
             addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, GlobalVariable, LocalStorage, DocumentEvent`);
+            
+            // Continue sending data every 5 seconds during test execution
+            const dataInterval = setInterval(() => {
+              if (typeof window !== 'undefined') {
+                // Update global variable with fresh timestamp
+                (window as any).latestTestCaseData = {
+                  type: '5GLABX_TEST_EXECUTION',
+                  testCaseId: realId,
+                  runId: executionData.run_id,
+                  testCaseData: testCaseData,
+                  timestamp: Date.now(),
+                  dataSource: 'REAL_SUPABASE_CONTINUOUS',
+                  apiUsed: apiUsed
+                };
+                
+                // Update localStorage
+                try {
+                  localStorage.setItem('5glabx_test_data', JSON.stringify({
+                    type: '5GLABX_TEST_EXECUTION',
+                    testCaseId: realId,
+                    testCaseData: testCaseData,
+                    timestamp: Date.now(),
+                    dataSource: 'REAL_SUPABASE_CONTINUOUS'
+                  }));
+                } catch (e) {}
+                
+                // Send fresh events
+                window.postMessage({
+                  type: '5GLABX_TEST_EXECUTION',
+                  testCaseId: realId,
+                  testCaseData: testCaseData,
+                  timestamp: Date.now(),
+                  dataSource: 'REAL_SUPABASE_CONTINUOUS'
+                }, '*');
+                
+                addLog('DEBUG', `🔄 Refreshed 5GLabX data (${Math.floor((Date.now() - startTime) / 1000)}s elapsed)`);
+              }
+            }, 5000);
+            
+            // Clear interval when test completes
+            setTimeout(() => {
+              clearInterval(dataInterval);
+              addLog('INFO', '🔄 Stopped continuous data refresh');
+            }, 30000);
           }
         } else {
           addLog('WARN', `${apiUsed} API returned success but no test case data found for ${realId}`);
@@ -1315,10 +1359,35 @@ const ClassicTestManager: React.FC = () => {
       // 4. Update UI status
       setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: 'Running' } : t));
       
-      // 5. Simulate execution completion (in real implementation, this would come from backend)
+      // 5. Simulate execution completion with MUCH slower timing for tab switching
+      addLog('INFO', `🕐 Test will run for 30 seconds - switch to 5GLabX tab to see live data!`);
+      
+      // Update progress every 3 seconds
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        setTestCases(prev => prev.map(t => t.id === id ? { 
+          ...t, 
+          status: `Running (${progress}%)`,
+          duration: `${Math.floor((Date.now() - startTime) / 1000)}s`
+        } : t));
+        addLog('INFO', `🔄 Test progress: ${progress}% - Switch to 5GLabX tab to see live data!`);
+        
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, 3000);
+      
+      const startTime = Date.now();
       setTimeout(() => {
+        clearInterval(progressInterval);
         const passed = Math.random() >= 0.2;
-        setTestCases(prev => prev.map(t => t.id === id ? { ...t, status: passed ? 'Completed' : 'Failed', lastRun: new Date().toLocaleString(), duration: '2m 15s' } : t));
+        setTestCases(prev => prev.map(t => t.id === id ? { 
+          ...t, 
+          status: passed ? 'Completed' : 'Failed', 
+          lastRun: new Date().toLocaleString(), 
+          duration: '30s' 
+        } : t));
         addLog(passed ? 'INFO' : 'ERROR', `Execution ${passed ? 'passed' : 'failed'} for ${id}`);
         
         // Stop 5GLabX playback
@@ -1328,7 +1397,7 @@ const ClassicTestManager: React.FC = () => {
         }
         
         setIsRunning(false);
-      }, 8000); // Extended time to allow 5GLabX playback
+      }, 30000); // 30 seconds - plenty of time to switch tabs!
       
     } catch (e) {
       addLog('ERROR', `Failed to start execution: ${e}`);
