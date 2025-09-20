@@ -129,31 +129,34 @@ import('/services/SrsranParser.js').then(module => {
   window.SrsranParser = module.default || module.SrsranParser;
 });
 
-// Load all view components
-const viewComponents = [
-  'AmfAnalyzerView', 'AnalyticsView', 'AusfAnalyzerView', 'CallFlowView', 'CLIMonitorView',
-  'ConfigManagerView', 'DashboardView', 'EnhancedLogsView', 'ExportManagerView',
-  'HelpSupportView', 'ImsLayerView', 'LayerTraceView', 'LogsView', 'MacLayerView',
-  'MmeAnalyzerView', 'NasLayerView', 'NBIoTAnalyticsView', 'NBIoTCallFlowView',
-  'NBIoTMacLayerView', 'NBIoTOverviewView', 'NBIoTPhyLayerView', 'NBIoTRrcLayerView',
-  'NBIoTTestingView', 'NtnAnalyticsView', 'NtnDopplerView', 'NtnOverviewView',
-  'NtnSatellitesView', 'NtnScenariosView', 'NtnSib19View', 'NtnTimingView',
-  'OranCuAnalysisView', 'OranDuAnalysisView', 'OranE1InterfaceView', 'OranF1InterfaceView',
-  'OranInterfacesView', 'OranOverviewView', 'OranPerformanceView', 'OranSmoView',
-  'OranXappsView', 'PdcpLayerView', 'PgwAnalyzerView', 'PhyLayerView',
-  'ReportGeneratorView', 'RlcLayerView', 'RrcLayerView', 'SgwAnalyzerView',
-  'SmfAnalyzerView', 'UpfAnalyzerView', 'UdmAnalyzerView', 'UserDashboardView',
-  'V2xAnalyticsView', 'V2xMacLayerView', 'V2xOverviewView', 'V2xPhyLayerView',
-  'V2xScenariosView', 'V2xSidelinkView', 'V2xTestingView', 'EnhancedOranOverviewView'
+// Load only existing view components to avoid errors
+const existingViewComponents = [
+  'PhyLayerView', 'MacLayerView', 'RrcLayerView', 'NasLayerView'
 ];
 
-// Load view components dynamically
-viewComponents.forEach(componentName => {
+// Load view components dynamically (only existing ones)
+existingViewComponents.forEach(componentName => {
   const componentPath = `/components/views/${componentName}.js`;
   import(componentPath).then(module => {
     window[componentName] = module.default || module[componentName];
+    console.log(`✅ Loaded ${componentName} successfully`);
   }).catch(error => {
     console.warn(`Failed to load ${componentName}:`, error);
+  });
+});
+
+// Load 5GLabX view components that exist
+const existing5GLabXViews = [
+  'LogsView', 'EnhancedLogsView', 'LayerTraceView', 'CallFlowView', 'AnalyticsView'
+];
+
+existing5GLabXViews.forEach(componentName => {
+  const componentPath = `/components/5glabx/views/${componentName}.tsx`;
+  import(componentPath).then(module => {
+    window[componentName] = module.default || module[componentName];
+    console.log(`✅ Loaded 5GLabX ${componentName} successfully`);
+  }).catch(error => {
+    console.warn(`Failed to load 5GLabX ${componentName}:`, error);
   });
 });
 
