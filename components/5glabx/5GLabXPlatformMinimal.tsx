@@ -81,6 +81,7 @@ import DirectDataInjector from './components/DirectDataInjector';
 import SimpleDataDisplay from './components/SimpleDataDisplay';
 import ThreeGPPComplianceDashboard from './components/ThreeGPPComplianceDashboard';
 import LayerParametersTracker from './components/LayerParametersTracker';
+import ChannelParametersTracker from './components/ChannelParametersTracker';
 
 // Import working TSX layer views
 import PhyLayerViewTSX from './views/PhyLayerViewTSX';
@@ -194,6 +195,9 @@ const DashboardView: React.FC = () => {
       
       {/* Layer Parameters Variation Tracker */}
       <LayerParametersTracker testCaseData={testManagerData} />
+      
+      {/* Channel Parameters Variation Tracker */}
+      <ChannelParametersTracker testCaseData={testManagerData} />
       
       {/* Simple Data Display */}
       <SimpleDataDisplay />
