@@ -93,6 +93,9 @@ import NasLayerViewTSX from './views/NasLayerViewTSX';
 
 // Import protocol layer data test component
 import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
+import DataFlowDebugger from './components/DataFlowDebugger';
+import TestDataGenerator from './components/TestDataGenerator';
+import IntegrationTester from './components/IntegrationTester';
 
 
 // Enhanced Dashboard View
@@ -112,7 +115,14 @@ const DashboardView: React.FC = () => {
       if (event.data.type === '5GLABX_TEST_DATA' || 
           event.data.type === '5GLABX_TEST_EXECUTION' ||
           event.data.type === '5GLABX_WEBSOCKET_DATA') {
-        console.log('🎯 5GLabX Dashboard received test data:', event.data.type, 'TestCase:', event.data.testCaseId);
+        console.log('🎯 5GLabX Dashboard received test data:', {
+          type: event.data.type,
+          testCaseId: event.data.testCaseId,
+          testCaseName: event.data.testCaseData?.testCase?.name,
+          messageCount: event.data.testCaseData?.expectedMessages?.length || 0,
+          dataSource: event.data.dataSource,
+          timestamp: new Date().toLocaleTimeString()
+        });
         setTestManagerData(event.data);
         setLastUpdate(new Date());
         
@@ -426,7 +436,10 @@ const Sidebar: React.FC<{
 
   const analyticsItems = [
     { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' },
-    { id: 'protocol-layer-test', label: 'Protocol Layer Test', icon: Activity, badge: 'NEW' }
+    { id: 'protocol-layer-test', label: 'Protocol Layer Test', icon: Activity, badge: 'NEW' },
+    { id: 'data-flow-debugger', label: 'Data Flow Debugger', icon: Activity, badge: 'DEBUG' },
+    { id: 'test-data-generator', label: 'Test Data Generator', icon: Database, badge: 'GEN' },
+    { id: 'integration-tester', label: 'Integration Tester', icon: CheckCircle, badge: 'TEST' }
   ];
 
   const layerItems = [
@@ -650,6 +663,12 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <AnalyticsView appState={{}} onStateChange={() => {}} />;
       case 'protocol-layer-test':
         return <ProtocolLayerDataTest />;
+      case 'data-flow-debugger':
+        return <DataFlowDebugger />;
+      case 'test-data-generator':
+        return <TestDataGenerator />;
+      case 'integration-tester':
+        return <IntegrationTester />;
       case 'phy-layer':
         return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'mac-layer':

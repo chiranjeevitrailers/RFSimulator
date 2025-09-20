@@ -120,11 +120,45 @@ const LogsView: React.FC<{
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    // Listen for Test Manager test execution data
-    const handleTestCaseData = (event: MessageEvent) => {
-      if (event.data.type === '5GLABX_TEST_EXECUTION') {
-        console.log('📊 LogsView received test case data for analysis:', event.data.testCaseId);
-        const { testCaseData, testCaseId } = event.data;
+    // Enhanced data loading with multiple fallback mechanisms
+    const loadTestData = () => {
+      console.log('🔍 LogsView: Attempting to load test data from multiple sources...');
+      
+      // Method 1: Check global variable
+      if ((window as any).latestTestCaseData) {
+        console.log('✅ LogsView: Found data in global variable');
+        processTestData((window as any).latestTestCaseData);
+        return;
+      }
+      
+      // Method 2: Check localStorage
+      try {
+        const storedData = localStorage.getItem('5glabx_test_data');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          console.log('✅ LogsView: Found data in localStorage');
+          processTestData(parsedData);
+          return;
+        }
+      } catch (e) {
+        console.warn('⚠️ LogsView: Failed to parse localStorage data:', e);
+      }
+      
+      // Method 3: Check for recent events
+      console.log('⚠️ LogsView: No test data found in fallback sources');
+    };
+    
+    // Process test data
+    const processTestData = (data: any) => {
+      if (data.type === '5GLABX_TEST_EXECUTION' && data.testCaseData) {
+        console.log('📊 LogsView processing test case data:', {
+          testCaseId: data.testCaseId,
+          testCaseName: data.testCaseData.testCase?.name,
+          messageCount: data.testCaseData.expectedMessages?.length || 0,
+          dataSource: data.dataSource
+        });
+        
+        const { testCaseData, testCaseId } = data;
         
         if (testCaseData.expectedMessages) {
           // Process each message as a log entry
@@ -159,6 +193,14 @@ const LogsView: React.FC<{
             }, index * 500);
           });
         }
+      }
+    };
+    
+    // Listen for Test Manager test execution data
+    const handleTestCaseData = (event: MessageEvent) => {
+      if (event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 LogsView received test case data for analysis:', event.data.testCaseId);
+        processTestData(event.data);
       }
     };
 
@@ -211,6 +253,11 @@ const LogsView: React.FC<{
       window.addEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
       window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
       console.log('✅ LogsView: All event listeners registered for Test Manager integration');
+      
+      // Try to load existing data immediately
+      setTimeout(() => {
+        loadTestData();
+      }, 1000);
     }
 
     return () => {

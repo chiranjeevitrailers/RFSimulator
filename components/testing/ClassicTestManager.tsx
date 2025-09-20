@@ -1098,7 +1098,7 @@ const ClassicTestManager: React.FC = () => {
           // Send real data to 5GLabX with multiple methods
           if (typeof window !== 'undefined') {
             // Method 1: PostMessage (for cross-tab communication)
-            window.postMessage({
+            const postMessageData = {
               type: '5GLABX_TEST_EXECUTION',
               testCaseId: realId,
               runId: executionData.run_id || `run_${Date.now()}`,
@@ -1107,29 +1107,52 @@ const ClassicTestManager: React.FC = () => {
               source: 'TestManager',
               dataSource: 'REAL_SUPABASE',
               apiUsed: apiUsed
-            }, '*');
+            };
+            
+            console.log('🚀 Test Manager: Sending data to 5GLabX via PostMessage:', {
+              testCaseId: realId,
+              testCaseName: testCaseData.testCase?.name,
+              messageCount: testCaseData.expectedMessages?.length || 0,
+              ieCount: testCaseData.expectedInformationElements?.length || 0,
+              layerParamCount: testCaseData.expectedLayerParameters?.length || 0,
+              dataSource: 'REAL_SUPABASE'
+            });
+            
+            // Add delay to ensure 5GLabX components are loaded
+            setTimeout(() => {
+              window.postMessage(postMessageData, '*');
+              console.log('✅ Test Manager: PostMessage sent to 5GLabX');
+            }, 500);
             
             // Method 2: CustomEvent (for same-page communication)
-            window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
-              detail: {
+            setTimeout(() => {
+              const customEventData = {
                 testCaseId: realId,
                 runId: executionData.run_id,
                 testCaseData: testCaseData,
                 timestamp: Date.now(),
                 dataSource: 'REAL_SUPABASE'
-              }
-            }));
+              };
+              
+              window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
+                detail: customEventData
+              }));
+              console.log('✅ Test Manager: CustomEvent sent to 5GLabX');
+            }, 600);
             
             // Method 3: Direct global variable (guaranteed to work)
-            (window as any).latestTestCaseData = {
-              type: '5GLABX_TEST_EXECUTION',
-              testCaseId: realId,
-              runId: executionData.run_id,
-              testCaseData: testCaseData,
-              timestamp: Date.now(),
-              dataSource: 'REAL_SUPABASE',
-              apiUsed: apiUsed
-            };
+            setTimeout(() => {
+              (window as any).latestTestCaseData = {
+                type: '5GLABX_TEST_EXECUTION',
+                testCaseId: realId,
+                runId: executionData.run_id,
+                testCaseData: testCaseData,
+                timestamp: Date.now(),
+                dataSource: 'REAL_SUPABASE',
+                apiUsed: apiUsed
+              };
+              console.log('✅ Test Manager: Global variable set for 5GLabX');
+            }, 700);
             
             // Method 4: LocalStorage (persists across tabs)
             try {

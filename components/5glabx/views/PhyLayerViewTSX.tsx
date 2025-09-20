@@ -63,42 +63,80 @@ const PhyLayerViewTSX: React.FC<{
   useEffect(() => {
     console.log('📡 PHY Layer TSX: Initializing...');
 
+    // Enhanced data loading with fallback mechanisms
+    const loadPhyData = () => {
+      console.log('🔍 PHY Layer: Attempting to load data from multiple sources...');
+      
+      // Method 1: Check global variable
+      if ((window as any).latestTestCaseData) {
+        console.log('✅ PHY Layer: Found data in global variable');
+        processPhyData((window as any).latestTestCaseData);
+        return;
+      }
+      
+      // Method 2: Check localStorage
+      try {
+        const storedData = localStorage.getItem('5glabx_test_data');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          console.log('✅ PHY Layer: Found data in localStorage');
+          processPhyData(parsedData);
+          return;
+        }
+      } catch (e) {
+        console.warn('⚠️ PHY Layer: Failed to parse localStorage data:', e);
+      }
+      
+      console.log('⚠️ PHY Layer: No test data found in fallback sources');
+    };
+    
+    // Process PHY data
+    const processPhyData = (data: any) => {
+      if (data.type === '5GLABX_TEST_EXECUTION' && data.testCaseData) {
+        console.log('📡 PHY Layer processing test case data:', {
+          testCaseId: data.testCaseId,
+          testCaseName: data.testCaseData.testCase?.name,
+          messageCount: data.testCaseData.expectedMessages?.length || 0
+        });
+        
+        const { testCaseData } = data;
+        
+        if (testCaseData.expectedMessages) {
+          const phyMessages = testCaseData.expectedMessages.filter((msg: any) => 
+            msg.layer === 'PHY' || msg.messageType.includes('PHY') || 
+            msg.messageType.includes('PDSCH') || msg.messageType.includes('PUSCH')
+          );
+          
+          console.log(`📡 PHY Layer: Processing ${phyMessages.length} expected PHY messages`);
+          
+          // Add expected PHY logs
+          const phyLogs = phyMessages.map((msg: any, idx: number) => ({
+            id: Date.now() + idx,
+            timestamp: new Date().toLocaleTimeString(),
+            layer: 'PHY',
+            message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
+            channel: msg.messageType,
+            direction: msg.direction,
+            source: 'Expected'
+          }));
+          
+          setLogs(prev => [...phyLogs, ...prev.slice(0, 19)]);
+          setIsConnected(true);
+        }
+      }
+    };
+    
     // Listen for Test Manager data
     const handleTestManagerData = (event: MessageEvent) => {
       if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
         console.log('📡 PHY Layer TSX: Received test manager data:', event.data.testCaseId);
+        processPhyData(event.data);
         
-        const { executionId, testCaseId } = event.data;
+        const { executionId } = event.data;
         
         // If we have an execution ID, fetch real data from Supabase
         if (executionId) {
           fetchPhyLayerData(executionId);
-        } else if (testCaseId) {
-          // Fallback to test case data if no execution ID
-          setIsConnected(true);
-          const { testCaseData } = event.data;
-          
-          if (testCaseData && testCaseData.expectedMessages) {
-            const phyMessages = testCaseData.expectedMessages.filter((msg: any) => 
-              msg.layer === 'PHY' || msg.messageType.includes('PHY') || 
-              msg.messageType.includes('PDSCH') || msg.messageType.includes('PUSCH')
-            );
-            
-            console.log(`📡 PHY Layer TSX: Processing ${phyMessages.length} expected PHY messages`);
-            
-            // Add expected PHY logs
-            const phyLogs = phyMessages.map((msg: any, idx: number) => ({
-              id: Date.now() + idx,
-              timestamp: new Date().toLocaleTimeString(),
-              layer: 'PHY',
-              message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
-              channel: msg.messageType,
-              direction: msg.direction,
-              source: 'Expected'
-            }));
-            
-            setLogs(prev => [...phyLogs, ...prev.slice(0, 19)]);
-          }
         }
       }
     };
@@ -124,6 +162,11 @@ const PhyLayerViewTSX: React.FC<{
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('phylayerupdate', handlePhyUpdate as EventListener);
       console.log('✅ PHY Layer TSX: Event listeners registered');
+      
+      // Try to load existing data immediately
+      setTimeout(() => {
+        loadPhyData();
+      }, 1000);
     }
 
     return () => {
