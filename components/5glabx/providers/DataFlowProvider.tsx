@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, createContext, useContext } from 'react';
-// import { DataFormatAdapter } from '@/utils/DataFormatAdapter';
-// import { useDataFormatAdapter } from '@/utils/DataFormatAdapterIntegration';
 
 // Data Flow Context
 interface DataFlowContextType {
@@ -42,30 +40,60 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [adapterAvailable, setAdapterAvailable] = useState(false);
   const [layerStatistics, setLayerStatistics] = useState<Record<string, any>>({});
   
-  // Use DataFormatAdapter hook (commented out for now)
-  // const { processLogs, processLayerData, validateData: validateDataHook, getSupportedLayers } = useDataFormatAdapter();
-  
-  // Fallback functions
-  const processLogs = (logs: any[]) => logs;
-  const processLayerData = (data: any) => data;
-  const validateDataHook = (data: any) => true;
-  const getSupportedLayers = () => ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'];
+  // Fallback functions when DataFormatAdapter is not available
+  const fallbackLogsFormat = (data: any) => {
+    return {
+      id: data.id || Date.now(),
+      timestamp: new Date(data.timestampMs || Date.now()).toLocaleTimeString(),
+      level: 'I',
+      component: data.layer || 'UNKNOWN',
+      message: `${data.messageName || 'Unknown'}: ${JSON.stringify(data.messagePayload || {})}`,
+      type: data.messageType || 'GENERIC',
+      source: 'TestManager'
+    };
+  };
+
+  const fallbackEnhancedFormat = (data: any) => {
+    return {
+      id: data.id || Date.now(),
+      timestamp: new Date(data.timestampMs || Date.now()).toLocaleTimeString() + '.123',
+      direction: data.direction || 'DL',
+      layer: data.layer || 'RRC',
+      channel: data.messageType || 'CCCH',
+      sfn: Math.floor(Math.random() * 1024).toString(),
+      messageType: data.messageType || 'Message',
+      rnti: 'C-RNTI',
+      message: data.messageName || 'Unknown Message',
+      rawData: JSON.stringify(data.messagePayload || {}).substring(0, 20),
+      ies: Object.entries(data.messagePayload || {}).map(([k, v]) => `${k}=${v}`).join(', ') || 'No IEs',
+      source: 'TestManager'
+    };
+  };
+
+  const fallbackLayerFormat = (data: any, layer: string) => {
+    return {
+      ...data,
+      layer,
+      timestamp: Date.now(),
+      processed: true
+    };
+  };
 
   useEffect(() => {
     const initializeDataFlow = async () => {
       try {
-        // Initialize DataFormatAdapter first (commented out for now)
-        // if (DataFormatAdapter) {
-        //   setDataFormatAdapter(DataFormatAdapter);
-        //   setAdapterAvailable(true);
-        //   console.log('DataFormatAdapter initialized in DataFlowProvider');
-        // } else {
+        // Initialize DataFormatAdapter first
+        if (typeof window !== 'undefined' && (window as any).DataFormatAdapter) {
+          setDataFormatAdapter((window as any).DataFormatAdapter);
+          setAdapterAvailable(true);
+          console.log('DataFormatAdapter initialized in DataFlowProvider');
+        } else {
           console.warn('DataFormatAdapter not available, using fallback mode');
-        // }
+        }
 
         // Initialize WebSocket connection for real-time data
-        if (typeof window !== 'undefined' && window.WebSocketService) {
-          const wsService = new window.WebSocketService();
+        if (typeof window !== 'undefined' && (window as any).WebSocketService) {
+          const wsService = new (window as any).WebSocketService();
           wsService.connect('ws://localhost:8081');
           
           wsService.on('connected', () => {
@@ -119,16 +147,22 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   ) || []
                 };
 
-                // Convert to different frontend formats using fallback functions
+                // Convert to different frontend formats using DataFormatAdapter
                 const convertedData = {
                   // For LogsView
-                  logsView: fallbackLogsFormat(baseData),
+                  logsView: (window as any).DataFormatAdapter ? 
+                    (window as any).DataFormatAdapter.adaptLogForViewer(baseData) : 
+                    fallbackLogsFormat(baseData),
                     
                   // For EnhancedLogsView  
-                  enhancedLogsView: fallbackEnhancedFormat(baseData),
+                  enhancedLogsView: (window as any).DataFormatAdapter ? 
+                    (window as any).DataFormatAdapter.adaptForEnhancedLogsView(baseData) :
+                    fallbackEnhancedFormat(baseData),
                     
                   // For Layer-specific views
-                  layerView: fallbackLayerFormat(baseData, message.layer),
+                  layerView: (window as any).DataFormatAdapter ? 
+                    (window as any).DataFormatAdapter.adaptForLayerView(baseData, message.layer) :
+                    fallbackLayerFormat(baseData, message.layer),
                     
                   // Original data for reference
                   original: baseData
@@ -319,15 +353,15 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
 
         // Initialize Test Case Playback Service with DataFormatAdapter
-        if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
-          const playbackService = new window.TestCasePlaybackService({
+        if (typeof window !== 'undefined' && (window as any).TestCasePlaybackService) {
+          const playbackService = new (window as any).TestCasePlaybackService({
             databaseService: null, // Will be set when needed
             websocketBroadcast: (type: string, source: string, data: any) => {
               // Broadcast test case data to all subscribers
               broadcastToSubscribers(type, data);
             },
             fetchImpl: fetch,
-            dataFormatAdapter: null // Pass the adapter (commented out for now)
+            dataFormatAdapter: (window as any).DataFormatAdapter // Pass the adapter
           });
           
           // Store reference for later use
@@ -336,8 +370,8 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize Layer Stats Service
-        if (typeof window !== 'undefined' && window.LayerStatsService) {
-          const layerStats = window.LayerStatsService;
+        if (typeof window !== 'undefined' && (window as any).LayerStatsService) {
+          const layerStats = (window as any).LayerStatsService;
           layerStats.init();
           
           // Subscribe to layer stats updates
@@ -351,8 +385,8 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize Stream Processor
-        if (typeof window !== 'undefined' && window.StreamProcessor) {
-          const processor = window.StreamProcessor;
+        if (typeof window !== 'undefined' && (window as any).StreamProcessor) {
+          const processor = (window as any).StreamProcessor;
           processor.startProcessing();
           
           // Subscribe to processed data
@@ -362,8 +396,8 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize Log Processor
-        if (typeof window !== 'undefined' && window.LogProcessor) {
-          const logProcessor = new window.LogProcessor();
+        if (typeof window !== 'undefined' && (window as any).LogProcessor) {
+          const logProcessor = new (window as any).LogProcessor();
           
           logProcessor.subscribe((logs: any[]) => {
             // Process logs by layer
@@ -378,8 +412,8 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize Message Analyzer
-        if (typeof window !== 'undefined' && window.MessageAnalyzer) {
-          const messageAnalyzer = new window.MessageAnalyzer();
+        if (typeof window !== 'undefined' && (window as any).MessageAnalyzer) {
+          const messageAnalyzer = new (window as any).MessageAnalyzer();
           
           messageAnalyzer.subscribe((analysis: any) => {
             // Distribute analysis results to appropriate layers
@@ -388,8 +422,8 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize CLI Bridge for real-time CLI data
-        if (typeof window !== 'undefined' && window.CLIBridge) {
-          const cliBridge = new window.CLIBridge();
+        if (typeof window !== 'undefined' && (window as any).CLIBridge) {
+          const cliBridge = new (window as any).CLIBridge();
           
           cliBridge.subscribe((cliData: any) => {
             setRealTimeData(cliData);
@@ -636,50 +670,14 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // Get supported layers
+  const getSupportedLayers = () => {
+    return ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS', 'O-RAN', 'NB-IoT', 'V2X', 'NTN'];
+  };
+
   // Get layer statistics
   const getLayerStatistics = () => {
     return layerStatistics;
-  };
-
-  // Fallback format functions
-  const fallbackLogsFormat = (data: any) => {
-    return {
-      id: data.id,
-      timestamp: new Date(data.timestampMs).toLocaleTimeString(),
-      level: 'I',
-      component: data.layer,
-      message: `${data.messageName}: ${JSON.stringify(data.messagePayload || {})}`,
-      type: data.messageType,
-      source: 'TestManager',
-      direction: data.direction,
-      protocol: data.protocol
-    };
-  };
-
-  const fallbackEnhancedFormat = (data: any) => {
-    return {
-      id: data.id,
-      timestamp: new Date(data.timestampMs).toLocaleTimeString() + '.123',
-      direction: data.direction || 'DL',
-      layer: data.layer || 'RRC',
-      channel: data.messageType || 'CCCH',
-      sfn: Math.floor(Math.random() * 1024).toString(),
-      messageType: data.messageType || 'Message',
-      rnti: 'C-RNTI',
-      message: data.messageName || 'Unknown Message',
-      rawData: JSON.stringify(data.messagePayload || {}).substring(0, 20),
-      ies: Object.entries(data.messagePayload || {}).map(([k, v]) => `${k}=${v}`).join(', ') || 'No IEs',
-      source: 'TestManager'
-    };
-  };
-
-  const fallbackLayerFormat = (data: any, layer: string) => {
-    return {
-      ...data,
-      layer,
-      timestamp: Date.now(),
-      processed: true
-    };
   };
 
   const contextValue: DataFlowContextType = {

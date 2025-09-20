@@ -34,7 +34,7 @@ function testEventDispatching() {
     return;
   }
 
-  // Test 5GLABX_TEST_EXECUTION event
+  // Test 5GLabX_TEST_EXECUTION event
   const testData = {
     type: '5GLABX_TEST_EXECUTION',
     testCaseId: 'TEST_001',
