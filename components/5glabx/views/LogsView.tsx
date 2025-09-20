@@ -112,16 +112,37 @@ const LogsView: React.FC<{
       }
     };
 
+    // Listen for direct log updates
+    const handleDirectLogUpdate = (event: CustomEvent) => {
+      console.log('📊 LogsView: Direct log update received:', event.detail);
+      const logData = event.detail;
+      
+      const newLog = {
+        id: logData.id || Date.now(),
+        timestamp: logData.timestamp || (Date.now() / 1000).toFixed(1),
+        level: logData.level || 'I',
+        component: logData.component || logData.layer || 'TEST',
+        message: logData.message || `${logData.messageType}: ${JSON.stringify(logData.payload || {})}`,
+        type: logData.messageType || logData.type || 'DATA',
+        source: 'TestManager'
+      };
+      
+      setLogs(prev => [...prev.slice(-99), newLog]);
+      console.log('📊 LogsView: Added direct log entry:', newLog.message);
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestCaseData);
       window.addEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
-      console.log('✅ LogsView: Event listeners registered for Test Manager integration');
+      window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
+      console.log('✅ LogsView: All event listeners registered for Test Manager integration');
     }
 
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestCaseData);
         window.removeEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
+        window.removeEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
       }
     };
   }, []);

@@ -192,6 +192,21 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     setRealTimeData(logEntry);
                     distributeDataToLayers(logEntry);
                     
+                    // Direct injection to LogsView if available
+                    if (typeof window !== 'undefined') {
+                      // Try to find and update LogsView directly
+                      const logsViewEvent = new CustomEvent('logsViewUpdate', {
+                        detail: logEntry
+                      });
+                      window.dispatchEvent(logsViewEvent);
+                      
+                      // Also try layer-specific events
+                      const layerEvent = new CustomEvent(`${logEntry.layer.toLowerCase()}LayerUpdate`, {
+                        detail: logEntry
+                      });
+                      window.dispatchEvent(layerEvent);
+                    }
+                    
                     // Try to send to LogProcessor directly if available
                     if ((window as any).LogProcessor) {
                       try {
