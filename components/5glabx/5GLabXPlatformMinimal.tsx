@@ -76,6 +76,7 @@ if (typeof window !== 'undefined') {
 // Import components
 import TestCaseDataFlow from './components/TestCaseDataFlow';
 import TestManagerDataDebug from './components/TestManagerDataDebug';
+import DirectDataInjector from './components/DirectDataInjector';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -172,6 +173,9 @@ const DashboardView: React.FC = () => {
       
       {/* Debug Component */}
       <TestManagerDataDebug />
+      
+      {/* Direct Data Injector */}
+      <DirectDataInjector />
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg border shadow-sm">
