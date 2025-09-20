@@ -6,7 +6,8 @@ import {
   Layers, Wifi, Cloud, Play, Pause, Square, Eye, Download, Upload,
   RefreshCw, Plus, Search, Filter, Calendar, Clock, TrendingUp,
   AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
-  Satellite, Network, Server, Phone, MapPin, FileText, HelpCircle
+  Satellite, Network, Server, Phone, MapPin, FileText, HelpCircle,
+  Radio
 } from 'lucide-react';
 
 // Import existing components from codebase
@@ -78,6 +79,10 @@ import TestCaseDataFlow from './components/TestCaseDataFlow';
 import TestManagerDataDebug from './components/TestManagerDataDebug';
 import DirectDataInjector from './components/DirectDataInjector';
 import SimpleDataDisplay from './components/SimpleDataDisplay';
+
+// Import working TSX layer views
+import PhyLayerViewTSX from './views/PhyLayerViewTSX';
+import MacLayerViewTSX from './views/MacLayerViewTSX';
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
@@ -403,6 +408,11 @@ const Sidebar: React.FC<{
     { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' }
   ];
 
+  const layerItems = [
+    { id: 'phy-layer', label: 'PHY Layer', icon: Radio, badge: 'LIVE' },
+    { id: 'mac-layer', label: 'MAC Layer', icon: Layers, badge: 'LIVE' }
+  ];
+
   const oranItems = [
     { id: 'oran-overview', label: 'O-RAN Overview', icon: Network },
     { id: 'oran-interfaces', label: 'O-RAN Interfaces', icon: Network },
@@ -500,6 +510,14 @@ const Sidebar: React.FC<{
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ANALYTICS</h3>
           <div className="space-y-1">
             {analyticsItems.map(renderMenuItem)}
+          </div>
+        </div>
+
+        {/* Protocol Layers */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">PROTOCOL LAYERS</h3>
+          <div className="space-y-1">
+            {layerItems.map(renderMenuItem)}
           </div>
         </div>
 
@@ -605,6 +623,10 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <CallFlowView appState={{}} onStateChange={() => {}} />;
       case 'analytics':
         return <AnalyticsView appState={{}} onStateChange={() => {}} />;
+      case 'phy-layer':
+        return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
+      case 'mac-layer':
+        return <MacLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'oran-overview':
         return <OranOverviewView appState={{}} onStateChange={() => {}} />;
       case 'oran-interfaces':
