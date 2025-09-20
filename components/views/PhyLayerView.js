@@ -11,6 +11,59 @@ function PhyLayerView() {
     });
 
     React.useEffect(() => {
+      // Listen for Test Manager data
+      const handleTestManagerData = (event) => {
+        if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+          console.log('📊 PHY Layer: Received test manager data:', event.data.testCaseId);
+          const { testCaseData } = event.data;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            const phyMessages = testCaseData.expectedMessages.filter(msg => 
+              msg.layer === 'PHY' || msg.messageType.includes('PHY')
+            );
+            
+            if (phyMessages.length > 0) {
+              console.log(`📊 PHY Layer: Processing ${phyMessages.length} PHY messages`);
+              const phyData = processPhyLogs(phyMessages.map(msg => ({
+                layer: 'PHY',
+                message: msg.messageName,
+                fields: msg.messagePayload,
+                channel: msg.messageType
+              })));
+              setPhyData(phyData);
+            }
+          }
+        }
+      };
+
+      // Listen for direct PHY layer updates
+      const handlePhyLayerUpdate = (event) => {
+        console.log('📊 PHY Layer: Direct update received:', event.detail);
+        if (event.detail && event.detail.layer === 'PHY') {
+          const phyLog = [{
+            layer: 'PHY',
+            message: event.detail.message,
+            fields: event.detail.payload || event.detail.data,
+            channel: event.detail.messageType
+          }];
+          const updatedData = processPhyLogs(phyLog);
+          setPhyData(prev => ({
+            pdschStats: { ...prev.pdschStats, ...updatedData.pdschStats },
+            puschStats: { ...prev.puschStats, ...updatedData.puschStats },
+            pucchStats: { ...prev.pucchStats, ...updatedData.pucchStats },
+            beamformingInfo: { ...prev.beamformingInfo, ...updatedData.beamformingInfo },
+            mimoMetrics: { ...prev.mimoMetrics, ...updatedData.mimoMetrics },
+            channelEstimation: { ...prev.channelEstimation, ...updatedData.channelEstimation }
+          }));
+        }
+      };
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('message', handleTestManagerData);
+        window.addEventListener('phylayerupdate', handlePhyLayerUpdate);
+        console.log('✅ PHY Layer: Event listeners registered for Test Manager integration');
+      }
+
       try {
         if (window.LogProcessor) {
           const logProcessor = new window.LogProcessor();
@@ -27,17 +80,36 @@ function PhyLayerView() {
             const cliBridge = new window.CLIDataBridge();
             cliBridge.startCollection(['srsran']).catch(() => {});
           }
-          return unsubscribe;
+          
+          return () => {
+            unsubscribe();
+            if (typeof window !== 'undefined') {
+              window.removeEventListener('message', handleTestManagerData);
+              window.removeEventListener('phylayerupdate', handlePhyLayerUpdate);
+            }
+          };
         } else {
           const updateData = () => {
             const phyLogs = [];
             setPhyData(processPhyLogs(phyLogs));
           };
           const interval = setInterval(updateData, 1000);
-          return () => clearInterval(interval);
+          return () => {
+            clearInterval(interval);
+            if (typeof window !== 'undefined') {
+              window.removeEventListener('message', handleTestManagerData);
+              window.removeEventListener('phylayerupdate', handlePhyLayerUpdate);
+            }
+          };
         }
       } catch (error) {
         console.error('PHY CLI integration failed:', error);
+        return () => {
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('message', handleTestManagerData);
+            window.removeEventListener('phylayerupdate', handlePhyLayerUpdate);
+          }
+        };
       }
     }, []);
 
