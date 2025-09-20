@@ -137,7 +137,10 @@ const PhyLayerViewTSX: React.FC<{
   return (
     <div className="p-6 space-y-6" data-layer="PHY">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">PHY Layer Analysis</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">PHY Layer Analysis</h1>
+          <p className="text-gray-600 mt-1">5G NR Physical Layer Protocol Analysis & Monitoring</p>
+        </div>
         <div className="flex items-center space-x-2">
           {isLoading && (
             <div className="flex items-center space-x-2">
