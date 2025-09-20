@@ -688,21 +688,21 @@ const ClassicTestManager: React.FC = () => {
         if (categoryTestCases.length > 0) {
           addLog('INFO', `Found ${categoryTestCases.length} real test cases for ${categoryFilter}`);
           
-          // Use real test cases from verification
-          const realCases = categoryTestCases.slice(0, 10).map((tc: any) => ({
-            id: tc.test_case_id || tc.id,
-            name: tc.name,
+          // Use real test cases from verification with actual UUIDs
+          const realCases = categoryTestCases.slice(0, 20).map((tc: any, index: number) => ({
+            id: tc.id, // Use the actual UUID from database
+            name: tc.name || `${categoryFilter} Test Case ${index + 1}`,
             component: categoryFilter,
             status: 'Not Started',
             iterations: 'Never',
             successRate: 'N/A',
             lastRun: 'N/A',
             duration: '-',
-            priority: 'Medium',
+            priority: tc.priority || 'Medium',
             selected: false,
             test_type: tc.test_type || '',
             raw_category: categoryFilter,
-            realDatabaseId: tc.test_case_id || tc.id
+            realDatabaseId: tc.id // Use actual UUID for API calls
           }));
           
           setTestCases(realCases as TestCaseRow[]);
@@ -755,7 +755,7 @@ const ClassicTestManager: React.FC = () => {
         
         if (raw.length > 0) {
           const cases = raw.map((t: any) => ({
-            id: t.id || t.test_case_id || `tc_${Date.now()}_${Math.random()}`,
+            id: t.id, // Use actual UUID from database
             name: t.name || `Test Case ${t.test_case_id || 'Unknown'}`,
             component: t.category || t.protocol || domainLabel,
             status: 'Not Started',
@@ -768,7 +768,7 @@ const ClassicTestManager: React.FC = () => {
             test_type: (t.test_type || '').toString().toLowerCase(),
             raw_category: t.category || '',
             // Store real database ID for API calls
-            realDatabaseId: t.id || t.test_case_id
+            realDatabaseId: t.id // Use actual UUID
           })) as any[];
           
           setTestCases(cases as TestCaseRow[]);
