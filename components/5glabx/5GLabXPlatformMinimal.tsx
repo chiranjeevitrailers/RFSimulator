@@ -90,10 +90,22 @@ const DashboardView: React.FC = () => {
 
     // Listen for test data broadcasts
     const handlePostMessage = (event: MessageEvent) => {
-      if (event.data.type === '5GLABX_TEST_DATA' || event.data.type === '5GLABX_TEST_EXECUTION') {
-        console.log('🎯 5GLabX Dashboard received test data:', event.data.type);
+      if (event.data.type === '5GLABX_TEST_DATA' || 
+          event.data.type === '5GLABX_TEST_EXECUTION' ||
+          event.data.type === '5GLABX_WEBSOCKET_DATA') {
+        console.log('🎯 5GLabX Dashboard received test data:', event.data.type, 'TestCase:', event.data.testCaseId);
         setTestManagerData(event.data);
         setLastUpdate(new Date());
+        
+        // Show detailed information about received data
+        if (event.data.type === '5GLABX_TEST_EXECUTION') {
+          console.log('📊 Test execution data details:', {
+            testCaseId: event.data.testCaseId,
+            messagesCount: event.data.testCaseData?.expectedMessages?.length || 0,
+            iesCount: event.data.testCaseData?.expectedInformationElements?.length || 0,
+            layerParamsCount: event.data.testCaseData?.expectedLayerParameters?.length || 0
+          });
+        }
       }
     };
 

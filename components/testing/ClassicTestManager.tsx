@@ -790,42 +790,83 @@ const ClassicTestManager: React.FC = () => {
         
         // Send to 5GLabX via multiple channels for reliability
         try {
-          // Method 1: Direct window messaging
+          addLog('INFO', `🔗 Starting 5GLabX integration for test case: ${id}`);
+          
+          // Method 1: Direct window messaging with enhanced data
           if (typeof window !== 'undefined') {
-            window.postMessage({
+            const messageData = {
               type: '5GLABX_TEST_EXECUTION',
               testCaseId: id,
               runId: executionData.run_id || `run_${Date.now()}`,
               testCaseData: testDataForPlayback,
-              timestamp: Date.now()
-            }, '*');
-            addLog('INFO', `✅ Sent test data to 5GLabX via postMessage`);
+              timestamp: Date.now(),
+              source: 'TestManager'
+            };
+            
+            window.postMessage(messageData, '*');
+            addLog('INFO', `✅ Posted message to 5GLabX: ${JSON.stringify(messageData).substring(0, 100)}...`);
+            
+            // Also try parent window if in iframe
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage(messageData, '*');
+              addLog('INFO', `✅ Posted message to parent window for 5GLabX`);
+            }
           }
           
-          // Method 2: Custom event dispatch
+          // Method 2: Custom event dispatch with detailed logging
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
+            const eventDetail = {
+              testCaseId: id,
+              runId: executionData.run_id || `run_${Date.now()}`,
+              testCaseData: testDataForPlayback,
+              timestamp: Date.now(),
+              source: 'TestManager'
+            };
+            
+            const customEvent = new CustomEvent('testCaseExecutionStarted', { detail: eventDetail });
+            window.dispatchEvent(customEvent);
+            addLog('INFO', `✅ Dispatched CustomEvent 'testCaseExecutionStarted' with ${testDataForPlayback.expectedMessages?.length || 0} messages`);
+            
+            // Additional event for 5GLabX log analysis
+            const logAnalysisEvent = new CustomEvent('5glabxLogAnalysis', { 
               detail: {
                 testCaseId: id,
-                runId: executionData.run_id || `run_${Date.now()}`,
-                testCaseData: testDataForPlayback,
+                messages: testDataForPlayback.expectedMessages || [],
+                ies: testDataForPlayback.expectedInformationElements || [],
+                layerParams: testDataForPlayback.expectedLayerParameters || [],
                 timestamp: Date.now()
               }
-            }));
-            addLog('INFO', `✅ Dispatched testCaseExecutionStarted event to 5GLabX`);
+            });
+            window.dispatchEvent(logAnalysisEvent);
+            addLog('INFO', `✅ Dispatched '5glabxLogAnalysis' event for log processing`);
           }
           
-          // Method 3: TestCasePlaybackService if available
+          // Method 3: TestCasePlaybackService integration
           if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
+            addLog('INFO', `Initializing TestCasePlaybackService...`);
+            
             if (!window.playbackServiceInstance) {
               window.playbackServiceInstance = new window.TestCasePlaybackService({
                 databaseService: null,
                 websocketBroadcast: (type: string, source: string, data: any) => {
-                  addLog('DEBUG', `📡 5GLabX WebSocket broadcast: ${type} from ${source}`);
+                  addLog('DEBUG', `📡 WebSocket broadcast: ${type} from ${source} - ${JSON.stringify(data).substring(0, 50)}...`);
+                  
+                  // Forward to 5GLabX
+                  if (typeof window !== 'undefined') {
+                    window.postMessage({
+                      type: '5GLABX_WEBSOCKET_DATA',
+                      broadcastType: type,
+                      source: source,
+                      data: data,
+                      testCaseId: id,
+                      timestamp: Date.now()
+                    }, '*');
+                  }
                 },
                 fetchImpl: fetch,
                 dataFormatAdapter: window.DataFormatAdapter || null
               });
+              addLog('INFO', `TestCasePlaybackService instance created`);
             }
             
             const playbackResult = await window.playbackServiceInstance.startPlayback({
@@ -835,7 +876,35 @@ const ClassicTestManager: React.FC = () => {
               speed: 1.0
             });
             
-            addLog('INFO', `✅ 5GLabX playback started: ${playbackResult.count} messages queued`);
+            addLog('INFO', `✅ TestCasePlaybackService started: ${playbackResult.count} messages queued for 5GLabX`);
+          } else {
+            addLog('WARN', `TestCasePlaybackService not available on window object`);
+          }
+          
+          // Method 4: Direct 5GLabX service integration
+          if (typeof window !== 'undefined' && (window as any).LogProcessor) {
+            addLog('INFO', `Sending data directly to 5GLabX LogProcessor...`);
+            
+            const logProcessor = new (window as any).LogProcessor();
+            testDataForPlayback.expectedMessages?.forEach((message: any, index: number) => {
+              setTimeout(() => {
+                const logEntry = {
+                  timestamp: Date.now(),
+                  level: 'INFO',
+                  source: 'TestManager',
+                  layer: message.layer,
+                  protocol: message.protocol,
+                  messageType: message.messageType,
+                  message: `${message.messageName}: ${JSON.stringify(message.messagePayload)}`,
+                  data: message.messagePayload,
+                  direction: message.direction,
+                  testCaseId: id
+                };
+                
+                logProcessor.processLogLine(JSON.stringify(logEntry));
+                addLog('DEBUG', `📊 Sent message ${index + 1} to 5GLabX LogProcessor: ${message.messageName}`);
+              }, index * 500);
+            });
           }
           
         } catch (playbackError) {

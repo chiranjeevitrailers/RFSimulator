@@ -54,6 +54,78 @@ const LogsView: React.FC<{
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [selectedComponent, setSelectedComponent] = useState('all');
 
+  // Listen for Test Manager data and integrate with 5GLabX log analysis
+  useEffect(() => {
+    // Listen for Test Manager test execution data
+    const handleTestCaseData = (event: MessageEvent) => {
+      if (event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 LogsView received test case data for analysis:', event.data.testCaseId);
+        const { testCaseData, testCaseId } = event.data;
+        
+        if (testCaseData.expectedMessages) {
+          // Process each message as a log entry
+          testCaseData.expectedMessages.forEach((message: any, index: number) => {
+            setTimeout(() => {
+              const newLog = {
+                id: Date.now() + index,
+                timestamp: (Date.now() / 1000).toFixed(1),
+                level: 'I',
+                component: message.layer,
+                message: `${message.messageName}: ${JSON.stringify(message.messagePayload || {})}`,
+                type: message.messageType,
+                source: 'TestManager',
+                testCaseId: testCaseId,
+                direction: message.direction,
+                protocol: message.protocol
+              };
+              
+              setLogs(prev => [...prev.slice(-99), newLog]); // Keep last 100 logs
+              console.log(`📊 LogsView: Added message ${index + 1} - ${message.messageName}`);
+            }, index * 500);
+          });
+        }
+      }
+    };
+
+    // Listen for log analysis events
+    const handleLogAnalysis = (event: CustomEvent) => {
+      console.log('🔬 LogsView received log analysis data:', event.detail);
+      const { messages, testCaseId } = event.detail;
+      
+      if (Array.isArray(messages)) {
+        messages.forEach((message: any, index: number) => {
+          setTimeout(() => {
+            const analysisLog = {
+              id: Date.now() + index + 1000,
+              timestamp: (Date.now() / 1000).toFixed(1),
+              level: 'I',
+              component: message.layer,
+              message: `Analysis: ${message.messageName} - ${JSON.stringify(message.payload || {})}`,
+              type: `${message.messageType}_ANALYSIS`,
+              source: 'LogAnalysis',
+              testCaseId: testCaseId
+            };
+            
+            setLogs(prev => [...prev.slice(-99), analysisLog]);
+          }, index * 300);
+        });
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleTestCaseData);
+      window.addEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
+      console.log('✅ LogsView: Event listeners registered for Test Manager integration');
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('message', handleTestCaseData);
+        window.removeEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
+      }
+    };
+  }, []);
+
   const filteredLogs = logs.filter(log => {
     const matchesSearch = log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          log.component.toLowerCase().includes(searchQuery.toLowerCase()) ||
