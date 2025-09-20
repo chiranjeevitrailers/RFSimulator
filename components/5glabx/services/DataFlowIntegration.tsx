@@ -144,38 +144,83 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // Listen for Test Manager postMessage events
         const handlePostMessage = (event: MessageEvent) => {
-          if (event.data.type === '5GLABX_TEST_DATA' || event.data.type === '5GLABX_TEST_EXECUTION') {
-            console.log('📡 5GLabX received test data broadcast:', event.data.type, event.data.testCaseId);
+          if (event.data.type === '5GLABX_TEST_DATA' || 
+              event.data.type === '5GLABX_TEST_EXECUTION' || 
+              event.data.type === '5GLABX_WEBSOCKET_DATA') {
+            console.log('📡 5GLabX DataFlow received:', event.data.type, 'TestCase:', event.data.testCaseId);
             
             if (event.data.type === '5GLABX_TEST_EXECUTION') {
-              // Handle complete test execution data
-              const { testCaseId, testCaseData } = event.data;
+              // Handle complete test execution data for log analysis
+              const { testCaseId, testCaseData, source } = event.data;
+              console.log(`🔍 Processing test execution data for log analysis:`, {
+                testCaseId,
+                messagesCount: testCaseData.expectedMessages?.length || 0,
+                iesCount: testCaseData.expectedInformationElements?.length || 0,
+                layerParamsCount: testCaseData.expectedLayerParameters?.length || 0
+              });
+              
               setTestCaseData(testCaseData);
               
-              // Process messages immediately for live display
+              // Process messages for live log analysis
               if (testCaseData.expectedMessages) {
-                addLog('INFO', `Processing ${testCaseData.expectedMessages.length} messages for live display`);
+                console.log(`📊 Starting live log analysis for ${testCaseData.expectedMessages.length} messages`);
+                
                 testCaseData.expectedMessages.forEach((message: any, index: number) => {
                   setTimeout(() => {
-                    const liveData = {
-                      timestamp: Date.now(),
-                      testCaseId,
+                    // Create log entry in format expected by 5GLabX components
+                    const logEntry = {
+                      id: `${testCaseId}_${index}`,
+                      timestamp: new Date(Date.now() + index * 500).toLocaleTimeString(),
+                      level: 'I',
+                      component: message.layer,
                       layer: message.layer,
                       protocol: message.protocol,
                       messageType: message.messageType,
-                      messageName: message.messageName,
+                      message: `${message.messageName}: ${JSON.stringify(message.messagePayload || {})}`,
                       direction: message.direction,
-                      payload: message.messagePayload,
-                      ies: testCaseData.expectedInformationElements || [],
-                      layerParams: testCaseData.expectedLayerParameters || []
+                      source: 'TestManager',
+                      testCaseId: testCaseId,
+                      ies: testCaseData.expectedInformationElements?.filter((ie: any) => 
+                        ie.ieName?.includes(message.messageType)
+                      ) || [],
+                      layerParams: testCaseData.expectedLayerParameters?.filter((param: any) => 
+                        param.layer === message.layer
+                      ) || []
                     };
                     
-                    setRealTimeData(liveData);
-                    distributeDataToLayers(liveData);
-                    console.log(`📊 5GLabX processing message ${index + 1}: ${message.messageName}`);
-                  }, index * 500); // Faster message processing
+                    // Send to all possible 5GLabX processors
+                    setRealTimeData(logEntry);
+                    distributeDataToLayers(logEntry);
+                    
+                    // Try to send to LogProcessor directly if available
+                    if ((window as any).LogProcessor) {
+                      try {
+                        const processor = new (window as any).LogProcessor();
+                        processor.processLogLine(JSON.stringify(logEntry));
+                      } catch (e) {
+                        console.warn('Failed to send to LogProcessor:', e);
+                      }
+                    }
+                    
+                    console.log(`📊 5GLabX log analysis: Message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName}`);
+                  }, index * 500);
                 });
               }
+            } else if (event.data.type === '5GLABX_WEBSOCKET_DATA') {
+              // Handle WebSocket broadcast data
+              const { broadcastType, source, data, testCaseId } = event.data;
+              console.log(`📡 Processing WebSocket data: ${broadcastType} from ${source}`);
+              
+              const processedData = {
+                timestamp: Date.now(),
+                testCaseId,
+                source,
+                broadcastType,
+                ...data
+              };
+              
+              setRealTimeData(processedData);
+              distributeDataToLayers(processedData);
             } else {
               // Handle individual data broadcasts
               const processedData = {
@@ -190,16 +235,50 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         };
 
+        // Listen for 5GLabX log analysis events
+        const handle5GLabXLogAnalysis = (event: CustomEvent) => {
+          console.log('🔬 5GLabX log analysis event received:', event.detail);
+          const { testCaseId, messages, ies, layerParams } = event.detail;
+          
+          // Process each message for log analysis
+          messages.forEach((message: any, index: number) => {
+            setTimeout(() => {
+              const analysisData = {
+                timestamp: Date.now(),
+                testCaseId,
+                messageIndex: index,
+                totalMessages: messages.length,
+                layer: message.layer,
+                protocol: message.protocol,
+                messageType: message.messageType,
+                messageName: message.messageName,
+                direction: message.direction,
+                payload: message.messagePayload,
+                relatedIEs: ies.filter((ie: any) => ie.ieName?.includes(message.messageType)),
+                relatedParams: layerParams.filter((param: any) => param.layer === message.layer)
+              };
+              
+              setRealTimeData(analysisData);
+              distributeDataToLayers(analysisData);
+              console.log(`🔬 Log analysis: ${index + 1}/${messages.length} - ${message.messageName}`);
+            }, index * 300);
+          });
+        };
+
         // Add event listeners
         if (typeof window !== 'undefined') {
           window.addEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+          window.addEventListener('5glabxLogAnalysis', handle5GLabXLogAnalysis as EventListener);
           window.addEventListener('message', handlePostMessage);
+          
+          console.log('✅ 5GLabX DataFlow event listeners registered');
         }
 
         // Cleanup function
         return () => {
           if (typeof window !== 'undefined') {
             window.removeEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
+            window.removeEventListener('5glabxLogAnalysis', handle5GLabXLogAnalysis as EventListener);
             window.removeEventListener('message', handlePostMessage);
           }
         };
