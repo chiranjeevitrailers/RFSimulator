@@ -969,11 +969,32 @@ const ClassicTestManager: React.FC = () => {
       const executionData = await executionResponse.json();
       addLog('INFO', `Execution started for ${id}, RunId: ${executionData.run_id || 'unknown'}`);
       
-      // 2. Fetch comprehensive test case data (messages, IEs, layer parameters)
-      addLog('INFO', `Fetching comprehensive test case data for ${realId}...`);
-      addLog('DEBUG', `API URL: /api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}&includeTemplates=true`);
+      // 2. Fetch test case data - try simple API first, then comprehensive
+      addLog('INFO', `Fetching test case data for ${realId}...`);
       
-      const testDataResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}&includeTemplates=true`);
+      let testDataResponse;
+      let apiUsed = '';
+      
+      // Try simple execution API first (works with basic test_cases table)
+      try {
+        addLog('DEBUG', `Trying simple execution API: /api/test-execution/simple?testCaseId=${encodeURIComponent(realId)}`);
+        testDataResponse = await fetch(`/api/test-execution/simple?testCaseId=${encodeURIComponent(realId)}`);
+        apiUsed = 'simple';
+        
+        if (!testDataResponse.ok) {
+          addLog('WARN', `Simple execution API failed: ${testDataResponse.status}, trying comprehensive...`);
+          
+          // Fallback to comprehensive API
+          addLog('DEBUG', `Trying comprehensive API: /api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}`);
+          testDataResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(realId)}&includeTemplates=true`);
+          apiUsed = 'comprehensive';
+        } else {
+          addLog('INFO', `✅ Simple execution API succeeded for ${realId}`);
+        }
+      } catch (apiError) {
+        addLog('ERROR', `API error: ${apiError}`);
+        testDataResponse = null;
+      }
       
       if (!testDataResponse.ok) {
         const errorText = await testDataResponse.text();
@@ -1063,15 +1084,44 @@ const ClassicTestManager: React.FC = () => {
         const testCaseData = testDataPayload.data;
         
         if (testCaseData && testCaseData.testCase) {
-          addLog('INFO', `✅ REAL test case data fetched from Supabase for ${id}:`);
+          addLog('INFO', `✅ REAL test case data fetched from Supabase using ${apiUsed} API for ${realId}:`);
           addLog('INFO', `  - Test Case Name: ${testCaseData.testCase.name}`);
           addLog('INFO', `  - Expected Messages: ${testCaseData.expectedMessages?.length || 0}`);
           addLog('INFO', `  - Information Elements: ${testCaseData.expectedInformationElements?.length || 0}`);
           addLog('INFO', `  - Layer Parameters: ${testCaseData.expectedLayerParameters?.length || 0}`);
           addLog('INFO', `  - Protocol: ${testCaseData.testCase.protocol}`);
           addLog('INFO', `  - Category: ${testCaseData.testCase.category}`);
+          
+          // 3. Feed REAL data to 5GLabX backend
+          addLog('INFO', `🔗 Starting 5GLabX integration with REAL Supabase data...`);
+          
+          // Send real data to 5GLabX
+          if (typeof window !== 'undefined') {
+            window.postMessage({
+              type: '5GLABX_TEST_EXECUTION',
+              testCaseId: realId,
+              runId: executionData.run_id || `run_${Date.now()}`,
+              testCaseData: testCaseData,
+              timestamp: Date.now(),
+              source: 'TestManager',
+              dataSource: 'REAL_SUPABASE',
+              apiUsed: apiUsed
+            }, '*');
+            
+            window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
+              detail: {
+                testCaseId: realId,
+                runId: executionData.run_id,
+                testCaseData: testCaseData,
+                timestamp: Date.now(),
+                dataSource: 'REAL_SUPABASE'
+              }
+            }));
+            
+            addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
+          }
         } else {
-          addLog('WARN', `API returned success but no test case data found for ${id}`);
+          addLog('WARN', `${apiUsed} API returned success but no test case data found for ${realId}`);
         }
         
         // 3. Feed data to 5GLabX backend - ENHANCED INTEGRATION
