@@ -27,8 +27,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: '5g-nr',
       name: '5G NR',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '📡',
+      color: '#3B82F6',
       children: [
         { id: '5gnr-functional', name: 'Functional', count: 0 },
         { id: '5gnr-performance', name: 'Performance', count: 0 },
@@ -39,8 +41,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: '4g-lte',
       name: '4G LTE',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '📶',
+      color: '#10B981',
       children: [
         { id: 'lte-functional', name: 'Functional', count: 0 },
         { id: 'lte-performance', name: 'Performance', count: 0 },
@@ -51,8 +55,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'ims',
       name: 'IMS/VoLTE/VoNR',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '📞',
+      color: '#8B5CF6',
       children: [
         { id: 'ims-functional', name: 'Functional', count: 0 },
         { id: 'ims-performance-stability', name: 'Performance/Stability', count: 0 }
@@ -61,8 +67,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'oran',
       name: 'O-RAN',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🌐',
+      color: '#F59E0B',
       children: [
         { id: 'oran-functional', name: 'Functional', count: 0 },
         { id: 'oran-performance', name: 'Performance', count: 0 }
@@ -71,8 +79,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'nbiot',
       name: 'NB-IoT',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🔗',
+      color: '#06B6D4',
       children: [
         { id: 'nbiot-functional', name: 'Functional', count: 0 },
         { id: 'nbiot-performance', name: 'Performance', count: 0 }
@@ -81,8 +91,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'v2x',
       name: 'V2X',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🚗',
+      color: '#EF4444',
       children: [
         { id: 'v2x-functional', name: 'Functional', count: 0 },
         { id: 'v2x-performance', name: 'Performance', count: 0 }
@@ -91,8 +103,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'ntn',
       name: 'NTN',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🛰️',
+      color: '#8B5CF6',
       children: [
         { id: 'ntn-functional', name: 'Functional', count: 0 },
         { id: 'ntn-performance', name: 'Performance', count: 0 }
@@ -101,8 +115,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'gcf',
       name: 'GCF Certification',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🏆',
+      color: '#F97316',
       children: [
         { id: 'gcf-3gpp-conformance', name: '3GPP Conformance', count: 0 },
         { id: 'gcf-protocol', name: 'Protocol', count: 0 },
@@ -113,8 +129,10 @@ const ClassicTestManager: React.FC = () => {
     {
       id: 'ptcrb',
       name: 'PTCRB Certification',
-      expanded: true,
+      expanded: false,
       totalCount: 0,
+      icon: '🥇',
+      color: '#6366F1',
       children: [
         { id: 'ptcrb-3gpp-conformance', name: '3GPP Conformance', count: 0 },
         { id: 'ptcrb-protocol', name: 'Protocol', count: 0 },
@@ -598,30 +616,37 @@ const ClassicTestManager: React.FC = () => {
       if (response.ok) {
         const stats = await response.json();
         
-        // Update test suite counts with real data
+        // Update test suite counts with real data from your provided counts
+        const realTestCaseCounts = {
+          '5G NR': { total: 287, functional: 74, performance: 71, rf: 71, stability: 71 },
+          '4G LTE': { total: 266, functional: 68, performance: 66, rf: 66, stability: 66 },
+          'IMS/VoLTE/VoNR': { total: 215, functional: 108, 'performance/stability': 107 },
+          'O-RAN': { total: 66, functional: 33, performance: 33 },
+          'NB-IoT': { total: 59, functional: 30, performance: 29 },
+          'V2X': { total: 59, functional: 30, performance: 29 },
+          'NTN': { total: 22, functional: 11, performance: 11 },
+          'GCF Certification': { total: 9, '3gpp_conformance': 3, protocol: 3, rf: 2, performance: 1 },
+          'PTCRB Certification': { total: 9, '3gpp_conformance': 3, protocol: 3, rf: 2, performance: 1 }
+        };
+
         setTestSuites(prevSuites => prevSuites.map(suite => {
-          const categoryMap: Record<string, string> = {
-            '5G NR': '5G_NR',
-            '4G LTE': '4G_LTE',
-            'IMS/VoLTE/VoNR': 'IMS_SIP',
-            'O-RAN': 'O_RAN',
-            'NB-IoT': 'NB_IoT',
-            'V2X': 'V2X',
-            'NTN': 'NTN',
-            'GCF Certification': 'GCF',
-            'PTCRB Certification': 'PTCRB'
-          };
-          
-          const categoryKey = categoryMap[suite.name];
-          const totalCount = stats.protocols?.[categoryKey] || 0;
+          const counts = realTestCaseCounts[suite.name] || { total: 0 };
           
           return {
             ...suite,
-            totalCount: totalCount,
-            children: suite.children.map((child: any) => ({
-              ...child,
-              count: Math.floor(totalCount / suite.children.length) + (child.id.includes('functional') ? totalCount % suite.children.length : 0)
-            }))
+            totalCount: counts.total,
+            children: suite.children.map((child: any) => {
+              // Map child names to count keys
+              const childKey = child.name.toLowerCase().replace(/[^a-z]/g, '_');
+              const mappedKey = childKey.includes('3gpp') ? '3gpp_conformance' : 
+                              childKey.includes('performance_stability') ? 'performance/stability' :
+                              childKey.replace('_', '');
+              
+              return {
+                ...child,
+                count: counts[mappedKey] || counts[child.name.toLowerCase()] || 0
+              };
+            })
           };
         }));
         
@@ -657,6 +682,12 @@ const ClassicTestManager: React.FC = () => {
 
   const addLog = (level: 'INFO'|'ERROR'|'WARN'|'DEBUG', message: string) => {
     setLogs(prev => [...prev, { timestamp: new Date().toLocaleString(), level, message }]);
+  };
+
+  const toggleTestSuiteExpansion = (suiteId: string) => {
+    setTestSuites(prevSuites => prevSuites.map(suite => 
+      suite.id === suiteId ? { ...suite, expanded: !suite.expanded } : suite
+    ));
   };
 
   const toggleTestSelection = (id: string) => {
@@ -863,31 +894,82 @@ const ClassicTestManager: React.FC = () => {
           </div>
           <div className="space-y-1 max-h-96 overflow-y-auto">
             {testSuites.map(suite => (
-              <div key={suite.id} className="space-y-1">
-                <div className={`flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer ${selectedDomain === suite.name ? 'bg-gray-700 border-l-2 border-blue-500' : ''}`} onClick={() => { 
-                  addLog('INFO', `Category clicked: ${suite.name}`); 
-                  setSelectedDomain(suite.name); 
-                  setSelectedCategoryType(null); 
-                  loadDomainCases(suite.name); 
-                }}>
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center space-x-2">
-                      <i data-lucide={suite.expanded ? 'chevron-down' : 'chevron-right'} className="w-4 h-4"></i>
-                      <span className="text-sm">{suite.name}</span>
+              <div key={suite.id} className="mb-2">
+                {/* Main Category Header */}
+                <div className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                  selectedDomain === suite.name 
+                    ? 'bg-gray-700 border-l-4 border-blue-500 shadow-md' 
+                    : 'hover:bg-gray-700 hover:shadow-sm'
+                }`}>
+                  {/* Left side - Icon, Name, Expand/Collapse */}
+                  <div className="flex items-center space-x-3" onClick={() => { 
+                    addLog('INFO', `Category clicked: ${suite.name}`); 
+                    setSelectedDomain(suite.name); 
+                    setSelectedCategoryType(null); 
+                    loadDomainCases(suite.name); 
+                  }}>
+                    <span className="text-lg">{(suite as any).icon}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-white">{suite.name}</span>
+                      <span className="text-xs text-gray-400">
+                        {(suite as any).totalCount > 0 ? `${(suite as any).totalCount} test cases` : 'Loading...'}
+                      </span>
                     </div>
+                  </div>
+                  
+                  {/* Right side - Count Badge and Expand Button */}
+                  <div className="flex items-center space-x-2">
                     {(suite as any).totalCount > 0 && (
-                      <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                      <span 
+                        className="text-white text-xs px-2 py-1 rounded-full font-medium"
+                        style={{ backgroundColor: (suite as any).color }}
+                      >
                         {(suite as any).totalCount}
                       </span>
                     )}
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        toggleTestSuiteExpansion(suite.id); 
+                      }}
+                      className="p-1 hover:bg-gray-600 rounded transition-colors"
+                    >
+                      <i data-lucide={suite.expanded ? 'chevron-down' : 'chevron-right'} className="w-4 h-4 text-gray-300"></i>
+                    </button>
                   </div>
                 </div>
+                
+                {/* Subcategories - Expandable */}
                 {suite.expanded && (
-                  <div className="ml-4 space-y-1">
+                  <div className="ml-6 mt-2 space-y-1 border-l-2 border-gray-600 pl-4">
                     {suite.children.map((child: any) => (
-                      <div key={child.id} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer" onClick={() => setSelectedCategoryType(child.name)}>
-                        <span className="text-sm text-gray-300">{child.name}</span>
-                        {child.count > 0 && <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">{child.count}</span>}
+                      <div 
+                        key={child.id} 
+                        className={`flex items-center justify-between p-2 rounded cursor-pointer transition-all duration-150 ${
+                          selectedCategoryType === child.name 
+                            ? 'bg-gray-600 border-l-2 border-blue-400' 
+                            : 'hover:bg-gray-600'
+                        }`}
+                        onClick={() => {
+                          setSelectedCategoryType(child.name);
+                          addLog('INFO', `Subcategory selected: ${child.name} (${child.count} test cases)`);
+                        }}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: (suite as any).color }}
+                          ></div>
+                          <span className="text-sm text-gray-300">{child.name}</span>
+                        </div>
+                        {child.count > 0 && (
+                          <span 
+                            className="text-white text-xs px-2 py-1 rounded-full font-medium"
+                            style={{ backgroundColor: (suite as any).color, opacity: 0.8 }}
+                          >
+                            {child.count}
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
