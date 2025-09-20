@@ -79,6 +79,7 @@ import TestCaseDataFlow from './components/TestCaseDataFlow';
 import TestManagerDataDebug from './components/TestManagerDataDebug';
 import DirectDataInjector from './components/DirectDataInjector';
 import SimpleDataDisplay from './components/SimpleDataDisplay';
+import ThreeGPPComplianceDashboard from './components/ThreeGPPComplianceDashboard';
 
 // Import working TSX layer views
 import PhyLayerViewTSX from './views/PhyLayerViewTSX';
@@ -186,6 +187,9 @@ const DashboardView: React.FC = () => {
       
       {/* Direct Data Injector */}
       <DirectDataInjector />
+      
+      {/* 3GPP Compliance Dashboard */}
+      <ThreeGPPComplianceDashboard testCaseData={testManagerData} />
       
       {/* Simple Data Display */}
       <SimpleDataDisplay />
