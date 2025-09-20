@@ -48,20 +48,20 @@ const NasLayerViewTSX: React.FC<{
               success: true
             },
             securityStats: {
-              ksi: 5 + Math.floor(Math.random() * 3),
+              ksi: 5 + 0,
               authenticated: true,
               ciphered: true,
               integrityProtected: true
             },
             sessionStats: {
-              activeSessions: 1 + Math.floor(Math.random() * 2),
+              activeSessions: 1 + 0,
               defaultSession: 1,
-              qosFlows: 2 + Math.floor(Math.random() * 3)
+              qosFlows: 2 + 0
             },
             mobilityStats: {
-              tauCount: Math.floor(Math.random() * 3),
+              tauCount: 0,
               serviceRequests: 1 + nasMessages.length,
-              emergencyCalls: Math.floor(Math.random() * 1)
+              emergencyCalls: 0
             }
           }));
 

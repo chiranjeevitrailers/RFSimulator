@@ -5,20 +5,60 @@ import {
   Activity, BarChart3, Package, Layers, TrendingUp, 
   Monitor, Network, Grid, Zap 
 } from 'lucide-react';
+import { protocolLayerDataService, ProtocolLayerMessage, LayerSpecificData } from '../services/ProtocolLayerDataService';
 
 const MacLayerViewTSX: React.FC<{
   appState?: any;
   onStateChange?: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [macData, setMacData] = useState({
-    harqStats: { processes: 8, retransmissions: 0, successRate: 98.5 },
-    schedulingStats: { dlGrants: 0, ulGrants: 0, avgLatency: 2.5 },
-    bufferStats: { bsr: 0, dlBuffer: 0, ulBuffer: 0 },
-    throughputStats: { dlThroughput: 0, ulThroughput: 0, efficiency: 85.2 }
-  });
-
+  const [macData, setMacData] = useState<LayerSpecificData>({});
+  const [messages, setMessages] = useState<ProtocolLayerMessage[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
+
+  // Fetch real MAC layer data from Supabase
+  const fetchMacLayerData = async (executionId: string) => {
+    if (!executionId || executionId === currentExecutionId) return;
+    
+    setIsLoading(true);
+    setCurrentExecutionId(executionId);
+    
+    try {
+      console.log(`📦 MAC Layer TSX: Fetching real data for execution: ${executionId}`);
+      
+      const { messages: macMessages, stats, layerSpecificData } = 
+        await protocolLayerDataService.fetchLayerData(executionId, 'MAC');
+      
+      setMessages(macMessages);
+      setMacData(layerSpecificData);
+      
+      // Convert messages to logs for display
+      const macLogs = macMessages.map((msg, idx) => ({
+        id: msg.id,
+        timestamp: new Date(msg.timestamp / 1000).toLocaleTimeString(),
+        layer: 'MAC',
+        message: `${msg.messageName}: ${JSON.stringify(msg.decodedData || {})}`,
+        pduType: msg.messageType,
+        direction: msg.direction,
+        source: 'Supabase',
+        validationStatus: msg.validationStatus,
+        processingTime: msg.processingTime
+      }));
+      
+      setLogs(macLogs);
+      setIsConnected(true);
+      
+      console.log(`✅ MAC Layer TSX: Loaded ${macMessages.length} real MAC messages`);
+      
+    } catch (error) {
+      console.error('❌ MAC Layer TSX: Error fetching real data:', error);
+      setIsConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     console.log('📦 MAC Layer TSX: Initializing...');
@@ -27,55 +67,38 @@ const MacLayerViewTSX: React.FC<{
     const handleTestManagerData = (event: MessageEvent) => {
       if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
         console.log('📦 MAC Layer TSX: Received test manager data:', event.data.testCaseId);
-        setIsConnected(true);
         
-        const { testCaseData } = event.data;
+        const { executionId, testCaseId } = event.data;
         
-        if (testCaseData && testCaseData.expectedMessages) {
-          const macMessages = testCaseData.expectedMessages.filter((msg: any) => 
-            msg.layer === 'MAC' || msg.messageType.includes('MAC') || 
-            msg.messageType.includes('PDU') || msg.messageType.includes('Grant')
-          );
+        // If we have an execution ID, fetch real data from Supabase
+        if (executionId) {
+          fetchMacLayerData(executionId);
+        } else if (testCaseId) {
+          // Fallback to test case data if no execution ID
+          setIsConnected(true);
+          const { testCaseData } = event.data;
           
-          console.log(`📦 MAC Layer TSX: Processing ${macMessages.length} MAC messages`);
-          
-          // Update MAC data
-          setMacData(prev => ({
-            harqStats: {
-              processes: 8,
-              retransmissions: Math.floor(Math.random() * 5),
-              successRate: 95 + Math.random() * 5
-            },
-            schedulingStats: {
-              dlGrants: macMessages.filter((m: any) => m.direction === 'DL').length * 10,
-              ulGrants: macMessages.filter((m: any) => m.direction === 'UL').length * 8,
-              avgLatency: 2 + Math.random() * 2
-            },
-            bufferStats: {
-              bsr: Math.floor(Math.random() * 1000),
-              dlBuffer: Math.floor(Math.random() * 500),
-              ulBuffer: Math.floor(Math.random() * 300)
-            },
-            throughputStats: {
-              dlThroughput: 100 + Math.random() * 50,
-              ulThroughput: 50 + Math.random() * 25,
-              efficiency: 80 + Math.random() * 15
-            }
-          }));
-
-          // Add MAC logs
-          const macLogs = macMessages.map((msg: any, idx: number) => ({
-            id: Date.now() + idx,
-            timestamp: new Date().toLocaleTimeString(),
-            layer: 'MAC',
-            message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
-            pduType: msg.messageType,
-            direction: msg.direction,
-            source: 'TestManager'
-          }));
-          
-          setLogs(prev => [...macLogs, ...prev.slice(0, 19)]);
-          console.log(`📦 MAC Layer TSX: Added ${macLogs.length} MAC log entries`);
+          if (testCaseData && testCaseData.expectedMessages) {
+            const macMessages = testCaseData.expectedMessages.filter((msg: any) => 
+              msg.layer === 'MAC' || msg.messageType.includes('MAC') || 
+              msg.messageType.includes('PDU') || msg.messageType.includes('Grant')
+            );
+            
+            console.log(`📦 MAC Layer TSX: Processing ${macMessages.length} expected MAC messages`);
+            
+            // Add expected MAC logs
+            const macLogs = macMessages.map((msg: any, idx: number) => ({
+              id: Date.now() + idx,
+              timestamp: new Date().toLocaleTimeString(),
+              layer: 'MAC',
+              message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType,
+              direction: msg.direction,
+              source: 'Expected'
+            }));
+            
+            setLogs(prev => [...macLogs, ...prev.slice(0, 19)]);
+          }
         }
       }
     };
@@ -92,15 +115,26 @@ const MacLayerViewTSX: React.FC<{
         window.removeEventListener('maclayerupdate', handleTestManagerData as EventListener);
       }
     };
-  }, []);
+  }, [currentExecutionId]);
 
   return (
     <div className="p-6 space-y-6" data-layer="MAC">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">MAC Layer Analysis</h1>
         <div className="flex items-center space-x-2">
+          {isLoading && (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm text-blue-600">Loading...</span>
+            </div>
+          )}
           <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-          <span className="text-sm text-gray-600">{isConnected ? 'Live Data' : 'Offline'}</span>
+          <span className="text-sm text-gray-600">
+            {isConnected ? (currentExecutionId ? 'Real Data' : 'Expected Data') : 'Offline'}
+          </span>
+          {currentExecutionId && (
+            <span className="text-xs text-gray-500">Exec: {currentExecutionId.slice(0, 8)}...</span>
+          )}
         </div>
       </div>
 
@@ -114,15 +148,15 @@ const MacLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Processes:</span>
-              <span className="font-medium">{macData.harqStats.processes}</span>
+              <span className="font-medium">{macData.harqStats?.processes || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Retransmissions:</span>
-              <span className="font-medium">{macData.harqStats.retransmissions}</span>
+              <span className="font-medium">{macData.harqStats?.retransmissions || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Success Rate:</span>
-              <span className="font-medium">{macData.harqStats.successRate.toFixed(1)}%</span>
+              <span className="font-medium">{(macData.harqStats?.successRate || 0).toFixed(1)}%</span>
             </div>
           </div>
         </div>
@@ -135,15 +169,15 @@ const MacLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">DL Grants:</span>
-              <span className="font-medium">{macData.schedulingStats.dlGrants}</span>
+              <span className="font-medium">{macData.schedulingStats?.dlGrants || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">UL Grants:</span>
-              <span className="font-medium">{macData.schedulingStats.ulGrants}</span>
+              <span className="font-medium">{macData.schedulingStats?.ulGrants || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Avg Latency:</span>
-              <span className="font-medium">{macData.schedulingStats.avgLatency.toFixed(1)} ms</span>
+              <span className="font-medium">{(macData.schedulingStats?.avgLatency || 0).toFixed(1)} ms</span>
             </div>
           </div>
         </div>
@@ -156,15 +190,15 @@ const MacLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">BSR:</span>
-              <span className="font-medium">{macData.bufferStats.bsr} bytes</span>
+              <span className="font-medium">{macData.bufferStats?.bsr || 0} bytes</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">DL Buffer:</span>
-              <span className="font-medium">{macData.bufferStats.dlBuffer} bytes</span>
+              <span className="font-medium">{macData.bufferStats?.dlBuffer || 0} bytes</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">UL Buffer:</span>
-              <span className="font-medium">{macData.bufferStats.ulBuffer} bytes</span>
+              <span className="font-medium">{macData.bufferStats?.ulBuffer || 0} bytes</span>
             </div>
           </div>
         </div>
@@ -177,15 +211,15 @@ const MacLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">DL:</span>
-              <span className="font-medium">{macData.throughputStats.dlThroughput.toFixed(1)} Mbps</span>
+              <span className="font-medium">{(macData.throughputStats?.dlThroughput || 0).toFixed(1)} Mbps</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">UL:</span>
-              <span className="font-medium">{macData.throughputStats.ulThroughput.toFixed(1)} Mbps</span>
+              <span className="font-medium">{(macData.throughputStats?.ulThroughput || 0).toFixed(1)} Mbps</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Efficiency:</span>
-              <span className="font-medium">{macData.throughputStats.efficiency.toFixed(1)}%</span>
+              <span className="font-medium">{(macData.throughputStats?.efficiency || 0).toFixed(1)}%</span>
             </div>
           </div>
         </div>
@@ -211,8 +245,22 @@ const MacLayerViewTSX: React.FC<{
                       <span className="text-green-600 font-mono">[{log.timestamp}]</span>
                       <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">MAC</span>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">{log.direction}</span>
+                      {log.validationStatus && (
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          log.validationStatus === 'valid' ? 'bg-green-100 text-green-800' :
+                          log.validationStatus === 'invalid' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {log.validationStatus}
+                        </span>
+                      )}
                     </div>
-                    <span className="text-xs text-gray-500">{log.source}</span>
+                    <div className="flex items-center space-x-2">
+                      {log.processingTime && (
+                        <span className="text-xs text-gray-500">{log.processingTime}ms</span>
+                      )}
+                      <span className="text-xs text-gray-500">{log.source}</span>
+                    </div>
                   </div>
                   <div className="mt-1 font-mono text-gray-900">{log.message}</div>
                   {log.pduType && (

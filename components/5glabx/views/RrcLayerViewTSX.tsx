@@ -103,7 +103,7 @@ const RrcLayerViewTSX: React.FC<{
               message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
               messageType: msg.messageType,
               direction: msg.direction,
-              transactionId: Math.floor(Math.random() * 4),
+              transactionId: 0,
               source: 'Expected'
             }));
             
