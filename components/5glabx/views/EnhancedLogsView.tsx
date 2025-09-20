@@ -54,8 +54,10 @@ const EnhancedLogsView: React.FC<{
   // Listen for Test Manager data injection
   useEffect(() => {
     const handleTestManagerData = (event: MessageEvent) => {
-      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
-        console.log('📊 Enhanced Logs: Received test manager data:', event.data.testCaseId);
+      console.log('📊 Enhanced Logs: Event received:', event.data?.type, event.data?.testCaseId);
+      
+      if (event.data && (event.data.type === '5GLABX_TEST_EXECUTION' || event.data.type === '5GLABX_WEBSOCKET_DATA')) {
+        console.log('📊 Enhanced Logs: Processing test manager data:', event.data.testCaseId);
         const { testCaseData } = event.data;
         
         if (testCaseData && testCaseData.expectedMessages) {
