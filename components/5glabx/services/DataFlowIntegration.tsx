@@ -192,19 +192,39 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     setRealTimeData(logEntry);
                     distributeDataToLayers(logEntry);
                     
-                    // Direct injection to LogsView if available
+                    // Direct injection to ALL 5GLabX views
                     if (typeof window !== 'undefined') {
-                      // Try to find and update LogsView directly
-                      const logsViewEvent = new CustomEvent('logsViewUpdate', {
+                      // LogsView update
+                      window.dispatchEvent(new CustomEvent('logsViewUpdate', {
                         detail: logEntry
-                      });
-                      window.dispatchEvent(logsViewEvent);
+                      }));
                       
-                      // Also try layer-specific events
-                      const layerEvent = new CustomEvent(`${logEntry.layer.toLowerCase()}LayerUpdate`, {
+                      // Enhanced LogsView update
+                      window.dispatchEvent(new CustomEvent('enhancedLogsUpdate', {
                         detail: logEntry
+                      }));
+                      
+                      // Layer Trace update
+                      window.dispatchEvent(new CustomEvent('layerTraceUpdate', {
+                        detail: logEntry
+                      }));
+                      
+                      // Call Flow update
+                      window.dispatchEvent(new CustomEvent('callFlowUpdate', {
+                        detail: logEntry
+                      }));
+                      
+                      // Layer-specific events for all layers
+                      const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
+                      layers.forEach(layer => {
+                        if (logEntry.layer === layer) {
+                          window.dispatchEvent(new CustomEvent(`${layer.toLowerCase()}LayerUpdate`, {
+                            detail: logEntry
+                          }));
+                        }
                       });
-                      window.dispatchEvent(layerEvent);
+                      
+                      console.log(`📡 Dispatched events for message: ${logEntry.messageType} on layer: ${logEntry.layer}`);
                     }
                     
                     // Try to send to LogProcessor directly if available

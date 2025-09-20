@@ -94,6 +94,51 @@ const CallFlowView: React.FC<{
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Listen for Test Manager data injection
+  useEffect(() => {
+    const handleTestManagerData = (event: MessageEvent) => {
+      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 Call Flow: Received test manager data:', event.data.testCaseId);
+        const { testCaseData } = event.data;
+        
+        if (testCaseData && testCaseData.expectedMessages) {
+          const newCallFlow = {
+            id: Date.now(),
+            name: testCaseData.testCase?.name || 'Test Manager Call Flow',
+            type: 'Test Execution',
+            status: 'running',
+            duration: `${testCaseData.expectedMessages.length * 0.5}s`,
+            steps: testCaseData.expectedMessages.map((message: any, index: number) => ({
+              id: index + 1,
+              from: message.direction === 'UL' ? 'UE' : 'gNB',
+              to: message.direction === 'UL' ? 'gNB' : 'UE',
+              message: message.messageName || message.messageType,
+              timestamp: `${index * 500}ms`,
+              status: 'success',
+              layer: message.layer,
+              payload: message.messagePayload
+            }))
+          };
+          
+          setCallFlows(prev => [newCallFlow, ...prev.slice(0, 4)]);
+          setSelectedCallFlow(newCallFlow);
+          console.log(`📊 Call Flow: Added test case flow with ${newCallFlow.steps.length} steps`);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleTestManagerData);
+      console.log('✅ Call Flow: Event listeners registered for Test Manager integration');
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('message', handleTestManagerData);
+      }
+    };
+  }, []);
+
   const types = ['all', 'Initial Access', 'Attach', 'Handover', 'IMS', 'Data Transfer'];
   const statuses = ['all', 'completed', 'in-progress', 'failed'];
 

@@ -51,6 +51,77 @@ const EnhancedLogsView: React.FC<{
   const [showDecoder, setShowDecoder] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
+  // Listen for Test Manager data injection
+  useEffect(() => {
+    const handleTestManagerData = (event: MessageEvent) => {
+      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 Enhanced Logs: Received test manager data:', event.data.testCaseId);
+        const { testCaseData } = event.data;
+        
+        if (testCaseData && testCaseData.expectedMessages) {
+          setIsConnected(true);
+          
+          testCaseData.expectedMessages.forEach((message: any, index: number) => {
+            setTimeout(() => {
+              const enhancedLog = {
+                id: Date.now() + index,
+                timestamp: new Date(Date.now() + index * 500).toLocaleTimeString() + '.123',
+                direction: message.direction || 'DL',
+                layer: message.layer || 'RRC',
+                channel: message.messageType || 'CCCH',
+                sfn: Math.floor(Math.random() * 1024).toString(),
+                messageType: message.messageType || 'RRCSetup',
+                rnti: 'C-RNTI',
+                message: message.messageName || message.messageType,
+                rawData: JSON.stringify(message.messagePayload || {}).substring(0, 20),
+                ies: Object.entries(message.messagePayload || {}).map(([k, v]) => `${k}=${v}`).join(', ') || 'No IEs',
+                source: 'TestManager'
+              };
+              
+              setLogs(prev => [...prev.slice(-99), enhancedLog]);
+              console.log(`📊 Enhanced Logs: Added message ${index + 1} - ${message.messageName}`);
+            }, index * 500);
+          });
+        }
+      }
+    };
+
+    const handleDirectLogUpdate = (event: CustomEvent) => {
+      console.log('📊 Enhanced Logs: Direct update received:', event.detail);
+      const logData = event.detail;
+      
+      const enhancedLog = {
+        id: logData.id || Date.now(),
+        timestamp: logData.timestamp || new Date().toLocaleTimeString() + '.123',
+        direction: logData.direction || 'DL',
+        layer: logData.layer || 'RRC',
+        channel: logData.messageType || 'CCCH',
+        sfn: logData.sfn || Math.floor(Math.random() * 1024).toString(),
+        messageType: logData.messageType || 'Message',
+        rnti: logData.rnti || 'C-RNTI',
+        message: logData.messageName || logData.message || 'Test Message',
+        rawData: JSON.stringify(logData.payload || logData.messagePayload || {}).substring(0, 20),
+        ies: logData.ies || 'No IEs',
+        source: 'TestManager'
+      };
+      
+      setLogs(prev => [...prev.slice(-99), enhancedLog]);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleTestManagerData);
+      window.addEventListener('enhancedLogsUpdate', handleDirectLogUpdate as EventListener);
+      console.log('✅ Enhanced Logs: Event listeners registered for Test Manager integration');
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('message', handleTestManagerData);
+        window.removeEventListener('enhancedLogsUpdate', handleDirectLogUpdate as EventListener);
+      }
+    };
+  }, []);
+
   // Comprehensive filter definitions
   const layers = ['ALL', 'PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'NGAP', 'GTP', 'SCTP', 'OTHER'];
   const channels = ['ALL', 'PBCH', 'PDCCH', 'PDSCH', 'PUSCH', 'PUCCH', 'PRACH', 'CCCH', 'DCCH', 'DTCH', 'BCCH', 'PCCH'];
