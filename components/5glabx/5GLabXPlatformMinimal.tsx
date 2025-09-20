@@ -91,6 +91,9 @@ import PdcpLayerViewTSX from './views/PdcpLayerViewTSX';
 import RrcLayerViewTSX from './views/RrcLayerViewTSX';
 import NasLayerViewTSX from './views/NasLayerViewTSX';
 
+// Import protocol layer data test component
+import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
+
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
   const [testManagerData, setTestManagerData] = React.useState<any>(null);
@@ -421,7 +424,8 @@ const Sidebar: React.FC<{
   ];
 
   const analyticsItems = [
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' }
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: 'LIVE' },
+    { id: 'protocol-layer-test', label: 'Protocol Layer Test', icon: Activity, badge: 'NEW' }
   ];
 
   const layerItems = [
@@ -643,6 +647,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <CallFlowView appState={{}} onStateChange={() => {}} />;
       case 'analytics':
         return <AnalyticsView appState={{}} onStateChange={() => {}} />;
+      case 'protocol-layer-test':
+        return <ProtocolLayerDataTest />;
       case 'phy-layer':
         return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'mac-layer':

@@ -5,20 +5,69 @@ import {
   Activity, BarChart3, Smartphone, Users, TrendingUp, 
   Monitor, Network, Settings, Zap, Signal, CheckCircle
 } from 'lucide-react';
+import { protocolLayerDataService, ProtocolLayerMessage, LayerSpecificData } from '../services/ProtocolLayerDataService';
 
 const RrcLayerViewTSX: React.FC<{
   appState?: any;
   onStateChange?: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [rrcData, setRrcData] = useState({
-    connectionStats: { state: 'RRC_CONNECTED', transactionId: 0, establishmentCause: 'mo-Data' },
-    measurementStats: { rsrp: -85, rsrq: -10, numCells: 1, reportsSent: 0 },
-    mobilityStats: { handovers: 0, cellReselections: 0, failures: 0 },
-    configurationStats: { srbCount: 2, drbCount: 1, measurements: 3, success: true }
-  });
-
+  const [rrcData, setRrcData] = useState<LayerSpecificData>({});
+  const [messages, setMessages] = useState<ProtocolLayerMessage[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
+
+  // Fetch real RRC layer data from Supabase
+  const fetchRrcLayerData = async (executionId: string) => {
+    if (!executionId || executionId === currentExecutionId) return;
+    
+    setIsLoading(true);
+    setCurrentExecutionId(executionId);
+    
+    try {
+      console.log(`📱 RRC Layer TSX: Fetching real data for execution: ${executionId}`);
+      
+      const { messages: rrcMessages, stats, layerSpecificData } = 
+        await protocolLayerDataService.fetchLayerData(executionId, 'RRC');
+      
+      setMessages(rrcMessages);
+      setRrcData(layerSpecificData);
+      
+      // Convert messages to logs for display
+      const rrcLogs = rrcMessages.map((msg, idx) => ({
+        id: msg.id,
+        timestamp: new Date(msg.timestamp / 1000).toLocaleTimeString(),
+        layer: 'RRC',
+        message: `${msg.messageName}: ${JSON.stringify(msg.decodedData || {})}`,
+        messageType: msg.messageType,
+        direction: msg.direction,
+        transactionId: extractTransactionId(msg),
+        source: 'Supabase',
+        validationStatus: msg.validationStatus,
+        processingTime: msg.processingTime
+      }));
+      
+      setLogs(rrcLogs);
+      setIsConnected(true);
+      
+      console.log(`✅ RRC Layer TSX: Loaded ${rrcMessages.length} real RRC messages`);
+      
+    } catch (error) {
+      console.error('❌ RRC Layer TSX: Error fetching real data:', error);
+      setIsConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Helper function to extract transaction ID from RRC messages
+  const extractTransactionId = (msg: ProtocolLayerMessage): number => {
+    const transactionIdParam = msg.layerParameters.find(p => 
+      p.parameter_name?.toUpperCase().includes('TRANSACTION_ID')
+    );
+    return transactionIdParam ? parseInt(transactionIdParam.parameter_value) || 0 : 0;
+  };
 
   useEffect(() => {
     console.log('📱 RRC Layer TSX: Initializing...');
@@ -27,58 +76,39 @@ const RrcLayerViewTSX: React.FC<{
     const handleTestManagerData = (event: MessageEvent) => {
       if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
         console.log('📱 RRC Layer TSX: Received test manager data:', event.data.testCaseId);
-        setIsConnected(true);
         
-        const { testCaseData } = event.data;
+        const { executionId, testCaseId } = event.data;
         
-        if (testCaseData && testCaseData.expectedMessages) {
-          const rrcMessages = testCaseData.expectedMessages.filter((msg: any) => 
-            msg.layer === 'RRC' || msg.messageType.includes('RRC') || 
-            msg.messageType.includes('Setup') || msg.messageType.includes('Reconfiguration')
-          );
+        // If we have an execution ID, fetch real data from Supabase
+        if (executionId) {
+          fetchRrcLayerData(executionId);
+        } else if (testCaseId) {
+          // Fallback to test case data if no execution ID
+          setIsConnected(true);
+          const { testCaseData } = event.data;
           
-          console.log(`📱 RRC Layer TSX: Processing ${rrcMessages.length} RRC messages`);
-          
-          // Update RRC data based on messages
-          setRrcData(prev => ({
-            connectionStats: {
-              state: 'RRC_CONNECTED',
+          if (testCaseData && testCaseData.expectedMessages) {
+            const rrcMessages = testCaseData.expectedMessages.filter((msg: any) => 
+              msg.layer === 'RRC' || msg.messageType.includes('RRC') || 
+              msg.messageType.includes('Setup') || msg.messageType.includes('Reconfiguration')
+            );
+            
+            console.log(`📱 RRC Layer TSX: Processing ${rrcMessages.length} expected RRC messages`);
+            
+            // Add expected RRC logs
+            const rrcLogs = rrcMessages.map((msg: any, idx: number) => ({
+              id: Date.now() + idx,
+              timestamp: new Date().toLocaleTimeString(),
+              layer: 'RRC',
+              message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
+              messageType: msg.messageType,
+              direction: msg.direction,
               transactionId: Math.floor(Math.random() * 4),
-              establishmentCause: 'mo-Data'
-            },
-            measurementStats: {
-              rsrp: -85 + Math.random() * 10,
-              rsrq: -10 + Math.random() * 5,
-              numCells: 1 + Math.floor(Math.random() * 3),
-              reportsSent: rrcMessages.length
-            },
-            mobilityStats: {
-              handovers: Math.floor(Math.random() * 3),
-              cellReselections: Math.floor(Math.random() * 2),
-              failures: Math.floor(Math.random() * 1)
-            },
-            configurationStats: {
-              srbCount: 2,
-              drbCount: 1,
-              measurements: rrcMessages.length,
-              success: true
-            }
-          }));
-
-          // Add RRC logs
-          const rrcLogs = rrcMessages.map((msg: any, idx: number) => ({
-            id: Date.now() + idx,
-            timestamp: new Date().toLocaleTimeString(),
-            layer: 'RRC',
-            message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {})}`,
-            messageType: msg.messageType,
-            direction: msg.direction,
-            transactionId: Math.floor(Math.random() * 4),
-            source: 'TestManager'
-          }));
-          
-          setLogs(prev => [...rrcLogs, ...prev.slice(0, 19)]);
-          console.log(`📱 RRC Layer TSX: Added ${rrcLogs.length} RRC log entries`);
+              source: 'Expected'
+            }));
+            
+            setLogs(prev => [...rrcLogs, ...prev.slice(0, 19)]);
+          }
         }
       }
     };
@@ -95,15 +125,26 @@ const RrcLayerViewTSX: React.FC<{
         window.removeEventListener('rrclayerupdate', handleTestManagerData as EventListener);
       }
     };
-  }, []);
+  }, [currentExecutionId]);
 
   return (
     <div className="p-6 space-y-6" data-layer="RRC">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">RRC Layer Analysis</h1>
         <div className="flex items-center space-x-2">
+          {isLoading && (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm text-blue-600">Loading...</span>
+            </div>
+          )}
           <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-          <span className="text-sm text-gray-600">{isConnected ? 'Live Data' : 'Offline'}</span>
+          <span className="text-sm text-gray-600">
+            {isConnected ? (currentExecutionId ? 'Real Data' : 'Expected Data') : 'Offline'}
+          </span>
+          {currentExecutionId && (
+            <span className="text-xs text-gray-500">Exec: {currentExecutionId.slice(0, 8)}...</span>
+          )}
         </div>
       </div>
 
@@ -117,15 +158,15 @@ const RrcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">State:</span>
-              <span className="font-medium text-green-600">{rrcData.connectionStats.state}</span>
+              <span className="font-medium text-green-600">{rrcData.connectionStats?.state || 'RRC_IDLE'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Transaction ID:</span>
-              <span className="font-medium">{rrcData.connectionStats.transactionId}</span>
+              <span className="font-medium">{rrcData.connectionStats?.transactionId || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Cause:</span>
-              <span className="font-medium">{rrcData.connectionStats.establishmentCause}</span>
+              <span className="font-medium">{rrcData.connectionStats?.establishmentCause || 'mo-Data'}</span>
             </div>
           </div>
         </div>
@@ -138,19 +179,19 @@ const RrcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">RSRP:</span>
-              <span className="font-medium">{rrcData.measurementStats.rsrp.toFixed(1)} dBm</span>
+              <span className="font-medium">{(rrcData.measurementStats?.rsrp || 0).toFixed(1)} dBm</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">RSRQ:</span>
-              <span className="font-medium">{rrcData.measurementStats.rsrq.toFixed(1)} dB</span>
+              <span className="font-medium">{(rrcData.measurementStats?.rsrq || 0).toFixed(1)} dB</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Neighbor Cells:</span>
-              <span className="font-medium">{rrcData.measurementStats.numCells}</span>
+              <span className="font-medium">{rrcData.measurementStats?.numCells || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Reports Sent:</span>
-              <span className="font-medium">{rrcData.measurementStats.reportsSent}</span>
+              <span className="font-medium">{rrcData.measurementStats?.reportsSent || 0}</span>
             </div>
           </div>
         </div>
