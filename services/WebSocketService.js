@@ -73,4 +73,9 @@ class WebSocketService {
   }
 }
 
+// Export for ES6 modules
+export default WebSocketService;
+export { WebSocketService };
+
+// Also make available globally for backward compatibility
 window.WebSocketService = WebSocketService;

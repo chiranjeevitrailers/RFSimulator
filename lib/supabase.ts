@@ -3,6 +3,10 @@ import { createClient as createSbClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
+// Singleton pattern to prevent multiple client instances
+let _supabaseClient: any = null;
+let _supabaseAdminClient: any = null;
+
 // Helper: create a configured client using env vars (public anon)
 export const createClient = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,21 +15,27 @@ export const createClient = () => {
   return createSbClient(url, key);
 };
 
-// Only create client if we have valid environment variables
-export const supabase = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key' 
-  ? createSbClient(supabaseUrl, supabaseAnonKey)
-  : null;
+// Singleton client getter
+export const supabase = (() => {
+  if (!_supabaseClient && supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key') {
+    _supabaseClient = createSbClient(supabaseUrl, supabaseAnonKey);
+  }
+  return _supabaseClient;
+})();
 
-// Admin client for server-side operations
+// Singleton admin client getter
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key';
-export const supabaseAdmin = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseServiceKey !== 'placeholder-service-key'
-  ? createSbClient(supabaseUrl, supabaseServiceKey, {
+export const supabaseAdmin = (() => {
+  if (!_supabaseAdminClient && supabaseUrl !== 'https://placeholder.supabase.co' && supabaseServiceKey !== 'placeholder-service-key') {
+    _supabaseAdminClient = createSbClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
       }
-    })
-  : null;
+    });
+  }
+  return _supabaseAdminClient;
+})();
 
 // Database Types
 export interface User {
