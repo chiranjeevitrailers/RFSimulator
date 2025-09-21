@@ -93,8 +93,9 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // Initialize WebSocket connection for real-time data
         if (typeof window !== 'undefined' && (window as any).WebSocketService) {
-          const wsService = new (window as any).WebSocketService();
-          wsService.connect('ws://localhost:8081');
+          try {
+            const wsService = new (window as any).WebSocketService();
+            wsService.connect('ws://localhost:8081');
           
           wsService.on('connected', () => {
             setIsConnected(true);
@@ -111,6 +112,9 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             // Distribute data to appropriate layers
             distributeDataToLayers(data);
           });
+          } catch (wsError) {
+            console.warn('WebSocket initialization failed, continuing without real-time data:', wsError);
+          }
         }
 
         // Listen for Test Manager execution events
