@@ -212,4 +212,9 @@ class MessageCorrelator {
 }
 
 // Export MessageCorrelator
+// Export for ES6 modules
+export default MessageCorrelator;
+export { MessageCorrelator };
+
+// Also make available globally for backward compatibility
 window.MessageCorrelator = MessageCorrelator;

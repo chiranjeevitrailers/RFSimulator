@@ -94,4 +94,9 @@ class LogProcessor {
   }
 }
 
+// Export for ES6 modules
+export default LogProcessor;
+export { LogProcessor };
+
+// Also make available globally for backward compatibility
 window.LogProcessor = LogProcessor;
