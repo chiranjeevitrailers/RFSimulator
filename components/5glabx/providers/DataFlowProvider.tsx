@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, createContext, useContext } from 'react';
+import { DataFormatAdapter } from '@/utils/DataFormatAdapter';
 
 // Data Flow Context
 interface DataFlowContextType {
@@ -375,64 +376,84 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // Initialize Layer Stats Service
         if (typeof window !== 'undefined' && (window as any).LayerStatsService) {
-          const layerStats = (window as any).LayerStatsService;
-          layerStats.init();
-          
-          // Subscribe to layer stats updates
-          layerStats.subscribe((stats: any) => {
-            setLayerData(prev => ({ ...prev, ...stats }));
-            // Notify layer subscribers
-            Object.keys(stats).forEach(layer => {
-              notifyLayerSubscribers(layer, stats[layer]);
+          try {
+            const layerStats = (window as any).LayerStatsService;
+            layerStats.init();
+            
+            // Subscribe to layer stats updates
+            layerStats.subscribe((stats: any) => {
+              setLayerData(prev => ({ ...prev, ...stats }));
+              // Notify layer subscribers
+              Object.keys(stats).forEach(layer => {
+                notifyLayerSubscribers(layer, stats[layer]);
+              });
             });
-          });
+          } catch (statsError) {
+            console.warn('LayerStatsService initialization failed, continuing without stats:', statsError);
+          }
         }
 
         // Initialize Stream Processor
         if (typeof window !== 'undefined' && (window as any).StreamProcessor) {
-          const processor = (window as any).StreamProcessor;
-          processor.startProcessing();
-          
-          // Subscribe to processed data
-          processor.subscribe((processedData: any) => {
-            distributeDataToLayers(processedData);
-          });
+          try {
+            const processor = (window as any).StreamProcessor;
+            processor.startProcessing();
+            
+            // Subscribe to processed data
+            processor.subscribe((processedData: any) => {
+              distributeDataToLayers(processedData);
+            });
+          } catch (streamError) {
+            console.warn('StreamProcessor initialization failed, continuing without stream processing:', streamError);
+          }
         }
 
         // Initialize Log Processor
         if (typeof window !== 'undefined' && (window as any).LogProcessor) {
-          const logProcessor = new (window as any).LogProcessor();
-          
-          logProcessor.subscribe((logs: any[]) => {
-            // Process logs by layer
-            const logsByLayer = processLogsByLayer(logs);
-            setLayerData(prev => ({ ...prev, ...logsByLayer }));
+          try {
+            const logProcessor = new (window as any).LogProcessor();
             
-            // Notify layer subscribers
-            Object.keys(logsByLayer).forEach(layer => {
-              notifyLayerSubscribers(layer, logsByLayer[layer]);
+            logProcessor.subscribe((logs: any[]) => {
+              // Process logs by layer
+              const logsByLayer = processLogsByLayer(logs);
+              setLayerData(prev => ({ ...prev, ...logsByLayer }));
+              
+              // Notify layer subscribers
+              Object.keys(logsByLayer).forEach(layer => {
+                notifyLayerSubscribers(layer, logsByLayer[layer]);
+              });
             });
-          });
+          } catch (logError) {
+            console.warn('LogProcessor initialization failed, continuing without log processing:', logError);
+          }
         }
 
         // Initialize Message Analyzer
         if (typeof window !== 'undefined' && (window as any).MessageAnalyzer) {
-          const messageAnalyzer = new (window as any).MessageAnalyzer();
-          
-          messageAnalyzer.subscribe((analysis: any) => {
-            // Distribute analysis results to appropriate layers
-            distributeAnalysisToLayers(analysis);
-          });
+          try {
+            const messageAnalyzer = new (window as any).MessageAnalyzer();
+            
+            messageAnalyzer.subscribe((analysis: any) => {
+              // Distribute analysis results to appropriate layers
+              distributeAnalysisToLayers(analysis);
+            });
+          } catch (analyzerError) {
+            console.warn('MessageAnalyzer initialization failed, continuing without analysis:', analyzerError);
+          }
         }
 
         // Initialize CLI Bridge for real-time CLI data
         if (typeof window !== 'undefined' && (window as any).CLIBridge) {
-          const cliBridge = new (window as any).CLIBridge();
-          
-          cliBridge.subscribe((cliData: any) => {
-            setRealTimeData(cliData);
-            distributeDataToLayers(cliData);
-          });
+          try {
+            const cliBridge = new (window as any).CLIBridge();
+            
+            cliBridge.subscribe((cliData: any) => {
+              setRealTimeData(cliData);
+              distributeDataToLayers(cliData);
+            });
+          } catch (cliError) {
+            console.warn('CLIBridge initialization failed, continuing without CLI data:', cliError);
+          }
         }
 
       } catch (error) {

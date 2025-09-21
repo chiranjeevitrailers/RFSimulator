@@ -201,3 +201,10 @@ const StreamProcessor = (() => {
         };
     }
 })();
+
+// Export for ES6 modules
+export default StreamProcessor;
+export { StreamProcessor };
+
+// Also make available globally for backward compatibility
+window.StreamProcessor = StreamProcessor;

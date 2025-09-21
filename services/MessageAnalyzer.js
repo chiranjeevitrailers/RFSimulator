@@ -142,4 +142,9 @@ class MessageAnalyzer {
   }
 }
 
+// Export for ES6 modules
+export default MessageAnalyzer;
+export { MessageAnalyzer };
+
+// Also make available globally for backward compatibility
 window.MessageAnalyzer = MessageAnalyzer;

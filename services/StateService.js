@@ -31,4 +31,9 @@ const StateService = {
 };
 
 // Make globally available
+// Export for ES6 modules
+export default StateService;
+export { StateService };
+
+// Also make available globally for backward compatibility
 window.StateService = StateService;

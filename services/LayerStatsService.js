@@ -242,4 +242,9 @@ class LayerStatsService {
 LayerStatsService.init();
 
 // Export LayerStatsService
+// Export for ES6 modules
+export default LayerStatsService;
+export { LayerStatsService };
+
+// Also make available globally for backward compatibility
 window.LayerStatsService = LayerStatsService;
