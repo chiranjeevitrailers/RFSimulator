@@ -75,6 +75,11 @@ import ThreeGPPComplianceDashboard from './components/ThreeGPPComplianceDashboar
 import LayerParametersTracker from './components/LayerParametersTracker';
 import ChannelParametersTracker from './components/ChannelParametersTracker';
 
+// Make SimpleDataDisplay available globally for testing
+if (typeof window !== 'undefined') {
+  window.SimpleDataDisplay = SimpleDataDisplay;
+}
+
 // Import working TSX layer views
 import PhyLayerViewTSX from './views/PhyLayerViewTSX';
 import MacLayerViewTSX from './views/MacLayerViewTSX';
@@ -162,6 +167,14 @@ const DashboardView: React.FC = () => {
               <span className="text-sm text-blue-700">Live Test Data</span>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Simple Data Display Component */}
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔥 Test Case Data Display</h3>
+          <SimpleDataDisplay />
         </div>
       </div>
       
