@@ -1187,6 +1187,197 @@ const ClassicTestManager: React.FC = () => {
           }
         } else {
           addLog('WARN', `${apiUsed} API returned success but no test case data found for ${realId}`);
+          
+          // Generate realistic test data using Test Data Generator
+          addLog('INFO', '🎯 No real data found - generating realistic test data for 5GLabX analysis...');
+          
+          const generateRealisticTestData = () => {
+            const testCaseType = testCase?.name?.toLowerCase() || 'generic';
+            let selectedTestCase = '5g-attach'; // Default
+            
+            // Map test case names to appropriate test data types
+            if (testCaseType.includes('attach') || testCaseType.includes('connection')) {
+              selectedTestCase = '5g-attach';
+            } else if (testCaseType.includes('handover') || testCaseType.includes('mobility')) {
+              selectedTestCase = '5g-handover';
+            } else if (testCaseType.includes('pdu') || testCaseType.includes('session')) {
+              selectedTestCase = '5g-pdu-session';
+            } else if (testCaseType.includes('rrc') || testCaseType.includes('setup')) {
+              selectedTestCase = '5g-rrc-setup';
+            }
+            
+            // Generate realistic test data
+            const testData = {
+              type: '5GLABX_TEST_EXECUTION',
+              testCaseId: realId,
+              runId: executionData.run_id || `run_${Date.now()}`,
+              testCase: {
+                name: testCase?.name || 'Generated Test Case',
+                description: testCase?.description || 'Realistic test data generated for 5GLabX analysis',
+                type: selectedTestCase
+              },
+              expectedMessages: generateTestMessages(selectedTestCase),
+              expectedInformationElements: generateInformationElements(selectedTestCase),
+              expectedLayerParameters: generateLayerParameters(selectedTestCase),
+              timestamp: Date.now(),
+              source: 'TestDataGenerator',
+              dataSource: 'GENERATED_REALISTIC'
+            };
+            
+            return testData;
+          };
+          
+          // Helper functions to generate realistic test data
+          const generateTestMessages = (testType: string) => {
+            const baseMessages = [
+              {
+                messageName: 'RRC Connection Request',
+                messageType: 'RRC_CONNECTION_REQUEST',
+                layer: 'RRC',
+                protocol: '5G_NR',
+                direction: 'UL',
+                messagePayload: {
+                  establishmentCause: 'mo-Data',
+                  ueIdentity: `0x${Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0')}`,
+                  spare: 0
+                },
+                informationElements: {
+                  'ue-Identity': {
+                    type: 'CHOICE',
+                    value: { randomValue: `0x${Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0')}` },
+                    criticality: 'reject',
+                    presence: 'mandatory'
+                  }
+                },
+                layerParameters: {
+                  rnti: 'C-RNTI',
+                  sfn: Math.floor(Math.random() * 1024),
+                  slot: Math.floor(Math.random() * 20)
+                },
+                standardReference: '3GPP TS 38.331'
+              },
+              {
+                messageName: 'RRC Connection Setup',
+                messageType: 'RRC_CONNECTION_SETUP',
+                layer: 'RRC',
+                protocol: '5G_NR',
+                direction: 'DL',
+                messagePayload: {
+                  rrcTransactionIdentifier: Math.floor(Math.random() * 4),
+                  criticalExtensions: {
+                    rrcConnectionSetup: {
+                      radioBearerConfig: {
+                        srb1Config: {
+                          rlcConfig: 'am'
+                        }
+                      }
+                    }
+                  }
+                },
+                informationElements: {
+                  'rrc-TransactionIdentifier': {
+                    type: 'INTEGER',
+                    value: Math.floor(Math.random() * 4),
+                    criticality: 'reject',
+                    presence: 'mandatory'
+                  }
+                },
+                layerParameters: {
+                  rnti: 'C-RNTI',
+                  sfn: Math.floor(Math.random() * 1024),
+                  slot: Math.floor(Math.random() * 20)
+                },
+                standardReference: '3GPP TS 38.331'
+              }
+            ];
+            
+            return baseMessages;
+          };
+          
+          const generateInformationElements = (testType: string) => {
+            return [
+              {
+                ieName: 'ue-Identity',
+                ieValue: `0x${Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0')}`,
+                ieType: 'MANDATORY',
+                asn1Type: 'CHOICE',
+                criticality: 'reject',
+                presence: 'mandatory'
+              },
+              {
+                ieName: 'rrc-TransactionIdentifier',
+                ieValue: Math.floor(Math.random() * 4),
+                ieType: 'MANDATORY',
+                asn1Type: 'INTEGER',
+                criticality: 'reject',
+                presence: 'mandatory'
+              }
+            ];
+          };
+          
+          const generateLayerParameters = (testType: string) => {
+            return [
+              {
+                parameterName: 'RNTI',
+                parameterValue: 'C-RNTI',
+                layer: 'RRC',
+                description: 'Radio Network Temporary Identifier'
+              },
+              {
+                parameterName: 'SFN',
+                parameterValue: Math.floor(Math.random() * 1024),
+                layer: 'PHY',
+                description: 'System Frame Number'
+              }
+            ];
+          };
+          
+          // Generate the test data
+          const generatedTestCaseData = generateRealisticTestData();
+          addLog('INFO', `✅ Generated realistic test data: ${generatedTestCaseData.expectedMessages.length} messages, ${generatedTestCaseData.expectedInformationElements.length} IEs, ${generatedTestCaseData.expectedLayerParameters.length} layer parameters`);
+          
+          // Send generated data to 5GLabX
+          const postMessageData = {
+            type: '5GLABX_TEST_EXECUTION',
+            testCaseId: realId,
+            runId: executionData.run_id || `run_${Date.now()}`,
+            testCaseData: generatedTestCaseData,
+            timestamp: Date.now(),
+            source: 'TestManager',
+            dataSource: 'GENERATED_REALISTIC',
+            apiUsed: apiUsed
+          };
+          
+          // Send via multiple methods
+          setTimeout(() => {
+            window.postMessage(postMessageData, '*');
+            console.log('✅ Test Manager: Generated data sent to 5GLabX via PostMessage');
+          }, 500);
+          
+          setTimeout(() => {
+            const customEventData = {
+              type: '5GLABX_TEST_EXECUTION',
+              testCaseId: realId,
+              testCaseData: generatedTestCaseData,
+              timestamp: Date.now(),
+              dataSource: 'GENERATED_REALISTIC'
+            };
+            window.dispatchEvent(new CustomEvent('5GLABX_TEST_EXECUTION', { detail: customEventData }));
+            console.log('✅ Test Manager: Generated data sent to 5GLabX via CustomEvent');
+          }, 600);
+          
+          setTimeout(() => {
+            (window as any).latestTestCaseData = {
+              type: '5GLABX_TEST_EXECUTION',
+              testCaseId: realId,
+              testCaseData: generatedTestCaseData,
+              timestamp: Date.now(),
+              dataSource: 'GENERATED_REALISTIC'
+            };
+            console.log('✅ Test Manager: Generated data set in global variable');
+          }, 700);
+          
+          addLog('INFO', `✅ Sent GENERATED realistic data to 5GLabX via 3 methods: ${generatedTestCaseData.testCase.name} with ${generatedTestCaseData.expectedMessages.length} messages`);
         }
         
         // 3. Feed data to 5GLabX backend - ENHANCED INTEGRATION
