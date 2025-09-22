@@ -374,11 +374,18 @@ class DatabaseService {
 }
 
 // Create global instance
-window.DatabaseService = new DatabaseService();
+if (typeof window !== 'undefined') {
+  window.DatabaseService = new DatabaseService();
 
-// Initialize when DOM is ready
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    window.DatabaseService.initialize();
-  });
+  // Initialize when DOM is ready
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.DatabaseService.initialize();
+    });
+  }
+}
+
+// Export for Node.js
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = DatabaseService;
 }

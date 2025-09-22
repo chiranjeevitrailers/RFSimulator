@@ -6,7 +6,7 @@ class TestCasePlaybackService {
   constructor({ databaseService, websocketBroadcast, fetchImpl, dataFormatAdapter }) {
     this.databaseService = databaseService;
     this.broadcast = websocketBroadcast; // (type, source, data) => void
-    this.fetch = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(window) : null);
+    this.fetch = fetchImpl || (typeof window !== 'undefined' && typeof fetch !== 'undefined' ? fetch.bind(window) : null);
     this.dataFormatAdapter = dataFormatAdapter || this.#getDataFormatAdapter();
     this.currentRun = null; // { runId, testCaseId, timeline, idx, timer, startedAt }
     this.isPlaying = false;
