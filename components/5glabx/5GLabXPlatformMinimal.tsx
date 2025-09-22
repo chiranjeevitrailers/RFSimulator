@@ -72,6 +72,7 @@ import SimpleDataDisplay from './components/SimpleDataDisplay';
 import ThreeGPPComplianceDashboard from './components/ThreeGPPComplianceDashboard';
 import LayerParametersTracker from './components/LayerParametersTracker';
 import ChannelParametersTracker from './components/ChannelParametersTracker';
+import LayerStatisticsDashboard from './components/LayerStatisticsDashboard';
 
 // Make SimpleDataDisplay available globally for testing
 declare global {
@@ -218,6 +219,9 @@ const DashboardView: React.FC = () => {
       
       {/* 3GPP Compliance Dashboard */}
       <ThreeGPPComplianceDashboard testCaseData={testManagerData} />
+      
+      {/* Layer Statistics Dashboard */}
+      <LayerStatisticsDashboard testCaseData={testManagerData} />
       
       {/* Layer Parameters Variation Tracker */}
       <LayerParametersTracker testCaseData={testManagerData} />
