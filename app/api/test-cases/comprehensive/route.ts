@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Required for static export
-import { supabaseAdmin } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Comprehensive Test Cases API
@@ -20,7 +18,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const includeData = searchParams.get('includeData') === 'true';
 
-    const supabase = supabaseAdmin!;
+    // Use service role key to bypass RLS policies
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
 
     console.log(`🔍 Fetching comprehensive test cases - Category: ${category}, Protocol: ${protocol}, Layer: ${layer}`);
 

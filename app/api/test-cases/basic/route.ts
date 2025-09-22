@@ -13,9 +13,9 @@ export async function GET(request: NextRequest) {
 
     // Use environment variables directly to avoid import issues
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       return NextResponse.json({
         success: false,
         error: 'Supabase configuration missing',
@@ -25,13 +25,15 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Basic test cases query - Limit:', limit);
 
-    // Create client directly
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Use service role key to bypass RLS policies
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
 
     // Ultra-simple query - just get IDs and names to test connectivity
     const { data: testCases, error } = await supabase
       .from('test_cases')
-      .select('id, name, protocol')
+      .select('id, name, protocol, layer, complexity, category')
       .limit(limit);
 
     if (error) {

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Required for static export
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Comprehensive Test Case Execution API
@@ -22,7 +20,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    // Use service role key to bypass RLS policies
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
 
     console.log(`🔍 Fetching comprehensive test case execution data - TestCase: ${testCaseId}, RunId: ${runId}`);
 
@@ -521,7 +524,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    // Use service role key to bypass RLS policies
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
 
     console.log(`🚀 Executing comprehensive test case: ${testCaseId}`);
 
