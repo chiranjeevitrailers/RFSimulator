@@ -69,9 +69,8 @@ import('/services/backend/CLIHealthCheck.js').then(module => {
   window.CLIHealthCheck = module.default || module.CLIHealthCheck;
 });
 
-import('/services/backend/CLIManager.js').then(module => {
-  window.CLIManager = module.default || module.CLIManager;
-});
+// Skip CLIManager as it requires Node.js modules not available in browser
+console.log('✅ Skipping CLIManager (requires Node.js modules)');
 
 import('/services/backend/DataAdapter.js').then(module => {
   window.DataAdapter = module.default || module.DataAdapter;

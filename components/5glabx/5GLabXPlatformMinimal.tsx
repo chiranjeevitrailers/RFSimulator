@@ -64,14 +64,7 @@ import {
 import ServiceIntegration from './services/ServiceIntegration';
 import { APIProvider } from './services/APIIntegration';
 
-// Load services script
-if (typeof window !== 'undefined') {
-  import('./scripts/loadServices.js').then(() => {
-    console.log('5GLabX services loading initiated');
-  }).catch(error => {
-    console.warn('Failed to load 5GLabX services:', error);
-  });
-}
+// Services are loaded via DataFlowProvider - no need for separate script loading
 
 // Import components
 import TestCaseDataFlow from './components/TestCaseDataFlow';
