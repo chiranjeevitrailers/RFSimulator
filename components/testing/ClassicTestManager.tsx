@@ -1181,49 +1181,9 @@ const ClassicTestManager: React.FC = () => {
             addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via 5 methods: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
             addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, GlobalVariable, LocalStorage, DocumentEvent`);
             
-            // Continue sending data every 5 seconds during test execution
-            const dataInterval = setInterval(() => {
-              if (typeof window !== 'undefined') {
-                // Update global variable with fresh timestamp
-                (window as any).latestTestCaseData = {
-                  type: '5GLABX_TEST_EXECUTION',
-                  testCaseId: realId,
-                  runId: executionData.run_id,
-                  testCaseData: testCaseData,
-                  timestamp: Date.now(),
-                  dataSource: 'REAL_SUPABASE_CONTINUOUS',
-                  apiUsed: apiUsed
-                };
-                
-                // Update localStorage
-                try {
-                  localStorage.setItem('5glabx_test_data', JSON.stringify({
-                    type: '5GLABX_TEST_EXECUTION',
-                    testCaseId: realId,
-                    testCaseData: testCaseData,
-                    timestamp: Date.now(),
-                    dataSource: 'REAL_SUPABASE_CONTINUOUS'
-                  }));
-                } catch (e) {}
-                
-                // Send fresh events
-                window.postMessage({
-                  type: '5GLABX_TEST_EXECUTION',
-                  testCaseId: realId,
-                  testCaseData: testCaseData,
-                  timestamp: Date.now(),
-                  dataSource: 'REAL_SUPABASE_CONTINUOUS'
-                }, '*');
-                
-                addLog('DEBUG', `🔄 Refreshed 5GLabX data (${Math.floor((Date.now() - startTime) / 1000)}s elapsed)`);
-              }
-            }, 5000);
-            
-            // Clear interval when test completes
-            setTimeout(() => {
-              clearInterval(dataInterval);
-              addLog('INFO', '🔄 Stopped continuous data refresh');
-            }, 30000);
+            // Note: Removed continuous data sending to prevent fake data repetition
+            // Real test execution should only send data once, not continuously
+            addLog('INFO', '✅ Test execution data sent once - no continuous repetition');
           }
         } else {
           addLog('WARN', `${apiUsed} API returned success but no test case data found for ${realId}`);
@@ -1552,31 +1512,9 @@ const ClassicTestManager: React.FC = () => {
             addLog('WARN', `TestCasePlaybackService not available on window object`);
           }
           
-          // Method 4: Direct 5GLabX service integration
-          if (typeof window !== 'undefined' && (window as any).LogProcessor) {
-            addLog('INFO', `Sending data directly to 5GLabX LogProcessor...`);
-            
-            const logProcessor = new (window as any).LogProcessor();
-            testDataForPlayback.expectedMessages?.forEach((message: any, index: number) => {
-              setTimeout(() => {
-                const logEntry = {
-                  timestamp: Date.now(),
-                  level: 'INFO',
-                  source: 'TestManager',
-                  layer: message.layer,
-                  protocol: message.protocol,
-                  messageType: message.messageType,
-                  message: `${message.messageName}: ${JSON.stringify(message.messagePayload)}`,
-                  data: message.messagePayload,
-                  direction: message.direction,
-                  testCaseId: id
-                };
-                
-                logProcessor.processLogLine(JSON.stringify(logEntry));
-                addLog('DEBUG', `📊 Sent message ${index + 1} to 5GLabX LogProcessor: ${message.messageName}`);
-              }, index * 500);
-            });
-          }
+          // Note: Removed fake log entry generation to prevent fake data repetition
+          // Real test execution should use actual data, not simulated log entries
+          addLog('INFO', '✅ Test execution completed - no fake log entries generated');
           
         } catch (playbackError) {
           addLog('ERROR', `5GLabX integration failed: ${playbackError}`);
