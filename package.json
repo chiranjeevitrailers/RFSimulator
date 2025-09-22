@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "node scripts/build-with-static-files.js",
     "start": "next start",
+    "server": "node server.js",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "jest",

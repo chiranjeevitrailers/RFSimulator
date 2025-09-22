@@ -24,29 +24,92 @@ export async function GET(request: NextRequest) {
 
     console.log(`🔍 Fetching comprehensive test cases - Category: ${category}, Protocol: ${protocol}, Layer: ${layer}`);
 
+    // Build query dynamically based on available tables
+    let selectQuery = '*';
+    let hasCategories = false;
+    let hasMessages = false;
+    let hasInformationElements = false;
+    let hasLayerParameters = false;
+
+    // Check if test_case_categories table exists
+    try {
+      const { data: categories, error: catError } = await supabase
+        .from('test_case_categories')
+        .select('id')
+        .limit(1);
+
+      if (!catError) {
+        hasCategories = true;
+      }
+    } catch (e) {
+      console.warn('test_case_categories table not found, skipping category join');
+    }
+
+    // Check if test_case_messages table exists
+    try {
+      const { data: messages, error: msgError } = await supabase
+        .from('test_case_messages')
+        .select('id')
+        .limit(1);
+
+      if (!msgError) {
+        hasMessages = true;
+      }
+    } catch (e) {
+      console.warn('test_case_messages table not found, skipping message join');
+    }
+
+    // Check if test_case_information_elements table exists
+    try {
+      const { data: ies, error: ieError } = await supabase
+        .from('test_case_information_elements')
+        .select('id')
+        .limit(1);
+
+      if (!ieError) {
+        hasInformationElements = true;
+      }
+    } catch (e) {
+      console.warn('test_case_information_elements table not found, skipping IE join');
+    }
+
+    // Check if test_case_layer_parameters table exists
+    try {
+      const { data: params, error: paramError } = await supabase
+        .from('test_case_layer_parameters')
+        .select('id')
+        .limit(1);
+
+      if (!paramError) {
+        hasLayerParameters = true;
+      }
+    } catch (e) {
+      console.warn('test_case_layer_parameters table not found, skipping parameter join');
+    }
+
+    // Build the select query dynamically
+    if (hasCategories) {
+      selectQuery += ',test_case_categories(name, description, protocol_focus, layer_focus)';
+    }
+
+    if (hasMessages) {
+      selectQuery += ',test_case_messages(*)';
+    }
+
+    if (hasInformationElements) {
+      selectQuery += ',test_case_information_elements(*)';
+    }
+
+    if (hasLayerParameters) {
+      selectQuery += ',test_case_layer_parameters(*)';
+    }
+
+    console.log(`Dynamic select query: ${selectQuery}`);
+
     // Build query
     let query = supabase
       .from('test_cases')
-      .select(`
-        *,
-        test_case_categories(name, description, protocol_focus, layer_focus),
-        test_case_messages(
-          id, step_id, step_order, timestamp_ms, direction, layer, protocol,
-          message_type, message_name, message_description, standard_reference,
-          message_template_id, message_variant, message_priority,
-          message_templates!inner(template_name, message_structure, validation_rules)
-        ),
-        test_case_information_elements(
-          id, ie_name, ie_type, ie_value, ie_value_hex, ie_value_binary,
-          ie_size, mandatory, is_valid, standard_reference,
-          information_element_library!inner(ie_description, ie_structure, allowed_values, value_range)
-        ),
-        test_case_layer_parameters(
-          id, layer, parameter_name, parameter_type, parameter_value,
-          parameter_unit, context, source, standard_reference,
-          layer_parameter_library!inner(parameter_description, data_type, min_value, max_value)
-        )
-      `)
+      .select(selectQuery)
       .order('name')
       .range(offset, offset + limit - 1);
 
@@ -96,7 +159,7 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.eq('complexity', complexity);
     }
     if (search) {
-      countQuery = countQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%,test_scenario.ilike.%${search}%`);
+      countQuery = countQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
     const { count, error: countError } = await countQuery;
@@ -111,19 +174,19 @@ export async function GET(request: NextRequest) {
       .select('protocol, layer, complexity')
       .then(({ data }) => {
         if (!data) return { data: null, error: null };
-        
+
         const stats = {
           total: data.length,
           byProtocol: data.reduce((acc, tc) => {
-            acc[tc.protocol] = (acc[tc.protocol] || 0) + 1;
+            acc[tc.protocol || '5G_NR'] = (acc[tc.protocol || '5G_NR'] || 0) + 1;
             return acc;
           }, {} as Record<string, number>),
           byLayer: data.reduce((acc, tc) => {
-            acc[tc.layer] = (acc[tc.layer] || 0) + 1;
+            acc[tc.layer || 'Multi'] = (acc[tc.layer || 'Multi'] || 0) + 1;
             return acc;
           }, {} as Record<string, number>),
           byComplexity: data.reduce((acc, tc) => {
-            acc[tc.complexity] = (acc[tc.complexity] || 0) + 1;
+            acc[tc.complexity || 'intermediate'] = (acc[tc.complexity || 'intermediate'] || 0) + 1;
             return acc;
           }, {} as Record<string, number>)
         };
