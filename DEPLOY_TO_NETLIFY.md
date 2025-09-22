@@ -14,6 +14,10 @@ netlify login
 ```
 This will open your browser for authentication.
 
+**Note**: If you're in a Docker container or remote environment, you may need to:
+1. Run the deployment script on your local machine
+2. Or manually configure the site through Netlify dashboard
+
 ### 2. Initialize Netlify Site
 ```bash
 netlify init
@@ -21,8 +25,9 @@ netlify init
 - Choose "Create & configure a new site"
 - Select your team
 - Choose a site name (e.g., `5glabx-platform`)
-- Set build command: `pnpm build`
-- Set publish directory: `out`
+- Set build command: `npm run build`
+- Set publish directory: `.next`
+- Set Node version: `20.11.0`
 
 ### 3. Deploy to Netlify
 ```bash

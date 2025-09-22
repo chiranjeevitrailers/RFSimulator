@@ -1,6 +1,7 @@
 [build]
-  command = "npx next build"
+  command = "npm run build"
   publish = ".next"
+  ignore = "/node_modules/*"
 
 [build.environment]
   NODE_VERSION = "20.11.0"
