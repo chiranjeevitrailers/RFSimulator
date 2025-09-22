@@ -82,6 +82,13 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const initializeDataFlow = async () => {
       try {
+        // Debug: Check what's available in window
+        if (typeof window !== 'undefined') {
+          console.log('Available window services:', Object.keys(window).filter(key => 
+            key.includes('Service') || key.includes('Adapter') || key.includes('Processor')
+          ));
+        }
+        
         // Initialize DataFormatAdapter first
         if (typeof window !== 'undefined' && (window as any).DataFormatAdapter) {
           setDataFormatAdapter((window as any).DataFormatAdapter);
@@ -92,7 +99,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Initialize WebSocket connection for real-time data
-        if (typeof window !== 'undefined' && (window as any).WebSocketService) {
+        if (typeof window !== 'undefined' && (window as any).WebSocketService && typeof (window as any).WebSocketService === 'function') {
           try {
             const wsService = new (window as any).WebSocketService();
             wsService.connect('ws://localhost:8081');
@@ -268,8 +275,10 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     // Try to send to LogProcessor directly if available
                     if ((window as any).LogProcessor) {
                       try {
-                        const processor = new (window as any).LogProcessor();
-                        processor.processLogLine(JSON.stringify(logEntry));
+                        if (typeof (window as any).LogProcessor === 'function') {
+                          const processor = new (window as any).LogProcessor();
+                          processor.processLogLine(JSON.stringify(logEntry));
+                        }
                       } catch (e) {
                         console.warn('Failed to send to LogProcessor:', e);
                       }
@@ -357,7 +366,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
 
         // Initialize Test Case Playback Service with DataFormatAdapter
-        if (typeof window !== 'undefined' && (window as any).TestCasePlaybackService) {
+        if (typeof window !== 'undefined' && (window as any).TestCasePlaybackService && typeof (window as any).TestCasePlaybackService === 'function') {
           const playbackService = new (window as any).TestCasePlaybackService({
             databaseService: null, // Will be set when needed
             websocketBroadcast: (type: string, source: string, data: any) => {
@@ -410,18 +419,20 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Initialize Log Processor
         if (typeof window !== 'undefined' && (window as any).LogProcessor) {
           try {
-            const logProcessor = new (window as any).LogProcessor();
-            
-            logProcessor.subscribe((logs: any[]) => {
-              // Process logs by layer
-              const logsByLayer = processLogsByLayer(logs);
-              setLayerData(prev => ({ ...prev, ...logsByLayer }));
+            if (typeof (window as any).LogProcessor === 'function') {
+              const logProcessor = new (window as any).LogProcessor();
+              
+              logProcessor.subscribe((logs: any[]) => {
+                // Process logs by layer
+                const logsByLayer = processLogsByLayer(logs);
+                setLayerData(prev => ({ ...prev, ...logsByLayer }));
               
               // Notify layer subscribers
               Object.keys(logsByLayer).forEach(layer => {
                 notifyLayerSubscribers(layer, logsByLayer[layer]);
               });
-            });
+              });
+            }
           } catch (logError) {
             console.warn('LogProcessor initialization failed, continuing without log processing:', logError);
           }
@@ -430,12 +441,14 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Initialize Message Analyzer
         if (typeof window !== 'undefined' && (window as any).MessageAnalyzer) {
           try {
-            const messageAnalyzer = new (window as any).MessageAnalyzer();
-            
-            messageAnalyzer.subscribe((analysis: any) => {
-              // Distribute analysis results to appropriate layers
-              distributeAnalysisToLayers(analysis);
-            });
+            if (typeof (window as any).MessageAnalyzer === 'function') {
+              const messageAnalyzer = new (window as any).MessageAnalyzer();
+              
+              messageAnalyzer.subscribe((analysis: any) => {
+                // Distribute analysis results to appropriate layers
+                distributeAnalysisToLayers(analysis);
+              });
+            }
           } catch (analyzerError) {
             console.warn('MessageAnalyzer initialization failed, continuing without analysis:', analyzerError);
           }
@@ -444,12 +457,14 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Initialize CLI Bridge for real-time CLI data
         if (typeof window !== 'undefined' && (window as any).CLIBridge) {
           try {
-            const cliBridge = new (window as any).CLIBridge();
-            
-            cliBridge.subscribe((cliData: any) => {
-              setRealTimeData(cliData);
-              distributeDataToLayers(cliData);
-            });
+            if (typeof (window as any).CLIBridge === 'function') {
+              const cliBridge = new (window as any).CLIBridge();
+              
+              cliBridge.subscribe((cliData: any) => {
+                setRealTimeData(cliData);
+                distributeDataToLayers(cliData);
+              });
+            }
           } catch (cliError) {
             console.warn('CLIBridge initialization failed, continuing without CLI data:', cliError);
           }
