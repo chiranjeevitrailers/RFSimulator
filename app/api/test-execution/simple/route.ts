@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Simple Test Execution API - Works with basic test_cases table data
@@ -17,7 +17,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = supabaseAdmin!;
+    // Use service role key to bypass RLS policies
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
 
     console.log(`🔍 Simple execution fetch for test case: ${testCaseId}`);
 
