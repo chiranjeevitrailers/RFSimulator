@@ -291,10 +291,7 @@ const LogsViewEnhanced: React.FC<{
         loadTestData();
       }, 500); // Reduced delay for faster loading
 
-      // Also check periodically for new data
-      const dataCheckInterval = setInterval(() => {
-        loadTestData();
-      }, 2000); // Check every 2 seconds
+      // Note: Removed periodic data checking to prevent fake data repetition
 
       // Cleanup function
       return () => {
@@ -302,7 +299,7 @@ const LogsViewEnhanced: React.FC<{
           window.removeEventListener('message', handleTestCaseData);
           window.removeEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
           window.removeEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
-          clearInterval(dataCheckInterval);
+          // clearInterval removed - no longer using setInterval
         }
       };
     }

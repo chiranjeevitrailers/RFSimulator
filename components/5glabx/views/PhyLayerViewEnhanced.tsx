@@ -184,16 +184,13 @@ const PhyLayerViewEnhanced: React.FC<{
         loadPhyData();
       }, 500); // Faster loading
 
-      // Check periodically for new data
-      const dataCheckInterval = setInterval(() => {
-        loadPhyData();
-      }, 2000);
+      // Note: Removed periodic data checking to prevent fake data repetition
 
       return () => {
         if (typeof window !== 'undefined') {
           window.removeEventListener('message', handleTestManagerData);
           window.removeEventListener('phylayerupdate', handlePhyUpdate as EventListener);
-          clearInterval(dataCheckInterval);
+          // clearInterval removed - no longer using setInterval
         }
       };
     }
