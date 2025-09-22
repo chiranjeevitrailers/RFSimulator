@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { DataFormatAdapter } from '@/utils/DataFormatAdapter';
 
 // Data Flow Context
 interface DataFlowContextType {

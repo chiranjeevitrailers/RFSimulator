@@ -2,12 +2,17 @@
 class LogProcessor {
   constructor() {
     this.callbacks = [];
-    this.parserFactory = new CliParserFactory();
+    // Check if CliParserFactory is available, otherwise use fallback
+    if (typeof CliParserFactory !== 'undefined') {
+      this.parserFactory = new CliParserFactory();
+    } else {
+      this.parserFactory = null;
+    }
   }
 
   async processLogLine(line, source = 'unknown') {
     try {
-      const parser = this.parserFactory.getParser(source);
+      const parser = this.parserFactory ? this.parserFactory.getParser(source) : null;
       if (!parser) {
         return this.createBasicLogEntry(line, source);
       }
