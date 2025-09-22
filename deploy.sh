@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # 5GLabX Platform - Automated Netlify Deployment Script
-# Run this script from your local machine (not in Docker container)
+# Updated for the latest build configuration
+#
+# IMPORTANT: Run this script on your LOCAL MACHINE (not in Docker container)
+# as it requires interactive browser authentication
 
 set -e  # Exit on any error
 
@@ -77,11 +80,7 @@ print_success "Dependencies installed successfully"
 
 # Build the project
 print_status "Building the project..."
-if command -v pnpm &> /dev/null; then
-    pnpm build
-else
-    npm run build
-fi
+npm run build
 
 if [ $? -ne 0 ]; then
     print_error "Build failed. Please check the error messages above."
