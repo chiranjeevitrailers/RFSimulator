@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Activity, BarChart3, Settings, Shield, Database, Monitor, MessageSquare,
   Layers, Wifi, Cloud, Play, Pause, Square, Eye, Download, Upload,
@@ -91,15 +91,15 @@ import IntegrationTester from './components/IntegrationTester';
 import LogsViewEnhanced from './views/LogsViewEnhanced';
 import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced';
 import PhyLayerViewEnhanced from './views/PhyLayerViewEnhanced';
-import { DataFlowProvider } from './providers/DataFlowProvider';
+// import { DataFlowProvider } from './providers/DataFlowProvider'; // Temporarily disabled to isolate React hooks issue
 
 
 // Enhanced Dashboard View
 const DashboardView: React.FC = () => {
-  const [testManagerData, setTestManagerData] = React.useState<any>(null);
-  const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
+  const [testManagerData, setTestManagerData] = useState<any>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Listen for test manager execution events
     const handleTestCaseExecution = (event: CustomEvent) => {
       setTestManagerData(event.detail);
@@ -809,16 +809,14 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
 
   return (
     <APIProvider>
-      <DataFlowProvider>
-        <ServiceIntegration>
-          <div className="h-screen flex bg-gray-50">
-            <Sidebar currentView={currentView} onNavigate={navigate} />
-            <div className="flex-1 overflow-auto">
-              {renderCurrentView()}
-            </div>
+      <ServiceIntegration>
+        <div className="h-screen flex bg-gray-50">
+          <Sidebar currentView={currentView} onNavigate={navigate} />
+          <div className="flex-1 overflow-auto">
+            {renderCurrentView()}
           </div>
-        </ServiceIntegration>
-      </DataFlowProvider>
+        </div>
+      </ServiceIntegration>
     </APIProvider>
   );
 };
