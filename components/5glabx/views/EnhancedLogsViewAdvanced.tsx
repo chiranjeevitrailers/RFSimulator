@@ -7,36 +7,7 @@ const EnhancedLogsViewAdvanced: React.FC<{
   appState: any;
   onStateChange: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [logs, setLogs] = useState([
-    {
-      id: 1,
-      timestamp: '10:00:00.123',
-      direction: 'DL',
-      layer: 'PHY',
-      channel: 'PBCH',
-      sfn: '100',
-      messageType: 'MIB',
-      rnti: 'SI-RNTI',
-      message: 'MIB decoded',
-      rawData: '40 04 64 40 00',
-      ies: 'SFN=100, BW=20MHz',
-      source: 'srsRAN'
-    },
-    {
-      id: 2,
-      timestamp: '10:00:01.456',
-      direction: 'DL',
-      layer: 'MAC',
-      channel: 'PDSCH',
-      sfn: '101',
-      messageType: 'DL-SCH',
-      rnti: 'C-RNTI',
-      message: 'HARQ transmission',
-      rawData: '01 23 45 67 89',
-      ies: 'HARQ-ID=1, RV=0, MCS=16',
-      source: 'srsRAN'
-    }
-  ]);
+  const [logs, setLogs] = useState([]);
 
   const [filteredLogs, setFilteredLogs] = useState(logs);
   const [filters, setFilters] = useState({
@@ -155,21 +126,15 @@ const EnhancedLogsViewAdvanced: React.FC<{
       window.addEventListener('enhancedLogsUpdate', handleDirectLogUpdate as EventListener);
       console.log('✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration');
 
-      // Load existing data immediately
+      // Load existing data once on mount
       setTimeout(() => {
         loadExistingData();
       }, 500);
-
-      // Check periodically for new data
-      const dataCheckInterval = setInterval(() => {
-        loadExistingData();
-      }, 2000);
 
       return () => {
         if (typeof window !== 'undefined') {
           window.removeEventListener('message', handleTestManagerData);
           window.removeEventListener('enhancedLogsUpdate', handleDirectLogUpdate as EventListener);
-          clearInterval(dataCheckInterval);
         }
       };
     }
