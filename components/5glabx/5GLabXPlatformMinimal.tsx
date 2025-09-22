@@ -16,7 +16,7 @@ import TestSuitesView from './views/TestSuitesView';
 import AnalyticsView from './views/AnalyticsView';
 import CallFlowView from './views/CallFlowView';
 import LayerTraceView from './views/LayerTraceView';
-import EnhancedLogsView from './views/EnhancedLogsView';
+// Removed duplicate EnhancedLogs main view import; using enhanced views under Enhanced Views section
 
 // Import all view wrappers
 import {
@@ -36,9 +36,7 @@ import {
   NtnOverviewView, NtnSatellitesView, NtnAnalyticsView, NtnSib19View,
   NtnTimingView, NtnDopplerView, NtnScenariosView,
   
-  // Protocol Layer Views
-  PhyLayerView, MacLayerView, RlcLayerView, PdcpLayerView,
-  RrcLayerView, NasLayerView, ImsLayerView,
+  // Protocol Layer Views (removed non-TSX layer views to avoid duplication)
   
   // Core Network Views
   AmfAnalyzerView, SmfAnalyzerView, UpfAnalyzerView, AusfAnalyzerView,
@@ -76,6 +74,11 @@ import LayerParametersTracker from './components/LayerParametersTracker';
 import ChannelParametersTracker from './components/ChannelParametersTracker';
 
 // Make SimpleDataDisplay available globally for testing
+declare global {
+  interface Window {
+    SimpleDataDisplay?: any;
+  }
+}
 if (typeof window !== 'undefined') {
   window.SimpleDataDisplay = SimpleDataDisplay;
 }
@@ -438,7 +441,6 @@ const Sidebar: React.FC<{
     { id: 'dashboard', label: 'Dashboard', icon: Activity, active: currentView === 'dashboard' },
     { id: 'test-case-data-flow', label: 'Test Case Data Flow', icon: Database },
     { id: 'logs', label: 'Logs Viewer', icon: FileText },
-    { id: 'enhanced-logs', label: 'Enhanced Logs', icon: Search },
     { id: 'layer-trace', label: 'Layer Trace', icon: Network },
     { id: 'callflow', label: 'Call Flow', icon: Phone }
   ];
@@ -457,14 +459,7 @@ const Sidebar: React.FC<{
       { id: 'phy-enhanced', label: 'Enhanced PHY', icon: Radio, badge: 'ENHANCED' }
     ];
 
-  const layerItems = [
-    { id: 'phy-layer', label: 'PHY Layer', icon: Radio, badge: 'LIVE' },
-    { id: 'mac-layer', label: 'MAC Layer', icon: Layers, badge: 'LIVE' },
-    { id: 'rlc-layer', label: 'RLC Layer', icon: Package2, badge: 'LIVE' },
-    { id: 'pdcp-layer', label: 'PDCP Layer', icon: Shield, badge: 'LIVE' },
-    { id: 'rrc-layer', label: 'RRC Layer', icon: Smartphone, badge: 'LIVE' },
-    { id: 'nas-layer', label: 'NAS Layer', icon: User, badge: 'LIVE' }
-  ];
+  // Removed duplicate layerItems; using unified protocolLayers section below
 
   const oranItems = [
     { id: 'oran-overview', label: 'O-RAN Overview', icon: Network },
@@ -514,8 +509,7 @@ const Sidebar: React.FC<{
     { id: 'rlc-layer', label: 'RLC Layer', icon: Network },
     { id: 'pdcp-layer', label: 'PDCP Layer', icon: FileText },
     { id: 'rrc-layer', label: 'RRC Layer', icon: Network },
-    { id: 'nas-layer', label: 'NAS Layer', icon: Server },
-    { id: 'ims-layer', label: 'IMS Analysis', icon: Phone }
+    { id: 'nas-layer', label: 'NAS Layer', icon: Server }
   ];
 
   const coreNetwork = [
@@ -574,13 +568,7 @@ const Sidebar: React.FC<{
           </div>
         </div>
 
-        {/* Protocol Layers */}
-        <div className="mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">PROTOCOL LAYERS</h3>
-          <div className="space-y-1">
-            {layerItems.map(renderMenuItem)}
-          </div>
-        </div>
+        {/* Protocol Layers (single source of truth defined later) */}
 
         {/* O-RAN Analysis */}
         <div className="mb-6">
@@ -674,8 +662,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <TestCaseDataFlow />;
       case 'logs':
         return <LogsView appState={{}} onStateChange={() => {}} />;
-      case 'enhanced-logs':
-        return <EnhancedLogsView appState={{}} onStateChange={() => {}} />;
+      // Removed duplicate enhanced-logs main view; use Enhanced Views -> logs-enhanced
       case 'test-suites':
         return <TestSuitesView appState={{}} onStateChange={() => {}} />;
       case 'layer-trace':
@@ -693,97 +680,86 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'integration-tester':
         return <IntegrationTester />;
       case 'logs-enhanced':
-        return <LogsViewEnhanced appState={{}} onStateChange={() => {}} />;
+        return <LogsViewEnhanced />;
       case 'logs-advanced':
-        return <EnhancedLogsViewAdvanced appState={{}} onStateChange={() => {}} />;
+        return <EnhancedLogsViewAdvanced />;
       case 'phy-enhanced':
-        return <PhyLayerViewEnhanced appState={{}} onStateChange={() => {}} />;
+        return <PhyLayerViewEnhanced />;
       case 'phy-layer':
-        return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <PhyLayerViewTSX />;
       case 'mac-layer':
-        return <MacLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <MacLayerViewTSX />;
       case 'rlc-layer':
-        return <RlcLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <RlcLayerViewTSX />;
       case 'pdcp-layer':
-        return <PdcpLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <PdcpLayerViewTSX />;
       case 'rrc-layer':
-        return <RrcLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <RrcLayerViewTSX />;
       case 'nas-layer':
-        return <NasLayerViewTSX appState={{}} onStateChange={() => {}} />;
+        return <NasLayerViewTSX />;
       case 'oran-overview':
-        return <OranOverviewView appState={{}} onStateChange={() => {}} />;
+        return <OranOverviewView />;
       case 'oran-interfaces':
-        return <OranInterfacesView appState={{}} onStateChange={() => {}} />;
+        return <OranInterfacesView />;
       case 'oran-cu-analysis':
-        return <OranCuAnalysisView appState={{}} onStateChange={() => {}} />;
+        return <OranCuAnalysisView />;
       case 'oran-du-analysis':
-        return <OranDuAnalysisView appState={{}} onStateChange={() => {}} />;
+        return <OranDuAnalysisView />;
       case 'oran-e1-interface':
-        return <OranE1InterfaceView appState={{}} onStateChange={() => {}} />;
+        return <OranE1InterfaceView />;
       case 'oran-f1-interface':
-        return <OranF1InterfaceView appState={{}} onStateChange={() => {}} />;
+        return <OranF1InterfaceView />;
       case 'oran-performance':
-        return <OranPerformanceView appState={{}} onStateChange={() => {}} />;
+        return <OranPerformanceView />;
       case 'oran-xapps':
-        return <OranXappsView appState={{}} onStateChange={() => {}} />;
+        return <OranXappsView />;
       case 'oran-smo':
-        return <OranSmoView appState={{}} onStateChange={() => {}} />;
+        return <OranSmoView />;
       case 'nbiot-overview':
-        return <NBIoTOverviewView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTOverviewView />;
       case 'nbiot-callflow':
-        return <NBIoTCallFlowView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTCallFlowView />;
       case 'nbiot-analytics':
-        return <NBIoTAnalyticsView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTAnalyticsView />;
       case 'nbiot-phy-layer':
-        return <NBIoTPhyLayerView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTPhyLayerView />;
       case 'nbiot-mac-layer':
-        return <NBIoTMacLayerView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTMacLayerView />;
       case 'nbiot-rrc-layer':
-        return <NBIoTRrcLayerView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTRrcLayerView />;
       case 'nbiot-testing':
-        return <NBIoTTestingView appState={{}} onStateChange={() => {}} />;
+        return <NBIoTTestingView />;
       case 'v2x-overview':
-        return <V2xOverviewView appState={{}} onStateChange={() => {}} />;
+        return <V2xOverviewView />;
       case 'v2x-sidelink':
-        return <V2xSidelinkView appState={{}} onStateChange={() => {}} />;
+        return <V2xSidelinkView />;
       case 'v2x-analytics':
-        return <V2xAnalyticsView appState={{}} onStateChange={() => {}} />;
+        return <V2xAnalyticsView />;
       case 'v2x-phy-layer':
-        return <V2xPhyLayerView appState={{}} onStateChange={() => {}} />;
+        return <V2xPhyLayerView />;
       case 'v2x-mac-layer':
-        return <V2xMacLayerView appState={{}} onStateChange={() => {}} />;
+        return <V2xMacLayerView />;
       case 'v2x-testing':
-        return <V2xTestingView appState={{}} onStateChange={() => {}} />;
+        return <V2xTestingView />;
       case 'v2x-scenarios':
-        return <V2xScenariosView appState={{}} onStateChange={() => {}} />;
+        return <V2xScenariosView />;
       case 'ntn-overview':
-        return <NtnOverviewView appState={{}} onStateChange={() => {}} />;
+        return <NtnOverviewView />;
       case 'ntn-satellites':
-        return <NtnSatellitesView appState={{}} onStateChange={() => {}} />;
+        return <NtnSatellitesView />;
       case 'ntn-analytics':
-        return <NtnAnalyticsView appState={{}} onStateChange={() => {}} />;
+        return <NtnAnalyticsView />;
       case 'ntn-sib19':
-        return <NtnSib19View appState={{}} onStateChange={() => {}} />;
+        return <NtnSib19View />;
       case 'ntn-timing':
-        return <NtnTimingView appState={{}} onStateChange={() => {}} />;
+        return <NtnTimingView />;
       case 'ntn-doppler':
-        return <NtnDopplerView appState={{}} onStateChange={() => {}} />;
+        return <NtnDopplerView />;
       case 'ntn-scenarios':
-        return <NtnScenariosView appState={{}} onStateChange={() => {}} />;
-      case 'phy-layer':
-        return <PhyLayerView appState={{}} onStateChange={() => {}} />;
-      case 'mac-layer':
-        return <MacLayerView appState={{}} onStateChange={() => {}} />;
-      case 'rlc-layer':
-        return <RlcLayerView appState={{}} onStateChange={() => {}} />;
-      case 'pdcp-layer':
-        return <PdcpLayerView appState={{}} onStateChange={() => {}} />;
-      case 'rrc-layer':
-        return <RrcLayerView appState={{}} onStateChange={() => {}} />;
-      case 'nas-layer':
-        return <NasLayerView appState={{}} onStateChange={() => {}} />;
+        return <NtnScenariosView />;
+      // Removed duplicate non-TSX protocol layer views; using TSX implementations above
       case 'ims-layer':
-        return <ImsLayerView appState={{}} onStateChange={() => {}} />;
+        return <ImsLayerView />;
       case 'amf-analyzer':
         return <AmfAnalyzerView appState={{}} onStateChange={() => {}} />;
       case 'smf-analyzer':
