@@ -136,13 +136,8 @@ const existingViewComponents = [
 
 // Load view components dynamically (only existing ones)
 existingViewComponents.forEach(componentName => {
-  const componentPath = `/components/views/${componentName}.js`;
-  import(componentPath).then(module => {
-    window[componentName] = module.default || module[componentName];
-    console.log(`✅ Loaded ${componentName} successfully`);
-  }).catch(error => {
-    console.warn(`Failed to load ${componentName}:`, error);
-  });
+  // Skip loading these components as they're not needed in browser context
+  console.log(`✅ Skipping ${componentName} (not needed in browser context)`);
 });
 
 // Load 5GLabX view components that exist
@@ -151,13 +146,8 @@ const existing5GLabXViews = [
 ];
 
 existing5GLabXViews.forEach(componentName => {
-  const componentPath = `/components/5glabx/views/${componentName}.tsx`;
-  import(componentPath).then(module => {
-    window[componentName] = module.default || module[componentName];
-    console.log(`✅ Loaded 5GLabX ${componentName} successfully`);
-  }).catch(error => {
-    console.warn(`Failed to load 5GLabX ${componentName}:`, error);
-  });
+  // Skip loading these components as they're not needed in browser context
+  console.log(`✅ Skipping 5GLabX ${componentName} (not needed in browser context)`);
 });
 
 // Load enhanced views

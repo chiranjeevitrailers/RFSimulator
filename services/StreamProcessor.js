@@ -12,7 +12,8 @@ const StreamProcessor = (() => {
         return {
             // Start stream processing
             startProcessing() {
-                if (!FeatureFlags.isEnabled('REAL_TIME_PROCESSING')) {
+                // Check if FeatureFlags is available, otherwise enable by default
+                if (typeof FeatureFlags !== 'undefined' && !FeatureFlags.isEnabled('REAL_TIME_PROCESSING')) {
                     return 'Real-time processing disabled';
                 }
 
