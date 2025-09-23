@@ -1141,32 +1141,10 @@ const ClassicTestManager: React.FC = () => {
             }, 600);
             
             // Method 3: Direct global variable (guaranteed to work)
-            setTimeout(() => {
-              (window as any).latestTestCaseData = {
-                type: '5GLABX_TEST_EXECUTION',
-                testCaseId: realId,
-                runId: executionData.run_id,
-                testCaseData: testCaseData,
-                timestamp: Date.now(),
-                dataSource: 'REAL_SUPABASE',
-                apiUsed: apiUsed
-              };
-              console.log('✅ Test Manager: Global variable set for 5GLabX');
-            }, 700);
+            // Removed global variable injection to avoid stale/sample data usage in views
             
             // Method 4: LocalStorage (persists across tabs)
-            try {
-              localStorage.setItem('5glabx_test_data', JSON.stringify({
-                type: '5GLABX_TEST_EXECUTION',
-                testCaseId: realId,
-                testCaseData: testCaseData,
-                timestamp: Date.now(),
-                dataSource: 'REAL_SUPABASE'
-              }));
-              addLog('INFO', `✅ Stored test data in localStorage for 5GLabX`);
-            } catch (storageError) {
-              addLog('WARN', `LocalStorage failed: ${storageError}`);
-            }
+            // Removed localStorage fallback to ensure only real-time/event/WS paths are used
             
             // Method 5: Force trigger event on document
             document.dispatchEvent(new CustomEvent('5glabxTestData', {
