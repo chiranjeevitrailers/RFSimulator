@@ -1156,8 +1156,8 @@ const ClassicTestManager: React.FC = () => {
               }
             }));
             
-            addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via 5 methods: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
-            addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, GlobalVariable, LocalStorage, DocumentEvent`);
+            addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via multiple events: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
+            addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, DocumentEvent`);
             
             // Note: Removed continuous data sending to prevent fake data repetition
             // Real test execution should only send data once, not continuously
