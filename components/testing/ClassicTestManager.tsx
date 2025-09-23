@@ -1035,8 +1035,8 @@ const ClassicTestManager: React.FC = () => {
         
         for (const workingId of workingIds) {
           try {
-            addLog('INFO', `Trying comprehensive API with working UUID: ${workingId}`);
-            const workingResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${encodeURIComponent(workingId)}&includeTemplates=true`);
+            addLog('INFO', `Trying simple API with working UUID: ${workingId}`);
+            const workingResponse = await fetch(`/api/test-execution/simple?testCaseId=${encodeURIComponent(workingId)}`);
             
             if (workingResponse.ok) {
               const workingData = await workingResponse.json();
@@ -1055,18 +1055,59 @@ const ClassicTestManager: React.FC = () => {
                 // Continue with 5GLabX integration using real data
                 addLog('INFO', `🔗 Starting 5GLabX integration with REAL Supabase data...`);
                 
-                // Send real data to 5GLabX
+                // Send real data to 5GLabX via multiple methods
                 if (typeof window !== 'undefined') {
-                  window.postMessage({
+                  // Method 1: PostMessage (for cross-tab communication)
+                  const postMessageData = {
                     type: '5GLABX_TEST_EXECUTION',
                     testCaseId: workingId,
                     runId: executionData.run_id || `run_${Date.now()}`,
                     testCaseData: realTestDataForPlayback,
                     timestamp: Date.now(),
                     source: 'TestManager',
+                    dataSource: 'REAL_SUPABASE',
+                    apiUsed: 'simple'
+                  };
+                  console.log('🚀 Test Manager: Sending REAL data to 5GLabX via PostMessage:', {
+                    testCaseId: workingId,
+                    testCaseName: realTestDataForPlayback.testCase?.name,
+                    messageCount: realTestDataForPlayback.expectedMessages?.length || 0,
+                    ieCount: realTestDataForPlayback.expectedInformationElements?.length || 0,
+                    layerParamCount: realTestDataForPlayback.expectedLayerParameters?.length || 0,
                     dataSource: 'REAL_SUPABASE'
-                  }, '*');
-                  addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX for test case: ${realTestDataForPlayback.testCase.name}`);
+                  });
+                  setTimeout(() => {
+                    window.postMessage(postMessageData, '*');
+                    console.log('✅ Test Manager: PostMessage sent to 5GLabX');
+                  }, 500);
+
+                  // Method 2: CustomEvent (for same-page communication)
+                  setTimeout(() => {
+                    const customEventData = {
+                      testCaseId: workingId,
+                      runId: executionData.run_id,
+                      testCaseData: realTestDataForPlayback,
+                      timestamp: Date.now(),
+                      dataSource: 'REAL_SUPABASE'
+                    };
+                    window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
+                      detail: customEventData
+                    }));
+                    console.log('✅ Test Manager: CustomEvent sent to 5GLabX');
+                  }, 600);
+
+                  // Method 3: Force trigger event on document
+                  document.dispatchEvent(new CustomEvent('5glabxTestData', {
+                    detail: {
+                      testCaseId: workingId,
+                      testCaseData: realTestDataForPlayback,
+                      timestamp: Date.now(),
+                      dataSource: 'REAL_SUPABASE'
+                    }
+                  }));
+
+                  addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via multiple events: ${realTestDataForPlayback.testCase.name} with ${realTestDataForPlayback.expectedMessages?.length || 0} messages`);
+                  addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, DocumentEvent`);
                 }
                 
                 break; // Exit loop on success
@@ -1078,7 +1119,9 @@ const ClassicTestManager: React.FC = () => {
           }
         }
         
-        addLog('WARN', `All attempts failed, using sample data for 5GLabX integration`);
+        addLog('ERROR', `All attempts failed to find test case data. No real Supabase data available for 5GLabX integration.`);
+        setIsRunning(false);
+        return;
       } else {
         const testDataPayload = await testDataResponse.json();
         const testCaseData = testDataPayload.data;
