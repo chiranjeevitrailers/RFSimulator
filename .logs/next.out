@@ -52,3 +52,5 @@ https://nextjs.org/telemetry
    Layers: RRC, NAS
    Protocols: 5G_NR
  GET /api/test-execution/mock/ 200 in 16ms
+ ✓ Compiled in 609ms (312 modules)
+ ✓ Compiled in 328ms (312 modules)

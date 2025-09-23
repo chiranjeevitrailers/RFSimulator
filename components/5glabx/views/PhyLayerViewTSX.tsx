@@ -63,31 +63,9 @@ const PhyLayerViewTSX: React.FC<{
   useEffect(() => {
     console.log('📡 PHY Layer TSX: Initializing...');
 
-    // Enhanced data loading with fallback mechanisms
+    // Only use real-time events (no global/localStorage fallbacks)
     const loadPhyData = () => {
-      console.log('🔍 PHY Layer: Attempting to load data from multiple sources...');
-      
-      // Method 1: Check global variable
-      if ((window as any).latestTestCaseData) {
-        console.log('✅ PHY Layer: Found data in global variable');
-        processPhyData((window as any).latestTestCaseData);
-        return;
-      }
-      
-      // Method 2: Check localStorage
-      try {
-        const storedData = localStorage.getItem('5glabx_test_data');
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          console.log('✅ PHY Layer: Found data in localStorage');
-          processPhyData(parsedData);
-          return;
-        }
-      } catch (e) {
-        console.warn('⚠️ PHY Layer: Failed to parse localStorage data:', e);
-      }
-      
-      console.log('⚠️ PHY Layer: No test data found in fallback sources');
+      console.log('🔍 PHY Layer: Awaiting real-time events (no fallback injection)');
     };
     
     // Process PHY data
