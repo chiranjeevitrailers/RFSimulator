@@ -42,3 +42,13 @@ https://nextjs.org/telemetry
  ✓ Compiled in 413ms (312 modules)
  ✓ Compiled in 232ms (312 modules)
  ✓ Compiled in 199ms (312 modules)
+ GET / 200 in 248ms
+🎯 Mock API: Fetching test case data for TC_5G_NR_INITIAL_ACCESS_001
+✅ Mock API: Generated comprehensive test case data:
+   Test Case: 5G NR Initial Access Procedure
+   Expected Messages: 3
+   Expected IEs: 4
+   Expected Layer Params: 4
+   Layers: RRC, NAS
+   Protocols: 5G_NR
+ GET /api/test-execution/mock/ 200 in 16ms
