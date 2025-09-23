@@ -7,110 +7,7 @@ const LogsViewEnhanced: React.FC<{
   appState: any;
   onStateChange: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [logs, setLogs] = useState([
-    {
-      id: 1,
-      timestamp: '931.6',
-      level: 'I',
-      component: 'PHY',
-      message: 'PDSCH: rnti=0x4601 h_id=0 k1=4 prb=[0,87) symb=[1,14) mod=QPSK rv=0 tbs=309 t=135.5us',
-      type: 'PDSCH',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"rnti": "0x4601", "harq_id": 0, "k1": 4, "prb_range": "[0,87)", "symbols": "[1,14)", "modulation": "QPSK", "rv": 0, "tbs": 309, "time": "135.5us"}',
-      informationElements: {
-        'rnti': { type: 'INTEGER', value: '0x4601', presence: 'mandatory', reference: 'TS 38.212' },
-        'harq-ProcessId': { type: 'INTEGER', value: 0, range: '0..15', presence: 'mandatory', reference: 'TS 38.321' },
-        'modulation': { type: 'ENUMERATED', value: 'QPSK', presence: 'mandatory', reference: 'TS 38.211' }
-      },
-      layerParameters: {
-        'SS-RSRP': { value: -85, unit: 'dBm', range: '(-156, -31)', reference: 'TS 38.215 5.1.1' },
-        'TBS': { value: 309, unit: 'bits', reference: 'TS 38.214' }
-      },
-      ies: 'rnti=0x4601, harq_id=0, modulation=QPSK, tbs=309'
-    },
-    {
-      id: 2,
-      timestamp: '938.5',
-      level: 'I',
-      component: 'MAC',
-      message: 'DL PDU: ue=0 rnti=0x4601 size=169: SDU: lcid=1 nof_sdus=1 total_size=55',
-      type: 'DL PDU',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"ue_id": 0, "rnti": "0x4601", "pdu_size": 169, "lcid": 1, "num_sdus": 1, "total_size": 55}',
-      informationElements: {
-        'ue-Identity': { type: 'INTEGER', value: 0, presence: 'mandatory', reference: 'TS 38.321' },
-        'rnti': { type: 'BIT STRING', value: '0x4601', size: 16, presence: 'mandatory', reference: 'TS 38.321' },
-        'lcid': { type: 'INTEGER', value: 1, range: '1..32', presence: 'mandatory', reference: 'TS 38.321' }
-      },
-      layerParameters: {
-        'PDU-Size': { value: 169, unit: 'bytes', reference: 'TS 38.321' },
-        'SDU-Count': { value: 1, reference: 'TS 38.321' }
-      },
-      ies: 'ue=0, rnti=0x4601, lcid=1, size=169'
-    },
-    {
-      id: 3,
-      timestamp: '940.1',
-      level: 'I',
-      component: 'RLC',
-      message: 'du=0 ue=0 SRB1 DL: TX PDU. dc=data p=1 si=full sn=0 pdu_len=53 grant_len=55',
-      type: 'TX PDU',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"du": 0, "ue": 0, "bearer": "SRB1", "dc": "data", "p": 1, "si": "full", "sn": 0, "pdu_len": 53, "grant_len": 55}',
-      informationElements: {
-        'sequence-Number': { type: 'INTEGER', value: 0, range: '0..4095', presence: 'mandatory', reference: 'TS 38.322' },
-        'segmentation-Info': { type: 'ENUMERATED', value: 'full', presence: 'mandatory', reference: 'TS 38.322' },
-        'polling-Bit': { type: 'BOOLEAN', value: true, presence: 'optional', reference: 'TS 38.322' }
-      },
-      layerParameters: {
-        'PDU-Length': { value: 53, unit: 'bytes', reference: 'TS 38.322' },
-        'Grant-Length': { value: 55, unit: 'bytes', reference: 'TS 38.322' }
-      },
-      ies: 'sn=0, si=full, p=1, pdu_len=53'
-    },
-    {
-      id: 4,
-      timestamp: '932.1',
-      level: 'E',
-      component: 'PHY',
-      message: 'PUCCH decode failed: rnti=0x4601 format=1',
-      type: 'PUCCH',
-      direction: 'UL',
-      protocol: '5G_NR',
-      rawData: '{"rnti": "0x4601", "format": 1, "decode_result": "failed"}',
-      informationElements: {
-        'rnti': { type: 'BIT STRING', value: '0x4601', size: 16, presence: 'mandatory', reference: 'TS 38.213' },
-        'pucch-Format': { type: 'INTEGER', value: 1, range: '0..4', presence: 'mandatory', reference: 'TS 38.213' }
-      },
-      layerParameters: {
-        'PUCCH-Power': { value: 10, unit: 'dBm', range: '(-40, 23)', reference: 'TS 38.213' }
-      },
-      ies: 'rnti=0x4601, format=1, result=failed'
-    },
-    {
-      id: 5,
-      timestamp: '933.2',
-      level: 'W',
-      component: 'SCHED',
-      message: 'High scheduling latency detected: 250us',
-      type: 'Scheduling',
-      direction: 'N/A',
-      protocol: '5G_NR',
-      rawData: '{"latency": "250us", "threshold": "100us", "status": "warning"}',
-      informationElements: {
-        'scheduling-Latency': { type: 'INTEGER', value: 250, unit: 'microseconds', presence: 'mandatory', reference: 'TS 38.321' },
-        'latency-Threshold': { type: 'INTEGER', value: 100, unit: 'microseconds', reference: 'TS 38.321' }
-      },
-      layerParameters: {
-        'Max-Latency': { value: 100, unit: 'us', reference: 'TS 38.321' },
-        'Current-Latency': { value: 250, unit: 'us', reference: 'TS 38.321' }
-      },
-      ies: 'latency=250us, threshold=100us'
-    }
-  ]);
+  const [logs, setLogs] = useState<any[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
@@ -126,28 +23,8 @@ const LogsViewEnhanced: React.FC<{
     const loadTestData = () => {
       console.log('🔍 LogsView Enhanced: Attempting to load test data from multiple sources...');
 
-      // Method 1: Check global variable
-      if ((window as any).latestTestCaseData) {
-        console.log('✅ LogsView Enhanced: Found data in global variable');
-        processTestData((window as any).latestTestCaseData);
-        return;
-      }
-
-      // Method 2: Check localStorage
-      try {
-        const storedData = localStorage.getItem('5glabx_test_data');
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          console.log('✅ LogsView Enhanced: Found data in localStorage');
-          processTestData(parsedData);
-          return;
-        }
-      } catch (e) {
-        console.warn('⚠️ LogsView Enhanced: Failed to parse localStorage data:', e);
-      }
-
-      // Method 3: Check for recent events
-      console.log('⚠️ LogsView Enhanced: No test data found in fallback sources');
+      // Only consume real-time events (message/custom events) or WebSocket-fed updates
+      console.log('⚠️ LogsView Enhanced: Awaiting real-time events (no fallback injection)');
     };
 
     // Process test data
@@ -286,10 +163,7 @@ const LogsViewEnhanced: React.FC<{
       window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
       console.log('✅ LogsView Enhanced: All event listeners registered for Test Manager integration');
 
-      // Try to load existing data immediately
-      setTimeout(() => {
-        loadTestData();
-      }, 500); // Reduced delay for faster loading
+      // Do not auto-inject from fallbacks; rely on runtime events only
 
       // Note: Removed periodic data checking to prevent fake data repetition
 
