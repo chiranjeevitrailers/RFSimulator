@@ -7,7 +7,7 @@ const LogsView: React.FC<{
   appState: any;
   onStateChange: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [logs, setLogs] = useState([
+  const [logs, setLogs] = useState<any[]>([
     {
       id: 1,
       timestamp: '931.6',
@@ -120,32 +120,9 @@ const LogsView: React.FC<{
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    // Enhanced data loading with multiple fallback mechanisms
+    // Enhanced data loading with events only (no localStorage/global fallbacks)
     const loadTestData = () => {
-      console.log('🔍 LogsView: Attempting to load test data from multiple sources...');
-      
-      // Method 1: Check global variable
-      if ((window as any).latestTestCaseData) {
-        console.log('✅ LogsView: Found data in global variable');
-        processTestData((window as any).latestTestCaseData);
-        return;
-      }
-      
-      // Method 2: Check localStorage
-      try {
-        const storedData = localStorage.getItem('5glabx_test_data');
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          console.log('✅ LogsView: Found data in localStorage');
-          processTestData(parsedData);
-          return;
-        }
-      } catch (e) {
-        console.warn('⚠️ LogsView: Failed to parse localStorage data:', e);
-      }
-      
-      // Method 3: Check for recent events
-      console.log('⚠️ LogsView: No test data found in fallback sources');
+      console.log('🔍 LogsView: Awaiting real-time events (no fallback injection)');
     };
     
     // Process test data
