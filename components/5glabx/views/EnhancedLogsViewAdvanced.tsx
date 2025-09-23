@@ -100,25 +100,8 @@ const EnhancedLogsViewAdvanced: React.FC<{
 
     // Load existing data on mount
     const loadExistingData = () => {
-      try {
-        // Check global variable
-        if ((window as any).latestTestCaseData) {
-          console.log('✅ Enhanced Logs Advanced: Found data in global variable');
-          handleTestManagerData({ data: (window as any).latestTestCaseData } as MessageEvent);
-          return;
-        }
-
-        // Check localStorage
-        const storedData = localStorage.getItem('5glabx_test_data');
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          console.log('✅ Enhanced Logs Advanced: Found data in localStorage');
-          handleTestManagerData({ data: parsedData } as MessageEvent);
-          return;
-        }
-      } catch (error) {
-        console.error('❌ Enhanced Logs Advanced: Error loading existing data:', error);
-      }
+      // Do not auto-load from globals/localStorage; rely on real-time events/WS
+      console.log('🔍 Enhanced Logs Advanced: Awaiting real-time events (no fallback injection)');
     };
 
     if (typeof window !== 'undefined') {
