@@ -1,0 +1,41 @@
+
+> 5glabx-platform@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.3
+   - Local:        http://localhost:3000
+   - Network:      http://172.30.0.2:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1251ms
+ ○ Compiling /api/test-execution/mock ...
+ ✓ Compiled /api/test-execution/mock in 1584ms (343 modules)
+🎯 Mock API: Fetching test case data for TC_5G_NR_INITIAL_ACCESS_001
+✅ Mock API: Generated comprehensive test case data:
+   Test Case: 5G NR Initial Access Procedure
+   Expected Messages: 3
+   Expected IEs: 4
+   Expected Layer Params: 4
+   Layers: RRC, NAS
+   Protocols: 5G_NR
+ GET /api/test-execution/mock/ 200 in 1744ms
+ ✓ Compiled /middleware in 383ms (159 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 3.2s (831 modules)
+ GET / 200 in 4085ms
+ ✓ Compiled in 1135ms (312 modules)
+🎯 Mock API: Fetching test case data for TC_5G_NR_INITIAL_ACCESS_001
+✅ Mock API: Generated comprehensive test case data:
+   Test Case: 5G NR Initial Access Procedure
+   Expected Messages: 3
+   Expected IEs: 4
+   Expected Layer Params: 4
+   Layers: RRC, NAS
+   Protocols: 5G_NR
+ GET /api/test-execution/mock/ 200 in 262ms
