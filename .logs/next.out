@@ -54,3 +54,6 @@ https://nextjs.org/telemetry
  GET /api/test-execution/mock/ 200 in 16ms
  ✓ Compiled in 609ms (312 modules)
  ✓ Compiled in 328ms (312 modules)
+ ✓ Compiled in 254ms (312 modules)
+ ✓ Compiled in 228ms (312 modules)
+ ✓ Compiled in 220ms (312 modules)

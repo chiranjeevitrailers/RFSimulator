@@ -98,31 +98,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.warn('DataFormatAdapter not available, using fallback mode');
         }
 
-        // Initialize WebSocket connection for real-time data
-        if (typeof window !== 'undefined' && (window as any).WebSocketService && typeof (window as any).WebSocketService === 'function') {
-          try {
-            const wsService = new (window as any).WebSocketService();
-            wsService.connect('ws://localhost:8081');
-          
-          wsService.on('connected', () => {
-            setIsConnected(true);
-            console.log('Data flow WebSocket connected');
-          });
-
-          wsService.on('disconnected', () => {
-            setIsConnected(false);
-            console.log('Data flow WebSocket disconnected');
-          });
-
-          wsService.on('message', (data: any) => {
-            setRealTimeData(data);
-            // Distribute data to appropriate layers
-            distributeDataToLayers(data);
-          });
-          } catch (wsError) {
-            console.warn('WebSocket initialization failed, continuing without real-time data:', wsError);
-          }
-        }
+        // Netlify: disable localhost WebSocket; rely on Supabase Realtime/subscriptions
 
         // Listen for Test Manager execution events
         const handleTestCaseExecution = (event: CustomEvent) => {
