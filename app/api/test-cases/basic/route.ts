@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase';
 
 /**
  * Basic Test Cases API - Minimal query to test connectivity
@@ -25,10 +25,8 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Basic test cases query - Limit:', limit);
 
-    // Use service role key to bypass RLS policies
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    });
+    // Use singleton admin client to prevent multiple instances
+    const supabase = supabaseAdmin;
 
     // Ultra-simple query - just get IDs and names to test connectivity
     const { data: testCases, error } = await supabase

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase';
 
 /**
  * Comprehensive Test Case Execution API
@@ -20,12 +20,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Use service role key to bypass RLS policies
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    // Use singleton admin client to prevent multiple instances
+    const supabase = supabaseAdmin;
 
     console.log(`🔍 Fetching comprehensive test case execution data - TestCase: ${testCaseId}, RunId: ${runId}`);
 
@@ -524,12 +520,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use service role key to bypass RLS policies
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    // Use singleton admin client to prevent multiple instances
+    const supabase = supabaseAdmin;
 
     console.log(`🚀 Executing comprehensive test case: ${testCaseId}`);
 

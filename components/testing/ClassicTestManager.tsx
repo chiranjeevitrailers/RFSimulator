@@ -1495,26 +1495,7 @@ const ClassicTestManager: React.FC = () => {
             addLog('INFO', `✅ Dispatched '5glabxLogAnalysis' event for log processing`);
           }
           
-          // Method 3b: Start server-side playback to stream over WebSocket (bridge)
-          try {
-            const wsPlaybackResp = await fetch('http://localhost:8080/api/test/playback/start', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                testCaseId: realId,
-                runId: executionData.run_id || `run_${Date.now()}`,
-                speed: 1.0,
-                apiBaseUrl: '/api'
-              })
-            });
-            if (wsPlaybackResp.ok) {
-              addLog('INFO', '📡 WebSocket bridge: server-side playback started (port 8081 streaming)');
-            } else {
-              addLog('WARN', `WebSocket bridge start failed: ${wsPlaybackResp.status}`);
-            }
-          } catch (wsErr) {
-            addLog('WARN', `WebSocket bridge unavailable (ensure server.js running): ${wsErr}`);
-          }
+          // WebSocket bridge removed - using Supabase-only data flow
 
           // Method 3: TestCasePlaybackService integration
           if (typeof window !== 'undefined' && window.TestCasePlaybackService) {
