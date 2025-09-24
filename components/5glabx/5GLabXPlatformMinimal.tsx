@@ -65,7 +65,6 @@ import { APIProvider } from './services/APIIntegration';
 // Services are loaded via DataFlowProvider - no need for separate script loading
 
 // Import components
-import TestCaseDataFlow from './components/TestCaseDataFlow';
 import TestManagerDataDebug from './components/TestManagerDataDebug';
 import DirectDataInjector from './components/DirectDataInjector';
 import SimpleDataDisplay from './components/SimpleDataDisplay';
@@ -97,7 +96,6 @@ import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
 import DataFlowDebugger from './components/DataFlowDebugger';
 import TestDataGenerator from './components/TestDataGenerator';
 import IntegrationTester from './components/IntegrationTester';
-import LogsViewEnhanced from './views/LogsViewEnhanced';
 import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced';
 import PhyLayerViewEnhanced from './views/PhyLayerViewEnhanced';
 // import { DataFlowProvider } from './providers/DataFlowProvider'; // Temporarily disabled to isolate React hooks issue
@@ -442,7 +440,6 @@ const Sidebar: React.FC<{
   // Menu items
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity, active: currentView === 'dashboard' },
-    { id: 'test-case-data-flow', label: 'Test Case Data Flow', icon: Database },
     { id: 'logs', label: 'Logs Viewer', icon: FileText },
     { id: 'layer-trace', label: 'Layer Trace', icon: Network },
     { id: 'callflow', label: 'Call Flow', icon: Phone }
@@ -457,7 +454,6 @@ const Sidebar: React.FC<{
     ];
 
     const enhancedViewsItems = [
-      { id: 'logs-enhanced', label: 'Enhanced Logs', icon: FileText, badge: 'ENHANCED' },
       { id: 'logs-advanced', label: 'Advanced Logs', icon: FileText, badge: 'ADVANCED' },
       { id: 'phy-enhanced', label: 'Enhanced PHY', icon: Radio, badge: 'ENHANCED' }
     ];
@@ -661,8 +657,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
     switch (currentView) {
       case 'dashboard':
         return <DashboardView />;
-      case 'test-case-data-flow':
-        return <TestCaseDataFlow />;
       case 'logs':
         return <LogsView appState={{}} onStateChange={() => {}} />;
       // Removed duplicate enhanced-logs main view; use Enhanced Views -> logs-enhanced
@@ -682,8 +676,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <TestDataGenerator />;
       case 'integration-tester':
         return <IntegrationTester />;
-      case 'logs-enhanced':
-        return <LogsViewEnhanced />;
       case 'logs-advanced':
         return <EnhancedLogsViewAdvanced />;
       case 'phy-enhanced':
