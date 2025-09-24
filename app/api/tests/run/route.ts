@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Required for static export
-import { supabaseAdmin } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = supabaseAdmin!;
+    // Create admin client directly
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return NextResponse.json({ error: 'Supabase configuration missing' }, { status: 500 });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
     
     // Get user from request (you'll need to implement auth)
     // For now, using a mock user ID
@@ -49,30 +61,40 @@ export async function POST(request: NextRequest) {
       console.warn('Duration calculation failed, using default:', durationErr);
     }
     
-    // Create test run record - use simpler structure to avoid field mismatch
+    // Create test run record - use correct column names based on actual schema
     const { data: testRun, error: runError } = await supabase
       .from('test_case_executions')
       .insert({
         id: runId,
         user_id: userId,
+        test_case_id: test_ids[0], // Use first test case ID
         status: 'queued',
         execution_mode: execution_mode,
-        // Use JSONB for configuration to avoid field issues
-        configuration: JSON.stringify({
+        start_time: new Date().toISOString(),
+        progress_percentage: 0,
+        total_steps: test_ids.length,
+        completed_steps: 0,
+        // Store configuration as JSON
+        configuration: {
           input_files,
           time_acceleration,
           log_level,
           capture_mode,
           estimated_duration_minutes: estimatedDuration,
           test_case_ids: test_ids
-        })
+        }
       })
       .select()
       .single();
     
     if (runError) {
       console.error('Database error:', runError);
-      return NextResponse.json({ error: 'Failed to create test run' }, { status: 500 });
+      console.error('Error details:', JSON.stringify(runError, null, 2));
+      return NextResponse.json({
+        error: 'Failed to create test run',
+        details: runError.message,
+        code: runError.code
+      }, { status: 500 });
     }
     
     // Add to queue (you'll need to implement a queue system)
@@ -82,9 +104,10 @@ export async function POST(request: NextRequest) {
         // Update status to running
         await supabase
           .from('test_case_executions')
-          .update({ 
+          .update({
             status: 'running',
-            start_time: new Date().toISOString()
+            start_time: new Date().toISOString(),
+            progress_percentage: 0
           })
           .eq('id', runId);
         
@@ -96,9 +119,9 @@ export async function POST(request: NextRequest) {
           // Update progress
           await supabase
             .from('test_case_executions')
-            .update({ 
-              progress,
-              current_test_id: testId
+            .update({
+              progress_percentage: progress,
+              completed_steps: i + 1
             })
             .eq('id', runId);
           
@@ -111,25 +134,38 @@ export async function POST(request: NextRequest) {
             .insert({
               execution_id: runId,
               test_case_id: testId,
+              step_name: `Test Step ${i + 1}`,
+              step_order: i + 1,
               status: Math.random() > 0.1 ? 'passed' : 'failed', // 90% pass rate
-              duration_seconds: Math.floor(Math.random() * 300) + 60,
+              start_time: new Date().toISOString(),
+              end_time: new Date(Date.now() + Math.floor(Math.random() * 300000) + 60000).toISOString(),
+              duration_ms: Math.floor(Math.random() * 300000) + 60000,
+              message: `Test case ${testId} executed successfully`,
+              details: {
+                metrics: {
+                  latency_ms: Math.floor(Math.random() * 100) + 50,
+                  throughput_mbps: Math.floor(Math.random() * 100) + 50,
+                  success_rate: Math.floor(Math.random() * 20) + 80
+                },
+                errors: [],
+                warnings: []
+              },
               metrics: {
                 latency_ms: Math.floor(Math.random() * 100) + 50,
                 throughput_mbps: Math.floor(Math.random() * 100) + 50,
                 success_rate: Math.floor(Math.random() * 20) + 80
-              },
-              errors: [],
-              warnings: []
+              }
             });
         }
         
         // Mark as completed
         await supabase
           .from('test_case_executions')
-          .update({ 
+          .update({
             status: 'completed',
             end_time: new Date().toISOString(),
-            progress: 100
+            progress_percentage: 100,
+            completed_steps: test_ids.length
           })
           .eq('id', runId);
         
@@ -139,10 +175,10 @@ export async function POST(request: NextRequest) {
         // Mark as failed
         await supabase
           .from('test_case_executions')
-          .update({ 
+          .update({
             status: 'failed',
             end_time: new Date().toISOString(),
-            error_message: error instanceof Error ? error.message : 'Unknown error'
+            progress_percentage: 0
           })
           .eq('id', runId);
       }
