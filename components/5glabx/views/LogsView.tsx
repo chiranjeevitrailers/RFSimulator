@@ -120,89 +120,120 @@ const LogsView: React.FC<{
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    // Enhanced data loading with events only (no localStorage/global fallbacks)
-    const loadTestData = () => {
-      console.log('🔍 LogsView: Awaiting real-time events (no fallback injection)');
-    };
-    
-    // Process test data
-    const processTestData = (data: any) => {
-      if (data.type === '5GLABX_TEST_EXECUTION' && data.testCaseData) {
-        console.log('📊 LogsView processing test case data:', {
-          testCaseId: data.testCaseId,
-          testCaseName: data.testCaseData.testCase?.name,
-          messageCount: data.testCaseData.expectedMessages?.length || 0,
-          dataSource: data.dataSource
+    console.log('🔍 Enhanced Logs Advanced: Initializing event listeners...');
+    console.log('✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration');
+    console.log('🔍 Enhanced Logs Advanced: Awaiting real-time events (no fallback injection)');
+
+    // Process test data from various sources
+    const processTestData = (data: any, source: string = 'unknown') => {
+      console.log('📊 LogsView processing test case data:', {
+        testCaseId: data.testCaseId,
+        testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
+        messageCount: data.testCaseData?.expectedMessages?.length || 0,
+        dataSource: source,
+        dataType: data.type
+      });
+
+      const testCaseData = data.testCaseData || data;
+      const testCaseId = data.testCaseId || testCaseData.testCaseId;
+
+      // Handle different data formats
+      let messages = [];
+      if (testCaseData.expectedMessages) {
+        messages = testCaseData.expectedMessages;
+      } else if (testCaseData.messages) {
+        messages = testCaseData.messages;
+      } else if (Array.isArray(testCaseData)) {
+        messages = testCaseData;
+      }
+
+      if (messages.length > 0) {
+        // Process each message as a log entry
+        messages.forEach((message: any, index: number) => {
+          setTimeout(() => {
+            const newLog = {
+              id: Date.now() + index,
+              timestamp: (Date.now() / 1000).toFixed(1),
+              level: 'I',
+              component: message.layer || 'TEST',
+              message: `${message.messageName || message.messageType}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
+              type: message.messageType || message.type || 'TEST_MESSAGE',
+              source: source || 'TestManager',
+              testCaseId: testCaseId,
+              direction: message.direction || 'UL',
+              protocol: message.protocol || '5G_NR',
+              // Enhanced data for IE viewing
+              rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+              informationElements: message.informationElements || {},
+              layerParameters: message.layerParameters || {},
+              standardReference: message.standardReference || 'Unknown',
+              messagePayload: message.messagePayload || message.payload || {},
+              ies: message.informationElements ?
+                Object.entries(message.informationElements).map(([k, v]: [string, any]) =>
+                  `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
+                ).join(', ') :
+                Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
+            };
+
+            setLogs(prev => [...prev.slice(-199), newLog]); // Keep last 200 logs
+            console.log(`📊 LogsView: Added message ${index + 1} - ${message.messageName || message.messageType}`);
+          }, index * 200); // Faster display for better UX
         });
-        
-        const { testCaseData, testCaseId } = data;
-        
-        if (testCaseData.expectedMessages) {
-          // Process each message as a log entry
-          testCaseData.expectedMessages.forEach((message: any, index: number) => {
-            setTimeout(() => {
-              const newLog = {
-                id: Date.now() + index,
-                timestamp: (Date.now() / 1000).toFixed(1),
-                level: 'I',
-                component: message.layer,
-                message: `${message.messageName}: ${JSON.stringify(message.messagePayload || {})}`,
-                type: message.messageType,
-                source: 'TestManager',
-                testCaseId: testCaseId,
-                direction: message.direction,
-                protocol: message.protocol,
-                // Enhanced data for IE viewing
-                rawData: JSON.stringify(message.messagePayload || {}, null, 2),
-                informationElements: message.informationElements || {},
-                layerParameters: message.layerParameters || {},
-                standardReference: message.standardReference || 'Unknown',
-                messagePayload: message.messagePayload || {},
-                ies: message.informationElements ? 
-                  Object.entries(message.informationElements).map(([k, v]: [string, any]) => 
-                    `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
-                  ).join(', ') : 
-                  Object.entries(message.messagePayload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
-              };
-              
-              setLogs(prev => [...prev.slice(-99), newLog]); // Keep last 100 logs
-              console.log(`📊 LogsView: Added message ${index + 1} - ${message.messageName}`);
-            }, index * 500);
-          });
-        }
+      } else {
+        console.log('⚠️  No messages found in test data');
       }
     };
     
-    // Listen for Test Manager test execution data
-    const handleTestCaseData = (event: MessageEvent) => {
-      if (event.data.type === '5GLABX_TEST_EXECUTION') {
-        console.log('📊 LogsView received test case data for analysis:', event.data.testCaseId);
-        processTestData(event.data);
+    // Enhanced event handling for multiple data sources
+    const handleMessageEvent = (event: MessageEvent) => {
+      console.log('📨 LogsView received message event:', event.data);
+
+      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION message');
+        processTestData(event.data, 'PostMessage');
       }
     };
 
-    // Listen for log analysis events
-    const handleLogAnalysis = (event: CustomEvent) => {
-      console.log('🔬 LogsView received log analysis data:', event.detail);
-      const { messages, testCaseId } = event.detail;
-      
-      if (Array.isArray(messages)) {
-        messages.forEach((message: any, index: number) => {
-          setTimeout(() => {
-            const analysisLog = {
-              id: Date.now() + index + 1000,
-              timestamp: (Date.now() / 1000).toFixed(1),
-              level: 'I',
-              component: message.layer,
-              message: `Analysis: ${message.messageName} - ${JSON.stringify(message.payload || {})}`,
-              type: `${message.messageType}_ANALYSIS`,
-              source: 'LogAnalysis',
-              testCaseId: testCaseId
-            };
-            
-            setLogs(prev => [...prev.slice(-99), analysisLog]);
-          }, index * 300);
+    const handleCustomEvent = (event: CustomEvent) => {
+      console.log('📨 LogsView received custom event:', event.type, event.detail);
+
+      if (event.type === '5GLABX_TEST_EXECUTION') {
+        console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION custom event');
+        processTestData(event.detail, 'CustomEvent');
+      } else if (event.type === 'testCaseExecutionStarted') {
+        console.log('📊 LogsView: Processing testCaseExecutionStarted event');
+        processTestData(event.detail, 'TestExecutionStarted');
+      } else if (event.type === '5glabxLogAnalysis') {
+        console.log('📊 LogsView: Processing 5glabxLogAnalysis event');
+        processTestData(event.detail, 'LogAnalysis');
+      } else if (event.type === '5glabx-test-execution-start') {
+        console.log('📊 LogsView: Test execution starting');
+        onStateChange({
+          currentView: 'logs',
+          testExecutionActive: true,
+          testExecutionStatus: 'starting'
         });
+      } else if (event.type === '5glabx-test-execution-data') {
+        console.log('📊 LogsView: Processing test execution data');
+        processTestData(event.detail, 'GlobalEvent');
+      } else if (event.type === '5glabx-test-execution-complete') {
+        console.log('📊 LogsView: Test execution completed');
+        onStateChange({
+          testExecutionActive: false,
+          testExecutionStatus: 'completed'
+        });
+      }
+    };
+
+    // Check for TestCasePlaybackService availability
+    const checkTestCasePlaybackService = () => {
+      if (window.TestCasePlaybackService) {
+        console.log('✅ TestCasePlaybackService is available');
+        console.log('📊 LogsView: TestCasePlaybackService integration ready');
+      } else {
+        console.warn('⚠️  TestCasePlaybackService not available on window object');
+        // Retry after a short delay
+        setTimeout(checkTestCasePlaybackService, 1000);
       }
     };
 
@@ -225,22 +256,52 @@ const LogsView: React.FC<{
       console.log('📊 LogsView: Added direct log entry:', newLog.message);
     };
 
+    // Set up all event listeners
     if (typeof window !== 'undefined') {
-      window.addEventListener('message', handleTestCaseData);
-      window.addEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
+      console.log('📡 LogsView: Setting up comprehensive event listeners...');
+
+      // Listen for all possible event types from test execution system
+      window.addEventListener('message', handleMessageEvent);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleCustomEvent as EventListener);
+      window.addEventListener('testCaseExecutionStarted', handleCustomEvent as EventListener);
+      window.addEventListener('5glabxLogAnalysis', handleCustomEvent as EventListener);
+      window.addEventListener('5glabx-test-execution-start', handleCustomEvent as EventListener);
+      window.addEventListener('5glabx-test-execution-data', handleCustomEvent as EventListener);
+      window.addEventListener('5glabx-test-execution-complete', handleCustomEvent as EventListener);
+
+      // Legacy event listeners
       window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
+
       console.log('✅ LogsView: All event listeners registered for Test Manager integration');
-      
-      // Try to load existing data immediately
-      setTimeout(() => {
-        loadTestData();
-      }, 1000);
+
+      // Check for TestCasePlaybackService availability
+      checkTestCasePlaybackService();
+
+      // Also set up integration with FiveGLabXDataReceiver if available
+      if (window.FiveGLabXDataReceiver) {
+        console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
+
+        // Override the receiver methods to process data
+        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
+        window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
+          console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
+          processTestData(data, 'FiveGLabXDataReceiver');
+          if (originalOnTestExecutionData) {
+            originalOnTestExecutionData(data);
+          }
+        };
+      }
     }
 
     return () => {
       if (typeof window !== 'undefined') {
-        window.removeEventListener('message', handleTestCaseData);
-        window.removeEventListener('5glabxLogAnalysis', handleLogAnalysis as EventListener);
+        window.removeEventListener('message', handleMessageEvent);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleCustomEvent as EventListener);
+        window.removeEventListener('testCaseExecutionStarted', handleCustomEvent as EventListener);
+        window.removeEventListener('5glabxLogAnalysis', handleCustomEvent as EventListener);
+        window.removeEventListener('5glabx-test-execution-start', handleCustomEvent as EventListener);
+        window.removeEventListener('5glabx-test-execution-data', handleCustomEvent as EventListener);
+        window.removeEventListener('5glabx-test-execution-complete', handleCustomEvent as EventListener);
         window.removeEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
       }
     };
