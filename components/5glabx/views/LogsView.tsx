@@ -7,116 +7,26 @@ const LogsView: React.FC<{
   appState: any;
   onStateChange: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [logs, setLogs] = useState<any[]>([
-    {
-      id: 1,
-      timestamp: '931.6',
-      level: 'I',
-      component: 'PHY',
-      message: 'PDSCH: rnti=0x4601 h_id=0 k1=4 prb=[0,87) symb=[1,14) mod=QPSK rv=0 tbs=309 t=135.5us',
-      type: 'PDSCH',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"rnti": "0x4601", "harq_id": 0, "k1": 4, "prb_range": "[0,87)", "symbols": "[1,14)", "modulation": "QPSK", "rv": 0, "tbs": 309, "time": "135.5us"}',
-      informationElements: {
-        'rnti': { type: 'INTEGER', value: '0x4601', presence: 'mandatory', reference: 'TS 38.212' },
-        'harq-ProcessId': { type: 'INTEGER', value: 0, range: '0..15', presence: 'mandatory', reference: 'TS 38.321' },
-        'modulation': { type: 'ENUMERATED', value: 'QPSK', presence: 'mandatory', reference: 'TS 38.211' }
-      },
-      layerParameters: {
-        'SS-RSRP': { value: -85, unit: 'dBm', range: '(-156, -31)', reference: 'TS 38.215 5.1.1' },
-        'TBS': { value: 309, unit: 'bits', reference: 'TS 38.214' }
-      },
-      ies: 'rnti=0x4601, harq_id=0, modulation=QPSK, tbs=309'
-    },
-    {
-      id: 2,
-      timestamp: '938.5',
-      level: 'I',
-      component: 'MAC',
-      message: 'DL PDU: ue=0 rnti=0x4601 size=169: SDU: lcid=1 nof_sdus=1 total_size=55',
-      type: 'DL PDU',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"ue_id": 0, "rnti": "0x4601", "pdu_size": 169, "lcid": 1, "num_sdus": 1, "total_size": 55}',
-      informationElements: {
-        'ue-Identity': { type: 'INTEGER', value: 0, presence: 'mandatory', reference: 'TS 38.321' },
-        'rnti': { type: 'BIT STRING', value: '0x4601', size: 16, presence: 'mandatory', reference: 'TS 38.321' },
-        'lcid': { type: 'INTEGER', value: 1, range: '1..32', presence: 'mandatory', reference: 'TS 38.321' }
-      },
-      layerParameters: {
-        'PDU-Size': { value: 169, unit: 'bytes', reference: 'TS 38.321' },
-        'SDU-Count': { value: 1, reference: 'TS 38.321' }
-      },
-      ies: 'ue=0, rnti=0x4601, lcid=1, size=169'
-    },
-    {
-      id: 3,
-      timestamp: '940.1',
-      level: 'I',
-      component: 'RLC',
-      message: 'du=0 ue=0 SRB1 DL: TX PDU. dc=data p=1 si=full sn=0 pdu_len=53 grant_len=55',
-      type: 'TX PDU',
-      direction: 'DL',
-      protocol: '5G_NR',
-      rawData: '{"du": 0, "ue": 0, "bearer": "SRB1", "dc": "data", "p": 1, "si": "full", "sn": 0, "pdu_len": 53, "grant_len": 55}',
-      informationElements: {
-        'sequence-Number': { type: 'INTEGER', value: 0, range: '0..4095', presence: 'mandatory', reference: 'TS 38.322' },
-        'segmentation-Info': { type: 'ENUMERATED', value: 'full', presence: 'mandatory', reference: 'TS 38.322' },
-        'polling-Bit': { type: 'BOOLEAN', value: true, presence: 'optional', reference: 'TS 38.322' }
-      },
-      layerParameters: {
-        'PDU-Length': { value: 53, unit: 'bytes', reference: 'TS 38.322' },
-        'Grant-Length': { value: 55, unit: 'bytes', reference: 'TS 38.322' }
-      },
-      ies: 'sn=0, si=full, p=1, pdu_len=53'
-    },
-    {
-      id: 4,
-      timestamp: '932.1',
-      level: 'E',
-      component: 'PHY',
-      message: 'PUCCH decode failed: rnti=0x4601 format=1',
-      type: 'PUCCH',
-      direction: 'UL',
-      protocol: '5G_NR',
-      rawData: '{"rnti": "0x4601", "format": 1, "decode_result": "failed"}',
-      informationElements: {
-        'rnti': { type: 'BIT STRING', value: '0x4601', size: 16, presence: 'mandatory', reference: 'TS 38.213' },
-        'pucch-Format': { type: 'INTEGER', value: 1, range: '0..4', presence: 'mandatory', reference: 'TS 38.213' }
-      },
-      layerParameters: {
-        'PUCCH-Power': { value: 10, unit: 'dBm', range: '(-40, 23)', reference: 'TS 38.213' }
-      },
-      ies: 'rnti=0x4601, format=1, result=failed'
-    },
-    {
-      id: 5,
-      timestamp: '933.2',
-      level: 'W',
-      component: 'SCHED',
-      message: 'High scheduling latency detected: 250us',
-      type: 'Scheduling',
-      direction: 'N/A',
-      protocol: '5G_NR',
-      rawData: '{"latency": "250us", "threshold": "100us", "status": "warning"}',
-      informationElements: {
-        'scheduling-Latency': { type: 'INTEGER', value: 250, unit: 'microseconds', presence: 'mandatory', reference: 'TS 38.321' },
-        'latency-Threshold': { type: 'INTEGER', value: 100, unit: 'microseconds', reference: 'TS 38.321' }
-      },
-      layerParameters: {
-        'Max-Latency': { value: 100, unit: 'us', reference: 'TS 38.321' },
-        'Current-Latency': { value: 250, unit: 'us', reference: 'TS 38.321' }
-      },
-      ies: 'latency=250us, threshold=100us'
-    }
-  ]);
+  // Initialize logs state - start empty to show real-time data
+  const [logs, setLogs] = useState<any[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [selectedComponent, setSelectedComponent] = useState('all');
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [showDecoder, setShowDecoder] = useState(false);
+  const [isReceivingData, setIsReceivingData] = useState(false);
+  const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null);
+
+  // Auto-reset receiving status after 5 seconds of inactivity
+  useEffect(() => {
+    if (isReceivingData && lastDataReceived) {
+      const timeout = setTimeout(() => {
+        setIsReceivingData(false);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isReceivingData, lastDataReceived]);
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
@@ -131,7 +41,8 @@ const LogsView: React.FC<{
         testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
         messageCount: data.testCaseData?.expectedMessages?.length || 0,
         dataSource: source,
-        dataType: data.type
+        dataType: data.type,
+        fullData: JSON.stringify(data, null, 2)
       });
 
       const testCaseData = data.testCaseData || data;
@@ -148,39 +59,84 @@ const LogsView: React.FC<{
       }
 
       if (messages.length > 0) {
-        // Process each message as a log entry
-        messages.forEach((message: any, index: number) => {
-          setTimeout(() => {
-            const newLog = {
-              id: Date.now() + index,
-              timestamp: (Date.now() / 1000).toFixed(1),
-              level: 'I',
-              component: message.layer || 'TEST',
-              message: `${message.messageName || message.messageType}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
-              type: message.messageType || message.type || 'TEST_MESSAGE',
-              source: source || 'TestManager',
-              testCaseId: testCaseId,
-              direction: message.direction || 'UL',
-              protocol: message.protocol || '5G_NR',
-              // Enhanced data for IE viewing
-              rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
-              informationElements: message.informationElements || {},
-              layerParameters: message.layerParameters || {},
-              standardReference: message.standardReference || 'Unknown',
-              messagePayload: message.messagePayload || message.payload || {},
-              ies: message.informationElements ?
-                Object.entries(message.informationElements).map(([k, v]: [string, any]) =>
-                  `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
-                ).join(', ') :
-                Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
-            };
+        console.log(`📋 Processing ${messages.length} messages from ${source}`);
 
-            setLogs(prev => [...prev.slice(-199), newLog]); // Keep last 200 logs
-            console.log(`📊 LogsView: Added message ${index + 1} - ${message.messageName || message.messageType}`);
-          }, index * 200); // Faster display for better UX
+        // Process each message as a log entry immediately (no setTimeout to ensure immediate display)
+        messages.forEach((message: any, index: number) => {
+          const newLog = {
+            id: `test-${testCaseId}-${Date.now()}-${index}`,
+            timestamp: (Date.now() / 1000).toFixed(1),
+            level: 'I',
+            component: message.layer || message.component || 'TEST',
+            message: `${message.messageName || message.messageType || 'Test Message'}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
+            type: message.messageType || message.type || 'TEST_MESSAGE',
+            source: source || 'TestManager',
+            testCaseId: testCaseId,
+            direction: message.direction || 'UL',
+            protocol: message.protocol || '5G_NR',
+            // Enhanced data for IE viewing
+            rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+            informationElements: message.informationElements || {},
+            layerParameters: message.layerParameters || {},
+            standardReference: message.standardReference || 'Unknown',
+            messagePayload: message.messagePayload || message.payload || {},
+            ies: message.informationElements ?
+              Object.entries(message.informationElements).map(([k, v]: [string, any]) =>
+                `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
+              ).join(', ') :
+              Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
+          };
+
+          setLogs(prev => {
+            const newLogs = [...prev, newLog];
+            console.log(`✅ Added log entry ${index + 1}:`, newLog.message.substring(0, 100) + '...');
+            return newLogs;
+          });
         });
+
+        // Update receiving status
+        setIsReceivingData(true);
+        setLastDataReceived(new Date());
+
+        console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`);
       } else {
-        console.log('⚠️  No messages found in test data');
+        console.log('⚠️  No messages found in test data, checking alternative formats...');
+
+        // Try to extract data from different formats
+        if (testCaseData && typeof testCaseData === 'object') {
+          console.log('📋 Test case data structure:', Object.keys(testCaseData));
+        }
+
+        // If no messages but we have test case data, create a summary log
+        if (testCaseData && (testCaseData.name || testCaseData.testCaseName)) {
+          console.log('📋 Creating summary log entry for test case');
+          const summaryLog = {
+            id: `test-summary-${testCaseId}-${Date.now()}`,
+            timestamp: (Date.now() / 1000).toFixed(1),
+            level: 'I',
+            component: 'TEST',
+            message: `Test Case Started: ${testCaseData.name || testCaseData.testCaseName} (${testCaseId})`,
+            type: 'TEST_EXECUTION_START',
+            source: source || 'TestManager',
+            testCaseId: testCaseId,
+            direction: 'N/A',
+            protocol: testCaseData.protocol || '5G_NR',
+            rawData: JSON.stringify(testCaseData, null, 2),
+            informationElements: {},
+            layerParameters: {},
+            standardReference: 'Test Execution'
+          };
+
+          setLogs(prev => {
+            const newLogs = [...prev, summaryLog];
+            console.log('✅ Added summary log entry:', summaryLog.message);
+            return newLogs;
+          });
+
+          // Update receiving status
+          setIsReceivingData(true);
+          setLastDataReceived(new Date());
+        }
       }
     };
     
@@ -404,6 +360,92 @@ const LogsView: React.FC<{
         </div>
       </div>
 
+      {/* Data Reception Status Indicator */}
+      <div className="bg-white p-4 rounded-lg border mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`flex items-center space-x-2 ${isReceivingData ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-3 h-3 rounded-full ${isReceivingData ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+              <span className="text-sm font-medium">
+                {isReceivingData ? '🟢 Receiving Real-Time Data' : '⚪ Waiting for Data'}
+              </span>
+            </div>
+            {lastDataReceived && (
+              <span className="text-xs text-gray-500">
+                Last update: {lastDataReceived.toLocaleTimeString()}
+              </span>
+            )}
+            {logs.length > 0 && (
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                {logs.length} messages loaded
+              </span>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => {
+                // Inject test data for demonstration
+                const testLogs = [
+                  {
+                    id: `demo-${Date.now()}-1`,
+                    timestamp: (Date.now() / 1000).toFixed(1),
+                    level: 'I',
+                    component: 'TEST',
+                    message: 'Demo: 5G NR Initial Access - Cell Search Started',
+                    type: 'DEMO_MESSAGE',
+                    source: 'Demo',
+                    testCaseId: 'demo',
+                    direction: 'UL',
+                    protocol: '5G_NR',
+                    rawData: '{"message": "Cell search initiated"}',
+                    informationElements: {},
+                    layerParameters: {},
+                    standardReference: 'Demo Data'
+                  },
+                  {
+                    id: `demo-${Date.now()}-2`,
+                    timestamp: (Date.now() / 1000 + 0.5).toFixed(1),
+                    level: 'I',
+                    component: 'PHY',
+                    message: 'Demo: Random Access Preamble transmitted (preamble_id: 15)',
+                    type: 'DEMO_MESSAGE',
+                    source: 'Demo',
+                    testCaseId: 'demo',
+                    direction: 'UL',
+                    protocol: '5G_NR',
+                    rawData: '{"preamble_id": 15, "power": 10}',
+                    informationElements: {'preamble_id': 15},
+                    layerParameters: {'Power': 10},
+                    standardReference: 'Demo Data'
+                  }
+                ];
+
+                setLogs(prev => [...prev, ...testLogs]);
+                setIsReceivingData(true);
+                setLastDataReceived(new Date());
+
+                setTimeout(() => {
+                  setIsReceivingData(false);
+                }, 3000);
+              }}
+              className="text-sm text-blue-600 hover:text-blue-800 px-3 py-1 border border-blue-300 rounded hover:bg-blue-50"
+            >
+              Demo Data
+            </button>
+            <button
+              onClick={() => {
+                setLogs([]);
+                setIsReceivingData(false);
+                setLastDataReceived(null);
+              }}
+              className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+            >
+              Clear Logs
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Logs Table */}
       <div className="bg-white rounded-lg border overflow-hidden">
         <div className="overflow-x-auto">
@@ -431,37 +473,62 @@ const LogsView: React.FC<{
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                    {log.timestamp}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelColor(log.level)}`}>
-                      {getLevelIcon(log.level)}
-                      <span className="ml-1">{log.level}</span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {log.component}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {log.type}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 max-w-md truncate">
-                    {log.message}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button 
-                      onClick={() => decodeMessage(log)}
-                      className="text-blue-600 hover:text-blue-900 hover:bg-blue-50 p-1 rounded"
-                      title="View Information Elements (IEs)"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+              {filteredLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className={`w-12 h-12 rounded-full ${isReceivingData ? 'bg-green-100 animate-pulse' : 'bg-gray-100'} flex items-center justify-center mb-4`}>
+                        {isReceivingData ? (
+                          <div className="w-6 h-6 bg-green-500 rounded-full animate-bounce"></div>
+                        ) : (
+                          <div className="w-6 h-6 bg-gray-400 rounded-full"></div>
+                        )}
+                      </div>
+                      <p className="text-gray-500 text-sm mb-2">
+                        {isReceivingData ? '🎯 Waiting for test execution data...' : '📭 No logs available'}
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        {isReceivingData
+                          ? 'Run a test case to see live data streaming here'
+                          : 'Start a test execution to populate this view with real-time data'
+                        }
+                      </p>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                      {log.timestamp}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelColor(log.level)}`}>
+                        {getLevelIcon(log.level)}
+                        <span className="ml-1">{log.level}</span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {log.component}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {log.type}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900 max-w-md truncate">
+                      {log.message}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => decodeMessage(log)}
+                        className="text-blue-600 hover:text-blue-900 hover:bg-blue-50 p-1 rounded"
+                        title="View Information Elements (IEs)"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
