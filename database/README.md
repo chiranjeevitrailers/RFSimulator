@@ -6,9 +6,14 @@ This directory contains the complete SQL database schema and data for all 8 End-
 
 ### Schema Files
 - **`schema.sql`** - Complete database schema with tables, indexes, constraints, and triggers
-- **`insert_e2e_test_cases.sql`** - First 2 E2E test cases (SMS Service, 5G→LTE Handover)
-- **`insert_remaining_e2e_test_cases.sql`** - Next 3 E2E test cases (MO Data, MT Data, MT CSFB)
-- **`insert_final_e2e_test_cases.sql`** - Final 3 E2E test cases (MO CSFB, LTE→5G Handover, 3G→LTE Handover)
+- **`insert_e2e_test_cases.sql`** - First 2 E2E test cases (SMS Service, 5G→LTE Handover) - **WARNING: May cause duplicate key errors if data exists**
+- **`insert_remaining_e2e_test_cases.sql`** - Next 3 E2E test cases (MO Data, MT Data, MT CSFB) - **WARNING: May cause duplicate key errors if data exists**
+- **`insert_final_e2e_test_cases.sql`** - Final 3 E2E test cases (MO CSFB, LTE→5G Handover, 3G→LTE Handover) - **WARNING: May cause duplicate key errors if data exists**
+
+### Upsert Files (Recommended)
+- **`upsert_e2e_test_cases.sql`** - First 2 E2E test cases with INSERT ... ON CONFLICT handling
+- **`upsert_remaining_e2e_test_cases.sql`** - Next 3 E2E test cases with INSERT ... ON CONFLICT handling
+- **`upsert_final_e2e_test_cases.sql`** - Final 3 E2E test cases with INSERT ... ON CONFLICT handling
 
 ## Database Structure
 
@@ -105,7 +110,15 @@ CREATE DATABASE 5glabx_e2e_tests;
 psql -d 5glabx_e2e_tests -f schema.sql
 ```
 
-### 3. Insert Test Cases
+### 3. Insert Test Cases (Recommended - Use Upsert Files)
+```bash
+# Use upsert files to handle existing data gracefully
+psql -d 5glabx_e2e_tests -f upsert_e2e_test_cases.sql
+psql -d 5glabx_e2e_tests -f upsert_remaining_e2e_test_cases.sql
+psql -d 5glabx_e2e_tests -f upsert_final_e2e_test_cases.sql
+```
+
+**Alternative (May cause duplicate key errors if data exists):**
 ```bash
 psql -d 5glabx_e2e_tests -f insert_e2e_test_cases.sql
 psql -d 5glabx_e2e_tests -f insert_remaining_e2e_test_cases.sql
