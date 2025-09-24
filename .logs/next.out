@@ -808,3 +808,89 @@ Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be 
 🔧 Updating test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
 ✅ Test case updated successfully: 7004525a-5fb2-4654-bc91-44ccde3eb358
  PUT /api/test-cases/update/7004525a-5fb2-4654-bc91-44ccde3eb358/ 200 in 842ms
+ ○ Compiling /api/test-cases/create ...
+ ✓ Compiled /api/test-cases/create in 1170ms (221 modules)
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+✅ Test case created successfully: a5131c90-ae41-4f5c-a2cb-2d4148022fb2
+ POST /api/test-cases/create/ 200 in 2890ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+✅ Test case created successfully: d2aa6348-aa78-476a-aaa8-fbf7113d6b0b
+ POST /api/test-cases/create/ 200 in 728ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+✅ Test case created successfully: 5eabd3f3-8c8a-4a0c-b3a6-b5dccc704966
+ POST /api/test-cases/create/ 200 in 384ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+✅ Test case created successfully: e2482966-76f0-433b-bcf6-2473595f5792
+ POST /api/test-cases/create/ 200 in 737ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (2dcd5a40-b7b3-48f0-b023-8842e67b8f48, TC-20250924045113712-6ab314, LTE→5G Handover End-to-End: Measurement → Handover → QoS U..., Complete end-to-end test for LTE→5G Handover End-to-End: Measu..., null, End-to-End, Multi, 1.0, expert, conformance, 30, 0.0100, {E2E,End-to-End,Comprehensive}, {}, {"scenario": "lte_5g_handover_e2e", "test_steps": [{"step": 1, "..., {"success_criteria": "Complete end-to-end flow validation", "val..., {}, {}, {}, f, f, t, null, 2025-09-24 04:51:13.706623+00, 2025-09-24 04:51:13.706623+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_category_check"'
+}
+ POST /api/test-cases/create/ 500 in 760ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (b30879ba-3ee1-4138-b349-d793b6735e5c, TC-20250924045114492-bff39a, 3G→LTE Handover End-to-End: Measurement → Relocation → Bea..., Complete end-to-end test for 3G→LTE Handover End-to-End: Measu..., null, End-to-End, Multi, 1.0, expert, conformance, 30, 0.0100, {E2E,End-to-End,Comprehensive}, {}, {"scenario": "3g_lte_handover_e2e", "test_steps": [{"step": 1, "..., {"success_criteria": "Complete end-to-end flow validation", "val..., {}, {}, {}, f, f, t, null, 2025-09-24 04:51:14.483132+00, 2025-09-24 04:51:14.483132+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_category_check"'
+}
+ POST /api/test-cases/create/ 500 in 721ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+✅ Test case created successfully: ae7132e4-5f3a-42b1-9a38-d513f4ab5e07
+ POST /api/test-cases/create/ 200 in 765ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+✅ Test case created successfully: f951d40d-7c5b-44ce-b8e3-8af5a0ad4e6f
+ POST /api/test-cases/create/ 200 in 687ms
+ ○ Compiling /api/test-execution/simple ...
+ ✓ Compiled /api/test-execution/simple in 674ms (223 modules)
+🔍 Simple execution fetch for test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Simple execution data created for: SMS Service End-to-End: MO → SMSC → MT Delivery
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=d427e8aa-d3c7-46e3-80f5-f955571934ea 200 in 1723ms
+🔍 Simple execution fetch for test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
+✅ Simple execution data created for: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 11
+ GET /api/test-execution/simple/?testCaseId=7004525a-5fb2-4654-bc91-44ccde3eb358 200 in 696ms
+🔍 Simple execution fetch for test case: a5131c90-ae41-4f5c-a2cb-2d4148022fb2
+✅ Simple execution data created for: MO Data End-to-End: PDP Activation → Data Transfer
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=a5131c90-ae41-4f5c-a2cb-2d4148022fb2 200 in 694ms
+🔍 Simple execution fetch for test case: d2aa6348-aa78-476a-aaa8-fbf7113d6b0b
+✅ Simple execution data created for: MT Data End-to-End: Paging → Data Delivery
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=d2aa6348-aa78-476a-aaa8-fbf7113d6b0b 200 in 671ms
+🔍 Simple execution fetch for test case: 5eabd3f3-8c8a-4a0c-b3a6-b5dccc704966
+✅ Simple execution data created for: MT CSFB End-to-End: Voice Call → Fallback → Connection
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=5eabd3f3-8c8a-4a0c-b3a6-b5dccc704966 200 in 748ms
+🔍 Simple execution fetch for test case: e2482966-76f0-433b-bcf6-2473595f5792
+✅ Simple execution data created for: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=e2482966-76f0-433b-bcf6-2473595f5792 200 in 710ms
+🔍 Simple execution fetch for test case: ae7132e4-5f3a-42b1-9a38-d513f4ab5e07
+✅ Simple execution data created for: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=ae7132e4-5f3a-42b1-9a38-d513f4ab5e07 200 in 668ms
+🔍 Simple execution fetch for test case: f951d40d-7c5b-44ce-b8e3-8af5a0ad4e6f
+✅ Simple execution data created for: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=f951d40d-7c5b-44ce-b8e3-8af5a0ad4e6f 200 in 681ms
