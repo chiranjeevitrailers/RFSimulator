@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     });
     
     // Get user from request (you'll need to implement auth)
-    // For now, using a mock user ID
-    const userId = 'mock-user-id';
+    // For now, generating a proper UUID for the mock user
+    const userId = uuidv4();
     
     const body = await request.json();
     const { 
@@ -44,18 +44,19 @@ export async function POST(request: NextRequest) {
     // Calculate estimated duration - handle both duration_minutes and duration_seconds
     let estimatedDuration = 5; // Default 5 minutes
     try {
-      const { data: testCases, error: durationError } = await supabase
-        .from('test_cases')
-        .select('duration_minutes, duration_seconds, test_case_id, id')
-        .or(`id.in.(${test_ids.map(id => `"${id}"`).join(',')}),test_case_id.in.(${test_ids.map(id => `"${id}"`).join(',')})`);
-      
-      if (durationError) {
-        console.warn('Duration fetch error:', durationError.message);
-      } else if (testCases && testCases.length > 0) {
-        estimatedDuration = testCases.reduce((sum, test) => {
-          const duration = test.duration_minutes || (test.duration_seconds ? Math.ceil(test.duration_seconds / 60) : 5);
-          return sum + duration;
-        }, 0);
+      // Use the first test case ID to get duration info
+      if (test_ids.length > 0) {
+        const { data: testCases, error: durationError } = await supabase
+          .from('test_cases')
+          .select('duration_minutes, test_case_id, id')
+          .or(`id.eq."${test_ids[0]}",test_case_id.eq."${test_ids[0]}"`)
+          .limit(1);
+
+        if (durationError) {
+          console.warn('Duration fetch error:', durationError.message);
+        } else if (testCases && testCases.length > 0) {
+          estimatedDuration = testCases[0].duration_minutes || 5;
+        }
       }
     } catch (durationErr) {
       console.warn('Duration calculation failed, using default:', durationErr);
