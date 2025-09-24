@@ -518,17 +518,13 @@ const FiveGLabXPlatform: React.FC = () => {
         script.async = true;
         script.onload = () => {
           console.log('✅ Services script loaded successfully');
-          // Check if TestCasePlaybackService is available
-          setTimeout(() => {
-            if (window.TestCasePlaybackService) {
-              console.log('✅ TestCasePlaybackService is now available');
-            } else {
-              console.warn('⚠️  TestCasePlaybackService still not available after script load');
-            }
-          }, 1000);
+          // Check if TestCasePlaybackService is available with multiple attempts
+          checkTestCasePlaybackServiceAvailability();
         };
         script.onerror = (error) => {
           console.error('❌ Failed to load services script:', error);
+          // Try alternative loading methods
+          loadServicesFallback();
         };
         document.head.appendChild(script);
 
@@ -540,24 +536,83 @@ const FiveGLabXPlatform: React.FC = () => {
           console.warn('Could not load services script via import, TestCasePlaybackService may not be available');
         }
 
-        // Check for TestCasePlaybackService availability with retry
-        let attempts = 0;
-        const checkService = () => {
-          attempts++;
-          if (window.TestCasePlaybackService) {
-            console.log('✅ TestCasePlaybackService is available on window object');
-          } else if (attempts < 5) {
-            console.log(`🔄 Checking for TestCasePlaybackService... (attempt ${attempts}/5)`);
-            setTimeout(checkService, 1000);
-          } else {
-            console.warn('⚠️  TestCasePlaybackService not available after multiple attempts');
-          }
-        };
-        checkService();
+        // Enhanced service availability checking
+        checkTestCasePlaybackServiceAvailability();
 
       } catch (error) {
         console.warn('Failed to load services script:', error);
+        loadServicesFallback();
       }
+    };
+
+    const checkTestCasePlaybackServiceAvailability = () => {
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      const checkService = () => {
+        attempts++;
+
+        if (window.TestCasePlaybackService) {
+          console.log('✅ TestCasePlaybackService is available on window object');
+          console.log('📊 Service type:', typeof window.TestCasePlaybackService);
+          console.log('📊 Service constructor:', window.TestCasePlaybackService.constructor?.name || 'Unknown');
+
+          // Verify it's a class with expected methods
+          if (typeof window.TestCasePlaybackService === 'function' && window.TestCasePlaybackService.prototype) {
+            const methods = Object.getOwnPropertyNames(window.TestCasePlaybackService.prototype);
+            console.log('📊 Available methods:', methods.filter(name => typeof window.TestCasePlaybackService.prototype[name] === 'function'));
+
+            if (methods.includes('startPlayback') && methods.includes('stopPlayback')) {
+              console.log('✅ TestCasePlaybackService has expected methods');
+            } else {
+              console.warn('⚠️  TestCasePlaybackService missing expected methods');
+            }
+          }
+        } else if (attempts < maxAttempts) {
+          console.log(`🔄 Checking for TestCasePlaybackService... (attempt ${attempts}/${maxAttempts})`);
+          setTimeout(checkService, 1000);
+        } else {
+          console.warn('⚠️  TestCasePlaybackService not available after multiple attempts');
+          console.log('🔄 Trying fallback loading methods...');
+          loadServicesFallback();
+        }
+      };
+
+      checkService();
+    };
+
+    const loadServicesFallback = () => {
+      console.log('🔄 Attempting fallback service loading...');
+
+      // Try loading the service directly
+      const loadServiceDirectly = async () => {
+        try {
+          console.log('🔄 Loading TestCasePlaybackService directly...');
+          const response = await fetch('/services/TestCasePlaybackService.js');
+          const scriptText = await response.text();
+
+          // Execute the script in global scope
+          const script = document.createElement('script');
+          script.textContent = scriptText;
+          document.head.appendChild(script);
+
+          console.log('✅ TestCasePlaybackService script injected directly');
+
+          // Check again after injection
+          setTimeout(() => {
+            if (window.TestCasePlaybackService) {
+              console.log('✅ TestCasePlaybackService now available after direct injection');
+            } else {
+              console.warn('⚠️  TestCasePlaybackService still not available after direct injection');
+            }
+          }, 500);
+
+        } catch (error) {
+          console.error('❌ Fallback service loading failed:', error);
+        }
+      };
+
+      loadServiceDirectly();
     };
 
     loadServices();

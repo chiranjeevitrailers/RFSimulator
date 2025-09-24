@@ -351,9 +351,24 @@ class TestCasePlaybackService {
   }
 }
 
+// Ensure the service is available globally
 if (typeof window !== 'undefined') {
   window.TestCasePlaybackService = TestCasePlaybackService;
+  console.log('✅ TestCasePlaybackService assigned to window object');
 }
 
-module.exports = TestCasePlaybackService;
+// Export for different module systems
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = TestCasePlaybackService;
+  console.log('✅ TestCasePlaybackService exported via CommonJS');
+}
+
+// Export for ES6 modules
+if (typeof exports !== 'undefined') {
+  exports.TestCasePlaybackService = TestCasePlaybackService;
+  console.log('✅ TestCasePlaybackService exported via ES6');
+}
+
+// Make sure it's available immediately when loaded
+console.log('🚀 TestCasePlaybackService loaded and ready for use');
 
