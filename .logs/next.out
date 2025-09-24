@@ -469,3 +469,17 @@ Test case creation error: {
 🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
 ✅ Test case created successfully: 33ebec89-c08b-41fb-91f7-4f28936796be
  POST /api/test-cases/create/ 200 in 657ms
+ ○ Compiling /api/test-execution/simple ...
+ ✓ Compiled /api/test-execution/simple in 1034ms (221 modules)
+🔍 Simple execution fetch for test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Simple execution data created for: SMS Service End-to-End: MO → SMSC → MT Delivery
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=d427e8aa-d3c7-46e3-80f5-f955571934ea 200 in 2855ms
+🔍 Simple execution fetch for test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
+✅ Simple execution data created for: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 11
+ GET /api/test-execution/simple/?testCaseId=7004525a-5fb2-4654-bc91-44ccde3eb358 200 in 704ms
