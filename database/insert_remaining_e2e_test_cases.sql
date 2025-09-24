@@ -8,7 +8,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'a5131c90-ae41-4f5c-a2cb-2d4148022fb2',
+    '411effa9-a957-47fe-a433-ace7fa903c78',
     'MO Data End-to-End: PDP Activation → Data Transfer',
     'Complete Mobile Originated data flow with PDP context activation and data transfer',
     'LTE',
@@ -88,7 +88,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'd2aa6348-aa78-476a-aaa8-fbf7113d6b0b',
+    '1d97d068-d0bc-49f3-ac79-62b09ed621fc',
     'MT Data End-to-End: Paging → Data Delivery',
     'Complete Mobile Terminated data flow with paging and data delivery',
     'LTE',
@@ -168,7 +168,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    '5eabd3f3-8c8a-4a0c-b3a6-b5dccc704966',
+    '3c77fd9c-5c3f-45cf-bcb3-5de29bb2ff27',
     'MT CSFB End-to-End: Voice Call → Fallback → Connection',
     'Complete Mobile Terminated Circuit Switched Fallback flow for voice calls',
     'LTE',

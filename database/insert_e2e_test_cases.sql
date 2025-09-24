@@ -8,7 +8,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'd427e8aa-d3c7-46e3-80f5-f955571934ea',
+    '69ddecaa-8db1-4ce2-9b25-7072185ed0ef',
     'SMS Service End-to-End: MO → SMSC → MT Delivery',
     'Complete SMS service flow from Mobile Originated to Mobile Terminated delivery via SMSC',
     'LTE',
@@ -88,7 +88,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    '7004525a-5fb2-4654-bc91-44ccde3eb358',
+    '42b17322-78b3-4dbc-a8df-b6a558053e47',
     '5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update',
     'Complete 5G to LTE handover flow with measurement, handover command, and bearer update',
     'Multi',

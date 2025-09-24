@@ -8,7 +8,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'e2482966-76f0-433b-bcf6-2473595f5792',
+    'ed22fcf5-2a2b-47a2-9f3c-ef858acc7695',
     'MO CSFB End-to-End: Voice Attempt → Fallback → Connection',
     'Complete Mobile Originated Circuit Switched Fallback flow for voice calls',
     'LTE',
@@ -88,7 +88,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'ae7132e4-5f3a-42b1-9a38-d513f4ab5e07',
+    '3df4003d-9e18-4a69-bdc3-4f1dc6c33afc',
     'LTE→5G Handover End-to-End: Measurement → Handover → QoS Update',
     'Complete LTE to 5G handover flow with measurement, handover command, and QoS update',
     'Multi',
@@ -170,7 +170,7 @@ INSERT INTO test_cases (
     estimated_duration_minutes, automation_level, review_status, layer,
     standard_reference, is_active, is_premium, is_featured
 ) VALUES (
-    'f951d40d-7c5b-44ce-b8e3-8af5a0ad4e6f',
+    '06816abe-0c38-403e-84f0-49b73fd81cbf',
     '3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update',
     'Complete 3G to LTE handover flow with measurement, relocation, and bearer update',
     'Multi',
