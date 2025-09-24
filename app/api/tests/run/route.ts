@@ -129,34 +129,36 @@ export async function POST(request: NextRequest) {
           // Simulate test execution time
           await new Promise(resolve => setTimeout(resolve, 2000));
           
-          // Create test result
+          // Create test result with proper UUID
+          const resultId = uuidv4();
           await supabase
             .from('test_case_results')
-            .insert({
-              execution_id: runId,
-              test_case_id: testId,
-              step_name: `Test Step ${i + 1}`,
-              step_order: i + 1,
-              status: Math.random() > 0.1 ? 'passed' : 'failed', // 90% pass rate
-              start_time: new Date().toISOString(),
-              end_time: new Date(Date.now() + Math.floor(Math.random() * 300000) + 60000).toISOString(),
-              duration_ms: Math.floor(Math.random() * 300000) + 60000,
-              message: `Test case ${testId} executed successfully`,
-              details: {
-                metrics: {
-                  latency_ms: Math.floor(Math.random() * 100) + 50,
-                  throughput_mbps: Math.floor(Math.random() * 100) + 50,
-                  success_rate: Math.floor(Math.random() * 20) + 80
-                },
-                errors: [],
-                warnings: []
-              },
-              metrics: {
-                latency_ms: Math.floor(Math.random() * 100) + 50,
-                throughput_mbps: Math.floor(Math.random() * 100) + 50,
-                success_rate: Math.floor(Math.random() * 20) + 80
-              }
-            });
+        .insert({
+          id: resultId,
+          execution_id: runId,
+          test_case_id: testId,
+          step_name: `Test Step ${i + 1}`,
+          step_order: i + 1,
+          status: 'passed', // Use valid status value
+          start_time: new Date().toISOString(),
+          end_time: new Date(Date.now() + Math.floor(Math.random() * 300000) + 60000).toISOString(),
+          duration_ms: Math.floor(Math.random() * 300000) + 60000,
+          message: `Test case ${testId} executed successfully`,
+          details: {
+            metrics: {
+              latency_ms: Math.floor(Math.random() * 100) + 50,
+              throughput_mbps: Math.floor(Math.random() * 100) + 50,
+              success_rate: Math.floor(Math.random() * 20) + 80
+            },
+            errors: [],
+            warnings: []
+          },
+          metrics: {
+            latency_ms: Math.floor(Math.random() * 100) + 50,
+            throughput_mbps: Math.floor(Math.random() * 100) + 50,
+            success_rate: Math.floor(Math.random() * 20) + 80
+          }
+        });
         }
         
         // Mark as completed
