@@ -39,10 +39,14 @@ const LogsView: React.FC<{
 
       if (logs && logs.length > 0) {
         console.log(`📋 LogsView: Processing ${logs.length} immediate logs from ${source}`);
+        console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
 
+        // FORCE IMMEDIATE DISPLAY - Multiple attempts to ensure visibility
+        console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 1');
         setLogs(prev => {
           const newLogs = [...prev, ...logs];
           console.log(`✅ LogsView: Added ${logs.length} immediate log entries`);
+          console.log(`📊 Total logs now: ${newLogs.length}`);
           return newLogs;
         });
 
@@ -50,10 +54,66 @@ const LogsView: React.FC<{
         setIsReceivingData(true);
         setLastDataReceived(new Date());
 
-        // Force UI update
+        // FORCE DISPLAY ATTEMPT 2 - After short delay
         setTimeout(() => {
-          setLogs(current => [...current]);
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 2');
+          setLogs(current => {
+            console.log(`📊 Current logs count: ${current.length}`);
+            // Force re-render even if logs are the same
+            return [...current];
+          });
         }, 50);
+
+        // FORCE DISPLAY ATTEMPT 3 - With parent component update
+        setTimeout(() => {
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 3');
+          if (onStateChange) {
+            onStateChange({
+              currentView: 'logs',
+              testExecutionActive: true,
+              testExecutionStatus: 'active',
+              logs: logs
+            });
+          }
+        }, 100);
+
+        // FORCE DISPLAY ATTEMPT 4 - Direct DOM manipulation fallback
+        setTimeout(() => {
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 4 - DOM fallback');
+          try {
+            // Create visual indicator that data is being processed
+            const indicator = document.createElement('div');
+            indicator.style.cssText = `
+              position: fixed;
+              top: 50%;
+              right: 10px;
+              background: #00ff00;
+              color: black;
+              padding: 10px 20px;
+              border-radius: 5px;
+              font-family: monospace;
+              font-size: 12px;
+              z-index: 9999;
+              max-width: 400px;
+              word-wrap: break-word;
+            `;
+            indicator.innerHTML = `
+              <strong>🚨 DATA RECEIVED</strong><br>
+              Source: ${source}<br>
+              Logs: ${logs.length}<br>
+              Time: ${new Date().toLocaleTimeString()}
+            `;
+            document.body.appendChild(indicator);
+
+            setTimeout(() => {
+              indicator.remove();
+            }, 5000);
+          } catch (error) {
+            console.warn('DOM manipulation failed:', error);
+          }
+        }, 200);
+      } else {
+        console.log('⚠️  No logs found in immediate-logs-update event:', event.detail);
       }
     };
 
@@ -62,29 +122,85 @@ const LogsView: React.FC<{
     // Also listen for the regular 5GLABX_TEST_EXECUTION event
     const handleTestExecution = (event) => {
       console.log('🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+      console.log('📊 Event detail structure:', JSON.stringify(event.detail, null, 2));
 
       const { testCaseId, testCaseData, logs } = event.detail;
 
       if (logs && logs.length > 0) {
         console.log(`📋 LogsView: Processing ${logs.length} logs from event`);
+        console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
 
+        // FORCE IMMEDIATE DISPLAY - Multiple attempts
+        console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 1 (5GLABX_TEST_EXECUTION)');
         setLogs(prev => {
           const newLogs = [...prev, ...logs];
           console.log(`✅ LogsView: Added ${logs.length} log entries from event`);
+          console.log(`📊 Total logs now: ${newLogs.length}`);
           return newLogs;
         });
 
         setIsReceivingData(true);
         setLastDataReceived(new Date());
 
+        // FORCE DISPLAY ATTEMPT 2
         setTimeout(() => {
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 2 (5GLABX_TEST_EXECUTION)');
           setLogs(current => [...current]);
         }, 50);
+
+        // FORCE DISPLAY ATTEMPT 3
+        setTimeout(() => {
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 3 (5GLABX_TEST_EXECUTION)');
+          if (onStateChange) {
+            onStateChange({
+              currentView: 'logs',
+              testExecutionActive: true,
+              testExecutionStatus: 'active',
+              logs: logs
+            });
+          }
+        }, 100);
+
+        // FORCE DISPLAY ATTEMPT 4 - Visual indicator
+        setTimeout(() => {
+          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 4 (5GLABX_TEST_EXECUTION)');
+          try {
+            const indicator = document.createElement('div');
+            indicator.style.cssText = `
+              position: fixed;
+              top: 50%;
+              right: 10px;
+              background: #ff6600;
+              color: white;
+              padding: 10px 20px;
+              border-radius: 5px;
+              font-family: monospace;
+              font-size: 12px;
+              z-index: 9999;
+              max-width: 400px;
+              word-wrap: break-word;
+            `;
+            indicator.innerHTML = `
+              <strong>🚨 5GLABX EVENT RECEIVED</strong><br>
+              Test Case: ${testCaseId}<br>
+              Logs: ${logs.length}<br>
+              Time: ${new Date().toLocaleTimeString()}
+            `;
+            document.body.appendChild(indicator);
+
+            setTimeout(() => {
+              indicator.remove();
+            }, 5000);
+          } catch (error) {
+            console.warn('DOM manipulation failed:', error);
+          }
+        }, 200);
       } else if (testCaseData && testCaseData.expectedMessages) {
-        console.log('🔥 LogsView: Processing testCaseData from event');
+        console.log('🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event');
 
         // Process the test case data directly
         const messages = testCaseData.expectedMessages;
+        console.log(`📋 Processing ${messages.length} messages from testCaseData`);
 
         const processedLogs = messages.map((message, index) => ({
           id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
@@ -93,7 +209,7 @@ const LogsView: React.FC<{
           component: message.layer || message.component || 'TEST',
           message: `${message.messageName || message.messageType || 'Test Message'}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
           type: message.messageType || message.type || 'TEST_MESSAGE',
-          source: 'EventListener',
+          source: '5GLABX_TEST_EXECUTION',
           testCaseId: testCaseId,
           direction: message.direction || 'UL',
           protocol: message.protocol || '5G_NR',
@@ -109,6 +225,9 @@ const LogsView: React.FC<{
             Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
         }));
 
+        console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`);
+
+        // FORCE DISPLAY ATTEMPT 1
         setLogs(prev => {
           const newLogs = [...prev, ...processedLogs];
           console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData`);
@@ -118,9 +237,34 @@ const LogsView: React.FC<{
         setIsReceivingData(true);
         setLastDataReceived(new Date());
 
+        // FORCE DISPLAY ATTEMPT 2
         setTimeout(() => {
           setLogs(current => [...current]);
         }, 50);
+
+        // FORCE DISPLAY ATTEMPT 3
+        setTimeout(() => {
+          if (onStateChange) {
+            onStateChange({
+              currentView: 'logs',
+              testExecutionActive: true,
+              testExecutionStatus: 'active',
+              logs: processedLogs
+            });
+          }
+        }, 100);
+      } else {
+        console.log('⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:', event.detail);
+
+        // Try to extract data from any format
+        if (event.detail && typeof event.detail === 'object') {
+          console.log('🔍 Attempting to extract data from event detail...');
+          console.log('📊 Event detail keys:', Object.keys(event.detail));
+
+          if (event.detail.testCaseData) {
+            console.log('🔍 Found testCaseData in event detail');
+          }
+        }
       }
     };
 
