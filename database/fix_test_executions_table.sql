@@ -1,6 +1,9 @@
 -- Fix test_case_executions table structure
 -- This script creates the missing table or fixes the schema to resolve the 500 error
 
+-- Ensure required extension for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create test_case_executions table if it doesn't exist
 CREATE TABLE IF NOT EXISTS test_case_executions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -43,19 +46,26 @@ ALTER TABLE test_case_executions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE test_case_results ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for RLS (adjust as needed for your auth system)
-CREATE POLICY IF NOT EXISTS "Users can view their own test executions" ON test_case_executions
+-- Drop existing policies if present to avoid syntax errors on CREATE POLICY
+DROP POLICY IF EXISTS "Users can view their own test executions" ON test_case_executions;
+DROP POLICY IF EXISTS "Users can insert their own test executions" ON test_case_executions;
+DROP POLICY IF EXISTS "Users can update their own test executions" ON test_case_executions;
+DROP POLICY IF EXISTS "Users can view their own test results" ON test_case_results;
+DROP POLICY IF EXISTS "Users can insert their own test results" ON test_case_results;
+
+CREATE POLICY "Users can view their own test executions" ON test_case_executions
     FOR SELECT USING (true); -- Adjust this based on your auth system
 
-CREATE POLICY IF NOT EXISTS "Users can insert their own test executions" ON test_case_executions
+CREATE POLICY "Users can insert their own test executions" ON test_case_executions
     FOR INSERT WITH CHECK (true); -- Adjust this based on your auth system
 
-CREATE POLICY IF NOT EXISTS "Users can update their own test executions" ON test_case_executions
+CREATE POLICY "Users can update their own test executions" ON test_case_executions
     FOR UPDATE USING (true); -- Adjust this based on your auth system
 
-CREATE POLICY IF NOT EXISTS "Users can view their own test results" ON test_case_results
+CREATE POLICY "Users can view their own test results" ON test_case_results
     FOR SELECT USING (true); -- Adjust this based on your auth system
 
-CREATE POLICY IF NOT EXISTS "Users can insert their own test results" ON test_case_results
+CREATE POLICY "Users can insert their own test results" ON test_case_results
     FOR INSERT WITH CHECK (true); -- Adjust this based on your auth system
 
 -- Verify the tables were created successfully
