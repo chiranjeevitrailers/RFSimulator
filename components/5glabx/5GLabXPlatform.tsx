@@ -555,6 +555,50 @@ const FiveGLabXPlatform: React.FC = () => {
         // Enhanced service availability checking
         checkTestCasePlaybackServiceAvailability();
 
+        // Set up emergency data injection trigger
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            // Auto-trigger emergency injection if data is available
+            window.autoEmergencyInjection = () => {
+              console.log('🔥 AUTO-EMERGENCY INJECTION TRIGGERED');
+
+              // Try all injection methods
+              if (window.injectTestDataGlobally) {
+                console.log('🚀 Using global injection');
+                window.injectTestDataGlobally({
+                  testCaseId: 'auto-injection-test',
+                  testCaseData: {
+                    id: 'auto-injection-test',
+                    name: 'Auto Emergency Injection Test',
+                    description: 'Test data injected via emergency mechanism',
+                    protocol: '5G_NR',
+                    category: '5G_NR',
+                    expectedMessages: [
+                      {
+                        id: 'auto_msg_1',
+                        stepOrder: 1,
+                        timestampMs: Date.now(),
+                        direction: 'UL',
+                        layer: 'RRC',
+                        protocol: '5G_NR',
+                        messageType: 'RRCSetupRequest',
+                        messageName: 'RRC Setup Request',
+                        messageDescription: 'Emergency injection test message',
+                        messagePayload: { test: 'emergency_injection' },
+                        informationElements: { 'Test IE': 'Emergency' },
+                        layerParameters: { 'Injection': 'Active' },
+                        standardReference: 'Emergency Test'
+                      }
+                    ]
+                  }
+                });
+              }
+            };
+
+            console.log('✅ Auto-emergency injection mechanism ready');
+          }
+        }, 2000);
+
       } catch (error) {
         console.warn('Failed to load services script:', error);
         loadServicesFallback();
