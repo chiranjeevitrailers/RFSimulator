@@ -171,21 +171,35 @@ const LogsView: React.FC<{
     // Enhanced event handling for multiple data sources
     const handleMessageEvent = (event: MessageEvent) => {
       console.log('📨 LogsView received message event:', event.data);
+      console.log('📨 Event origin:', event.origin);
+      console.log('📨 Event source:', event.source);
 
       if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
         console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION message');
+        console.log('📊 Message details:', {
+          testCaseId: event.data.testCaseId,
+          runId: event.data.runId,
+          hasTestCaseData: !!event.data.testCaseData,
+          messageCount: event.data.testCaseData?.expectedMessages?.length || 0,
+          dataKeys: Object.keys(event.data)
+        });
+        processTestData(event.data, 'PostMessage');
+      } else if (event.data && event.data.testCaseId) {
+        console.log('📊 LogsView: Processing test case data from PostMessage');
         processTestData(event.data, 'PostMessage');
       }
     };
 
     const handleCustomEvent = (event: CustomEvent) => {
       console.log('📨 LogsView received custom event:', event.type, event.detail);
+      console.log('📨 Custom event detail keys:', Object.keys(event.detail || {}));
 
       if (event.type === '5GLABX_TEST_EXECUTION') {
         console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION custom event');
         processTestData(event.detail, 'CustomEvent');
       } else if (event.type === 'testCaseExecutionStarted') {
         console.log('📊 LogsView: Processing testCaseExecutionStarted event');
+        console.log('📊 Event detail:', JSON.stringify(event.detail, null, 2));
         processTestData(event.detail, 'TestExecutionStarted');
       } else if (event.type === '5glabxLogAnalysis') {
         console.log('📊 LogsView: Processing 5glabxLogAnalysis event');
@@ -199,6 +213,7 @@ const LogsView: React.FC<{
         });
       } else if (event.type === '5glabx-test-execution-data') {
         console.log('📊 LogsView: Processing test execution data');
+        console.log('📊 Event detail data:', JSON.stringify(event.detail, null, 2));
         processTestData(event.detail, 'GlobalEvent');
       } else if (event.type === '5glabx-test-execution-complete') {
         console.log('📊 LogsView: Test execution completed');
@@ -206,6 +221,13 @@ const LogsView: React.FC<{
           testExecutionActive: false,
           testExecutionStatus: 'completed'
         });
+      } else {
+        console.log('📊 LogsView: Unknown custom event type:', event.type);
+        // Try to process any event with test case data
+        if (event.detail && event.detail.testCaseId) {
+          console.log('📊 Processing unknown event with test case data');
+          processTestData(event.detail, `CustomEvent-${event.type}`);
+        }
       }
     };
 
@@ -261,20 +283,39 @@ const LogsView: React.FC<{
       // Check for TestCasePlaybackService availability
       checkTestCasePlaybackService();
 
-      // Also set up integration with FiveGLabXDataReceiver if available
-      if (window.FiveGLabXDataReceiver) {
-        console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
+          // Also set up integration with FiveGLabXDataReceiver if available
+          if (window.FiveGLabXDataReceiver) {
+            console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
 
-        // Override the receiver methods to process data
-        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
-        window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
-          console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
-          processTestData(data, 'FiveGLabXDataReceiver');
-          if (originalOnTestExecutionData) {
-            originalOnTestExecutionData(data);
+            // Override the receiver methods to process data
+            const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
+            window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
+              console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
+              console.log('📊 FiveGLabXDataReceiver data:', JSON.stringify(data, null, 2));
+              processTestData(data, 'FiveGLabXDataReceiver');
+              if (originalOnTestExecutionData) {
+                originalOnTestExecutionData(data);
+              }
+            };
           }
-        };
-      }
+
+          // Set up a global data receiver for immediate processing
+          if (typeof window !== 'undefined') {
+            (window as any).injectTestDataToLogsView = (data: any) => {
+              console.log('🚀 Injecting test data directly to LogsView:', data);
+              processTestData(data, 'DirectInjection');
+            };
+
+            // Also set up a direct data bridge
+            if (!window.directDataBridge) {
+              window.directDataBridge = {
+                inject: (data: any) => {
+                  console.log('🔗 DirectDataBridge: Injecting data to LogsView');
+                  processTestData(data, 'DirectDataBridge');
+                }
+              };
+            }
+          }
     }
 
     return () => {

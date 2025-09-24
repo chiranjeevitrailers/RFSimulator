@@ -1201,7 +1201,33 @@ const ClassicTestManager: React.FC = () => {
             
             addLog('INFO', `✅ Sent REAL Supabase data to 5GLabX via multiple events: ${testCaseData.testCase.name} with ${testCaseData.expectedMessages?.length || 0} messages`);
             addLog('DEBUG', `Data sent via: PostMessage, CustomEvent, DocumentEvent`);
-            
+
+            // Method 5: Direct injection to LogsView (most reliable)
+            setTimeout(() => {
+              if (window.injectTestDataToLogsView) {
+                console.log('🚀 Test Manager: Using direct injection to LogsView');
+                window.injectTestDataToLogsView(postMessageData);
+                addLog('INFO', '✅ Direct injection to LogsView completed');
+              } else if (window.directDataBridge && window.directDataBridge.inject) {
+                console.log('🔗 Test Manager: Using DirectDataBridge');
+                window.directDataBridge.inject(postMessageData);
+                addLog('INFO', '✅ DirectDataBridge injection completed');
+              } else {
+                console.log('⚠️  Direct injection methods not available, relying on event listeners');
+              }
+            }, 700);
+
+            // Method 6: Call FiveGLabXPlatform directly if available
+            setTimeout(() => {
+              if (window.FiveGLabXPlatform && window.FiveGLabXPlatform.onTestExecutionData) {
+                console.log('🎯 Test Manager: Calling FiveGLabXPlatform.onTestExecutionData');
+                window.FiveGLabXPlatform.onTestExecutionData(postMessageData);
+                addLog('INFO', '✅ FiveGLabXPlatform.onTestExecutionData called');
+              } else {
+                console.log('⚠️  FiveGLabXPlatform not available');
+              }
+            }, 800);
+
             // Note: Removed continuous data sending to prevent fake data repetition
             // Real test execution should only send data once, not continuously
             addLog('INFO', '✅ Test execution data sent once - no continuous repetition');
