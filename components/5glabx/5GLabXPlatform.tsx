@@ -506,6 +506,31 @@ const FiveGLabXPlatform: React.FC = () => {
     executionMessages: [] as any[]
   });
 
+  // Load services script on component mount
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        // Load the services script that makes TestCasePlaybackService available
+        const script = document.createElement('script');
+        script.src = '/scripts/loadServices.js';
+        script.async = true;
+        document.head.appendChild(script);
+
+        // Also try to load it directly if the script path doesn't work
+        try {
+          await import('/scripts/loadServices.js');
+          console.log('✅ Services script loaded successfully');
+        } catch (e) {
+          console.warn('Could not load services script, TestCasePlaybackService may not be available');
+        }
+      } catch (error) {
+        console.warn('Failed to load services script:', error);
+      }
+    };
+
+    loadServices();
+  }, []);
+
   // WebSocket connection for test execution
   const wsConfig = appState.websocketConfig ? {
     url: appState.websocketConfig.url,
