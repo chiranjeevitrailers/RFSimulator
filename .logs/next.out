@@ -162,3 +162,310 @@ Test case fetch error: {
    Expected IEs: 10
    Expected Layer Params: 10
  GET /api/test-execution/simple/?testCaseId=a6d95965-c711-4086-8e85-8c438d4de1e6 200 in 1986ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 3.8s (660 modules)
+ POST /api/test-cases/create/ 404 in 4802ms
+ POST /api/test-cases/create/ 404 in 163ms
+ POST /api/test-cases/create/ 404 in 129ms
+ POST /api/test-cases/create/ 404 in 196ms
+ POST /api/test-cases/create/ 404 in 160ms
+ POST /api/test-cases/create/ 404 in 250ms
+ POST /api/test-cases/create/ 404 in 166ms
+ POST /api/test-cases/create/ 404 in 159ms
+ ✓ Compiled in 3.7s (833 modules)
+ ○ Compiling /api/test-cases/create ...
+ ✓ Compiled /api/test-cases/create in 1836ms (750 modules)
+🔧 Creating test case: SMS Service End-to-End: MO → SMSC → MT Delivery
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 3702ms
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 291ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 680ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 746ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 320ms
+🔧 Creating test case: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 316ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 270ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'duration_seconds' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 678ms
+ ✓ Compiled in 1387ms (764 modules)
+🔧 Creating test case: SMS Service End-to-End: MO → SMSC → MT Delivery
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 811ms
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 661ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 704ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 650ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 315ms
+🔧 Creating test case: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 660ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 673ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+Test case creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'priority' column of 'test_cases' in the schema cache"
+}
+ POST /api/test-cases/create/ 500 in 693ms
+ ✓ Compiled /api/test-cases/simple in 436ms (223 modules)
+🔍 Simple fetch - Category: null, Limit: 1
+✅ Simple fetch successful: 1 test cases found
+ GET /api/test-cases/simple/?limit=1 200 in 1770ms
+ ✓ Compiled in 1777ms (535 modules)
+🔧 Creating test case: SMS Service End-to-End: MO → SMSC → MT Delivery
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (3b1b1b4d-030c-47ef-aae9-d9d0f48e50df, LTE-20250924042127656-b422ec, SMS Service End-to-End: MO → SMSC → MT Delivery, Complete SMS service flow from Mobile Originated to Mobile Termi..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {SMS,E2E,MO,MT,SMSC,Delivery}, {}, {"scenario": "sms_service_e2e", "services": ["SMS"], "flow_type"..., {"success_criteria": "SMS delivered successfully from MO to MT",..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:27.627485+00, 2025-09-24 04:21:27.627485+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.040 SMS Service, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 755ms
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (606dcc2e-9851-4fd8-bfad-c9ba7f1de04b, LTE-20250924042127981-69da3e, MO Data End-to-End: PDP Activation → Data Transfer, Complete Mobile Originated data flow from PDP context activation..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Data,E2E,MO,PDP,Activation,Transfer}, {}, {"scenario": "mo_data_e2e", "services": ["Data"], "flow_type": "..., {"success_criteria": "PDP context activated and data transfer su..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:27.978704+00, 2025-09-24 04:21:27.978704+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.401 EPS Bearer Management, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 291ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (9ffe36c0-3018-4a43-bef8-3ebfc52d892d, LTE-20250924042128304-000947, MT Data End-to-End: Paging → Data Delivery, Complete Mobile Terminated data flow from paging to successful d..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Data,E2E,MT,Paging,Delivery}, {}, {"scenario": "mt_data_e2e", "services": ["Data"], "flow_type": "..., {"success_criteria": "UE paged and data delivered successfully",..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:28.296065+00, 2025-09-24 04:21:28.296065+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.401 EPS Bearer Management, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 304ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (c79fddc5-e6f6-440f-9e6d-325a82808b4d, LTE-20250924042128613-8ec8a3, MT CSFB End-to-End: Voice Call → Fallback → Connection, Complete Mobile Terminated Circuit Switched Fallback flow from v..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {CSFB,E2E,MT,Voice,Fallback,Connection}, {}, {"scenario": "mt_csfb_e2e", "services": ["Voice"], "flow_type": ..., {"success_criteria": "CSFB completed and voice call established"..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:28.610515+00, 2025-09-24 04:21:28.610515+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.272 CSFB, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 272ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (ec5897fb-f395-4a59-8269-11e1e666d854, LTE-20250924042129293-581d15, MO CSFB End-to-End: Voice Attempt → Fallback → Connection, Complete Mobile Originated Circuit Switched Fallback flow from v..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {CSFB,E2E,MO,Voice,Fallback,Connection}, {}, {"scenario": "mo_csfb_e2e", "services": ["Voice"], "flow_type": ..., {"success_criteria": "CSFB completed and voice call established"..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:29.290524+00, 2025-09-24 04:21:29.290524+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.272 CSFB, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 662ms
+🔧 Creating test case: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (56ee600a-b6c1-4f26-a81f-0f078900df84, NR-20250924042129572-fc84f8, 5G→LTE Handover End-to-End: Measurement → Handover → Beare..., Complete handover flow from 5G NR to LTE with measurement, hando..., null, 5G_NR, NR, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,5G,LTE,Measurement,Bearer}, {}, {"scenario": "5g_lte_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with beare..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:29.563156+00, 2025-09-24 04:21:29.563156+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 38.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 275ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (d07e438f-800d-44c0-bb9a-421cf11295f5, NR-20250924042129870-a38be3, LTE→5G Handover End-to-End: Measurement → Handover → QoS U..., Complete handover flow from LTE to 5G NR with measurement, hando..., null, 5G_NR, NR, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,LTE,5G,Measurement,QoS}, {}, {"scenario": "lte_5g_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with QoS u..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:29.867911+00, 2025-09-24 04:21:29.867911+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 38.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 288ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (cab15a0f-ff7a-4ac9-9f92-de028626a526, LTE-20250924042130179-cef58b, 3G→LTE Handover End-to-End: Measurement → Relocation → Bea..., Complete handover flow from 3G UMTS to LTE with measurement, rel..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,3G,LTE,Measurement,Relocation,Bearer}, {}, {"scenario": "3g_lte_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with beare..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:30.175953+00, 2025-09-24 04:21:30.175953+00, null, null, null, null, {}, {}, {}, {}, {}, {}, automated, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 25.331 & 36.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_automation_level_check"'
+}
+ POST /api/test-cases/create/ 500 in 303ms
+🔍 Simple fetch - Category: null, Limit: 1
+✅ Simple fetch successful: 1 test cases found
+ GET /api/test-cases/simple/?limit=1 200 in 749ms
+ ✓ Compiled in 1884ms (535 modules)
+🔧 Creating test case: SMS Service End-to-End: MO → SMSC → MT Delivery
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (96a84abf-bca5-4bde-936a-50e2eae1cbd1, LTE-20250924042146958-3203ec, SMS Service End-to-End: MO → SMSC → MT Delivery, Complete SMS service flow from Mobile Originated to Mobile Termi..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {SMS,E2E,MO,MT,SMSC,Delivery}, {}, {"scenario": "sms_service_e2e", "services": ["SMS"], "flow_type"..., {"success_criteria": "SMS delivered successfully from MO to MT",..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:46.955832+00, 2025-09-24 04:21:46.955832+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.040 SMS Service, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 879ms
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (d64562e3-2324-4383-a24e-c915cbaba978, LTE-20250924042147709-a5618a, MO Data End-to-End: PDP Activation → Data Transfer, Complete Mobile Originated data flow from PDP context activation..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Data,E2E,MO,PDP,Activation,Transfer}, {}, {"scenario": "mo_data_e2e", "services": ["Data"], "flow_type": "..., {"success_criteria": "PDP context activated and data transfer su..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:47.707308+00, 2025-09-24 04:21:47.707308+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.401 EPS Bearer Management, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 703ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (3d1331a2-5eed-425c-93e0-9880be1f26a8, LTE-20250924042148388-9ececc, MT Data End-to-End: Paging → Data Delivery, Complete Mobile Terminated data flow from paging to successful d..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Data,E2E,MT,Paging,Delivery}, {}, {"scenario": "mt_data_e2e", "services": ["Data"], "flow_type": "..., {"success_criteria": "UE paged and data delivered successfully",..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:48.386582+00, 2025-09-24 04:21:48.386582+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.401 EPS Bearer Management, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 656ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (f5ff0344-e6c3-4cad-9134-8ebbfd645221, LTE-20250924042149072-bfeb5d, MT CSFB End-to-End: Voice Call → Fallback → Connection, Complete Mobile Terminated Circuit Switched Fallback flow from v..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {CSFB,E2E,MT,Voice,Fallback,Connection}, {}, {"scenario": "mt_csfb_e2e", "services": ["Voice"], "flow_type": ..., {"success_criteria": "CSFB completed and voice call established"..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:49.069891+00, 2025-09-24 04:21:49.069891+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.272 CSFB, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 689ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (9c7ac851-501f-4db5-9ca2-5f0b8088ffdb, LTE-20250924042149752-bf162f, MO CSFB End-to-End: Voice Attempt → Fallback → Connection, Complete Mobile Originated Circuit Switched Fallback flow from v..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {CSFB,E2E,MO,Voice,Fallback,Connection}, {}, {"scenario": "mo_csfb_e2e", "services": ["Voice"], "flow_type": ..., {"success_criteria": "CSFB completed and voice call established"..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:49.749694+00, 2025-09-24 04:21:49.749694+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 23.272 CSFB, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 664ms
+🔧 Creating test case: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (81dfa2a3-4f2a-4296-9e69-16f24b7d1c53, NR-20250924042150459-4af5c4, 5G→LTE Handover End-to-End: Measurement → Handover → Beare..., Complete handover flow from 5G NR to LTE with measurement, hando..., null, 5G_NR, NR, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,5G,LTE,Measurement,Bearer}, {}, {"scenario": "5g_lte_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with beare..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:50.456729+00, 2025-09-24 04:21:50.456729+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 38.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 689ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (0b93a601-bdd6-4400-9977-b531276b042e, NR-20250924042151141-de5c5b, LTE→5G Handover End-to-End: Measurement → Handover → QoS U..., Complete handover flow from LTE to 5G NR with measurement, hando..., null, 5G_NR, NR, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,LTE,5G,Measurement,QoS}, {}, {"scenario": "lte_5g_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with QoS u..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:51.139132+00, 2025-09-24 04:21:51.139132+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 38.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 679ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+Test case creation error: {
+  code: '23514',
+  details: 'Failing row contains (0ba11d07-0d59-4024-8d77-e15a79d81fba, LTE-20250924042151822-0f2819, 3G→LTE Handover End-to-End: Measurement → Relocation → Bea..., Complete handover flow from 3G UMTS to LTE with measurement, rel..., null, 4G_LTE, LTE, 1.0, expert, end_to_end, 30, 0.0100, {Handover,E2E,3G,LTE,Measurement,Relocation,Bearer}, {}, {"scenario": "3g_lte_handover_e2e", "services": ["Data", "Voice"..., {"success_criteria": "Handover completed successfully with beare..., {}, {}, {}, f, f, t, null, 2025-09-24 04:21:51.820346+00, 2025-09-24 04:21:51.820346+00, null, null, null, null, {}, {}, {}, {}, {}, {}, manual, 5, 30, {}, null, null, {}, null, approved, Multi, 3GPP TS 25.331 & 36.331 Handover Procedures, null).',
+  hint: null,
+  message: 'new row for relation "test_cases" violates check constraint "test_cases_test_type_check"'
+}
+ POST /api/test-cases/create/ 500 in 677ms
+🔍 Simple fetch - Category: null, Limit: 1
+✅ Simple fetch successful: 1 test cases found
+ GET /api/test-cases/simple/?limit=1 200 in 759ms
+ ✓ Compiled in 1500ms (535 modules)
+🔧 Creating test case: SMS Service End-to-End: MO → SMSC → MT Delivery
+✅ Test case created successfully: d427e8aa-d3c7-46e3-80f5-f955571934ea
+ POST /api/test-cases/create/ 200 in 1054ms
+🔧 Creating test case: MO Data End-to-End: PDP Activation → Data Transfer
+✅ Test case created successfully: 2fac4988-2313-4197-bc7e-39d3a66f23c1
+ POST /api/test-cases/create/ 200 in 675ms
+🔧 Creating test case: MT Data End-to-End: Paging → Data Delivery
+✅ Test case created successfully: da690637-519e-4dec-89b4-6dfe74d4e5dd
+ POST /api/test-cases/create/ 200 in 673ms
+🔧 Creating test case: MT CSFB End-to-End: Voice Call → Fallback → Connection
+✅ Test case created successfully: 84618fcb-aee1-4c12-a179-939f6decc04c
+ POST /api/test-cases/create/ 200 in 662ms
+🔧 Creating test case: MO CSFB End-to-End: Voice Attempt → Fallback → Connection
+✅ Test case created successfully: 1cb40c79-63ca-4354-bb27-343f3424e9e0
+ POST /api/test-cases/create/ 200 in 661ms
+🔧 Creating test case: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+✅ Test case created successfully: 7004525a-5fb2-4654-bc91-44ccde3eb358
+ POST /api/test-cases/create/ 200 in 700ms
+🔧 Creating test case: LTE→5G Handover End-to-End: Measurement → Handover → QoS Update
+✅ Test case created successfully: 6ac9e85a-baa0-44fb-afd5-af1ceee7c118
+ POST /api/test-cases/create/ 200 in 713ms
+🔧 Creating test case: 3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Update
+✅ Test case created successfully: 33ebec89-c08b-41fb-91f7-4f28936796be
+ POST /api/test-cases/create/ 200 in 657ms
