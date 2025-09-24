@@ -784,3 +784,27 @@ Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be 
    Expected IEs: 10
    Expected Layer Params: 11
  GET /api/test-execution/simple/?testCaseId=7004525a-5fb2-4654-bc91-44ccde3eb358 200 in 715ms
+Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/test-cases/update/[id]/route.ts:13:31)
+  11 | ) {
+  12 |   try {
+> 13 |     const testCaseId = params.id;
+     |                               ^
+  14 |     const body = await request.json();
+  15 |     
+  16 |     if (!testCaseId) {
+🔧 Updating test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Test case updated successfully: d427e8aa-d3c7-46e3-80f5-f955571934ea
+ PUT /api/test-cases/update/d427e8aa-d3c7-46e3-80f5-f955571934ea/ 200 in 1784ms
+Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/test-cases/update/[id]/route.ts:13:31)
+  11 | ) {
+  12 |   try {
+> 13 |     const testCaseId = params.id;
+     |                               ^
+  14 |     const body = await request.json();
+  15 |     
+  16 |     if (!testCaseId) {
+🔧 Updating test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
+✅ Test case updated successfully: 7004525a-5fb2-4654-bc91-44ccde3eb358
+ PUT /api/test-cases/update/7004525a-5fb2-4654-bc91-44ccde3eb358/ 200 in 842ms
