@@ -31,8 +31,105 @@ const LogsView: React.FC<{
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
     console.log('🔍 Enhanced Logs Advanced: Initializing event listeners...');
+
+    // Listen for immediate logs update event
+    const handleImmediateLogsUpdate = (event) => {
+      console.log('🔥 LogsView: Received immediate-logs-update event:', event.detail);
+      const { logs, source } = event.detail;
+
+      if (logs && logs.length > 0) {
+        console.log(`📋 LogsView: Processing ${logs.length} immediate logs from ${source}`);
+
+        setLogs(prev => {
+          const newLogs = [...prev, ...logs];
+          console.log(`✅ LogsView: Added ${logs.length} immediate log entries`);
+          return newLogs;
+        });
+
+        // Update receiving status
+        setIsReceivingData(true);
+        setLastDataReceived(new Date());
+
+        // Force UI update
+        setTimeout(() => {
+          setLogs(current => [...current]);
+        }, 50);
+      }
+    };
+
+    window.addEventListener('immediate-logs-update', handleImmediateLogsUpdate);
+
+    // Also listen for the regular 5GLABX_TEST_EXECUTION event
+    const handleTestExecution = (event) => {
+      console.log('🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+
+      const { testCaseId, testCaseData, logs } = event.detail;
+
+      if (logs && logs.length > 0) {
+        console.log(`📋 LogsView: Processing ${logs.length} logs from event`);
+
+        setLogs(prev => {
+          const newLogs = [...prev, ...logs];
+          console.log(`✅ LogsView: Added ${logs.length} log entries from event`);
+          return newLogs;
+        });
+
+        setIsReceivingData(true);
+        setLastDataReceived(new Date());
+
+        setTimeout(() => {
+          setLogs(current => [...current]);
+        }, 50);
+      } else if (testCaseData && testCaseData.expectedMessages) {
+        console.log('🔥 LogsView: Processing testCaseData from event');
+
+        // Process the test case data directly
+        const messages = testCaseData.expectedMessages;
+
+        const processedLogs = messages.map((message, index) => ({
+          id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
+          timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
+          level: 'I',
+          component: message.layer || message.component || 'TEST',
+          message: `${message.messageName || message.messageType || 'Test Message'}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
+          type: message.messageType || message.type || 'TEST_MESSAGE',
+          source: 'EventListener',
+          testCaseId: testCaseId,
+          direction: message.direction || 'UL',
+          protocol: message.protocol || '5G_NR',
+          rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+          informationElements: message.informationElements || {},
+          layerParameters: message.layerParameters || {},
+          standardReference: message.standardReference || 'Unknown',
+          messagePayload: message.messagePayload || message.payload || {},
+          ies: message.informationElements ?
+            Object.entries(message.informationElements).map(([k, v]) =>
+              `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
+            ).join(', ') :
+            Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
+        }));
+
+        setLogs(prev => {
+          const newLogs = [...prev, ...processedLogs];
+          console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData`);
+          return newLogs;
+        });
+
+        setIsReceivingData(true);
+        setLastDataReceived(new Date());
+
+        setTimeout(() => {
+          setLogs(current => [...current]);
+        }, 50);
+      }
+    };
+
+    window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+
     console.log('✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration');
-    console.log('🔍 Enhanced Logs Advanced: Awaiting real-time events (no fallback injection)');
+    console.log('🔥 Enhanced Logs Advanced: Listening for immediate-logs-update events');
+    console.log('🔥 Enhanced Logs Advanced: Listening for 5GLABX_TEST_EXECUTION events');
+    console.log('🔍 Enhanced Logs Advanced: Awaiting real-time events (with immediate fallback)');
 
     // Process test data from various sources
     const processTestData = (data: any, source: string = 'unknown') => {
