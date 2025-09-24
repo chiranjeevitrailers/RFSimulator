@@ -483,3 +483,304 @@ Test case creation error: {
    Expected IEs: 10
    Expected Layer Params: 11
  GET /api/test-execution/simple/?testCaseId=7004525a-5fb2-4654-bc91-44ccde3eb358 200 in 704ms
+ ✓ Compiled in 2.6s (471 modules)
+ ✓ Compiled in 1544ms (457 modules)
+ ✓ Compiled in 2.2s (471 modules)
+ ✓ Compiled in 2.1s (457 modules)
+ ○ Compiling /api/test-cases/update/[id] ...
+ ✓ Compiled /api/test-cases/update/[id] in 3.7s (519 modules)
+Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/test-cases/update/[id]/route.ts:13:31)
+  11 | ) {
+  12 |   try {
+> 13 |     const testCaseId = params.id;
+     |                               ^
+  14 |     const body = await request.json();
+  15 |     
+  16 |     if (!testCaseId) {
+🔧 Updating test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Test case updated successfully: d427e8aa-d3c7-46e3-80f5-f955571934ea
+ PUT /api/test-cases/update/d427e8aa-d3c7-46e3-80f5-f955571934ea/ 200 in 7777ms
+ ○ Compiling /api/test-case-messages/create ...
+ ✓ Compiled /api/test-case-messages/create in 623ms (521 modules)
+🔧 Creating test case message: Primary Synchronization Signal
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 1722ms
+🔧 Creating test case message: Secondary Synchronization Signal
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 775ms
+🔧 Creating test case message: Physical Broadcast Channel
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 736ms
+🔧 Creating test case message: Physical Random Access Channel
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 745ms
+🔧 Creating test case message: Random Access Response
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 775ms
+🔧 Creating test case message: RRC Connection Request
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 713ms
+🔧 Creating test case message: RRC Connection Setup
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 345ms
+🔧 Creating test case message: RRC Connection Setup Complete
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 717ms
+🔧 Creating test case message: Attach Request
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 724ms
+🔧 Creating test case message: Authentication Request
+Message creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'updated_at' column of 'test_case_messages' in the schema cache"
+}
+ POST /api/test-case-messages/create/ 500 in 358ms
+ ✓ Compiled /api/test-case-information-elements/create in 497ms (523 modules)
+🔧 Creating test case IE: UE-Identity
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 1348ms
+🔧 Creating test case IE: Transaction-ID
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 333ms
+🔧 Creating test case IE: Cell-ID
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 307ms
+🔧 Creating test case IE: RSRP
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 719ms
+🔧 Creating test case IE: RSRQ
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 725ms
+🔧 Creating test case IE: System-Bandwidth
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 702ms
+🔧 Creating test case IE: PHICH-Config
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 321ms
+🔧 Creating test case IE: Preamble-ID
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 303ms
+🔧 Creating test case IE: RA-RNTI
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 314ms
+🔧 Creating test case IE: Timing-Advance
+IE creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_information_elements' in the schema cache"
+}
+ POST /api/test-case-information-elements/create/ 500 in 344ms
+ ○ Compiling /api/test-case-layer-parameters/create ...
+ ✓ Compiled /api/test-case-layer-parameters/create in 540ms (525 modules)
+🔧 Creating test case layer parameter: RSRP
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 1410ms
+🔧 Creating test case layer parameter: RSRQ
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 327ms
+🔧 Creating test case layer parameter: System-Bandwidth
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 329ms
+🔧 Creating test case layer parameter: Cell-ID
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 745ms
+🔧 Creating test case layer parameter: Preamble-ID
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 685ms
+🔧 Creating test case layer parameter: RA-RNTI
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 290ms
+🔧 Creating test case layer parameter: Timing-Advance
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 698ms
+🔧 Creating test case layer parameter: Transaction-ID
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 274ms
+🔧 Creating test case layer parameter: UE-Identity
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 283ms
+🔧 Creating test case layer parameter: IMSI
+Parameter creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'description' column of 'test_case_layer_parameters' in the schema cache"
+}
+ POST /api/test-case-layer-parameters/create/ 500 in 712ms
+Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/test-cases/update/[id]/route.ts:13:31)
+  11 | ) {
+  12 |   try {
+> 13 |     const testCaseId = params.id;
+     |                               ^
+  14 |     const body = await request.json();
+  15 |     
+  16 |     if (!testCaseId) {
+🔧 Updating test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Test case updated successfully: d427e8aa-d3c7-46e3-80f5-f955571934ea
+ PUT /api/test-cases/update/d427e8aa-d3c7-46e3-80f5-f955571934ea/ 200 in 1132ms
+Error: Route "/api/test-cases/update/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/test-cases/update/[id]/route.ts:13:31)
+  11 | ) {
+  12 |   try {
+> 13 |     const testCaseId = params.id;
+     |                               ^
+  14 |     const body = await request.json();
+  15 |     
+  16 |     if (!testCaseId) {
+🔧 Updating test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
+✅ Test case updated successfully: 7004525a-5fb2-4654-bc91-44ccde3eb358
+ PUT /api/test-cases/update/7004525a-5fb2-4654-bc91-44ccde3eb358/ 200 in 993ms
+ ○ Compiling /api/test-execution/simple ...
+ ✓ Compiled /api/test-execution/simple in 1300ms (223 modules)
+🔍 Simple execution fetch for test case: d427e8aa-d3c7-46e3-80f5-f955571934ea
+✅ Simple execution data created for: SMS Service End-to-End: MO → SMSC → MT Delivery
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=d427e8aa-d3c7-46e3-80f5-f955571934ea 200 in 2460ms
+🔍 Simple execution fetch for test case: 7004525a-5fb2-4654-bc91-44ccde3eb358
+✅ Simple execution data created for: 5G→LTE Handover End-to-End: Measurement → Handover → Bearer Update
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 11
+ GET /api/test-execution/simple/?testCaseId=7004525a-5fb2-4654-bc91-44ccde3eb358 200 in 715ms
