@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Complete 5GLabX Platform Test Flow
- * This script demonstrates the complete data flow from test case selection to 5GLabX display
+ * 5GLabX - Complete Test Execution System Test
+ * Tests the entire flow from API to frontend display
  */
 
 const http = require('http');
 
-console.log('🚀 5GLabX Platform Complete Flow Test');
-console.log('=====================================\n');
+console.log('🚀 5GLabX - Complete Test Execution System Test');
+console.log('==============================================\n');
 
 // Test 1: Check if server is running
 console.log('1. Testing server connectivity...');
