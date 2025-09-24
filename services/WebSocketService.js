@@ -8,7 +8,7 @@ class WebSocketService {
     this.isConnected = false;
   }
 
-  connect(url = 'ws://localhost:8081') {
+  connect(url = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082') {
     try {
       this.ws = new WebSocket(url);
       

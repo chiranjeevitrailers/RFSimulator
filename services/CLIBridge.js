@@ -45,7 +45,7 @@ function CLIBridge() {
         }));
 
         // Initialize WebSocket connection to backend server
-        const ws = new WebSocket('ws://localhost:8081');
+        const ws = new WebSocket(process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082');
 
         ws.onopen = () => {
           console.log('CLIBridge: Connected to backend WebSocket server');
