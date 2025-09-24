@@ -95,16 +95,30 @@ const SimpleDirectDataView: React.FC = () => {
     let messages = [];
 
     if (data.success && data.data?.expectedMessages) {
-      // Correct API response structure
+      // Correct API response structure: { success: true, data: { expectedMessages: [...] } }
       messages = data.data.expectedMessages;
+      testCaseInfo = data.data.testCase || {};
+      console.log('✅ Using correct API structure: data.data.expectedMessages');
+    } else if (data.data?.testCase?.expectedMessages) {
+      // Alternative structure: data.data.testCase.expectedMessages
+      messages = data.data.testCase.expectedMessages;
+      testCaseInfo = data.data.testCase || {};
+      console.log('✅ Using alternative structure: data.data.testCase.expectedMessages');
     } else if (data.testCaseData?.expectedMessages) {
       // Fallback for old structure
       messages = data.testCaseData.expectedMessages;
+      testCaseInfo = data.testCaseData || {};
+      console.log('✅ Using fallback structure: data.testCaseData.expectedMessages');
     } else if (data.expectedMessages) {
       // Direct access fallback
       messages = data.expectedMessages;
+      testCaseInfo = {};
+      console.log('✅ Using direct access: data.expectedMessages');
     } else {
-      console.warn('No expectedMessages found in data structure:', Object.keys(data));
+      console.warn('No expectedMessages found in data structure. Available keys:', Object.keys(data));
+      if (data.data) {
+        console.warn('Available keys in data:', Object.keys(data.data));
+      }
       return [];
     }
 
