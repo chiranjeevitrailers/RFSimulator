@@ -329,27 +329,10 @@ const TestDataGenerator: React.FC = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Test Data Generator</h1>
-          <p className="text-gray-600 mt-1">Generate realistic test data for 5GLabX components</p>
+          <h1 className="text-2xl font-bold text-gray-900">Test Data Reference</h1>
+          <p className="text-gray-600 mt-1">Reference test case structures (real data comes from Test Manager)</p>
         </div>
         <div className="flex space-x-2">
-          <Button
-            onClick={generateTestData}
-            disabled={isGenerating}
-            className="flex items-center"
-          >
-            {isGenerating ? (
-              <>
-                <Activity className="w-4 h-4 mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 mr-2" />
-                Generate Test Data
-              </>
-            )}
-          </Button>
           {generatedData && (
             <Button onClick={exportData} variant="outline" className="flex items-center">
               <Download className="w-4 h-4 mr-2" />
@@ -361,12 +344,21 @@ const TestDataGenerator: React.FC = () => {
 
       <Tabs defaultValue="testcases" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="testcases">Test Cases</TabsTrigger>
-          <TabsTrigger value="generated">Generated Data</TabsTrigger>
-          <TabsTrigger value="messages">Message Details</TabsTrigger>
+          <TabsTrigger value="testcases">Reference Test Cases</TabsTrigger>
+          <TabsTrigger value="generated">Sample Data</TabsTrigger>
+          <TabsTrigger value="messages">Message Structures</TabsTrigger>
         </TabsList>
 
         <TabsContent value="testcases" className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className="flex items-center">
+              <Database className="w-5 h-5 text-blue-600 mr-2" />
+              <div>
+                <h3 className="text-sm font-medium text-blue-900">Real Data Source</h3>
+                <p className="text-sm text-blue-700">Real test case data comes from the Test Manager → Supabase. This section shows reference structures only.</p>
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {Object.entries(testCases).map(([key, testCase]) => (
               <Card 
