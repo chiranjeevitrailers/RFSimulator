@@ -187,10 +187,9 @@ The 5GLabX platform implements a comprehensive data flow architecture that conne
   - All 4G legacy views (3 components)
   - All utility views (3 components)
 
-#### Test Case Data Flow Component
-- **File**: `/components/5glabx/components/TestCaseDataFlow.tsx`
-- **Purpose**: Demonstrates complete data flow architecture
-- **Features**:
+#### Test Case Data Flow (Removed)
+- **Status**: Removed - functionality integrated into Dashboard
+- **Reason**: Duplicate functionality with Dashboard component
   - Test case selection and execution
   - Real-time data flow visualization
   - Layer status monitoring
