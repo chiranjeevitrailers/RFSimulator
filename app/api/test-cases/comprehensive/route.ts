@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const protocol = searchParams.get('protocol');
     const layer = searchParams.get('layer');
     const complexity = searchParams.get('complexity');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = parseInt(searchParams.get('limit') || '2000'); // Increased from 50 to 2000 to show more test cases
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
     const includeData = searchParams.get('includeData') === 'true';
@@ -196,22 +196,21 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: {
-        testCases: testCases || [],
-        pagination: {
-          total: count || 0,
-          limit,
-          offset,
-          hasMore: (count || 0) > offset + limit
-        },
-        statistics: stats || {},
-        filters: {
-          category,
-          protocol,
-          layer,
-          complexity,
-          search
-        }
+      data: testCases || [], // Return test cases directly, not nested
+      count: testCases?.length || 0,
+      total: count || 0,
+      pagination: {
+        limit,
+        offset,
+        hasMore: (count || 0) > offset + limit
+      },
+      statistics: stats || {},
+      filters: {
+        category,
+        protocol,
+        layer,
+        complexity,
+        search
       },
       message: 'Test cases fetched successfully'
     });
