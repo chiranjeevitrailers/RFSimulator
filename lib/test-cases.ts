@@ -98,47 +98,89 @@ export class TestCaseService {
     limit?: number;
     offset?: number;
   }): Promise<TestCase[]> {
-    let query = supabase
-      .from('test_cases')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      // Use API endpoint instead of direct database access for better control
+      const params = new URLSearchParams();
 
-    if (filters?.category) {
-      query = query.eq('category', filters.category);
+      if (filters?.category) params.append('category', filters.category);
+      if (filters?.protocol_version) params.append('protocol', filters.protocol_version);
+      if (filters?.complexity) params.append('complexity', filters.complexity);
+      if (filters?.is_active !== undefined) params.append('is_active', filters.is_active.toString());
+      if (filters?.search) params.append('search', filters.search);
+
+      // Set a high limit to ensure we get all test cases
+      const limit = filters?.limit || 1000;
+      const offset = filters?.offset || 0;
+
+      params.append('limit', limit.toString());
+      params.append('offset', offset.toString());
+
+      const response = await fetch(`/api/test-cases/comprehensive?${params.toString()}`);
+
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('API returned error:', result.error);
+        throw new Error(result.error || 'Failed to fetch test cases');
+      }
+
+      console.log(`✅ Fetched ${result.data?.length || 0} test cases from API`);
+
+      return result.data || [];
+    } catch (error) {
+      console.error('Error fetching test cases via API:', error);
+
+      // Fallback to direct database access if API fails
+      console.log('🔄 Falling back to direct database access...');
+
+      let query = supabase
+        .from('test_cases')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (filters?.category) {
+        query = query.eq('category', filters.category);
+      }
+
+      if (filters?.protocol_version) {
+        query = query.eq('protocol', filters.protocol_version);
+      }
+
+      if (filters?.complexity) {
+        query = query.eq('complexity', filters.complexity);
+      }
+
+      if (filters?.is_active !== undefined) {
+        query = query.eq('is_active', filters.is_active);
+      }
+
+      if (filters?.search) {
+        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      }
+
+      // Apply higher limit for fallback
+      const limit = filters?.limit || 1000;
+      query = query.limit(limit);
+
+      if (filters?.offset) {
+        query = query.range(filters.offset, filters.offset + limit - 1);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching test cases from database:', error);
+        throw error;
+      }
+
+      console.log(`✅ Fetched ${data?.length || 0} test cases from database fallback`);
+      return data || [];
     }
-
-    if (filters?.protocol_version) {
-      query = query.eq('protocol_version', filters.protocol_version);
-    }
-
-    if (filters?.complexity) {
-      query = query.eq('complexity', filters.complexity);
-    }
-
-    if (filters?.is_active !== undefined) {
-      query = query.eq('is_active', filters.is_active);
-    }
-
-    if (filters?.search) {
-      query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
-    }
-
-    if (filters?.limit) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters?.offset) {
-      query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching test cases:', error);
-      throw error;
-    }
-
-    return data || [];
   }
 
   static async getTestCaseById(id: string): Promise<TestCase | null> {

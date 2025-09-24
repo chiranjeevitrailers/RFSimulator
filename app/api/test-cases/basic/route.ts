@@ -9,7 +9,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '3');
+    const limit = parseInt(searchParams.get('limit') || '100'); // Increased from 3 to 100 for better visibility
 
     // Use environment variables directly to avoid import issues
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
