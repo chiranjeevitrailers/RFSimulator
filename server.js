@@ -485,6 +485,7 @@ class RealCLILogServer {
   initializeTestExecutionWebSocket() {
     try {
       // Start the test execution WebSocket server on port 8082
+      this.testExecutionWebSocketServer = TestExecutionWebSocketServer.getInstance();
       this.testExecutionWebSocketServer.start(8082);
       console.log('Test Execution WebSocket server initialized on port 8082');
     } catch (error) {
