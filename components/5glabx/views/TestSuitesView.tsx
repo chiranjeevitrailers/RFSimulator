@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  Play, 
-  Pause, 
-  Square, 
-  Eye, 
-  Download, 
-  Upload, 
-  Search, 
+import {
+  Shield,
+  Play,
+  Pause,
+  Square,
+  Eye,
+  Download,
+  Upload,
+  Search,
   Filter,
   CheckCircle,
   XCircle,
@@ -24,11 +24,22 @@ import {
   Server,
   Database
 } from 'lucide-react';
+import { useTestExecution } from '../services/TestExecutionService';
 
 const TestSuitesView: React.FC<{
   appState: any;
   onStateChange: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
+  const {
+    executeTestCase,
+    getTestCaseData,
+    getExecutionStatus,
+    cancelExecution,
+    onExecutionStatus,
+    onExecutionMessage,
+    executions,
+  } = useTestExecution();
+
   const [testSuites, setTestSuites] = useState([
     {
       id: '5g-nr-initial-access',
@@ -361,16 +372,99 @@ const TestSuitesView: React.FC<{
     }
   };
 
-  const handleRunTest = (suiteId: string) => {
-    setRunningTests(prev => new Set(prev).add(suiteId));
-    // Simulate test execution
-    setTimeout(() => {
+  const handleRunTest = async (suiteId: string) => {
+    try {
+      setRunningTests(prev => new Set(prev).add(suiteId));
+
+      // Find the test suite
+      const suite = testSuites.find(s => s.id === suiteId);
+      if (!suite) {
+        console.error('Test suite not found:', suiteId);
+        return;
+      }
+
+      // Get user ID (in a real app, this would come from auth context)
+      const userId = `user-${Date.now()}`;
+
+      // Execute the test case using the enhanced API
+      const testExecution = await fetch('/api/test-execution/enhanced', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          testCaseId: suiteId,
+          userId: userId,
+          executionMode: 'comprehensive',
+          configuration: {
+            protocol: suite.category.includes('5G') ? '5G_NR' : 'LTE',
+            layer: suite.name.includes('Initial Access') ? 'Multi' : 'RRC',
+            complexity: 'intermediate',
+            category: suite.category,
+            description: suite.description,
+          },
+          timeAcceleration: 1.0,
+          logLevel: 'detailed',
+          captureMode: 'full',
+        }),
+      }).then(res => res.json());
+
+      if (testExecution.success) {
+        console.log('Test execution started successfully:', testExecution);
+        onStateChange({
+          ...appState,
+          currentExecutionId: testExecution.executionId,
+          testExecutionStatus: 'running',
+        });
+
+        // Monitor execution status
+        const statusCallback = (status: any) => {
+          console.log('Execution status update:', status);
+          if (status.status === 'completed') {
+            onStateChange({
+              ...appState,
+              testExecutionStatus: 'completed',
+              executionResult: status,
+            });
+          } else if (status.status === 'failed') {
+            onStateChange({
+              ...appState,
+              testExecutionStatus: 'failed',
+              executionError: status.error,
+            });
+          }
+        };
+
+        onExecutionStatus(testExecution.executionId!, statusCallback);
+
+        // Set up WebSocket connection for real-time data
+        const wsConfig = {
+          url: 'ws://localhost:8082',
+          executionId: testExecution.executionId!,
+        };
+
+        // This would trigger the WebSocket connection in the parent component
+        onStateChange({
+          ...appState,
+          websocketConfig: wsConfig,
+          testExecutionActive: true,
+        });
+
+      } else {
+        console.error('Test execution failed:', testExecution);
+        alert(`Test execution failed: ${testExecution.message}`);
+      }
+
+    } catch (error) {
+      console.error('Error executing test:', error);
+      alert(`Error executing test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
       setRunningTests(prev => {
         const newSet = new Set(prev);
         newSet.delete(suiteId);
         return newSet;
       });
-    }, 5000);
+    }
   };
 
   const getStatusIcon = (suite: any) => {

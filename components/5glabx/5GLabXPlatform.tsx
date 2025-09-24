@@ -6,10 +6,11 @@ import AnalyticsView from './views/AnalyticsView';
 import TestSuitesView from './views/TestSuitesView';
 import LayerTraceView from './views/LayerTraceView';
 import CallFlowView from './views/CallFlowView';
-import { 
-  Activity, 
-  BarChart3, 
-  Settings, 
+import { useTestExecutionWebSocket } from './services/TestExecutionWebSocketService';
+import {
+  Activity,
+  BarChart3,
+  Settings,
   LogOut,
   User,
   Bell,
@@ -495,8 +496,31 @@ const FiveGLabXPlatform: React.FC = () => {
     searchQuery: '',
     realTimeEnabled: false,
     darkMode: false,
-    isMonitoring: false
+    isMonitoring: false,
+    currentExecutionId: null as string | null,
+    testExecutionStatus: null as string | null,
+    executionResult: null as any,
+    executionError: null as string | null,
+    websocketConfig: null as any,
+    testExecutionActive: false,
+    executionMessages: [] as any[]
   });
+
+  // WebSocket connection for test execution
+  const wsConfig = appState.websocketConfig ? {
+    url: appState.websocketConfig.url,
+    executionId: appState.websocketConfig.executionId,
+  } : null;
+
+  const {
+    isConnected: wsConnected,
+    messages: wsMessages,
+    connectionError: wsError,
+    sendMessage: sendWsMessage,
+    getMessagesByType,
+    getMessagesByLayer,
+    clearMessages: clearWsMessages,
+  } = useTestExecutionWebSocket(wsConfig);
 
   const navigate = (viewId: string) => {
     setAppState(prev => ({
@@ -505,20 +529,54 @@ const FiveGLabXPlatform: React.FC = () => {
     }));
   };
 
+  // Update execution messages when WebSocket receives new messages
+  useEffect(() => {
+    if (wsMessages.length > 0) {
+      setAppState(prev => ({
+        ...prev,
+        executionMessages: [...prev.executionMessages, ...wsMessages].slice(-1000), // Keep last 1000 messages
+      }));
+    }
+  }, [wsMessages]);
+
+  // Update state when WebSocket connects/disconnects
+  useEffect(() => {
+    setAppState(prev => ({
+      ...prev,
+      websocketConnected: wsConnected,
+      websocketError: wsError?.message || null,
+    }));
+  }, [wsConnected, wsError]);
+
+  const handleStateChange = (newState: any) => {
+    setAppState(prev => ({ ...prev, ...newState }));
+  };
+
   const renderCurrentView = () => {
+    const updatedAppState = {
+      ...appState,
+      wsConnected,
+      wsMessages,
+      wsError,
+      sendWsMessage,
+      getMessagesByType,
+      getMessagesByLayer,
+      clearWsMessages,
+    };
+
     switch (appState.currentView) {
       case 'dashboard':
-        return <DashboardView appState={appState} onStateChange={setAppState} />;
+        return <DashboardView appState={updatedAppState} onStateChange={handleStateChange} />;
       case 'logs':
-        return <LogsView appState={appState} onStateChange={setAppState} />;
+        return <LogsView appState={updatedAppState} onStateChange={handleStateChange} />;
       case 'analytics':
-        return <AnalyticsView appState={appState} onStateChange={setAppState} />;
+        return <AnalyticsView appState={updatedAppState} onStateChange={handleStateChange} />;
       case 'layer-trace':
-        return <LayerTraceView appState={appState} onStateChange={setAppState} />;
+        return <LayerTraceView appState={updatedAppState} onStateChange={handleStateChange} />;
       case 'callflow':
-        return <CallFlowView appState={appState} onStateChange={setAppState} />;
+        return <CallFlowView appState={updatedAppState} onStateChange={handleStateChange} />;
       case 'test-suites':
-        return <TestSuitesView appState={appState} onStateChange={setAppState} />;
+        return <TestSuitesView appState={updatedAppState} onStateChange={handleStateChange} />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
