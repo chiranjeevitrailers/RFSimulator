@@ -57,52 +57,8 @@ const SimpleDataDisplay: React.FC = () => {
       console.log('🔥 SimpleDataDisplay: All event listeners registered');
     }
 
-    // Also fetch test case data directly from API
-    const fetchTestCaseData = async () => {
-      try {
-        console.log('🔥 SimpleDataDisplay: Fetching test case data from API...');
-        const response = await fetch('/api/test-execution/simple/?testCaseId=a27e2fc0-d6a9-4fa7-b3b2-a7d3089af985');
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const result = await response.json();
-        console.log('🔥 SimpleDataDisplay: API response received:', result);
-
-        if (result.success && result.data) {
-          console.log('🔥 SimpleDataDisplay: Processing API data...');
-          setTestData(prev => [{
-            timestamp: new Date(),
-            type: '5GLABX_TEST_EXECUTION',
-            testCaseId: 'a27e2fc0-d6a9-4fa7-b3b2-a7d3089af985',
-            testCaseData: result.data,
-            dataSource: 'API'
-          }, ...prev.slice(0, 9)]);
-
-          // Create logs from API data
-          if (result.data.expectedMessages) {
-            const newLogs = result.data.expectedMessages.map((msg: any, idx: number) => ({
-              id: Date.now() + idx,
-              timestamp: new Date().toLocaleTimeString(),
-              layer: msg.layer || 'UNKNOWN',
-              message: msg.messageName || msg.messageType || 'Unknown Message',
-              direction: msg.direction || 'UL',
-              payload: JSON.stringify(msg.messagePayload || {}),
-              source: 'API'
-            }));
-
-            setLogs(prev => [...newLogs, ...prev.slice(0, 19)]);
-            console.log(`🔥 SimpleDataDisplay: Added ${newLogs.length} log entries from API`);
-          }
-        }
-      } catch (error) {
-        console.error('🔥 SimpleDataDisplay: Error fetching API data:', error);
-      }
-    };
-
-    // Fetch data immediately
-    fetchTestCaseData();
+    // Removed automatic API fetch - now only listens to Test Manager events
+    console.log('🔥 SimpleDataDisplay: Waiting for Test Manager events (no automatic API fetch)');
 
     return () => {
       if (typeof window !== 'undefined') {
@@ -114,11 +70,13 @@ const SimpleDataDisplay: React.FC = () => {
     };
   }, []);
 
-  // Manual fetch function for debugging
+  // Manual fetch function for debugging - uses a known working test case
   const manualFetch = async () => {
     try {
       console.log('🔥 SimpleDataDisplay: Manual fetch triggered...');
-      const response = await fetch('/api/test-execution/simple/?testCaseId=a27e2fc0-d6a9-4fa7-b3b2-a7d3089af985');
+      // Use a known working test case ID from the logs
+      const testCaseId = 'a27e2fc0-d6a9-4fa7-b3b2-a7d3089af985';
+      const response = await fetch(`/api/test-execution/simple/?testCaseId=${testCaseId}`);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -131,7 +89,7 @@ const SimpleDataDisplay: React.FC = () => {
         setTestData(prev => [{
           timestamp: new Date(),
           type: '5GLABX_TEST_EXECUTION',
-          testCaseId: 'a27e2fc0-d6a9-4fa7-b3b2-a7d3089af985',
+          testCaseId: testCaseId,
           testCaseData: result.data,
           dataSource: 'Manual'
         }, ...prev.slice(0, 9)]);

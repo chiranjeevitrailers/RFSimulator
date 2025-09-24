@@ -174,10 +174,10 @@ const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Simple Data Display Component */}
+      {/* Test Case Data Display Component - Only shows real data from Test Manager */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔥 Test Case Data Display</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔥 Real Test Case Data Display</h3>
           <SimpleDataDisplay />
         </div>
       </div>
@@ -229,8 +229,7 @@ const DashboardView: React.FC = () => {
       {/* Channel Parameters Variation Tracker */}
       <ChannelParametersTracker testCaseData={testManagerData} />
       
-      {/* Simple Data Display */}
-      <SimpleDataDisplay />
+      {/* Removed duplicate SimpleDataDisplay - already rendered above */}
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg border shadow-sm">
