@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5GLabX Frontend Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.connected { background-color: #d4edda; color: #155724; }
+        .status.disconnected { background-color: #f8d7da; color: #721c24; }
+        .status.info { background-color: #d1ecf1; color: #0c5460; }
+        .log-entry {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry.info { border-left: 4px solid #17a2b8; }
+        .log-entry.success { border-left: 4px solid #28a745; }
+        .log-entry.warning { border-left: 4px solid #ffc107; }
+        .log-entry.error { border-left: 4px solid #dc3545; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .message-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .message-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .message-item.ul { border-left: 4px solid #28a745; }
+        .message-item.dl { border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🧪 5GLabX Frontend Integration Test</h1>
+    
+    <div class="container">
+        <h2>📡 WebSocket Connection Status</h2>
+        <div id="wsStatus" class="status disconnected">Disconnected</div>
+        <button onclick="connectWebSocket()">Connect to WebSocket</button>
+        <button onclick="disconnectWebSocket()">Disconnect</button>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Test Case Execution</h2>
+        <button onclick="executeTest()">Execute Test Case</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="testStatus" class="status info">Ready to execute test case</div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Received Messages</h2>
+        <div id="messageList" class="message-list">
+            <div class="log-entry info">No messages received yet</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📝 Event Logs</h2>
+        <div id="eventLogs" class="message-list">
+            <div class="log-entry info">Event logs will appear here</div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let messageCount = 0;
+        let eventCount = 0;
+
+        // WebSocket connection functions
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addLog('warning', 'WebSocket already connected');
+                return;
+            }
+
+            const wsUrl = 'ws://localhost:8082';
+            addLog('info', `Connecting to WebSocket: ${wsUrl}`);
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                addLog('success', 'WebSocket connected successfully');
+                document.getElementById('wsStatus').textContent = 'Connected';
+                document.getElementById('wsStatus').className = 'status connected';
+            };
+            
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    addLog('success', `Received message: ${data.type || 'unknown'}`);
+                    addMessage(data);
+                } catch (error) {
+                    addLog('error', `Failed to parse message: ${error.message}`);
+                }
+            };
+            
+            ws.onclose = function() {
+                addLog('warning', 'WebSocket connection closed');
+                document.getElementById('wsStatus').textContent = 'Disconnected';
+                document.getElementById('wsStatus').className = 'status disconnected';
+            };
+            
+            ws.onerror = function(error) {
+                addLog('error', `WebSocket error: ${error.message || 'Connection failed'}`);
+                document.getElementById('wsStatus').textContent = 'Error';
+                document.getElementById('wsStatus').className = 'status disconnected';
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        // Test execution function
+        function executeTest() {
+            addLog('info', 'Starting test case execution...');
+            document.getElementById('testStatus').textContent = 'Executing test case...';
+            document.getElementById('testStatus').className = 'status info';
+
+            // Simulate test case data
+            const testCaseData = {
+                type: 'test-execution',
+                executionId: `exec-${Date.now()}`,
+                testCaseId: 'demo-test-case-001',
+                testCaseData: {
+                    id: 'demo-test-case-001',
+                    name: '5G NR Initial Access - Basic Attach',
+                    category: '5G_NR',
+                    expectedMessages: [
+                        {
+                            id: 'msg-001',
+                            name: 'Random Access Preamble',
+                            layer: 'PHY',
+                            direction: 'UL',
+                            timestamp: 0
+                        },
+                        {
+                            id: 'msg-002',
+                            name: 'Random Access Response',
+                            layer: 'PHY',
+                            direction: 'DL',
+                            timestamp: 1000
+                        },
+                        {
+                            id: 'msg-003',
+                            name: 'RRC Setup Request',
+                            layer: 'RRC',
+                            direction: 'UL',
+                            timestamp: 2000
+                        },
+                        {
+                            id: 'msg-004',
+                            name: 'RRC Setup',
+                            layer: 'RRC',
+                            direction: 'DL',
+                            timestamp: 3000
+                        },
+                        {
+                            id: 'msg-005',
+                            name: 'RRC Setup Complete',
+                            layer: 'RRC',
+                            direction: 'UL',
+                            timestamp: 4000
+                        }
+                    ]
+                },
+                status: 'running',
+                timestamp: new Date().toISOString(),
+                dataSource: 'FRONTEND_DEMO'
+            };
+
+            // Send test execution data
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(testCaseData));
+                addLog('success', 'Test execution data sent to WebSocket server');
+            } else {
+                addLog('error', 'WebSocket not connected - cannot send test data');
+            }
+
+            // Simulate receiving messages over time
+            testCaseData.testCaseData.expectedMessages.forEach((message, index) => {
+                setTimeout(() => {
+                    const messageData = {
+                        type: 'message',
+                        executionId: testCaseData.executionId,
+                        messageId: message.id,
+                        message: message,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify(messageData));
+                        addLog('info', `Sent message: ${message.name}`);
+                    }
+                }, index * 1000);
+            });
+
+            // Update status after completion
+            setTimeout(() => {
+                document.getElementById('testStatus').textContent = 'Test case execution completed';
+                document.getElementById('testStatus').className = 'status success';
+                addLog('success', 'Test case execution completed successfully');
+            }, testCaseData.testCaseData.expectedMessages.length * 1000 + 1000);
+        }
+
+        // Event handling functions
+        function addLog(type, message) {
+            const logsContainer = document.getElementById('eventLogs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            eventCount++;
+        }
+
+        function addMessage(data) {
+            const messageContainer = document.getElementById('messageList');
+            
+            // Clear "no messages" placeholder
+            if (messageCount === 0) {
+                messageContainer.innerHTML = '';
+            }
+            
+            const messageItem = document.createElement('div');
+            messageItem.className = 'message-item';
+            
+            if (data.message && data.message.direction) {
+                messageItem.className += ` ${data.message.direction.toLowerCase()}`;
+            }
+            
+            let messageText = '';
+            if (data.type === 'test-execution') {
+                messageText = `Test Execution: ${data.testCaseData.name} (${data.testCaseData.expectedMessages.length} messages)`;
+            } else if (data.type === 'message') {
+                messageText = `${data.message.direction} ${data.message.layer}: ${data.message.name}`;
+            } else {
+                messageText = `${data.type}: ${JSON.stringify(data).substring(0, 100)}...`;
+            }
+            
+            messageItem.textContent = `[${new Date().toLocaleTimeString()}] ${messageText}`;
+            messageContainer.appendChild(messageItem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            messageCount++;
+        }
+
+        function clearLogs() {
+            document.getElementById('eventLogs').innerHTML = '<div class="log-entry info">Event logs cleared</div>';
+            document.getElementById('messageList').innerHTML = '<div class="log-entry info">No messages received yet</div>';
+            messageCount = 0;
+            eventCount = 0;
+        }
+
+        // Listen for CustomEvents (simulating 5GLabX integration)
+        window.addEventListener('testCaseExecutionStarted', function(event) {
+            addLog('success', `CustomEvent received: testCaseExecutionStarted - ${event.detail.testCaseId}`);
+            addMessage(event.detail);
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
+                addLog('success', `PostMessage received: ${event.data.type} - ${event.data.testCaseId}`);
+                addMessage(event.data);
+            }
+        });
+
+        // Auto-connect on page load
+        window.addEventListener('load', function() {
+            addLog('info', 'Page loaded - ready for testing');
+            addLog('info', 'Click "Connect to WebSocket" to start');
+        });
+    </script>
+</body>
+</html>
