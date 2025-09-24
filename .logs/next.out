@@ -87,3 +87,31 @@ https://nextjs.org/telemetry
  ✓ Compiled in 1528ms (312 modules)
  ✓ Compiled in 4.6s (312 modules)
  ✓ Compiled in 2s (456 modules)
+ ○ Compiling /api/test-cases/simple ...
+ ✓ Compiled /api/test-cases/simple in 3.5s (519 modules)
+🔍 Simple fetch - Category: null, Limit: 5
+✅ Simple fetch successful: 5 test cases found
+ GET /api/test-cases/simple/?limit=5 200 in 5942ms
+ ○ Compiling /api/tests/run-simple ...
+ ✓ Compiled /api/tests/run-simple in 566ms (538 modules)
+🚀 Simple test run started: f9807667-c7bf-4e25-b2bd-83587ff9b7b5 for test cases: a6d95965-c711-4086-8e85-8c438d4de1e6
+ POST /api/tests/run-simple/ 200 in 809ms
+ ○ Compiling /api/test-execution/simple ...
+ ✓ Compiled /api/test-execution/simple in 609ms (540 modules)
+🔍 Simple execution fetch for test case: a6d95965-c711-4086-8e85-8c438d4de1e6
+✅ Simple execution data created for: 4G LTE Conformance - 3GPP TS 36.211 Conformance
+   Expected Messages: 2
+   Expected IEs: 2
+   Expected Layer Params: 2
+ GET /api/test-execution/simple/?testCaseId=a6d95965-c711-4086-8e85-8c438d4de1e6 200 in 1571ms
+🔍 Simple fetch - Category: 5G_NR, Limit: 3
+✅ Simple fetch successful: 3 test cases found
+ GET /api/test-cases/simple/?category=5G_NR&limit=3 200 in 1329ms
+🚀 Simple test run started: 24ffc25c-c714-45a2-b3e9-e98dd7cb8360 for test cases: c8266910-8cf0-4547-aa1a-32cc28bd0489
+ POST /api/tests/run-simple/ 200 in 89ms
+🔍 Simple execution fetch for test case: c8266910-8cf0-4547-aa1a-32cc28bd0489
+✅ Simple execution data created for: 5G NR Conformance - 3GPP TS 38.211 Conformance
+   Expected Messages: 2
+   Expected IEs: 2
+   Expected Layer Params: 2
+ GET /api/test-execution/simple/?testCaseId=c8266910-8cf0-4547-aa1a-32cc28bd0489 200 in 387ms
