@@ -1,21 +1,21 @@
-🎯 5GLABX DATA FLOW ARCHITECTURE - WHERE TO WHERE
-=================================================
+🎯 5GLABX DATA FLOW ARCHITECTURE - SUPABASE TO FRONTEND
+=======================================================
 
-❌ CURRENT PROBLEM: Data generated but never reaches frontend display
-✅ SOLUTION: Direct injection from backend to frontend components
+✅ COMPLETE ARCHITECTURE NOW UNDERSTOOD:
+Test cases stored in Supabase → Select test case → Run → Fetch from Supabase → Display in 5GLabX
 
 ─────────────────────────────────────────────────────────────────────────
-📍 DATA FLOW PATH: FROM BACKEND → TO FRONTEND
+📍 COMPLETE DATA FLOW PATH: SUPABASE → BACKEND → FRONTEND
 ─────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   BACKEND       │    │  TRANSMISSION    │    │   FRONTEND      │
-│   SOURCES       │    │    LAYER         │    │  DESTINATIONS   │
+│   SUPABASE      │    │    BACKEND       │    │   FRONTEND      │
+│   DATA STORE    │    │    PROCESSING    │    │    DISPLAY      │
 ├─────────────────┤    ├──────────────────┤    ├─────────────────┤
-│ • Test Execution│    │ • Event Dispatch │    │ • Logs View     │
-│ • API Response  │───▶│ • Direct DOM     │───▶│ • Layer Trace   │
-│ • Supabase Data │    │ • Global Events  │    │ • Analytics     │
-│ • Protocol Gen  │    │ • Visual Inject  │    │ • Call Flow     │
+│ • Test Cases    │    │ • API Endpoints  │    │ • Logs View     │
+│ • Complete Data │───▶│ • Data Structure │───▶│ • Layer Trace   │
+│ • Protocol Info │    │ • Event Dispatch │    │ • Analytics     │
+│ • IEs & Params  │    │ • Visual Inject  │    │ • Call Flow     │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 
 ─────────────────────────────────────────────────────────────────────────
