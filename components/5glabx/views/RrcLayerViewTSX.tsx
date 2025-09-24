@@ -204,15 +204,15 @@ const RrcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Handovers:</span>
-              <span className="font-medium">{rrcData.mobilityStats.handovers}</span>
+              <span className="font-medium">{rrcData.mobilityStats?.handovers || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Cell Reselections:</span>
-              <span className="font-medium">{rrcData.mobilityStats.cellReselections}</span>
+              <span className="font-medium">{rrcData.mobilityStats?.cellReselections || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Failures:</span>
-              <span className="font-medium">{rrcData.mobilityStats.failures}</span>
+              <span className="font-medium">{rrcData.mobilityStats?.failures || 0}</span>
             </div>
           </div>
         </div>
@@ -225,21 +225,21 @@ const RrcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">SRB Count:</span>
-              <span className="font-medium">{rrcData.configurationStats.srbCount}</span>
+              <span className="font-medium">{rrcData.configurationStats?.srbCount || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">DRB Count:</span>
-              <span className="font-medium">{rrcData.configurationStats.drbCount}</span>
+              <span className="font-medium">{rrcData.configurationStats?.drbCount || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Measurements:</span>
-              <span className="font-medium">{rrcData.configurationStats.measurements}</span>
+              <span className="font-medium">{rrcData.configurationStats?.measurements || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Success:</span>
               <span className="font-medium flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
-                {rrcData.configurationStats.success ? 'Yes' : 'No'}
+                {rrcData.configurationStats?.success ? 'Yes' : 'No'}
               </span>
             </div>
           </div>
