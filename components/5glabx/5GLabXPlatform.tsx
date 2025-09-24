@@ -509,20 +509,52 @@ const FiveGLabXPlatform: React.FC = () => {
   // Load services script on component mount
   useEffect(() => {
     const loadServices = async () => {
+      console.log('🚀 Starting to load 5GLabX services...');
+
       try {
         // Load the services script that makes TestCasePlaybackService available
         const script = document.createElement('script');
         script.src = '/scripts/loadServices.js';
         script.async = true;
+        script.onload = () => {
+          console.log('✅ Services script loaded successfully');
+          // Check if TestCasePlaybackService is available
+          setTimeout(() => {
+            if (window.TestCasePlaybackService) {
+              console.log('✅ TestCasePlaybackService is now available');
+            } else {
+              console.warn('⚠️  TestCasePlaybackService still not available after script load');
+            }
+          }, 1000);
+        };
+        script.onerror = (error) => {
+          console.error('❌ Failed to load services script:', error);
+        };
         document.head.appendChild(script);
 
         // Also try to load it directly if the script path doesn't work
         try {
           await import('/scripts/loadServices.js');
-          console.log('✅ Services script loaded successfully');
+          console.log('✅ Services script loaded via import');
         } catch (e) {
-          console.warn('Could not load services script, TestCasePlaybackService may not be available');
+          console.warn('Could not load services script via import, TestCasePlaybackService may not be available');
         }
+
+        // Check for TestCasePlaybackService availability with retry
+        let attempts = 0;
+        const checkService = () => {
+          attempts++;
+          if (window.TestCasePlaybackService) {
+            console.log('✅ TestCasePlaybackService is available on window object');
+          } else if (attempts < 5) {
+            console.log(`🔄 Checking for TestCasePlaybackService... (attempt ${attempts}/5)`);
+            setTimeout(checkService, 1000);
+          } else {
+            console.warn('⚠️  TestCasePlaybackService not available after multiple attempts');
+          }
+        };
+        checkService();
+
       } catch (error) {
         console.warn('Failed to load services script:', error);
       }
