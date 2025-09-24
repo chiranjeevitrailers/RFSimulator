@@ -14,7 +14,7 @@ const ServiceIntegration: React.FC<{ children: React.ReactNode }> = ({ children 
         // Initialize WebSocket Service
         if (typeof window !== 'undefined' && window.WebSocketService) {
           const wsService = new window.WebSocketService();
-          wsService.connect('ws://localhost:8081');
+          wsService.connect(process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082');
           setServiceStatus(prev => ({ ...prev, websocket: 'Connected' }));
         }
 

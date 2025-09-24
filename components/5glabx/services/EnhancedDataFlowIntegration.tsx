@@ -60,7 +60,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Initialize WebSocket connection for real-time data
         if (typeof window !== 'undefined' && window.WebSocketService) {
           const wsService = new window.WebSocketService();
-          wsService.connect('ws://localhost:8081');
+          wsService.connect(process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082');
 
           wsService.on('connected', () => {
             setIsConnected(true);

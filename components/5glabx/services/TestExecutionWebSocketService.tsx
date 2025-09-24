@@ -220,7 +220,7 @@ class TestExecutionWebSocketService {
   }
 
   private buildWebSocketUrl(config: TestExecutionWebSocketConfig): string {
-    const baseUrl = config.url || 'ws://localhost:8081';
+    const baseUrl = config.url || process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082';
     const url = new URL(baseUrl);
 
     // Add query parameters

@@ -106,6 +106,58 @@ const DashboardView: React.FC = () => {
   const [testManagerData, setTestManagerData] = useState<any>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+  // Fallback function to check for active test executions
+  const checkForActiveExecutions = async () => {
+    try {
+      console.log('🔍 5GLabX: Checking for active test executions...');
+      const response = await fetch('/api/tests/runs/active');
+      if (response.ok) {
+        const activeRun = await response.json();
+        if (activeRun?.id) {
+          console.log('📊 5GLabX: Found active execution:', activeRun.id);
+          // Subscribe to Supabase realtime for this execution
+          subscribeToExecutionData(activeRun.id);
+        }
+      }
+    } catch (error) {
+      console.log('ℹ️ 5GLabX: No active executions found or API unavailable');
+    }
+  };
+
+  // Subscribe to Supabase realtime for execution data
+  const subscribeToExecutionData = async (executionId: string) => {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const channel = supabase.channel('execution-data')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'decoded_messages',
+          filter: `execution_id=eq.${executionId}`
+        }, (payload) => {
+          console.log('📊 5GLabX: Received realtime data:', payload.new);
+          // Process the incoming message data
+          if (payload.new) {
+            setTestManagerData(prev => ({
+              ...prev,
+              realtimeMessages: [...(prev?.realtimeMessages || []), payload.new]
+            }));
+            setLastUpdate(new Date());
+          }
+        })
+        .subscribe();
+
+      console.log('✅ 5GLabX: Subscribed to Supabase realtime for execution:', executionId);
+    } catch (error) {
+      console.error('❌ 5GLabX: Failed to subscribe to Supabase realtime:', error);
+    }
+  };
+
   useEffect(() => {
     // Listen for test manager execution events
     const handleTestCaseExecution = (event: CustomEvent) => {
@@ -144,6 +196,9 @@ const DashboardView: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.addEventListener('testCaseExecutionStarted', handleTestCaseExecution as EventListener);
       window.addEventListener('message', handlePostMessage);
+      
+      // Fallback: Check for active test executions on mount
+      checkForActiveExecutions();
     }
 
     return () => {
