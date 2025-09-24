@@ -85,7 +85,7 @@ export default function LiveKPIDashboard({ testCaseId, onKPIsUpdate }: LiveKPIDa
 
   useEffect(() => {
     // Initialize WebSocket connection for live updates
-    const ws = new WebSocket(`ws://localhost:3000/api/simulation/stream?testCaseId=${testCaseId}`);
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082'}/api/simulation/stream?testCaseId=${testCaseId}`);
     
     ws.onopen = () => {
       setIsConnected(true);

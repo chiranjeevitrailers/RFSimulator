@@ -58,7 +58,7 @@
     "healthCheckInterval": 30000
   },
   "frontend": {
-    "websocketUrl": "ws://localhost:8081",
+    "websocketUrl": "ws://localhost:8082",
     "apiUrl": "http://localhost:8080",
     "reconnectAttempts": 5,
     "reconnectDelay": 2000

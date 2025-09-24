@@ -6,7 +6,7 @@ function LiveMonitor({ onLogReceived, isMonitoring = false, onToggleMonitoring }
     }, []);
 
     const [connectionStatus, setConnectionStatus] = React.useState('disconnected');
-    const [wsUrl, setWsUrl] = React.useState('ws://localhost:8081');
+    const [wsUrl, setWsUrl] = React.useState(process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082');
     const [selectedSources, setSelectedSources] = React.useState(['testcase']);
     const [logCount, setLogCount] = React.useState(0);
     const wsRef = React.useRef(null);
