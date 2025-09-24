@@ -115,3 +115,50 @@ https://nextjs.org/telemetry
    Expected IEs: 2
    Expected Layer Params: 2
  GET /api/test-execution/simple/?testCaseId=c8266910-8cf0-4547-aa1a-32cc28bd0489 200 in 387ms
+🔍 Simple fetch - Category: null, Limit: 1
+✅ Simple fetch successful: 1 test cases found
+ GET /api/test-cases/simple/?limit=1 200 in 1896ms
+🔍 Simple execution fetch for test case: a6d95965-c711-4086-8e85-8c438d4de1e6
+✅ Simple execution data created for: 4G LTE Conformance - 3GPP TS 36.211 Conformance
+   Expected Messages: 2
+   Expected IEs: 2
+   Expected Layer Params: 2
+ GET /api/test-execution/simple/?testCaseId=a6d95965-c711-4086-8e85-8c438d4de1e6 200 in 861ms
+ ○ Compiling /api/test-execution/comprehensive ...
+ ✓ Compiled /api/test-execution/comprehensive in 1694ms (523 modules)
+🔍 Fetching comprehensive test case execution data - TestCase: a6d95965-c711-4086-8e85-8c438d4de1e6, RunId: null
+Dynamic select query: *,test_case_categories!inner(name, description, protocol_focus, layer_focus, complexity_level),test_case_messages(*),test_case_information_elements(*),test_case_layer_parameters(*),test_case_dependencies(*)
+Test case fetch error: {
+  code: 'PGRST201',
+  details: [
+    {
+      cardinality: 'one-to-many',
+      embedding: 'test_cases with test_case_dependencies',
+      relationship: 'test_case_dependencies_depends_on_test_case_id_fkey using test_cases(id) and test_case_dependencies(depends_on_test_case_id)'
+    },
+    {
+      cardinality: 'one-to-many',
+      embedding: 'test_cases with test_case_dependencies',
+      relationship: 'test_case_dependencies_test_case_id_fkey using test_cases(id) and test_case_dependencies(test_case_id)'
+    }
+  ],
+  hint: "Try changing 'test_case_dependencies' to one of the following: 'test_case_dependencies!test_case_dependencies_depends_on_test_case_id_fkey', 'test_case_dependencies!test_case_dependencies_test_case_id_fkey'. Find the desired relationship in the 'details' key.",
+  message: "Could not embed because more than one relationship was found for 'test_cases' and 'test_case_dependencies'"
+}
+ GET /api/test-execution/comprehensive/?testCaseId=a6d95965-c711-4086-8e85-8c438d4de1e6&includeTemplates=true 404 in 6700ms
+🔍 Simple fetch - Category: null, Limit: 10
+✅ Simple fetch successful: 10 test cases found
+ GET /api/test-cases/simple/?limit=10 200 in 859ms
+ ✓ Compiled in 2s (537 modules)
+ ✓ Compiled in 1765ms (533 modules)
+ ✓ Compiled in 1740ms (312 modules)
+ ✓ Compiled in 1677ms (312 modules)
+ ✓ Compiled in 1112ms (312 modules)
+ ○ Compiling /api/test-execution/simple ...
+ ✓ Compiled /api/test-execution/simple in 555ms (221 modules)
+🔍 Simple execution fetch for test case: a6d95965-c711-4086-8e85-8c438d4de1e6
+✅ Simple execution data created for: 4G LTE Conformance - 3GPP TS 36.211 Conformance
+   Expected Messages: 10
+   Expected IEs: 10
+   Expected Layer Params: 10
+ GET /api/test-execution/simple/?testCaseId=a6d95965-c711-4086-8e85-8c438d4de1e6 200 in 1986ms
