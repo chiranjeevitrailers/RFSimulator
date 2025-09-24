@@ -54,19 +54,19 @@ DROP POLICY IF EXISTS "Users can view their own test results" ON test_case_resul
 DROP POLICY IF EXISTS "Users can insert their own test results" ON test_case_results;
 
 CREATE POLICY "Users can view their own test executions" ON test_case_executions
-    FOR SELECT USING (true); -- Adjust this based on your auth system
+    FOR SELECT USING (true);
 
 CREATE POLICY "Users can insert their own test executions" ON test_case_executions
-    FOR INSERT WITH CHECK (true); -- Adjust this based on your auth system
+    FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Users can update their own test executions" ON test_case_executions
-    FOR UPDATE USING (true); -- Adjust this based on your auth system
+    FOR UPDATE USING (true);
 
 CREATE POLICY "Users can view their own test results" ON test_case_results
-    FOR SELECT USING (true); -- Adjust this based on your auth system
+    FOR SELECT USING (true);
 
 CREATE POLICY "Users can insert their own test results" ON test_case_results
-    FOR INSERT WITH CHECK (true); -- Adjust this based on your auth system
+    FOR INSERT WITH CHECK (true);
 
 -- Verify the tables were created successfully
 SELECT 
