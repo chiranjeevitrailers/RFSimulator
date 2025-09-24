@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-09-24T06:36:44.292Z",
+  "apiResults": {
+    "Basic Test Cases": {
+      "status": 200,
+      "success": true,
+      "data": "{\"success\":true,\"data\":[{\"id\":\"2fac4988-2313-4197-bc7e-39d3a66f23c1\",\"name\":\"MO Data End-to-End: PDP Activation → Data Transfer\",\"protocol\":\"LTE\",\"layer\":\"Multi\",\"complexity\":\"expert\",\"category\":\"4G_L..."
+    },
+    "Comprehensive Test Cases": {
+      "status": 200,
+      "success": true,
+      "data": "{\"success\":true,\"data\":{\"testCases\":[{\"id\":\"06816abe-0c38-403e-84f0-49b73fd81cbf\",\"test_case_id\":\"LTE-20250924053219596-06d714\",\"name\":\"3G→LTE Handover End-to-End: Measurement → Relocation → Bearer Up..."
+    },
+    "Test Run Endpoint": {
+      "status": 405,
+      "success": false,
+      "data": ""
+    }
+  },
+  "testCasesFound": 3,
+  "executionResult": null,
+  "summary": {
+    "apiEndpointsWorking": 2,
+    "databaseConnected": true,
+    "testExecutionWorking": false,
+    "frontendDataFlowWorking": true
+  }
+}
