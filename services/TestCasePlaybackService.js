@@ -17,19 +17,32 @@ class TestCasePlaybackService {
   #getDataFormatAdapter() {
     // Try different ways to access DataFormatAdapter
     if (typeof DataFormatAdapter !== 'undefined') {
-      return DataFormatAdapter;
+      return typeof DataFormatAdapter === 'function' ? new DataFormatAdapter() : DataFormatAdapter;
     }
     if (typeof window !== 'undefined' && window.DataFormatAdapter) {
-      return window.DataFormatAdapter;
+      return typeof window.DataFormatAdapter === 'function' ? new window.DataFormatAdapter() : window.DataFormatAdapter;
     }
     if (typeof require !== 'undefined') {
       try {
-        return require('../utils/DataFormatAdapter');
+        const DataFormatAdapterModule = require('../utils/DataFormatAdapter');
+        return DataFormatAdapterModule.default || DataFormatAdapterModule.DataFormatAdapter || new DataFormatAdapterModule();
       } catch (e) {
-        // Fallback to null if not available
+        console.warn('Could not load DataFormatAdapter via require:', e.message);
       }
     }
-    return null;
+
+    // Create fallback adapter if none available
+    console.warn('⚠️  DataFormatAdapter not found, using built-in adapter');
+    return {
+      adapt: (data, source) => {
+        console.log('🔄 Built-in DataFormatAdapter: Processing data from', source);
+        return data; // Return as-is if no adapter available
+      },
+      adaptLogForViewer: (data) => {
+        console.log('🔄 Built-in DataFormatAdapter: Processing log data');
+        return data; // Return as-is if no adapter available
+      }
+    };
   }
 
   async startPlayback({ testCaseId, runId, apiBaseUrl = '/api', speed = 1.0 }) {
@@ -43,8 +56,22 @@ class TestCasePlaybackService {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const payload = await res.json();
       data = payload.data || payload;
+
+      // Use DataFormatAdapter to ensure consistent data format
+      if (this.dataFormatAdapter && typeof this.dataFormatAdapter.adapt === 'function') {
+        console.log('🔄 TestCasePlaybackService: Adapting data with DataFormatAdapter');
+        const adaptedData = this.dataFormatAdapter.adapt(data, 'test-execution-api');
+        if (adaptedData.success) {
+          data = adaptedData.testCaseData;
+          console.log('✅ DataFormatAdapter: Successfully adapted test execution data');
+        } else {
+          console.warn('⚠️  DataFormatAdapter: Adaptation failed, using raw data');
+        }
+      }
+
     } catch (e) {
       // Fallback: minimal example dataset so playback always works
+      console.log('🔄 TestCasePlaybackService: Using fallback data due to API error:', e.message);
       data = {
         expectedMessages: [
           { stepOrder: 1, timestampMs: 0, direction: 'UL', layer: 'PHY', protocol: '5G-NR', messageType: 'RandomAccessPreamble', messageName: 'RA Preamble', messagePayload: { preamble_id: 15 }, standardReference: 'TS 38.211' },
