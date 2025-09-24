@@ -6,6 +6,7 @@ const { spawn } = require('child_process');
 const cors = require('cors');
 const DatabaseService = require('./services/database/DatabaseService');
 const NetworkConnectivityManager = require('./services/network/NetworkConnectivityManager');
+const TestExecutionWebSocketServer = require('./lib/test-execution-websocket-server');
 
 class RealCLILogServer {
   constructor() {
@@ -18,6 +19,7 @@ class RealCLILogServer {
     this.logBuffers = new Map();
     this.databaseService = new DatabaseService();
     this.networkManager = new NetworkConnectivityManager();
+    this.testExecutionWebSocketServer = new TestExecutionWebSocketServer();
 
     this.setupMiddleware();
     this.setupRoutes();
@@ -25,6 +27,7 @@ class RealCLILogServer {
     this.initializeCLIMonitoring();
     this.initializeDatabase();
     this.initializeNetworkMonitoring();
+    this.initializeTestExecutionWebSocket();
   }
 
   setupMiddleware() {
@@ -476,6 +479,16 @@ class RealCLILogServer {
       console.log('Network connectivity monitoring initialized');
     } catch (error) {
       console.error('Network monitoring initialization error:', error);
+    }
+  }
+
+  initializeTestExecutionWebSocket() {
+    try {
+      // Start the test execution WebSocket server on port 8082
+      this.testExecutionWebSocketServer.start(8082);
+      console.log('Test Execution WebSocket server initialized on port 8082');
+    } catch (error) {
+      console.error('Test Execution WebSocket initialization error:', error);
     }
   }
 
@@ -1743,9 +1756,13 @@ class RealCLILogServer {
       this.stopCLITool(name);
     }
 
-    // Close WebSocket server
+    // Close WebSocket servers
     if (this.wss) {
       this.wss.close();
+    }
+
+    if (this.testExecutionWebSocketServer) {
+      this.testExecutionWebSocketServer.stop();
     }
 
     // Close watchers
