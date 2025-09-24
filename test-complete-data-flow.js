@@ -30,12 +30,36 @@ async function testBackendAPI() {
     if (response.ok) {
       const data = await response.json();
       console.log('✅ API Response: SUCCESS');
-      console.log(`📋 Test Case: ${data.testCaseData?.name || 'Unknown'}`);
-      console.log(`📋 Protocol: ${data.testCaseData?.protocol || 'Unknown'}`);
-      console.log(`📋 Messages: ${data.testCaseData?.expectedMessages?.length || 0}`);
 
-      if (data.testCaseData?.expectedMessages) {
-        console.log('📋 Sample Message:', JSON.stringify(data.testCaseData.expectedMessages[0], null, 2).substring(0, 200) + '...');
+      // Extract data using correct API response structure
+      let testCaseInfo = {};
+      let messagesCount = 0;
+
+      if (data.success && data.data?.expectedMessages) {
+        // Correct structure: { success: true, data: { expectedMessages: [...] } }
+        messagesCount = data.data.expectedMessages.length;
+        testCaseInfo = data.data.testCase || {};
+        console.log('✅ Using correct API structure');
+      } else if (data.data?.testCase?.expectedMessages) {
+        // Alternative structure
+        messagesCount = data.data.testCase.expectedMessages.length;
+        testCaseInfo = data.data.testCase || {};
+        console.log('✅ Using alternative API structure');
+      } else if (data.testCaseData?.expectedMessages) {
+        // Fallback structure
+        messagesCount = data.testCaseData.expectedMessages.length;
+        testCaseInfo = data.testCaseData || {};
+        console.log('✅ Using fallback API structure');
+      }
+
+      console.log(`📋 Test Case: ${testCaseInfo.name || 'Unknown'}`);
+      console.log(`📋 Protocol: ${testCaseInfo.protocol || 'Unknown'}`);
+      console.log(`📋 Messages: ${messagesCount}`);
+
+      if (messagesCount > 0) {
+        console.log('📋 Sample Message: Available - will show in full output');
+      } else {
+        console.log('❌ No messages found - this indicates data structure mismatch');
       }
 
       return data;
@@ -62,17 +86,44 @@ async function testFrontendReception(testData) {
   }
 
   console.log('📡 Testing data transmission to frontend...');
+
+  // Extract data using correct API response structure
+  let testCaseInfo = {};
+  let messages = [];
+  let messagesCount = 0;
+
+  if (testData.success && testData.data?.expectedMessages) {
+    // Correct structure: { success: true, data: { expectedMessages: [...] } }
+    messages = testData.data.expectedMessages;
+    testCaseInfo = testData.data.testCase || {};
+    messagesCount = messages.length;
+    console.log('✅ Using correct API structure for frontend test');
+  } else if (testData.data?.testCase?.expectedMessages) {
+    // Alternative structure
+    messages = testData.data.testCase.expectedMessages;
+    testCaseInfo = testData.data.testCase || {};
+    messagesCount = messages.length;
+    console.log('✅ Using alternative API structure for frontend test');
+  } else if (testData.testCaseData?.expectedMessages) {
+    // Fallback structure
+    messages = testData.testCaseData.expectedMessages;
+    testCaseInfo = testData.testCaseData || {};
+    messagesCount = messages.length;
+    console.log('✅ Using fallback API structure for frontend test');
+  }
+
   console.log('📋 Data to send:', {
-    testCaseId: testData.testCaseId,
-    messages: testData.testCaseData?.expectedMessages?.length || 0,
-    protocol: testData.testCaseData?.protocol
+    testCaseId: testCaseInfo.id || 'unknown',
+    messages: messagesCount,
+    protocol: testCaseInfo.protocol || 'Unknown',
+    testCaseName: testCaseInfo.name || 'Unknown'
   });
 
   // Simulate the frontend receiving data via events
   console.log('\n📡 Simulating Frontend Event Reception:');
 
   // Convert test case data to log format
-  const logs = testData.testCaseData?.expectedMessages?.map((msg, index) => ({
+  const logs = messages.map((msg, index) => ({
     id: `test-${Date.now()}-${index}`,
     timestamp: (Date.now() / 1000).toFixed(1),
     level: 'I',
@@ -80,13 +131,13 @@ async function testFrontendReception(testData) {
     message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
     type: msg.messageType || 'TEST_MESSAGE',
     source: 'DataFlowTest',
-    testCaseId: testData.testCaseId,
+    testCaseId: testCaseInfo.id || 'unknown',
     direction: msg.direction || 'UL',
     protocol: msg.protocol || '5G_NR',
     rawData: JSON.stringify(msg.messagePayload || {}, null, 2),
     informationElements: msg.informationElements || {},
     layerParameters: msg.layerParameters || {}
-  })) || [];
+  }));
 
   console.log(`✅ Generated ${logs.length} log entries for frontend`);
 
