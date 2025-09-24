@@ -43,7 +43,15 @@ async function testAPIResponse() {
             console.log('📋 Messages count:', testCase.expectedMessages.length);
             console.log('📋 Sample message:', JSON.stringify(testCase.expectedMessages[0], null, 2));
           } else {
-            console.log('❌ NO expectedMessages found - this is the problem!');
+            console.log('❌ NO expectedMessages in testCase object');
+
+            // Check if expectedMessages is in data.data instead
+            if (data.data?.expectedMessages) {
+              console.log('✅ Found expectedMessages in data.data:', data.data.expectedMessages.length);
+              console.log('📋 Sample message from data.data:', JSON.stringify(data.data.expectedMessages[0], null, 2));
+            } else {
+              console.log('❌ NO expectedMessages found anywhere in response');
+            }
           }
         }
       } else {
