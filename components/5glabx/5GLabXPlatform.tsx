@@ -528,6 +528,22 @@ const FiveGLabXPlatform: React.FC = () => {
         };
         document.head.appendChild(script);
 
+        // Also load the service directly as a script tag (more reliable)
+        const directScript = document.createElement('script');
+        directScript.src = '/services/TestCasePlaybackService.js';
+        directScript.async = true;
+        directScript.onload = () => {
+          console.log('✅ TestCasePlaybackService loaded directly');
+          // Check availability immediately after loading
+          if (window.TestCasePlaybackService) {
+            console.log('✅ TestCasePlaybackService now available after direct load');
+          }
+        };
+        directScript.onerror = () => {
+          console.warn('⚠️  Direct TestCasePlaybackService load failed');
+        };
+        document.head.appendChild(directScript);
+
         // Also try to load it directly if the script path doesn't work
         try {
           await import('/scripts/loadServices.js');
@@ -568,6 +584,30 @@ const FiveGLabXPlatform: React.FC = () => {
               console.warn('⚠️  TestCasePlaybackService missing expected methods');
             }
           }
+
+          // Test if the service can be instantiated
+          try {
+            const serviceInstance = new window.TestCasePlaybackService({});
+            console.log('✅ TestCasePlaybackService can be instantiated');
+            console.log('📊 Instance type:', serviceInstance.constructor.name);
+          } catch (error) {
+            console.warn('⚠️  TestCasePlaybackService instantiation failed:', error);
+          }
+        } else {
+          console.log('❌ TestCasePlaybackService not found on window object');
+
+          // Check if it's available as TestCasePlaybackServiceClass
+          if ((window as any).TestCasePlaybackServiceClass) {
+            console.log('🔄 Found TestCasePlaybackService as TestCasePlaybackServiceClass');
+            window.TestCasePlaybackService = (window as any).TestCasePlaybackServiceClass;
+            console.log('✅ TestCasePlaybackService reassigned from TestCasePlaybackServiceClass');
+          }
+
+          // Check if checkTestCasePlaybackService function is available
+          if (window.checkTestCasePlaybackService) {
+            console.log('🔄 Running service availability check...');
+            window.checkTestCasePlaybackService();
+          }
         } else if (attempts < maxAttempts) {
           console.log(`🔄 Checking for TestCasePlaybackService... (attempt ${attempts}/${maxAttempts})`);
           setTimeout(checkService, 1000);
@@ -604,6 +644,24 @@ const FiveGLabXPlatform: React.FC = () => {
               console.log('✅ TestCasePlaybackService now available after direct injection');
             } else {
               console.warn('⚠️  TestCasePlaybackService still not available after direct injection');
+
+              // Try to load it manually by creating a script element
+              console.log('🔄 Attempting manual service loading...');
+              try {
+                const manualScript = document.createElement('script');
+                manualScript.textContent = `
+                  console.log('🚀 Manual service loading attempt...');
+                  if (typeof TestCasePlaybackService !== 'undefined') {
+                    window.TestCasePlaybackService = TestCasePlaybackService;
+                    console.log('✅ TestCasePlaybackService loaded manually');
+                  } else {
+                    console.log('❌ TestCasePlaybackService not found for manual loading');
+                  }
+                `;
+                document.head.appendChild(manualScript);
+              } catch (manualError) {
+                console.error('❌ Manual loading failed:', manualError);
+              }
             }
           }, 500);
 

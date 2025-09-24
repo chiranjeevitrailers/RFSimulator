@@ -351,24 +351,51 @@ class TestCasePlaybackService {
   }
 }
 
-// Ensure the service is available globally
+// Ensure the service is available globally immediately
 if (typeof window !== 'undefined') {
+  // Assign to window object immediately
   window.TestCasePlaybackService = TestCasePlaybackService;
-  console.log('✅ TestCasePlaybackService assigned to window object');
+  console.log('✅ TestCasePlaybackService assigned to window object immediately');
+
+  // Also make it available as a global variable for immediate access
+  (window as any).TestCasePlaybackServiceClass = TestCasePlaybackService;
+  console.log('✅ TestCasePlaybackService also available as TestCasePlaybackServiceClass');
 }
 
 // Export for different module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = TestCasePlaybackService;
+  module.exports.TestCasePlaybackService = TestCasePlaybackService;
   console.log('✅ TestCasePlaybackService exported via CommonJS');
 }
 
 // Export for ES6 modules
 if (typeof exports !== 'undefined') {
   exports.TestCasePlaybackService = TestCasePlaybackService;
+  exports.default = TestCasePlaybackService;
   console.log('✅ TestCasePlaybackService exported via ES6');
 }
 
 // Make sure it's available immediately when loaded
 console.log('🚀 TestCasePlaybackService loaded and ready for use');
+
+// Add a global function to check service availability
+if (typeof window !== 'undefined') {
+  window.checkTestCasePlaybackService = () => {
+    console.log('🔍 Checking TestCasePlaybackService availability...');
+    console.log('📊 window.TestCasePlaybackService:', typeof window.TestCasePlaybackService);
+    console.log('📊 window.TestCasePlaybackServiceClass:', typeof (window as any).TestCasePlaybackServiceClass);
+    console.log('📊 Service constructor:', window.TestCasePlaybackService?.constructor?.name);
+    console.log('📊 Available methods:', Object.getOwnPropertyNames(window.TestCasePlaybackService?.prototype || {}).filter(name => typeof window.TestCasePlaybackService?.prototype?.[name] === 'function'));
+
+    if (window.TestCasePlaybackService && typeof window.TestCasePlaybackService === 'function') {
+      console.log('✅ TestCasePlaybackService is properly loaded and functional');
+      return true;
+    } else {
+      console.log('❌ TestCasePlaybackService is not properly loaded');
+      return false;
+    }
+  };
+  console.log('✅ checkTestCasePlaybackService function added to window');
+}
 
