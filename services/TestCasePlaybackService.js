@@ -385,7 +385,7 @@ if (typeof window !== 'undefined') {
   console.log('✅ TestCasePlaybackService assigned to window object immediately');
 
   // Also make it available as a global variable for immediate access
-  (window as any).TestCasePlaybackServiceClass = TestCasePlaybackService;
+  window.TestCasePlaybackServiceClass = TestCasePlaybackService;
   console.log('✅ TestCasePlaybackService also available as TestCasePlaybackServiceClass');
 }
 
@@ -411,7 +411,7 @@ if (typeof window !== 'undefined') {
   window.checkTestCasePlaybackService = () => {
     console.log('🔍 Checking TestCasePlaybackService availability...');
     console.log('📊 window.TestCasePlaybackService:', typeof window.TestCasePlaybackService);
-    console.log('📊 window.TestCasePlaybackServiceClass:', typeof (window as any).TestCasePlaybackServiceClass);
+    console.log('📊 window.TestCasePlaybackServiceClass:', typeof window.TestCasePlaybackServiceClass);
     console.log('📊 Service constructor:', window.TestCasePlaybackService?.constructor?.name);
     console.log('📊 Available methods:', Object.getOwnPropertyNames(window.TestCasePlaybackService?.prototype || {}).filter(name => typeof window.TestCasePlaybackService?.prototype?.[name] === 'function'));
 
