@@ -89,11 +89,28 @@ const SimpleDirectDataView: React.FC = () => {
     timestamp: Date.now()
   };
 
-  // Convert test case data to log format
+  // Convert test case data to log format - handles correct API response structure
   const convertToLogs = (data: any): TestLog[] => {
-    if (!data.testCaseData?.expectedMessages) return [];
+    // Handle the correct API response structure: { success: true, data: { expectedMessages: [...] } }
+    let messages = [];
 
-    return data.testCaseData.expectedMessages.map((msg: any, index: number) => ({
+    if (data.success && data.data?.expectedMessages) {
+      // Correct API response structure
+      messages = data.data.expectedMessages;
+    } else if (data.testCaseData?.expectedMessages) {
+      // Fallback for old structure
+      messages = data.testCaseData.expectedMessages;
+    } else if (data.expectedMessages) {
+      // Direct access fallback
+      messages = data.expectedMessages;
+    } else {
+      console.warn('No expectedMessages found in data structure:', Object.keys(data));
+      return [];
+    }
+
+    console.log(`✅ Found ${messages.length} messages to convert to logs`);
+
+    return messages.map((msg: any, index: number) => ({
       id: `direct-${Date.now()}-${index}`,
       timestamp: (Date.now() / 1000).toFixed(1),
       level: 'I',
@@ -101,7 +118,7 @@ const SimpleDirectDataView: React.FC = () => {
       message: `${msg.messageName}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
       type: msg.messageType || 'TEST_MESSAGE',
       source: 'DirectInjection',
-      testCaseId: data.testCaseId,
+      testCaseId: data.testCaseId || data.data?.testCase?.id || 'unknown',
       direction: msg.direction || 'UL',
       protocol: msg.protocol || '5G_NR',
       rawData: JSON.stringify(msg.messagePayload || {}, null, 2),
@@ -247,8 +264,32 @@ const SimpleDirectDataView: React.FC = () => {
     setLastUpdate('');
   };
 
-  const loadSampleData = () => {
-    loadTestData(sampleTestData);
+  const loadSampleData = async () => {
+    try {
+      console.log('📡 Loading real test case data from API...');
+
+      const testCaseId = '2fac4988-2313-4197-bc7e-39d3a66f23c1';
+      const response = await fetch(`/api/test-execution/simple?testCaseId=${testCaseId}`);
+
+      if (response.ok) {
+        const apiData = await response.json();
+        console.log('✅ API data received:', {
+          success: apiData.success,
+          hasData: !!apiData.data,
+          hasMessages: !!(apiData.data?.expectedMessages?.length),
+          messageCount: apiData.data?.expectedMessages?.length || 0
+        });
+
+        // Use the real API data
+        loadTestData(apiData);
+      } else {
+        console.warn('❌ API request failed, using sample data');
+        loadTestData(sampleTestData);
+      }
+    } catch (error) {
+      console.error('❌ Error loading API data:', error);
+      loadTestData(sampleTestData);
+    }
   };
 
   return (
