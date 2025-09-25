@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ClassicTestManager from '@/components/testing/ClassicTestManager';
+import ProfessionalTestingPlatform from '@/components/testing/ProfessionalTestingPlatform';
 
 // A thin TSX wrapper that renders the existing plain-React implementation
 // in components/testing/ProfessionalTestingPlatform.js to ensure the
@@ -16,8 +16,8 @@ declare global {
 const ProfessionalTestManager: React.FC = () => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Prefer native TSX implementation to avoid blank page if global script is missing
-  return <ClassicTestManager />;
+  // Use the ProfessionalTestingPlatform component
+  return <ProfessionalTestingPlatform />;
 };
 
 export default ProfessionalTestManager;
