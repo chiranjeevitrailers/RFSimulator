@@ -14,7 +14,10 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'loading component configurations' },
-      { timestamp: '2024-01-18 00:40:17', level: 'INFO', message: 'Preparing test environment' }
+      { timestamp: '2024-01-18 00:40:17', level: 'INFO', message: 'Preparing test environment' },
+      { timestamp: '2024-01-18 00:40:18', level: 'INFO', message: 'Test environment ready' },
+      { timestamp: '2024-01-18 00:40:19', level: 'INFO', message: 'Monitoring system status' },
+      { timestamp: '2024-01-18 00:40:20', level: 'INFO', message: 'All components online' }
     ]);
     const [testCases, setTestCases] = React.useState([
       {
@@ -153,6 +156,46 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         setIsRunning(false);
         addLog('INFO', 'Batch test execution completed');
       }, 5000);
+    };
+
+    const handleRunSelectedTests = () => {
+      const selectedTests = testCases.filter(tc => tc.selected);
+      if (selectedTests.length === 0) {
+        addLog('WARN', 'No tests selected for execution');
+        return;
+      }
+      
+      setIsRunning(true);
+      addLog('INFO', `Starting execution of ${selectedTests.length} selected tests`);
+      
+      // Update selected tests to running status
+      setTestCases(prev => prev.map(tc => 
+        tc.selected ? { ...tc, status: 'Running' } : tc
+      ));
+      
+      setTimeout(() => {
+        setIsRunning(false);
+        addLog('INFO', `Completed execution of ${selectedTests.length} selected tests`);
+        setTestCases(prev => prev.map(tc => 
+          tc.selected ? { ...tc, status: 'Completed', lastRun: new Date().toLocaleString() } : tc
+        ));
+      }, 3000);
+    };
+
+    const handleSelectAll = () => {
+      const allSelected = testCases.every(tc => tc.selected);
+      setTestCases(prev => prev.map(tc => ({ ...tc, selected: !allSelected })));
+    };
+
+    const handleDeleteSelected = () => {
+      const selectedTests = testCases.filter(tc => tc.selected);
+      if (selectedTests.length === 0) {
+        addLog('WARN', 'No tests selected for deletion');
+        return;
+      }
+      
+      setTestCases(prev => prev.filter(tc => !tc.selected));
+      addLog('INFO', `Deleted ${selectedTests.length} selected tests`);
     };
 
     const toggleTestSelection = (testId) => {
@@ -374,6 +417,15 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                 className: 'bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700'
               }, '+ Add Test Case'),
               React.createElement('button', {
+                key: 'run-selected',
+                className: 'bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center space-x-1',
+                onClick: handleRunSelectedTests,
+                disabled: isRunning
+              }, [
+                React.createElement('i', { key: 'icon', 'data-lucide': 'play', className: 'w-4 h-4' }),
+                React.createElement('span', { key: 'text' }, 'Run Selected')
+              ]),
+              React.createElement('button', {
                 key: 'run-all',
                 className: 'bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center space-x-1',
                 onClick: handleRunAllTests,
@@ -384,7 +436,8 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               ]),
               React.createElement('button', {
                 key: 'delete',
-                className: 'bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700'
+                className: 'bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700',
+                onClick: handleDeleteSelected
               }, 'Delete Selected')
             ])
           ]),
@@ -405,7 +458,15 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                   key: 'row',
                   className: 'bg-gray-50'
                 }, [
-                  React.createElement('th', { key: 'select', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, ''),
+                  React.createElement('th', { 
+                    key: 'select', 
+                    className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' 
+                  }, React.createElement('input', {
+                    type: 'checkbox',
+                    checked: testCases.length > 0 && testCases.every(tc => tc.selected),
+                    onChange: handleSelectAll,
+                    className: 'form-checkbox'
+                  })),
                   React.createElement('th', { key: 'name', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Name'),
                   React.createElement('th', { key: 'component', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Component'),
                   React.createElement('th', { key: 'status', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Status'),
@@ -519,10 +580,10 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           ])
         ]),
 
-        // Automation Log Section - White panel on gray background
+        // Automation Log Section - Positioned below Test Cases Management
         React.createElement('div', {
           key: 'logs',
-          className: 'flex-1 bg-white p-4 m-4 rounded shadow-sm' // White panel with margin and shadow
+          className: 'bg-white p-4 m-4 rounded shadow-sm' // White panel with margin and shadow
         }, [
           React.createElement('div', {
             key: 'header',
@@ -553,22 +614,22 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             ])
           ]),
 
-          // Log Display - Dark blue/black background as in image
+          // Log Display - Dark gray background showing ongoing logs
           React.createElement('div', {
             key: 'log-display',
-            className: 'bg-gray-900 text-white p-4 rounded font-mono text-sm h-64 overflow-y-auto' // Changed to dark gray/black
+            className: 'bg-gray-800 text-white p-4 rounded font-mono text-sm h-64 overflow-y-auto border border-gray-600' // Dark gray background
           }, logs.map((log, index) => 
             React.createElement('div', {
               key: index,
-              className: 'mb-1'
+              className: 'mb-1 flex items-start'
             }, [
               React.createElement('span', {
                 key: 'timestamp',
-                className: 'text-blue-400'
+                className: 'text-blue-300 font-bold'
               }, `[${log.timestamp}]`),
               React.createElement('span', {
                 key: 'message',
-                className: 'text-white ml-2'
+                className: 'text-gray-100 ml-2'
               }, log.message)
             ])
           ))
