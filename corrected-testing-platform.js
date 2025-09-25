@@ -11,6 +11,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [selectedTestSuite, setSelectedTestSuite] = React.useState(null);
     const [selectedTests, setSelectedTests] = React.useState([]);
     const [isRunning, setIsRunning] = React.useState(false);
+    const [scrollPosition, setScrollPosition] = React.useState(0);
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'loading component configurations' },
@@ -89,6 +90,114 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         successRate: 'N/A',
         lastRun: '2024-01-18 00:25:30',
         duration: '3.2s',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-007',
+        name: 'Authentication',
+        component: 'Core Network',
+        status: 'Completed',
+        iterations: '8',
+        successRate: '87%',
+        lastRun: '2024-01-18 00:30:15',
+        duration: '1.2s',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-008',
+        name: 'Session Management',
+        component: 'gNodeB',
+        status: 'Not Started',
+        iterations: 'Never',
+        successRate: 'N/A',
+        lastRun: 'N/A',
+        duration: '',
+        priority: 'Medium',
+        selected: false
+      },
+      {
+        id: 'tc-009',
+        name: 'Quality of Service',
+        component: 'eNodeB',
+        status: 'Running',
+        iterations: '4',
+        successRate: '75%',
+        lastRun: '2024-01-18 00:28:45',
+        duration: '4.5s',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-010',
+        name: 'Load Balancing',
+        component: 'Core Network',
+        status: 'Failed',
+        iterations: '1',
+        successRate: '0%',
+        lastRun: '2024-01-18 00:20:30',
+        duration: '6.8s',
+        priority: 'Low',
+        selected: false
+      },
+      {
+        id: 'tc-011',
+        name: 'Power Control',
+        component: 'gNodeB',
+        status: 'Completed',
+        iterations: '6',
+        successRate: '83%',
+        lastRun: '2024-01-18 00:15:20',
+        duration: '2.1s',
+        priority: 'Medium',
+        selected: false
+      },
+      {
+        id: 'tc-012',
+        name: 'Interference Management',
+        component: 'eNodeB',
+        status: 'Not Started',
+        iterations: 'Never',
+        successRate: 'N/A',
+        lastRun: 'N/A',
+        duration: '',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-013',
+        name: 'Resource Allocation',
+        component: 'gNodeB',
+        status: 'Paused',
+        iterations: '2',
+        successRate: '50%',
+        lastRun: '2024-01-18 00:10:15',
+        duration: '3.7s',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-014',
+        name: 'Network Slicing',
+        component: 'Core Network',
+        status: 'Running',
+        iterations: '3',
+        successRate: '67%',
+        lastRun: '2024-01-18 00:05:45',
+        duration: '5.2s',
+        priority: 'Medium',
+        selected: false
+      },
+      {
+        id: 'tc-015',
+        name: 'Beam Management',
+        component: 'gNodeB',
+        status: 'Completed',
+        iterations: '7',
+        successRate: '86%',
+        lastRun: '2024-01-18 00:00:30',
+        duration: '1.9s',
         priority: 'High',
         selected: false
       }
@@ -196,6 +305,14 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       
       setTestCases(prev => prev.filter(tc => !tc.selected));
       addLog('INFO', `Deleted ${selectedTests.length} selected tests`);
+    };
+
+    const handleScroll = (e) => {
+      const scrollTop = e.target.scrollTop;
+      const scrollHeight = e.target.scrollHeight;
+      const clientHeight = e.target.clientHeight;
+      const scrollPercent = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+      setScrollPosition(scrollPercent);
     };
 
     const toggleTestSelection = (testId) => {
@@ -442,10 +559,29 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             ])
           ]),
 
-          // Test Cases Table with Scroll
+          // Scroll Indicator
+          React.createElement('div', {
+            key: 'scroll-info',
+            className: 'text-xs text-gray-500 mb-2 text-center'
+          }, [
+            React.createElement('div', {
+              key: 'count',
+              className: 'mb-1'
+            }, `Showing ${testCases.length} test cases - Scroll to view all`),
+            React.createElement('div', {
+              key: 'progress',
+              className: 'w-full bg-gray-200 rounded-full h-1'
+            }, React.createElement('div', {
+              className: 'bg-blue-600 h-1 rounded-full transition-all duration-300',
+              style: { width: `${scrollPosition}%` }
+            }))
+          ]),
+
+          // Test Cases Table with Enhanced Scroll
           React.createElement('div', {
             key: 'table',
-            className: 'overflow-x-auto max-h-96 overflow-y-auto border border-gray-200 rounded'
+            className: 'overflow-x-auto max-h-80 overflow-y-auto border border-gray-200 rounded bg-white shadow-inner scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100',
+            onScroll: handleScroll
           }, [
             React.createElement('table', {
               key: 'table',
@@ -485,7 +621,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               }, testCases.map(testCase => 
                 React.createElement('tr', {
                   key: testCase.id,
-                  className: 'hover:bg-gray-50'
+                  className: `hover:bg-blue-50 transition-colors duration-150 ${testCase.selected ? 'bg-blue-100' : 'bg-white'}`
                 }, [
                   React.createElement('td', {
                     key: 'select',
