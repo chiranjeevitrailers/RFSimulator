@@ -14,6 +14,8 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [selectedTests, setSelectedTests] = React.useState([]);
     const [isRunning, setIsRunning] = React.useState(false);
     const [filteredTestCases, setFilteredTestCases] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [displayLimit, setDisplayLimit] = React.useState(100); // Show first 100 test cases initially
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'Loading component configurations' },
@@ -279,12 +281,14 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       setLogs(prev => [...prev, { timestamp, level, message }]);
     };
 
-    // Load test cases from database (Supabase)
+    // Load test cases from database (Supabase) - Load ALL test cases
     const fetchTestCases = async () => {
       try {
-        addLog('INFO', 'Loading test cases from Supabase database...');
+        setIsLoading(true);
+        addLog('INFO', 'Loading ALL test cases from Supabase database...');
         
-        const response = await fetch('/api/test-cases/simple');
+        // Request all test cases without limit
+        const response = await fetch('/api/test-cases/simple?limit=0');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -299,6 +303,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         if (testCasesData.length === 0) {
           addLog('WARNING', 'No test cases found in database');
           setTestCases([]);
+          setIsLoading(false);
           return;
         }
         
@@ -321,11 +326,28 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         setFilteredTestCases(formattedTestCases); // Initialize filtered test cases
         addLog('INFO', `Successfully loaded ${formattedTestCases.length} test cases from Supabase`);
         
+        // Log categorization summary
+        const categories = {};
+        formattedTestCases.forEach(tc => {
+          const cat = tc.category || 'Unknown';
+          categories[cat] = (categories[cat] || 0) + 1;
+        });
+        
+        addLog('INFO', `Test case categories: ${Object.keys(categories).map(cat => `${cat}(${categories[cat]})`).join(', ')}`);
+        
+        // If we have many test cases, show a performance note
+        if (formattedTestCases.length > 1000) {
+          addLog('INFO', `Large dataset detected (${formattedTestCases.length} test cases). Using optimized display mode.`);
+        }
+        
+        setIsLoading(false);
+        
       } catch (error) {
         addLog('ERROR', `Failed to load test cases from Supabase: ${error.message}`);
         console.error('Error loading test cases:', error);
         setTestCases([]);
         setFilteredTestCases([]);
+        setIsLoading(false);
       }
     };
 
@@ -453,9 +475,22 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       }
     };
 
-    // Function to get test cases for display
+    // Function to get test cases for display (with pagination for performance)
     const getDisplayTestCases = () => {
-      return filteredTestCases.length > 0 ? filteredTestCases : testCases;
+      const allTestCases = filteredTestCases.length > 0 ? filteredTestCases : testCases;
+      
+      // For large datasets, show only a subset for better performance
+      if (allTestCases.length > displayLimit) {
+        return allTestCases.slice(0, displayLimit);
+      }
+      
+      return allTestCases;
+    };
+
+    // Function to load more test cases
+    const loadMoreTestCases = () => {
+      setDisplayLimit(prev => Math.min(prev + 100, testCases.length));
+      addLog('INFO', `Displaying ${Math.min(displayLimit + 100, testCases.length)} of ${testCases.length} test cases`);
     };
 
     // Function to handle test suite child selection
@@ -799,77 +834,121 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               React.createElement('div', {
                 key: 'table-body',
                 className: 'divide-y divide-gray-200'
-              }, getDisplayTestCases().length > 0 ? getDisplayTestCases().map(testCase => 
-                React.createElement('div', {
-                  key: testCase.id,
-                  className: 'px-6 py-4 hover:bg-gray-50'
+              }, [
+                // Loading indicator
+                isLoading && React.createElement('div', {
+                  key: 'loading-state',
+                  className: 'px-6 py-12 text-center'
                 }, [
                   React.createElement('div', {
-                    key: 'table-row',
-                    className: 'grid grid-cols-9 gap-4 items-center'
+                    key: 'loading-icon',
+                    className: 'w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin'
+                  }, React.createElement('i', { 'data-lucide': 'loader', className: 'w-6 h-6 text-blue-600' })),
+                  React.createElement('h3', {
+                    key: 'loading-title',
+                    className: 'text-lg font-medium text-gray-900 mb-2'
+                  }, 'Loading Test Cases...'),
+                  React.createElement('p', {
+                    key: 'loading-description',
+                    className: 'text-sm text-gray-500'
+                  }, 'Fetching all test cases from Supabase database...')
+                ]),
+                
+                // Test cases table
+                !isLoading && getDisplayTestCases().length > 0 && getDisplayTestCases().map(testCase => 
+                  React.createElement('div', {
+                    key: testCase.id,
+                    className: 'px-6 py-4 hover:bg-gray-50'
                   }, [
                     React.createElement('div', {
-                      key: 'col-name',
-                      className: 'flex items-center space-x-2'
+                      key: 'table-row',
+                      className: 'grid grid-cols-9 gap-4 items-center'
                     }, [
-                      React.createElement('input', {
-                        key: 'checkbox',
-                        type: 'checkbox',
-                        checked: testCase.selected,
-                        onChange: () => toggleTestSelection(testCase.id),
-                        className: 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
-                      }),
-                      React.createElement('span', {
-                        key: 'name',
-                        className: 'text-sm font-medium text-gray-900'
-                      }, testCase.name)
-                    ]),
-                    React.createElement('div', {
-                      key: 'col-component',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.component),
-                    React.createElement('div', {
-                      key: 'col-status',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.status),
-                    React.createElement('div', {
-                      key: 'col-iterations',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.iterations),
-                    React.createElement('div', {
-                      key: 'col-success-rate',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.successRate),
-                    React.createElement('div', {
-                      key: 'col-last-run',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.lastRun),
-                    React.createElement('div', {
-                      key: 'col-duration',
-                      className: 'flex items-center space-x-2'
-                    }, [
-                      React.createElement('button', {
-                        key: 'play-btn',
-                        className: 'p-1 text-blue-600 hover:text-blue-700',
-                        onClick: () => handleRunTest(testCase.id)
-                      }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
-                      React.createElement('button', {
-                        key: 'view-btn',
-                        className: 'p-1 text-gray-600 hover:text-gray-700'
-                      }, React.createElement('i', { 'data-lucide': 'eye', className: 'w-4 h-4' }))
-                    ]),
-                    React.createElement('div', {
-                      key: 'col-priority',
-                      className: 'text-sm text-gray-700'
-                    }, testCase.priority),
-                    React.createElement('div', {
-                      key: 'col-actions',
-                      className: 'text-sm text-gray-700'
-                    }, '')
+                      React.createElement('div', {
+                        key: 'col-name',
+                        className: 'flex items-center space-x-2'
+                      }, [
+                        React.createElement('input', {
+                          key: 'checkbox',
+                          type: 'checkbox',
+                          checked: testCase.selected,
+                          onChange: () => toggleTestSelection(testCase.id),
+                          className: 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                        }),
+                        React.createElement('span', {
+                          key: 'name',
+                          className: 'text-sm font-medium text-gray-900'
+                        }, testCase.name)
+                      ]),
+                      React.createElement('div', {
+                        key: 'col-component',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.component),
+                      React.createElement('div', {
+                        key: 'col-status',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.status),
+                      React.createElement('div', {
+                        key: 'col-iterations',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.iterations),
+                      React.createElement('div', {
+                        key: 'col-success-rate',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.successRate),
+                      React.createElement('div', {
+                        key: 'col-last-run',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.lastRun),
+                      React.createElement('div', {
+                        key: 'col-duration',
+                        className: 'flex items-center space-x-2'
+                      }, [
+                        React.createElement('button', {
+                          key: 'play-btn',
+                          className: 'p-1 text-blue-600 hover:text-blue-700',
+                          onClick: () => handleRunTest(testCase.id)
+                        }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
+                        React.createElement('button', {
+                          key: 'view-btn',
+                          className: 'p-1 text-gray-600 hover:text-gray-700'
+                        }, React.createElement('i', { 'data-lucide': 'eye', className: 'w-4 h-4' }))
+                      ]),
+                      React.createElement('div', {
+                        key: 'col-priority',
+                        className: 'text-sm text-gray-700'
+                      }, testCase.priority),
+                      React.createElement('div', {
+                        key: 'col-actions',
+                        className: 'text-sm text-gray-700'
+                      }, '')
+                    ])
                   ])
-                ])
-              ) : [
-                React.createElement('div', {
+                ),
+                
+                // Load More button for large datasets
+                !isLoading && getDisplayTestCases().length > 0 && (filteredTestCases.length > displayLimit || testCases.length > displayLimit) && React.createElement('div', {
+                  key: 'load-more-section',
+                  className: 'px-6 py-4 border-t border-gray-200 bg-gray-50'
+                }, [
+                  React.createElement('div', {
+                    key: 'load-more-content',
+                    className: 'text-center'
+                  }, [
+                    React.createElement('p', {
+                      key: 'load-more-text',
+                      className: 'text-sm text-gray-600 mb-3'
+                    }, `Showing ${getDisplayTestCases().length} of ${filteredTestCases.length > 0 ? filteredTestCases.length : testCases.length} test cases`),
+                    React.createElement('button', {
+                      key: 'load-more-btn',
+                      className: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700',
+                      onClick: loadMoreTestCases
+                    }, 'Load More Test Cases')
+                  ])
+                ]),
+                
+                // Empty state
+                !isLoading && getDisplayTestCases().length === 0 && React.createElement('div', {
                   key: 'empty-state',
                   className: 'px-6 py-12 text-center'
                 }, [
@@ -884,7 +963,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                   React.createElement('p', {
                     key: 'empty-description',
                     className: 'text-sm text-gray-500 mb-4'
-                  }, testCases.length === 0 ? 'Loading test cases from Supabase database...' : 'No test cases match the current filter.'),
+                  }, testCases.length === 0 ? 'No test cases found in database.' : 'No test cases match the current filter.'),
                   testCases.length === 0 && React.createElement('button', {
                     key: 'refresh-btn',
                     className: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700',
