@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import ProfessionalTestingPlatform from '@/components/testing/ProfessionalTestingPlatform';
 
 // A thin TSX wrapper that renders the existing plain-React implementation
 // in components/testing/ProfessionalTestingPlatform.js to ensure the
@@ -14,10 +13,20 @@ declare global {
 }
 
 const ProfessionalTestManager: React.FC = () => {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  // Use the original JavaScript ProfessionalTestingPlatform component
+  if (typeof window !== 'undefined' && window.ProfessionalTestingPlatform) {
+    return React.createElement(window.ProfessionalTestingPlatform, {});
+  }
 
-  // Use the ProfessionalTestingPlatform component
-  return <ProfessionalTestingPlatform />;
+  // Fallback if the component is not loaded
+  return (
+    <div className="h-full flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-lg font-semibold text-gray-900 mb-2">Professional Test Manager</div>
+        <div className="text-sm text-gray-600">Loading...</div>
+      </div>
+    </div>
+  );
 };
 
 export default ProfessionalTestManager;
