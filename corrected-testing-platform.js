@@ -412,7 +412,26 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             React.createElement('h2', {
               key: 'title',
               className: 'text-lg font-semibold text-gray-900'
-            }, 'Automation Log')
+            }, 'Automation Log'),
+            React.createElement('div', {
+              key: 'actions',
+              className: 'flex items-center space-x-2'
+            }, [
+              React.createElement('button', {
+                key: 'clear',
+                className: 'bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-700 flex items-center space-x-1'
+              }, [
+                React.createElement('i', { key: 'icon', 'data-lucide': 'square', className: 'w-4 h-4' }),
+                React.createElement('span', { key: 'text' }, 'Clear')
+              ]),
+              React.createElement('button', {
+                key: 'download',
+                className: 'bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 flex items-center space-x-1'
+              }, [
+                React.createElement('i', { key: 'icon', 'data-lucide': 'download', className: 'w-4 h-4' }),
+                React.createElement('span', { key: 'text' }, 'Download')
+              ])
+            ])
           ]),
 
           // Log Display - Dark blue/black background as in image
