@@ -988,7 +988,7 @@ const ProfessionalTestManager: React.FC = () => {
                 disabled: isRunning
               }, [
                 React.createElement('i', { key: 'icon', 'data-lucide': 'play', className: 'w-4 h-4' }),
-                React.createElement('span', { key: 'text' }, 'Run Selected')
+                React.createElement('span', { key: 'text' }, '▶ Run Selected')
               ]),
               React.createElement('button', {
                 key: 'run-all',
@@ -997,7 +997,20 @@ const ProfessionalTestManager: React.FC = () => {
                 disabled: isRunning
               }, [
                 React.createElement('i', { key: 'icon', 'data-lucide': 'play', className: 'w-4 h-4' }),
-                React.createElement('span', { key: 'text' }, 'Run All Tests')
+                React.createElement('span', { key: 'text' }, '▶ Run All Tests')
+              ]),
+              React.createElement('button', {
+                key: 'stop-all',
+                className: 'bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 flex items-center space-x-1',
+                onClick: () => {
+                  setTestCases(prev => prev.map(tc => ({ ...tc, status: 'Not Started' })));
+                  setIsRunning(false);
+                  addLog('INFO', 'All tests stopped');
+                },
+                disabled: !isRunning
+              }, [
+                React.createElement('i', { key: 'icon', 'data-lucide': 'square', className: 'w-4 h-4' }),
+                React.createElement('span', { key: 'text' }, '⏹ Stop All')
               ]),
               React.createElement('button', {
                 key: 'delete',
@@ -1204,22 +1217,31 @@ const ProfessionalTestManager: React.FC = () => {
                   }, [
                     React.createElement('button', {
                       key: 'start',
-                      className: 'bg-green-600 text-white p-1 rounded hover:bg-green-700',
+                      className: 'bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 flex items-center space-x-1',
                       onClick: () => handleStartTest(testCase.id),
                       disabled: testCase.status === 'Running'
-                    }, React.createElement('i', { 'data-lucide': 'play', className: 'w-3 h-3' })),
+                    }, [
+                      React.createElement('i', { key: 'icon', 'data-lucide': 'play', className: 'w-3 h-3' }),
+                      React.createElement('span', { key: 'text' }, 'Run')
+                    ]),
                     React.createElement('button', {
                       key: 'stop',
-                      className: 'bg-red-600 text-white p-1 rounded hover:bg-red-700',
+                      className: 'bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 flex items-center space-x-1',
                       onClick: () => handleStopTest(testCase.id),
                       disabled: testCase.status === 'Not Started'
-                    }, React.createElement('i', { 'data-lucide': 'square', className: 'w-3 h-3' })),
+                    }, [
+                      React.createElement('i', { key: 'icon', 'data-lucide': 'square', className: 'w-3 h-3' }),
+                      React.createElement('span', { key: 'text' }, 'Stop')
+                    ]),
                     React.createElement('button', {
                       key: 'pause',
-                      className: 'bg-yellow-600 text-white p-1 rounded hover:bg-yellow-700',
+                      className: 'bg-yellow-600 text-white px-2 py-1 rounded text-xs hover:bg-yellow-700 flex items-center space-x-1',
                       onClick: () => handlePauseTest(testCase.id),
                       disabled: testCase.status !== 'Running'
-                    }, React.createElement('i', { 'data-lucide': 'pause', className: 'w-3 h-3' }))
+                    }, [
+                      React.createElement('i', { key: 'icon', 'data-lucide': 'pause', className: 'w-3 h-3' }),
+                      React.createElement('span', { key: 'text' }, 'Pause')
+                    ])
                   ])),
                   React.createElement('td', {
                     key: 'actions',
@@ -1229,14 +1251,20 @@ const ProfessionalTestManager: React.FC = () => {
                   }, [
                     React.createElement('button', {
                       key: 'run',
-                      className: 'bg-blue-600 text-white p-1 rounded hover:bg-blue-700',
+                      className: 'bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 flex items-center space-x-1',
                       onClick: () => handleRunTest(testCase.id),
                       disabled: isRunning
-                    }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
+                    }, [
+                      React.createElement('i', { key: 'icon', 'data-lucide': 'play', className: 'w-3 h-3' }),
+                      React.createElement('span', { key: 'text' }, 'Execute')
+                    ]),
                     React.createElement('button', {
                       key: 'view',
-                      className: 'bg-gray-600 text-white p-1 rounded hover:bg-gray-700'
-                    }, React.createElement('i', { 'data-lucide': 'eye', className: 'w-4 h-4' }))
+                      className: 'bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 flex items-center space-x-1'
+                    }, [
+                      React.createElement('i', { key: 'icon', 'data-lucide': 'eye', className: 'w-3 h-3' }),
+                      React.createElement('span', { key: 'text' }, 'View')
+                    ])
                   ]))
                 ])
               ))
