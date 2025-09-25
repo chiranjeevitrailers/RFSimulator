@@ -171,3 +171,5 @@ Thumbs.db
 *.gz
 *.rar
 *.7zcore
+core
+*.core
