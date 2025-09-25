@@ -12,6 +12,15 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [selectedTests, setSelectedTests] = React.useState([]);
     const [isRunning, setIsRunning] = React.useState(false);
     const [scrollPosition, setScrollPosition] = React.useState(0);
+    
+    // TODO: Integrate with existing Supabase implementation
+    // Load test cases and counts from Supabase database
+    // The implementation is already available, just need to connect here
+    React.useEffect(() => {
+      // Load test cases from Supabase
+      // loadTestCasesFromSupabase();
+      // loadTestSuiteCountsFromSupabase();
+    }, []);
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'loading component configurations' },
@@ -210,31 +219,58 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       { id: 'core', name: 'Core Network', status: 'active', color: 'green' }
     ];
 
-    // Test Suites Categories - Fixed to match image order
+    // Test Suites Categories - Updated to match specified layout
     const testSuites = [
       {
-        id: 'enodeb-suites',
-        name: 'eNodeB Test Suites',
+        id: '5g-nr',
+        name: '5G NR',
+        totalCount: 450,
         expanded: true,
         children: [
-          { id: 'functional', name: 'Functional', count: 1 }
+          { id: '5g-functional', name: 'Functional', count: 200 },
+          { id: '5g-performance', name: 'Performance', count: 150 },
+          { id: '5g-mobility', name: 'Mobility', count: 75 },
+          { id: '5g-rf', name: 'RF', count: 25 }
         ]
       },
       {
-        id: 'gnodeb-suites',
-        name: 'gNodeB Test Suites',
+        id: '4g-lte',
+        name: '4G LTE',
+        totalCount: 600,
         expanded: true,
         children: [
-          { id: '5g-connectivity', name: '5G Connectivity', count: 0 },
-          { id: 'beam-management', name: 'Beam Management', count: 0 },
-          { id: 'network-slice', name: 'Network Slice Test', count: 0 }
+          { id: '4g-functional', name: 'Functional', count: 300 },
+          { id: '4g-performance', name: 'Performance', count: 200 },
+          { id: '4g-mobility', name: 'Mobility', count: 80 },
+          { id: '4g-rf', name: 'RF', count: 20 }
         ]
       },
       {
-        id: 'core-network-suites',
-        name: 'Core Network Test Suites',
-        expanded: false,
-        children: []
+        id: 'core-network',
+        name: 'Core Network',
+        totalCount: 300,
+        expanded: true,
+        children: [
+          { id: 'core-network-tests', name: 'Core Network', count: 300 }
+        ]
+      },
+      {
+        id: 'call-flows',
+        name: 'Call Flows',
+        totalCount: 350,
+        expanded: true,
+        children: [
+          { id: 'call-flows-tests', name: 'Call Flows', count: 350 }
+        ]
+      },
+      {
+        id: 'other',
+        name: 'Other',
+        totalCount: 100,
+        expanded: true,
+        children: [
+          { id: 'other-tests', name: 'Other', count: 100 }
+        ]
       }
     ];
 
@@ -481,6 +517,19 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                     key: 'name',
                     className: 'text-sm'
                   }, suite.name)
+                ]),
+                React.createElement('div', {
+                  key: 'right',
+                  className: 'flex items-center space-x-2'
+                }, [
+                  React.createElement('span', {
+                    key: 'total-count',
+                    className: 'bg-blue-600 text-white text-xs px-2 py-1 rounded-full'
+                  }, `[${suite.totalCount}]`),
+                  React.createElement('span', {
+                    key: 'total-display',
+                    className: 'text-xs text-gray-400'
+                  }, `(${suite.totalCount})`)
                 ])
               ]),
               suite.expanded && React.createElement('div', {
@@ -492,14 +541,23 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                   className: 'flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer',
                   onClick: () => setSelectedTestSuite(child.id)
                 }, [
+                  React.createElement('div', {
+                    key: 'left',
+                    className: 'flex items-center space-x-2'
+                  }, [
+                    React.createElement('span', {
+                      key: 'tree',
+                      className: 'text-gray-500 text-xs'
+                    }, '├──'),
+                    React.createElement('span', {
+                      key: 'name',
+                      className: 'text-sm text-gray-300'
+                    }, child.name)
+                  ]),
                   React.createElement('span', {
-                    key: 'name',
-                    className: 'text-sm text-gray-300'
-                  }, child.name),
-                  child.count > 0 && React.createElement('span', {
                     key: 'count',
                     className: 'bg-blue-600 text-white text-xs px-2 py-1 rounded-full'
-                  }, child.count)
+                  }, `[${child.count}]`)
                 ])
               ))
             ])
