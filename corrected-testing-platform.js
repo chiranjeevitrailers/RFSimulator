@@ -26,7 +26,67 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         successRate: 'N/A',
         lastRun: 'N/A',
         duration: '',
-        priority: '',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-002',
+        name: 'Detach',
+        component: 'eNodeB',
+        status: 'Completed',
+        iterations: '5',
+        successRate: '100%',
+        lastRun: '2024-01-18 00:35:22',
+        duration: '2.3s',
+        priority: 'Medium',
+        selected: false
+      },
+      {
+        id: 'tc-003',
+        name: 'Handover',
+        component: 'gNodeB',
+        status: 'Running',
+        iterations: '3',
+        successRate: '66%',
+        lastRun: '2024-01-18 00:38:15',
+        duration: '1.8s',
+        priority: 'High',
+        selected: false
+      },
+      {
+        id: 'tc-004',
+        name: 'Paging',
+        component: 'Core Network',
+        status: 'Failed',
+        iterations: '2',
+        successRate: '0%',
+        lastRun: '2024-01-18 00:32:45',
+        duration: '5.1s',
+        priority: 'Low',
+        selected: false
+      },
+      {
+        id: 'tc-005',
+        name: 'Bearer Setup',
+        component: 'eNodeB',
+        status: 'Not Started',
+        iterations: 'Never',
+        successRate: 'N/A',
+        lastRun: 'N/A',
+        duration: '',
+        priority: 'Medium',
+        selected: false
+      },
+      {
+        id: 'tc-006',
+        name: 'Mobility Management',
+        component: 'gNodeB',
+        status: 'Paused',
+        iterations: '1',
+        successRate: 'N/A',
+        lastRun: '2024-01-18 00:25:30',
+        duration: '3.2s',
+        priority: 'High',
         selected: false
       }
     ]);
@@ -107,8 +167,39 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         case 'Running': return 'bg-blue-100 text-blue-800';
         case 'Failed': return 'bg-red-100 text-red-800';
         case 'Not Started': return 'bg-gray-100 text-gray-800';
+        case 'Paused': return 'bg-yellow-100 text-yellow-800';
         default: return 'bg-gray-100 text-gray-800';
       }
+    };
+
+    const getPriorityColor = (priority) => {
+      switch (priority) {
+        case 'High': return 'bg-red-100 text-red-800';
+        case 'Medium': return 'bg-yellow-100 text-yellow-800';
+        case 'Low': return 'bg-green-100 text-green-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    };
+
+    const handleStartTest = (testId) => {
+      setTestCases(prev => prev.map(tc => 
+        tc.id === testId ? { ...tc, status: 'Running' } : tc
+      ));
+      addLog('INFO', `Starting test: ${testId}`);
+    };
+
+    const handleStopTest = (testId) => {
+      setTestCases(prev => prev.map(tc => 
+        tc.id === testId ? { ...tc, status: 'Failed' } : tc
+      ));
+      addLog('INFO', `Stopped test: ${testId}`);
+    };
+
+    const handlePauseTest = (testId) => {
+      setTestCases(prev => prev.map(tc => 
+        tc.id === testId ? { ...tc, status: 'Paused' } : tc
+      ));
+      addLog('INFO', `Paused test: ${testId}`);
     };
 
     const getLogLevelColor = (level) => {
@@ -298,10 +389,10 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             ])
           ]),
 
-          // Test Cases Table
+          // Test Cases Table with Scroll
           React.createElement('div', {
             key: 'table',
-            className: 'overflow-x-auto'
+            className: 'overflow-x-auto max-h-96 overflow-y-auto border border-gray-200 rounded'
           }, [
             React.createElement('table', {
               key: 'table',
@@ -314,16 +405,17 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                   key: 'row',
                   className: 'bg-gray-50'
                 }, [
-                  React.createElement('th', { key: 'select', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, ''),
-                  React.createElement('th', { key: 'name', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Name'),
-                  React.createElement('th', { key: 'component', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Component'),
-                  React.createElement('th', { key: 'status', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Status'),
-                  React.createElement('th', { key: 'iterations', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Iterations'),
-                  React.createElement('th', { key: 'success', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Success Rate'),
-                  React.createElement('th', { key: 'last-run', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Last Run'),
-                  React.createElement('th', { key: 'duration', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Duration'),
-                  React.createElement('th', { key: 'priority', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Priority'),
-                  React.createElement('th', { key: 'actions', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase' }, 'Actions')
+                  React.createElement('th', { key: 'select', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, ''),
+                  React.createElement('th', { key: 'name', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Name'),
+                  React.createElement('th', { key: 'component', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Component'),
+                  React.createElement('th', { key: 'status', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Status'),
+                  React.createElement('th', { key: 'iterations', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Iterations'),
+                  React.createElement('th', { key: 'success', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Success Rate'),
+                  React.createElement('th', { key: 'last-run', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Last Run'),
+                  React.createElement('th', { key: 'duration', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Duration'),
+                  React.createElement('th', { key: 'priority', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Priority'),
+                  React.createElement('th', { key: 'controls', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Controls'),
+                  React.createElement('th', { key: 'actions', className: 'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sticky top-0 bg-gray-50' }, 'Actions')
                 ])
               ]),
               React.createElement('tbody', {
@@ -375,8 +467,35 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                   }, testCase.duration),
                   React.createElement('td', {
                     key: 'priority',
-                    className: 'px-4 py-2 text-sm text-gray-500'
-                  }, testCase.priority),
+                    className: 'px-4 py-2'
+                  }, React.createElement('span', {
+                    className: `px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(testCase.priority)}`
+                  }, testCase.priority)),
+                  React.createElement('td', {
+                    key: 'controls',
+                    className: 'px-4 py-2'
+                  }, React.createElement('div', {
+                    className: 'flex items-center space-x-1'
+                  }, [
+                    React.createElement('button', {
+                      key: 'start',
+                      className: 'bg-green-600 text-white p-1 rounded hover:bg-green-700',
+                      onClick: () => handleStartTest(testCase.id),
+                      disabled: testCase.status === 'Running'
+                    }, React.createElement('i', { 'data-lucide': 'play', className: 'w-3 h-3' })),
+                    React.createElement('button', {
+                      key: 'stop',
+                      className: 'bg-red-600 text-white p-1 rounded hover:bg-red-700',
+                      onClick: () => handleStopTest(testCase.id),
+                      disabled: testCase.status === 'Not Started'
+                    }, React.createElement('i', { 'data-lucide': 'square', className: 'w-3 h-3' })),
+                    React.createElement('button', {
+                      key: 'pause',
+                      className: 'bg-yellow-600 text-white p-1 rounded hover:bg-yellow-700',
+                      onClick: () => handlePauseTest(testCase.id),
+                      disabled: testCase.status !== 'Running'
+                    }, React.createElement('i', { 'data-lucide': 'pause', className: 'w-3 h-3' }))
+                  ])),
                   React.createElement('td', {
                     key: 'actions',
                     className: 'px-4 py-2'
