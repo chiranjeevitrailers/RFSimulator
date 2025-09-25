@@ -699,6 +699,56 @@ const Sidebar: React.FC<{
 // Main 5GLabX Platform Component
 const FiveGLabXPlatformMinimal: React.FC = () => {
   const [currentView, setCurrentView] = useState('dashboard');
+  const [logs, setLogs] = useState<any[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+
+  // Connect to 5GLabX WebSocket for real-time log analysis
+  useEffect(() => {
+    const connectTo5GLabX = () => {
+      try {
+        const ws = new WebSocket('ws://localhost:8080/5glabx/logs');
+        
+        ws.onopen = () => {
+          setIsConnected(true);
+          console.log('Connected to 5GLabX WebSocket for log analysis');
+        };
+        
+        ws.onmessage = (event) => {
+          const logEntry = JSON.parse(event.data);
+          setLogs(prev => [...prev, {
+            timestamp: new Date().toLocaleString(),
+            level: logEntry.level || 'INFO',
+            message: logEntry.message || logEntry.analysis || '5GLabX log entry',
+            source: '5GLabX'
+          }]);
+        };
+        
+        ws.onclose = () => {
+          setIsConnected(false);
+          console.log('Disconnected from 5GLabX WebSocket. Attempting to reconnect in 5 seconds...');
+          setTimeout(connectTo5GLabX, 5000);
+        };
+        
+        ws.onerror = (error) => {
+          console.error('5GLabX WebSocket error:', error);
+          setIsConnected(false);
+        };
+        
+        return ws;
+      } catch (error) {
+        console.error('Error setting up 5GLabX WebSocket:', error);
+        return null;
+      }
+    };
+
+    const ws = connectTo5GLabX();
+    
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
+  }, []);
 
   const navigate = (viewId: string) => {
     setCurrentView(viewId);
@@ -709,7 +759,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'logs':
-        return <LogsView appState={{}} onStateChange={() => {}} />;
+        return <LogsView appState={{ logs, isConnected }} onStateChange={() => {}} />;
       // Removed duplicate enhanced-logs main view; use Enhanced Views -> logs-enhanced
       case 'test-suites':
         return <TestSuitesView appState={{}} onStateChange={() => {}} />;
@@ -845,10 +895,26 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   return (
     <APIProvider>
       <ServiceIntegration>
-        <div className="h-screen flex bg-gray-50">
-          <Sidebar currentView={currentView} onNavigate={navigate} />
-          <div className="flex-1 overflow-auto">
-            {renderCurrentView()}
+        <div className="h-screen flex flex-col bg-gray-50">
+          {/* Header with connection status */}
+          <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-gray-900">5GLabX Platform</h1>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-sm text-gray-600">
+                {isConnected ? 'Connected to 5GLabX Backend' : 'Disconnected'}
+              </span>
+              <span className="text-xs text-gray-500">
+                ({logs.length} logs)
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex flex-1">
+            <Sidebar currentView={currentView} onNavigate={navigate} />
+            <div className="flex-1 overflow-auto">
+              {renderCurrentView()}
+            </div>
           </div>
         </div>
       </ServiceIntegration>
