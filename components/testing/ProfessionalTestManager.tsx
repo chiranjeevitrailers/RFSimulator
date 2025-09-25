@@ -380,6 +380,13 @@ const ProfessionalTestManager: React.FC = () => {
       setLogs(prev => [...prev, { timestamp, level, message }]);
     };
 
+    // Toggle test suite expansion
+    const toggleTestSuite = (suiteId) => {
+      setTestSuites(prev => prev.map(suite => 
+        suite.id === suiteId ? { ...suite, expanded: !suite.expanded } : suite
+      ));
+    };
+
     const handleRunTest = async (testId) => {
       setIsRunning(true);
       addLog('INFO', `Starting test execution: ${testId}`);
