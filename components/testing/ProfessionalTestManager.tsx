@@ -126,7 +126,33 @@ const ProfessionalTestManager: React.FC = () => {
           }
         });
         
-        addLog('INFO', 'Loaded test suite counts from Supabase');
+        // Update testSuites with real counts from Supabase
+        setTestSuites(prev => prev.map(suite => {
+          const categoryKey = suite.id === '5g-nr' ? '5G_NR' :
+                             suite.id === '4g-lte' ? '4G_LTE' :
+                             suite.id === 'o-ran' ? 'O_RAN' :
+                             suite.id === 'nb-iot' ? 'NB_IoT' :
+                             suite.id === 'ntn' ? 'NTN' :
+                             suite.id === 'v2x' ? 'V2X' :
+                             suite.id === 'core-network' ? 'IMS_SIP' :
+                             suite.id === 'call-flows' ? 'IMS_SIP' :
+                             'Other';
+          
+          const realCount = counts[categoryKey]?.total || 0;
+          
+          return {
+            ...suite,
+            totalCount: realCount,
+            children: suite.children.map(child => {
+              // Map subcategories to real counts if available
+              const subcategoryCount = counts[categoryKey]?.subcategories[child.name] || 
+                                     Math.floor(realCount / suite.children.length);
+              return { ...child, count: subcategoryCount };
+            })
+          };
+        }));
+        
+        addLog('INFO', `Loaded test suite counts from Supabase: ${Object.keys(counts).join(', ')}`);
         return counts;
       } catch (error) {
         console.error('Error loading test suite counts:', error);
@@ -373,6 +399,50 @@ const ProfessionalTestManager: React.FC = () => {
         expanded: true,
         children: [
           { id: 'call-flows-tests', name: 'Call Flows', count: 350 }
+        ]
+      },
+      {
+        id: 'o-ran',
+        name: 'O-RAN',
+        totalCount: 250,
+        expanded: true,
+        children: [
+          { id: 'oran-interface', name: 'Interface Tests', count: 100 },
+          { id: 'oran-performance', name: 'Performance', count: 80 },
+          { id: 'oran-security', name: 'Security', count: 70 }
+        ]
+      },
+      {
+        id: 'nb-iot',
+        name: 'NB-IoT',
+        totalCount: 180,
+        expanded: true,
+        children: [
+          { id: 'nb-iot-functional', name: 'Functional', count: 90 },
+          { id: 'nb-iot-coverage', name: 'Coverage', count: 50 },
+          { id: 'nb-iot-power', name: 'Power Management', count: 40 }
+        ]
+      },
+      {
+        id: 'ntn',
+        name: 'NTN',
+        totalCount: 120,
+        expanded: true,
+        children: [
+          { id: 'ntn-satellite', name: 'Satellite', count: 60 },
+          { id: 'ntn-handover', name: 'Handover', count: 40 },
+          { id: 'ntn-latency', name: 'Latency', count: 20 }
+        ]
+      },
+      {
+        id: 'v2x',
+        name: 'V2X',
+        totalCount: 200,
+        expanded: true,
+        children: [
+          { id: 'v2x-safety', name: 'Safety', count: 80 },
+          { id: 'v2x-mobility', name: 'Mobility', count: 70 },
+          { id: 'v2x-communication', name: 'Communication', count: 50 }
         ]
       },
       {
