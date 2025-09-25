@@ -315,31 +315,73 @@ function ProfessionalTestingPlatform({ appState, onStateChange }: ProfessionalTe
         key: 'main-content',
         className: 'flex-1 flex overflow-hidden'
       }, [
-        // Left Sidebar - Test Suites
+        // Left Sidebar - RAN Components and Test Suites
         React.createElement('div', {
           key: 'sidebar',
           className: 'w-80 bg-white border-r border-gray-200 flex flex-col'
         }, [
+          // RAN Components Section
           React.createElement('div', {
-            key: 'sidebar-header',
+            key: 'ran-components',
             className: 'p-4 border-b border-gray-200'
           }, [
             React.createElement('h3', {
-              key: 'sidebar-title',
-              className: 'text-lg font-semibold text-gray-900'
-            }, 'Test Suites'),
-            React.createElement('button', {
-              key: 'refresh-btn',
-              className: 'mt-2 text-sm text-blue-600 hover:text-blue-800',
-              onClick: fetchTestCases
-            }, 'Refresh from Database')
+              key: 'ran-components-title',
+              className: 'text-lg font-semibold text-gray-900 mb-3'
+            }, 'RAN Components'),
+            React.createElement('div', {
+              key: 'ran-components-list',
+              className: 'space-y-2'
+            }, ranComponents.map(component => 
+              React.createElement('div', {
+                key: component.id,
+                className: 'flex items-center justify-between p-2 hover:bg-gray-50 rounded'
+              }, [
+                React.createElement('span', {
+                  key: 'component-name',
+                  className: 'text-sm font-medium text-gray-700'
+                }, component.name),
+                React.createElement('div', {
+                  key: 'component-actions',
+                  className: 'flex items-center space-x-1'
+                }, [
+                  React.createElement('button', {
+                    key: 'play-btn',
+                    className: 'p-1 text-green-600 hover:text-green-700'
+                  }, React.createElement('i', { 'data-lucide': 'play', className: 'w-3 h-3' })),
+                  React.createElement('button', {
+                    key: 'stop-btn',
+                    className: 'p-1 text-red-600 hover:text-red-700'
+                  }, React.createElement('i', { 'data-lucide': 'square', className: 'w-3 h-3' })),
+                  React.createElement('button', {
+                    key: 'settings-btn',
+                    className: 'p-1 text-gray-600 hover:text-gray-700'
+                  }, React.createElement('i', { 'data-lucide': 'settings', className: 'w-3 h-3' }))
+                ])
+              ])
+            ))
           ]),
+
+          // Test Suites Section
           React.createElement('div', {
-            key: 'sidebar-content',
-            className: 'flex-1 overflow-y-auto p-4'
+            key: 'test-suites-section',
+            className: 'flex-1 p-4'
           }, [
             React.createElement('div', {
-              key: 'test-suites',
+              key: 'test-suites-header',
+              className: 'flex items-center justify-between mb-3'
+            }, [
+              React.createElement('h3', {
+                key: 'test-suites-title',
+                className: 'text-lg font-semibold text-gray-900'
+              }, 'Test Suites'),
+              React.createElement('button', {
+                key: 'add-test-suite-btn',
+                className: 'px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700'
+              }, '+ Add Test Suite')
+            ]),
+            React.createElement('div', {
+              key: 'test-suites-content',
               className: 'space-y-2'
             }, testSuites.map(suite => 
               React.createElement('div', {
@@ -408,9 +450,9 @@ function ProfessionalTestingPlatform({ appState, onStateChange }: ProfessionalTe
           key: 'main-area',
           className: 'flex-1 flex flex-col'
         }, [
-          // Test Cases List
+          // Test Cases Management
           React.createElement('div', {
-            key: 'test-cases',
+            key: 'test-cases-management',
             className: 'flex-1 p-6'
           }, [
             React.createElement('div', {
@@ -420,11 +462,18 @@ function ProfessionalTestingPlatform({ appState, onStateChange }: ProfessionalTe
               React.createElement('h2', {
                 key: 'test-cases-title',
                 className: 'text-xl font-semibold text-gray-900'
-              }, 'Test Cases'),
+              }, 'Test Cases Management'),
               React.createElement('div', {
                 key: 'test-cases-actions',
                 className: 'flex items-center space-x-2'
               }, [
+                React.createElement('button', {
+                  key: 'add-test-case-btn',
+                  className: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2'
+                }, [
+                  React.createElement('i', { key: 'icon', 'data-lucide': 'plus', className: 'w-4 h-4' }),
+                  React.createElement('span', { key: 'text' }, '+ Add Test Case')
+                ]),
                 React.createElement('button', {
                   key: 'run-all-btn',
                   className: 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2',
@@ -435,120 +484,145 @@ function ProfessionalTestingPlatform({ appState, onStateChange }: ProfessionalTe
                   React.createElement('span', { key: 'text' }, 'Run All Tests')
                 ]),
                 React.createElement('button', {
-                  key: 'clear-btn',
-                  className: 'px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700'
+                  key: 'delete-selected-btn',
+                  className: 'px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700'
                 }, [
-                  React.createElement('i', { key: 'icon', 'data-lucide': 'square', className: 'w-4 h-4' }),
-                  React.createElement('span', { key: 'text' }, 'Clear')
+                  React.createElement('i', { key: 'icon', 'data-lucide': 'trash-2', className: 'w-4 h-4' }),
+                  React.createElement('span', { key: 'text' }, 'Delete Selected')
                 ])
               ])
             ]),
+            
+            // Test Cases Table
             React.createElement('div', {
-              key: 'test-cases-list',
-              className: 'space-y-2'
-            }, testCases.map(testCase => 
+              key: 'test-cases-table',
+              className: 'bg-white border border-gray-200 rounded-lg overflow-hidden'
+            }, [
+              // Table Header
               React.createElement('div', {
-                key: testCase.id,
-                className: `p-4 border rounded-lg cursor-pointer transition-colors ${
-                  testCase.selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                }`
+                key: 'table-header',
+                className: 'bg-gray-50 border-b border-gray-200 px-6 py-3'
               }, [
                 React.createElement('div', {
-                  key: 'test-case-content',
-                  className: 'flex items-center justify-between'
+                  key: 'table-header-row',
+                  className: 'grid grid-cols-9 gap-4 text-sm font-medium text-gray-700'
+                }, [
+                  React.createElement('div', { key: 'col-name' }, 'Name'),
+                  React.createElement('div', { key: 'col-component' }, 'Component'),
+                  React.createElement('div', { key: 'col-status' }, 'Status'),
+                  React.createElement('div', { key: 'col-iterations' }, 'Iterations'),
+                  React.createElement('div', { key: 'col-success-rate' }, 'Success Rate'),
+                  React.createElement('div', { key: 'col-last-run' }, 'Last Run'),
+                  React.createElement('div', { key: 'col-duration' }, 'Duration'),
+                  React.createElement('div', { key: 'col-priority' }, 'Priority'),
+                  React.createElement('div', { key: 'col-actions' }, 'Actions')
+                ])
+              ]),
+              
+              // Table Body
+              React.createElement('div', {
+                key: 'table-body',
+                className: 'divide-y divide-gray-200'
+              }, testCases.map(testCase => 
+                React.createElement('div', {
+                  key: testCase.id,
+                  className: 'px-6 py-4 hover:bg-gray-50'
                 }, [
                   React.createElement('div', {
-                    key: 'test-case-info',
-                    className: 'flex items-center space-x-3'
+                    key: 'table-row',
+                    className: 'grid grid-cols-9 gap-4 items-center'
                   }, [
-                    React.createElement('input', {
-                      key: 'test-case-checkbox',
-                      type: 'checkbox',
-                      checked: testCase.selected,
-                      onChange: () => toggleTestSelection(testCase.id),
-                      className: 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
-                    }),
                     React.createElement('div', {
-                      key: 'test-case-details',
-                      className: 'flex-1'
+                      key: 'col-name',
+                      className: 'flex items-center space-x-2'
                     }, [
-                      React.createElement('div', {
-                        key: 'test-case-name',
-                        className: 'font-medium text-gray-900'
-                      }, testCase.name),
-                      React.createElement('div', {
-                        key: 'test-case-meta',
-                        className: 'text-sm text-gray-500'
-                      }, `${testCase.component} • ${testCase.status}`)
-                    ])
-                  ]),
-                  React.createElement('div', {
-                    key: 'test-case-actions',
-                    className: 'flex items-center space-x-2'
-                  }, [
-                    React.createElement('button', {
-                      key: 'run-btn',
-                      className: 'px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50',
-                      disabled: isRunning,
-                      onClick: () => handleRunTest(testCase.id)
-                    }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
-                    React.createElement('button', {
-                      key: 'view-btn',
-                      className: 'px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700'
-                    }, React.createElement('i', { 'data-lucide': 'eye', className: 'w-4 h-4' }))
+                      React.createElement('input', {
+                        key: 'checkbox',
+                        type: 'checkbox',
+                        checked: testCase.selected,
+                        onChange: () => toggleTestSelection(testCase.id),
+                        className: 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                      }),
+                      React.createElement('span', {
+                        key: 'name',
+                        className: 'text-sm font-medium text-gray-900'
+                      }, testCase.name)
+                    ]),
+                    React.createElement('div', {
+                      key: 'col-component',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.component),
+                    React.createElement('div', {
+                      key: 'col-status',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.status),
+                    React.createElement('div', {
+                      key: 'col-iterations',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.iterations),
+                    React.createElement('div', {
+                      key: 'col-success-rate',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.successRate),
+                    React.createElement('div', {
+                      key: 'col-last-run',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.lastRun),
+                    React.createElement('div', {
+                      key: 'col-duration',
+                      className: 'flex items-center space-x-2'
+                    }, [
+                      React.createElement('button', {
+                        key: 'play-btn',
+                        className: 'p-1 text-blue-600 hover:text-blue-700'
+                      }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
+                      React.createElement('button', {
+                        key: 'view-btn',
+                        className: 'p-1 text-gray-600 hover:text-gray-700'
+                      }, React.createElement('i', { 'data-lucide': 'eye', className: 'w-4 h-4' }))
+                    ]),
+                    React.createElement('div', {
+                      key: 'col-priority',
+                      className: 'text-sm text-gray-700'
+                    }, testCase.priority),
+                    React.createElement('div', {
+                      key: 'col-actions',
+                      className: 'text-sm text-gray-700'
+                    }, '')
                   ])
                 ])
-              ])
-            ))
+              ))
+            ])
           ]),
 
-          // Logs Panel
+          // Automation Log
           React.createElement('div', {
-            key: 'logs-panel',
+            key: 'automation-log',
             className: 'h-64 bg-white border-t border-gray-200 flex flex-col'
           }, [
             React.createElement('div', {
-              key: 'logs-header',
+              key: 'log-header',
               className: 'p-4 border-b border-gray-200'
             }, [
               React.createElement('h2', {
-                key: 'logs-title',
+                key: 'log-title',
                 className: 'text-lg font-semibold text-gray-900'
-              }, 'Execution Logs'),
-              React.createElement('div', {
-                key: 'logs-actions',
-                className: 'flex items-center space-x-2 mt-2'
-              }, [
-                React.createElement('button', {
-                  key: 'clear-logs-btn',
-                  className: 'px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center space-x-2'
-                }, [
-                  React.createElement('i', { key: 'icon', 'data-lucide': 'square', className: 'w-4 h-4' }),
-                  React.createElement('span', { key: 'text' }, 'Clear')
-                ]),
-                React.createElement('button', {
-                  key: 'download-logs-btn',
-                  className: 'px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2'
-                }, [
-                  React.createElement('i', { key: 'icon', 'data-lucide': 'download', className: 'w-4 h-4' }),
-                  React.createElement('span', { key: 'text' }, 'Download')
-                ])
-              ])
+              }, 'Automation Log')
             ]),
             React.createElement('div', {
-              key: 'logs-content',
-              className: 'flex-1 overflow-y-auto p-4 font-mono text-sm'
+              key: 'log-content',
+              className: 'flex-1 overflow-y-auto p-4 font-mono text-sm bg-gray-900 text-green-400'
             }, [
               React.createElement('div', {
-                key: 'logs-list',
+                key: 'log-list',
                 className: 'space-y-1'
               }, logs.map((log, index) => 
                 React.createElement('div', {
                   key: index,
                   className: `flex items-start space-x-2 ${
-                    log.level === 'ERROR' ? 'text-red-600' : 
-                    log.level === 'WARNING' ? 'text-yellow-600' : 
-                    'text-gray-700'
+                    log.level === 'ERROR' ? 'text-red-400' : 
+                    log.level === 'WARNING' ? 'text-yellow-400' : 
+                    'text-green-400'
                   }`
                 }, [
                   React.createElement('span', {
