@@ -132,6 +132,7 @@ async function startTestExecution(executionId: string, testCaseData: any) {
   try {
     // Get the WebSocket server instance
     const wsServer = TestExecutionWebSocketServer.getInstance();
+    const supabase = supabaseAdmin;
 
     // Process messages sequentially based on their timestamps
     if (testCaseData?.test_case_messages && testCaseData.test_case_messages.length > 0) {
@@ -280,7 +281,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const supabase = createClient();
+  const supabase = supabaseAdmin;
 
   try {
     // Get execution status
@@ -332,7 +333,5 @@ export async function GET(request: NextRequest) {
   }
 }
 
-const supabase = createClient();
-
-// Import supabase at the top level for the startTestExecution function
+// Use supabaseAdmin for the startTestExecution function
 // This is a workaround since the function is called asynchronously
