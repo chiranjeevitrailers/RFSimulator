@@ -13,6 +13,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [selectedTestSuite, setSelectedTestSuite] = React.useState(null);
     const [selectedTests, setSelectedTests] = React.useState([]);
     const [isRunning, setIsRunning] = React.useState(false);
+    const [filteredTestCases, setFilteredTestCases] = React.useState([]);
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'Loading component configurations' },
@@ -43,12 +44,16 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     // Test Suites Categories - Dynamic based on loaded test cases
     const getTestSuites = () => {
       const categories = {};
+      const testCasesByCategory = {};
+      
       testCases.forEach(tc => {
         const category = tc.category || 'Other';
         if (!categories[category]) {
           categories[category] = 0;
+          testCasesByCategory[category] = [];
         }
         categories[category]++;
+        testCasesByCategory[category].push(tc);
       });
 
       return [
@@ -57,9 +62,24 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           name: '5G NR Test Suites',
           expanded: true,
           children: [
-            { id: '5g-connectivity', name: '5G Connectivity', count: categories['5G_NR'] || 0 },
-            { id: 'beam-management', name: 'Beam Management', count: 0 },
-            { id: 'network-slice', name: 'Network Slice Test', count: 0 }
+            { 
+              id: '5g-connectivity', 
+              name: '5G Connectivity', 
+              count: categories['5G_NR'] || 0,
+              testCases: testCasesByCategory['5G_NR'] || []
+            },
+            { 
+              id: 'beam-management', 
+              name: 'Beam Management', 
+              count: 0,
+              testCases: []
+            },
+            { 
+              id: 'network-slice', 
+              name: 'Network Slice Test', 
+              count: 0,
+              testCases: []
+            }
           ]
         },
         {
@@ -67,7 +87,12 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           name: '4G LTE Test Suites',
           expanded: true,
           children: [
-            { id: 'lte-functional', name: 'Functional', count: categories['4G_LTE'] || 0 }
+            { 
+              id: 'lte-functional', 
+              name: 'Functional', 
+              count: categories['4G_LTE'] || 0,
+              testCases: testCasesByCategory['4G_LTE'] || []
+            }
           ]
         },
         {
@@ -75,7 +100,12 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           name: 'Core Network Test Suites',
           expanded: false,
           children: [
-            { id: 'core-functional', name: 'Core Network', count: categories['CORE_NETWORK'] || 0 }
+            { 
+              id: 'core-functional', 
+              name: 'Core Network', 
+              count: categories['CORE_NETWORK'] || 0,
+              testCases: testCasesByCategory['CORE_NETWORK'] || []
+            }
           ]
         }
       ];
@@ -240,7 +270,35 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     };
 
     const toggleTestSuite = (suiteId) => {
-      setSelectedTestSuite(selectedTestSuite === suiteId ? null : suiteId);
+      const newSelectedSuite = selectedTestSuite === suiteId ? null : suiteId;
+      setSelectedTestSuite(newSelectedSuite);
+      
+      // Filter test cases based on selected test suite
+      if (newSelectedSuite) {
+        const testSuites = getTestSuites();
+        const selectedSuite = testSuites.find(suite => suite.id === newSelectedSuite);
+        if (selectedSuite) {
+          const allTestCases = selectedSuite.children.flatMap(child => child.testCases);
+          setFilteredTestCases(allTestCases);
+        }
+      } else {
+        setFilteredTestCases(testCases);
+      }
+    };
+
+    // Function to get test cases for display
+    const getDisplayTestCases = () => {
+      return filteredTestCases.length > 0 ? filteredTestCases : testCases;
+    };
+
+    // Function to handle test suite child selection
+    const handleTestSuiteChildClick = (child) => {
+      if (child.testCases && child.testCases.length > 0) {
+        setFilteredTestCases(child.testCases);
+        addLog('INFO', `Filtered to ${child.name}: ${child.testCases.length} test cases`);
+      } else {
+        addLog('INFO', `No test cases available in ${child.name}`);
+      }
     };
 
     // Load test cases on component mount (backend change only)
@@ -418,21 +476,60 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                 }, suite.children.map(child => 
                   React.createElement('div', {
                     key: child.id,
-                    className: 'p-2 hover:bg-gray-50 rounded cursor-pointer'
+                    className: 'space-y-1'
                   }, [
                     React.createElement('div', {
-                      key: 'child-content',
-                      className: 'flex items-center justify-between'
+                      key: 'child-header',
+                      className: 'p-2 hover:bg-gray-50 rounded cursor-pointer',
+                      onClick: () => handleTestSuiteChildClick(child)
                     }, [
-                      React.createElement('span', {
-                        key: 'child-name',
-                        className: 'text-sm text-gray-700'
-                      }, child.name),
-                      child.count > 0 && React.createElement('span', {
-                        key: 'child-count',
-                        className: 'text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full'
-                      }, child.count)
-                    ])
+                      React.createElement('div', {
+                        key: 'child-content',
+                        className: 'flex items-center justify-between'
+                      }, [
+                        React.createElement('span', {
+                          key: 'child-name',
+                          className: 'text-sm text-gray-700'
+                        }, child.name),
+                        child.count > 0 && React.createElement('span', {
+                          key: 'child-count',
+                          className: 'text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full'
+                        }, child.count)
+                      ])
+                    ]),
+                    // Show test cases under each child if they exist
+                    child.testCases && child.testCases.length > 0 && React.createElement('div', {
+                      key: 'child-test-cases',
+                      className: 'ml-4 space-y-1'
+                    }, child.testCases.map(testCase => 
+                      React.createElement('div', {
+                        key: testCase.id,
+                        className: 'p-1 text-xs text-gray-600 hover:bg-gray-100 rounded cursor-pointer',
+                        onClick: () => {
+                          setFilteredTestCases([testCase]);
+                          addLog('INFO', `Selected test case: ${testCase.name}`);
+                        }
+                      }, [
+                        React.createElement('div', {
+                          key: 'test-case-info',
+                          className: 'flex items-center justify-between'
+                        }, [
+                          React.createElement('span', {
+                            key: 'test-case-name',
+                            className: 'truncate'
+                          }, testCase.name),
+                          React.createElement('span', {
+                            key: 'test-case-status',
+                            className: `text-xs px-1 py-0.5 rounded ${
+                              testCase.status === 'Completed' ? 'bg-green-100 text-green-800' :
+                              testCase.status === 'Running' ? 'bg-blue-100 text-blue-800' :
+                              testCase.status === 'Failed' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`
+                          }, testCase.status)
+                        ])
+                      ])
+                    ))
                   ])
                 ))
               ])
