@@ -40,6 +40,8 @@ const ProfessionalTestManager: React.FC = () => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [isRunning, setIsRunning] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
+    const [isPanelVisible, setIsPanelVisible] = useState(true);
+    const [horizontalScrollPosition, setHorizontalScrollPosition] = useState(0);
     
     // Integrate with existing working Supabase implementation
     useEffect(() => {
@@ -714,8 +716,15 @@ const ProfessionalTestManager: React.FC = () => {
       const scrollTop = e.target.scrollTop;
       const scrollHeight = e.target.scrollHeight;
       const clientHeight = e.target.clientHeight;
-      const scrollPercent = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
-      setScrollPosition(scrollPercent);
+      const scrollLeft = e.target.scrollLeft;
+      const scrollWidth = e.target.scrollWidth;
+      const clientWidth = e.target.clientWidth;
+      
+      const verticalScrollPercent = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+      const horizontalScrollPercent = Math.round((scrollLeft / (scrollWidth - clientWidth)) * 100);
+      
+      setScrollPosition(verticalScrollPercent);
+      setHorizontalScrollPosition(horizontalScrollPercent);
     };
 
     const toggleTestSelection = (testId) => {
@@ -961,6 +970,14 @@ const ProfessionalTestManager: React.FC = () => {
               className: 'flex items-center space-x-2'
             }, [
               React.createElement('button', {
+                key: 'toggle-visibility',
+                className: `px-3 py-2 rounded text-sm flex items-center space-x-1 ${isPanelVisible ? 'bg-gray-600 text-white hover:bg-gray-700' : 'bg-green-600 text-white hover:bg-green-700'}`,
+                onClick: () => setIsPanelVisible(!isPanelVisible)
+              }, [
+                React.createElement('i', { key: 'icon', 'data-lucide': isPanelVisible ? 'eye-off' : 'eye', className: 'w-4 h-4' }),
+                React.createElement('span', { key: 'text' }, isPanelVisible ? 'Hide Panel' : 'Show Panel')
+              ]),
+              React.createElement('button', {
                 key: 'add',
                 className: 'bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700'
               }, '+ Add Test Case'),
@@ -1008,12 +1025,92 @@ const ProfessionalTestManager: React.FC = () => {
             }))
           ]),
 
-          // Test Cases Table with Enhanced Scroll
-          React.createElement('div', {
-            key: 'table',
-            className: 'overflow-x-auto max-h-80 overflow-y-auto border border-gray-200 rounded bg-white shadow-inner scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100',
-            onScroll: handleScroll
+          // Test Cases Table with Enhanced Scroll and Visibility Controls
+          isPanelVisible && React.createElement('div', {
+            key: 'table-container',
+            className: 'relative border border-gray-200 rounded bg-white shadow-inner'
           }, [
+            // Scroll Controls Header
+            React.createElement('div', {
+              key: 'scroll-controls',
+              className: 'flex items-center justify-between p-2 bg-gray-50 border-b border-gray-200'
+            }, [
+              React.createElement('div', {
+                key: 'scroll-info',
+                className: 'flex items-center space-x-4 text-sm text-gray-600'
+              }, [
+                React.createElement('span', { key: 'count' }, `${testCases.length} test cases`),
+                React.createElement('span', { key: 'scroll-hint' }, 'Use scroll bars to navigate ↑↓ ←→'),
+                React.createElement('div', {
+                  key: 'scroll-indicators',
+                  className: 'flex items-center space-x-2 text-xs'
+                }, [
+                  React.createElement('span', { key: 'vertical-indicator' }, `↑↓ ${scrollPosition}%`),
+                  React.createElement('span', { key: 'horizontal-indicator' }, `←→ ${horizontalScrollPosition}%`)
+                ])
+              ]),
+              React.createElement('div', {
+                key: 'scroll-buttons',
+                className: 'flex items-center space-x-2'
+              }, [
+                // Vertical Scroll Controls
+                React.createElement('div', {
+                  key: 'vertical-controls',
+                  className: 'flex items-center space-x-1'
+                }, [
+                  React.createElement('button', {
+                    key: 'scroll-top',
+                    className: 'px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200',
+                    onClick: () => {
+                      const tableContainer = document.querySelector('.test-cases-table');
+                      if (tableContainer) tableContainer.scrollTop = 0;
+                    }
+                  }, '↑ Top'),
+                  React.createElement('button', {
+                    key: 'scroll-bottom',
+                    className: 'px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200',
+                    onClick: () => {
+                      const tableContainer = document.querySelector('.test-cases-table');
+                      if (tableContainer) tableContainer.scrollTop = tableContainer.scrollHeight;
+                    }
+                  }, '↓ Bottom')
+                ]),
+                
+                // Horizontal Scroll Controls
+                React.createElement('div', {
+                  key: 'horizontal-controls',
+                  className: 'flex items-center space-x-1'
+                }, [
+                  React.createElement('button', {
+                    key: 'scroll-left',
+                    className: 'px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200',
+                    onClick: () => {
+                      const tableContainer = document.querySelector('.test-cases-table');
+                      if (tableContainer) tableContainer.scrollLeft -= 200;
+                    }
+                  }, '← Left'),
+                  React.createElement('button', {
+                    key: 'scroll-right',
+                    className: 'px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200',
+                    onClick: () => {
+                      const tableContainer = document.querySelector('.test-cases-table');
+                      if (tableContainer) tableContainer.scrollLeft += 200;
+                    }
+                  }, 'Right →')
+                ])
+              ])
+            ]),
+            
+            // Scrollable Table Container
+            React.createElement('div', {
+              key: 'table',
+              className: 'test-cases-table overflow-x-auto overflow-y-auto max-h-96 border-0 bg-white',
+              style: {
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#9CA3AF #F3F4F6'
+              },
+              onScroll: handleScroll
+            }, [
             React.createElement('table', {
               key: 'table',
               className: 'w-full border-collapse'
@@ -1145,6 +1242,8 @@ const ProfessionalTestManager: React.FC = () => {
               ))
             ])
           ])
+            ]) // Close table container
+          ]) // Close table-container
         ]),
 
         // Automation Log Section - Positioned below Test Cases Management
