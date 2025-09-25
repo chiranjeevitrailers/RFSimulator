@@ -194,17 +194,19 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           }
         });
         
-        window.dispatchEvent(testExecutionEvent);
-        addLog('INFO', `Data sent to 5GLabX Platform for execution: ${result.executionId}`);
-        
-        // Also send via postMessage for additional compatibility
-        window.postMessage({
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(testExecutionEvent);
+          addLog('INFO', `Data sent to 5GLabX Platform for execution: ${result.executionId}`);
+
+          // Also send via postMessage for additional compatibility
+          window.postMessage({
           type: '5GLABX_TEST_EXECUTION',
           executionId: result.executionId,
           testCaseId: testId,
           data: result
         }, '*');
-        
+        }
+
         setIsRunning(false);
         addLog('INFO', `Test execution completed: ${testId}`);
         setTestCases(prev => prev.map(tc => 
@@ -698,4 +700,9 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
   }
 }
 
-window.ProfessionalTestingPlatform = ProfessionalTestingPlatform;
+// Add default export
+export default ProfessionalTestingPlatform;
+
+if (typeof window !== 'undefined') {
+  window.ProfessionalTestingPlatform = ProfessionalTestingPlatform;
+}
