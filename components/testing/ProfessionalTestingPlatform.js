@@ -19,20 +19,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'Loading component configurations' },
       { timestamp: '2024-01-18 00:40:17', level: 'INFO', message: 'Preparing test environment' }
     ]);
-    const [testCases, setTestCases] = React.useState([
-      {
-        id: 'tc-001',
-        name: 'Attach',
-        component: 'eNodeB',
-        status: 'Not Started',
-        iterations: 'Never',
-        successRate: 'N/A',
-        lastRun: 'N/A',
-        duration: '',
-        priority: '',
-        selected: false
-      }
-    ]);
+    const [testCases, setTestCases] = React.useState([]);
 
     // RAN Components
     const ranComponents = [
@@ -41,11 +28,12 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       { id: 'core', name: 'Core Network', status: 'active', color: 'green' }
     ];
 
-    // Test Suites Categories - Dynamic based on loaded test cases
+    // Test Suites Categories - Dynamic based on loaded test cases from Supabase
     const getTestSuites = () => {
       const categories = {};
       const testCasesByCategory = {};
       
+      // Process test cases from Supabase
       testCases.forEach(tc => {
         const category = tc.category || 'Other';
         if (!categories[category]) {
@@ -54,6 +42,29 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         }
         categories[category]++;
         testCasesByCategory[category].push(tc);
+      });
+
+      // Map database categories to test suite structure
+      const mapCategoryToSuite = (categoryName) => {
+        const upperCategory = categoryName?.toUpperCase();
+        if (upperCategory?.includes('5G') || upperCategory?.includes('NR')) {
+          return '5G_NR';
+        } else if (upperCategory?.includes('4G') || upperCategory?.includes('LTE')) {
+          return '4G_LTE';
+        } else if (upperCategory?.includes('CORE') || upperCategory?.includes('AMF') || upperCategory?.includes('SMF')) {
+          return 'CORE_NETWORK';
+        }
+        return 'OTHER';
+      };
+
+      // Group test cases by their mapped categories
+      const suiteCategories = {};
+      Object.keys(testCasesByCategory).forEach(category => {
+        const suiteCategory = mapCategoryToSuite(category);
+        if (!suiteCategories[suiteCategory]) {
+          suiteCategories[suiteCategory] = [];
+        }
+        suiteCategories[suiteCategory].push(...testCasesByCategory[category]);
       });
 
       return [
@@ -65,8 +76,8 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             { 
               id: '5g-connectivity', 
               name: '5G Connectivity', 
-              count: categories['5G_NR'] || 0,
-              testCases: testCasesByCategory['5G_NR'] || []
+              count: suiteCategories['5G_NR']?.length || 0,
+              testCases: suiteCategories['5G_NR'] || []
             },
             { 
               id: 'beam-management', 
@@ -90,8 +101,8 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             { 
               id: 'lte-functional', 
               name: 'Functional', 
-              count: categories['4G_LTE'] || 0,
-              testCases: testCasesByCategory['4G_LTE'] || []
+              count: suiteCategories['4G_LTE']?.length || 0,
+              testCases: suiteCategories['4G_LTE'] || []
             }
           ]
         },
@@ -103,11 +114,25 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             { 
               id: 'core-functional', 
               name: 'Core Network', 
-              count: categories['CORE_NETWORK'] || 0,
-              testCases: testCasesByCategory['CORE_NETWORK'] || []
+              count: suiteCategories['CORE_NETWORK']?.length || 0,
+              testCases: suiteCategories['CORE_NETWORK'] || []
             }
           ]
-        }
+        },
+        // Add Other category if there are uncategorized test cases
+        ...(suiteCategories['OTHER']?.length > 0 ? [{
+          id: 'other',
+          name: 'Other Test Suites',
+          expanded: false,
+          children: [
+            { 
+              id: 'other-functional', 
+              name: 'Other', 
+              count: suiteCategories['OTHER']?.length || 0,
+              testCases: suiteCategories['OTHER'] || []
+            }
+          ]
+        }] : [])
       ];
     };
 
@@ -118,10 +143,10 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       setLogs(prev => [...prev, { timestamp, level, message }]);
     };
 
-    // Load test cases from database (backend change only)
+    // Load test cases from database (Supabase)
     const fetchTestCases = async () => {
       try {
-        addLog('INFO', 'Loading test cases from database...');
+        addLog('INFO', 'Loading test cases from Supabase database...');
         
         const response = await fetch('/api/test-cases/simple');
         if (!response.ok) {
@@ -133,6 +158,12 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         
         if (!Array.isArray(testCasesData)) {
           throw new Error(`Expected array but got: ${typeof testCasesData}`);
+        }
+        
+        if (testCasesData.length === 0) {
+          addLog('WARNING', 'No test cases found in database');
+          setTestCases([]);
+          return;
         }
         
         const formattedTestCases = testCasesData.map(tc => ({
@@ -151,14 +182,14 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         }));
         
         setTestCases(formattedTestCases);
-        addLog('INFO', `Loaded ${formattedTestCases.length} test cases from database`);
+        setFilteredTestCases(formattedTestCases); // Initialize filtered test cases
+        addLog('INFO', `Successfully loaded ${formattedTestCases.length} test cases from Supabase`);
         
       } catch (error) {
-        addLog('ERROR', `Failed to load test cases: ${error.message}`);
+        addLog('ERROR', `Failed to load test cases from Supabase: ${error.message}`);
         console.error('Error loading test cases:', error);
-        
-        // Keep the original fallback test case
-        addLog('INFO', 'Using fallback test case');
+        setTestCases([]);
+        setFilteredTestCases([]);
       }
     };
 
@@ -301,6 +332,13 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       }
     };
 
+    // Function to show all test cases
+    const showAllTestCases = () => {
+      setFilteredTestCases(testCases);
+      setSelectedTestSuite(null);
+      addLog('INFO', `Showing all ${testCases.length} test cases`);
+    };
+
     // Load test cases on component mount (backend change only)
     React.useEffect(() => {
       fetchTestCases();
@@ -428,10 +466,20 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                 key: 'test-suites-title',
                 className: 'text-lg font-semibold text-gray-900'
               }, 'Test Suites'),
-              React.createElement('button', {
-                key: 'add-test-suite-btn',
-                className: 'px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700'
-              }, '+ Add Test Suite')
+              React.createElement('div', {
+                key: 'test-suites-actions',
+                className: 'flex items-center space-x-2'
+              }, [
+                React.createElement('button', {
+                  key: 'show-all-btn',
+                  className: 'px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700',
+                  onClick: showAllTestCases
+                }, 'Show All'),
+                React.createElement('button', {
+                  key: 'add-test-suite-btn',
+                  className: 'px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700'
+                }, '+ Add Test Suite')
+              ])
             ]),
             React.createElement('div', {
               key: 'test-suites-content',
@@ -615,7 +663,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               React.createElement('div', {
                 key: 'table-body',
                 className: 'divide-y divide-gray-200'
-              }, testCases.map(testCase => 
+              }, getDisplayTestCases().length > 0 ? getDisplayTestCases().map(testCase => 
                 React.createElement('div', {
                   key: testCase.id,
                   className: 'px-6 py-4 hover:bg-gray-50'
@@ -666,7 +714,8 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                     }, [
                       React.createElement('button', {
                         key: 'play-btn',
-                        className: 'p-1 text-blue-600 hover:text-blue-700'
+                        className: 'p-1 text-blue-600 hover:text-blue-700',
+                        onClick: () => handleRunTest(testCase.id)
                       }, React.createElement('i', { 'data-lucide': 'play', className: 'w-4 h-4' })),
                       React.createElement('button', {
                         key: 'view-btn',
@@ -683,7 +732,30 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                     }, '')
                   ])
                 ])
-              ))
+              ) : [
+                React.createElement('div', {
+                  key: 'empty-state',
+                  className: 'px-6 py-12 text-center'
+                }, [
+                  React.createElement('div', {
+                    key: 'empty-icon',
+                    className: 'w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'
+                  }, React.createElement('i', { 'data-lucide': 'database', className: 'w-6 h-6 text-gray-400' })),
+                  React.createElement('h3', {
+                    key: 'empty-title',
+                    className: 'text-lg font-medium text-gray-900 mb-2'
+                  }, 'No Test Cases Found'),
+                  React.createElement('p', {
+                    key: 'empty-description',
+                    className: 'text-sm text-gray-500 mb-4'
+                  }, testCases.length === 0 ? 'Loading test cases from Supabase database...' : 'No test cases match the current filter.'),
+                  testCases.length === 0 && React.createElement('button', {
+                    key: 'refresh-btn',
+                    className: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700',
+                    onClick: fetchTestCases
+                  }, 'Refresh from Database')
+                ])
+              ])
             ])
           ]),
 
