@@ -330,7 +330,7 @@ const ProfessionalTestManager: React.FC = () => {
     ];
 
     // Test Suites Categories - Updated to match specified layout
-    const testSuites = [
+    const [testSuites, setTestSuites] = useState([
       {
         id: '5g-nr',
         name: '5G NR',
@@ -382,7 +382,7 @@ const ProfessionalTestManager: React.FC = () => {
           { id: 'other-tests', name: 'Other', count: 100 }
         ]
       }
-    ];
+    ]);
 
     const addLog = (level, message) => {
       const timestamp = new Date().toLocaleString();
@@ -724,6 +724,12 @@ const ProfessionalTestManager: React.FC = () => {
       ));
     };
 
+    const toggleTestSuite = (suiteId) => {
+      setTestSuites(prev => prev.map(suite => 
+        suite.id === suiteId ? { ...suite, expanded: !suite.expanded } : suite
+      ));
+    };
+
     const getStatusColor = (status) => {
       switch (status) {
         case 'Completed': return 'bg-green-100 text-green-800';
@@ -869,7 +875,7 @@ const ProfessionalTestManager: React.FC = () => {
               React.createElement('div', {
                 key: 'header',
                 className: 'flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer',
-                onClick: () => setSelectedTestSuite(suite.id)
+                onClick: () => toggleTestSuite(suite.id)
               }, [
                 React.createElement('div', {
                   key: 'left',
