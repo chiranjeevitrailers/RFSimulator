@@ -133,13 +133,13 @@ const DashboardView: React.FC = () => {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      const channel = supabase.channel('execution-data')
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'decoded_messages',
-          filter: `execution_id=eq.${executionId}`
-        }, (payload) => {
+        const channel = supabase.channel('execution-data')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'decoded_messages',
+            filter: `test_run_id=eq.${executionId}`
+          }, (payload) => {
           console.log('📊 5GLabX: Received realtime data:', payload.new);
           // Process the incoming message data
           if (payload.new) {
