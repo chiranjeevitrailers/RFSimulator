@@ -1,7 +1,12 @@
 // Professional Testing Platform - QXDM/Keysight-like Interface
 import React from 'react';
 
-function ProfessionalTestingPlatform({ appState, onStateChange }) {
+interface ProfessionalTestingPlatformProps {
+  appState?: any;
+  onStateChange?: (state: any) => void;
+}
+
+function ProfessionalTestingPlatform({ appState, onStateChange }: ProfessionalTestingPlatformProps) {
   try {
     React.useEffect(() => {
       if (typeof lucide !== 'undefined') {
