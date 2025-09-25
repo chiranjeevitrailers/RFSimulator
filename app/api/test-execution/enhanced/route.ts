@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import TestExecutionWebSocketServer from '@/lib/test-execution-websocket-server';
 
 const activeExecutions = new Map<string, any>();
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = supabaseAdmin;
 
     console.log(`🚀 Starting enhanced test execution: ${testCaseId}`);
 
