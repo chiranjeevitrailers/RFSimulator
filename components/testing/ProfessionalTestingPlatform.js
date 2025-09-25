@@ -16,20 +16,10 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'Loading component configurations' },
       { timestamp: '2024-01-18 00:40:17', level: 'INFO', message: 'Preparing test environment' }
     ]);
-    const [testCases, setTestCases] = React.useState([
-      {
-        id: 'tc-001',
-        name: 'Attach',
-        component: 'eNodeB',
-        status: 'Not Started',
-        iterations: 'Never',
-        successRate: 'N/A',
-        lastRun: 'N/A',
-        duration: '',
-        priority: '',
-        selected: false
-      }
-    ]);
+    const [testCases, setTestCases] = React.useState([]);
+    const [loadingTestCases, setLoadingTestCases] = React.useState(true);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [selectedCategory, setSelectedCategory] = React.useState('all');
 
     // RAN Components
     const ranComponents = [
@@ -38,37 +28,122 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       { id: 'core', name: 'Core Network', status: 'active', color: 'green' }
     ];
 
-    // Test Suites Categories
-    const testSuites = [
-      {
-        id: '5g-nr',
-        name: '5G NR Test Suites',
-        expanded: true,
-        children: [
-          { id: '5g-connectivity', name: '5G Connectivity', count: 0 },
-          { id: 'beam-management', name: 'Beam Management', count: 0 },
-          { id: 'network-slice', name: 'Network Slice Test', count: 0 }
-        ]
-      },
-      {
-        id: '4g-lte',
-        name: '4G LTE Test Suites',
-        expanded: true,
-        children: [
-          { id: 'lte-functional', name: 'Functional', count: 1 }
-        ]
-      },
-      {
-        id: 'core-network',
-        name: 'Core Network Test Suites',
-        expanded: false,
-        children: []
-      }
-    ];
+    // Test Suites Categories - Dynamic based on loaded test cases
+    const getTestSuites = () => {
+      const categories = {};
+      testCases.forEach(tc => {
+        const category = tc.category || 'Other';
+        if (!categories[category]) {
+          categories[category] = 0;
+        }
+        categories[category]++;
+      });
+
+      return [
+        {
+          id: '5g-nr',
+          name: '5G NR Test Suites',
+          expanded: true,
+          children: [
+            { id: '5g-connectivity', name: '5G Connectivity', count: categories['5G_NR'] || 0 },
+            { id: 'beam-management', name: 'Beam Management', count: 0 },
+            { id: 'network-slice', name: 'Network Slice Test', count: 0 }
+          ]
+        },
+        {
+          id: '4g-lte',
+          name: '4G LTE Test Suites',
+          expanded: true,
+          children: [
+            { id: 'lte-functional', name: 'Functional', count: categories['4G_LTE'] || 0 }
+          ]
+        },
+        {
+          id: 'core-network',
+          name: 'Core Network Test Suites',
+          expanded: false,
+          children: [
+            { id: 'core-functional', name: 'Core Network', count: categories['CORE_NETWORK'] || 0 }
+          ]
+        },
+        {
+          id: 'other',
+          name: 'Other Test Suites',
+          expanded: false,
+          children: Object.entries(categories)
+            .filter(([cat]) => !['5G_NR', '4G_LTE', 'CORE_NETWORK'].includes(cat))
+            .map(([cat, count]) => ({ id: cat.toLowerCase(), name: cat, count }))
+        }
+      ];
+    };
+
+    const testSuites = getTestSuites();
+
+    // Filter test cases based on search and category
+    const filteredTestCases = testCases.filter(tc => {
+      const matchesSearch = tc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           tc.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || tc.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
 
     const addLog = (level, message) => {
       const timestamp = new Date().toLocaleString();
       setLogs(prev => [...prev, { timestamp, level, message }]);
+    };
+
+    // Fetch test cases from Supabase
+    const fetchTestCases = async () => {
+      try {
+        setLoadingTestCases(true);
+        addLog('INFO', 'Loading test cases from database...');
+        
+        const response = await fetch('/api/test-cases/simple');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const formattedTestCases = data.map(tc => ({
+          id: tc.id,
+          name: tc.name,
+          component: tc.category || 'Unknown',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '',
+          priority: tc.priority || 'Medium',
+          selected: false,
+          category: tc.category,
+          description: tc.description
+        }));
+        
+        setTestCases(formattedTestCases);
+        addLog('INFO', `Loaded ${formattedTestCases.length} test cases from database`);
+        
+      } catch (error) {
+        addLog('ERROR', `Failed to load test cases: ${error.message}`);
+        console.error('Error loading test cases:', error);
+        
+        // Fallback to sample test cases
+        setTestCases([
+          {
+            id: 'tc-001',
+            name: 'Attach',
+            component: 'eNodeB',
+            status: 'Not Started',
+            iterations: 'Never',
+            successRate: 'N/A',
+            lastRun: 'N/A',
+            duration: '',
+            priority: 'Medium',
+            selected: false
+          }
+        ]);
+      } finally {
+        setLoadingTestCases(false);
+      }
     };
 
     const handleRunTest = async (testId) => {
@@ -175,6 +250,11 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         tc.id === testId ? { ...tc, selected: !tc.selected } : tc
       ));
     };
+
+    // Load test cases on component mount
+    React.useEffect(() => {
+      fetchTestCases();
+    }, []);
 
     const getStatusColor = (status) => {
       switch (status) {
@@ -373,8 +453,82 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
             ])
           ]),
 
-          // Test Cases Table
+          // Search and Filter Controls
           React.createElement('div', {
+            key: 'search-filters',
+            className: 'mb-4 p-4 bg-gray-50 rounded-lg'
+          }, [
+            React.createElement('div', {
+              key: 'search-row',
+              className: 'flex gap-4 items-center'
+            }, [
+              React.createElement('div', {
+                key: 'search',
+                className: 'flex-1'
+              }, [
+                React.createElement('label', {
+                  key: 'search-label',
+                  className: 'block text-sm font-medium text-gray-700 mb-1'
+                }, 'Search Test Cases'),
+                React.createElement('input', {
+                  key: 'search-input',
+                  type: 'text',
+                  placeholder: 'Search by name or description...',
+                  value: searchTerm,
+                  onChange: (e) => setSearchTerm(e.target.value),
+                  className: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                })
+              ]),
+              React.createElement('div', {
+                key: 'category',
+                className: 'flex-1'
+              }, [
+                React.createElement('label', {
+                  key: 'category-label',
+                  className: 'block text-sm font-medium text-gray-700 mb-1'
+                }, 'Filter by Category'),
+                React.createElement('select', {
+                  key: 'category-select',
+                  value: selectedCategory,
+                  onChange: (e) => setSelectedCategory(e.target.value),
+                  className: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                }, [
+                  React.createElement('option', { key: 'all', value: 'all' }, 'All Categories'),
+                  ...Object.keys(testCases.reduce((acc, tc) => {
+                    acc[tc.category || 'Other'] = true;
+                    return acc;
+                  }, {})).map(cat => 
+                    React.createElement('option', { key: cat, value: cat }, cat)
+                  )
+                ])
+              ]),
+              React.createElement('div', {
+                key: 'stats',
+                className: 'text-sm text-gray-600'
+              }, [
+                React.createElement('div', { key: 'total' }, `Total: ${testCases.length}`),
+                React.createElement('div', { key: 'filtered' }, `Showing: ${filteredTestCases.length}`)
+              ])
+            ])
+          ]),
+
+          // Loading Indicator
+          loadingTestCases && React.createElement('div', {
+            key: 'loading',
+            className: 'text-center py-8'
+          }, [
+            React.createElement('div', {
+              key: 'spinner',
+              className: 'inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'
+            }),
+            React.createElement('p', {
+              key: 'loading-text',
+              className: 'mt-2 text-gray-600'
+            }, 'Loading test cases from database...')
+          ]),
+
+          // Test Cases Table
+          !loadingTestCases && React.createElement('div', {
             key: 'table',
             className: 'overflow-x-auto'
           }, [
@@ -404,7 +558,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               React.createElement('tbody', {
                 key: 'body',
                 className: 'bg-white divide-y divide-gray-200'
-              }, testCases.map(testCase => 
+              }, filteredTestCases.map(testCase => 
                 React.createElement('tr', {
                   key: testCase.id,
                   className: 'hover:bg-gray-50'
