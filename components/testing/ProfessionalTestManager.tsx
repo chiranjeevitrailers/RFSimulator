@@ -23,7 +23,7 @@ const ProfessionalTestManager: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [filteredTestCases, setFilteredTestCases] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [displayLimit, setDisplayLimit] = useState(100);
+  const [displayLimit, setDisplayLimit] = useState(500);
   const [logs, setLogs] = useState([
     { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
     { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'Loading component configurations' },
@@ -305,18 +305,18 @@ const ProfessionalTestManager: React.FC = () => {
     addLog('INFO', 'Fetching test cases from Supabase...');
     
     try {
-      const response = await fetch('/api/test-cases/simple?limit=0');
+      const response = await fetch('/api/test-cases/comprehensive/?limit=2000');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       const result = await response.json();
-      const testCasesData = result.data?.testCases || result;
+      const testCasesData = result.data || result;
       
       if (Array.isArray(testCasesData)) {
         setTestCases(testCasesData);
         setFilteredTestCases(testCasesData.slice(0, displayLimit));
-        addLog('INFO', `Loaded ${testCasesData.length} test cases from Supabase`);
+        addLog('INFO', `Loaded ${testCasesData.length} test cases from Supabase (Total: ${result.total || testCasesData.length})`);
       } else {
         addLog('ERROR', 'Invalid test cases data format');
       }
