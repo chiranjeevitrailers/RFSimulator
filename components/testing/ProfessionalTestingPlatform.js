@@ -1,4 +1,6 @@
 // Professional Testing Platform - QXDM/Keysight-like Interface
+import React from 'react';
+
 function ProfessionalTestingPlatform({ appState, onStateChange }) {
   try {
     React.useEffect(() => {
