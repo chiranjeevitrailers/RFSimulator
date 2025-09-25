@@ -1036,17 +1036,17 @@ export async function POST(request: NextRequest) {
 
     // Prepare messages for insertion into decoded_messages
     const decodedMessagesToInsert = expectedMessages.map((msg: any) => ({
-      execution_id: executionId,
-      test_case_id: testCase.id,
-      message_id: msg.id,
-      message_name: msg.messageName,
+      test_run_id: executionResult.id, // Use the actual test_case_executions.id as test_run_id
+      message_id: uuidv4(),
+      timestamp_us: (Date.now() + msg.timestampMs) * 1000,
       protocol: msg.protocol,
-      layer: msg.layer,
-      direction: msg.direction,
       message_type: msg.messageType,
-      sequence_order: msg.stepOrder,
-      timestamp_ms: Date.now() + msg.timestampMs,
-      message_payload: msg.messagePayload,
+      message_name: msg.messageName,
+      message_direction: msg.direction,
+      layer: msg.layer,
+      decoded_data: msg.messagePayload,
+      message_size: JSON.stringify(msg.messagePayload).length,
+      processing_time_ms: Math.random() * 10 + 1
     }));
 
     // Insert decoded messages into the table

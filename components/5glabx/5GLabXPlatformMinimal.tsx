@@ -137,8 +137,8 @@ const DashboardView: React.FC = () => {
           .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
-            table: 'decoded_messages',
-            filter: `test_run_id=eq.${executionId}`
+            table: 'decoded_messages'
+            // Remove filter to catch all new messages, then filter in the callback
           }, (payload) => {
           console.log('📊 5GLabX: Received realtime data:', payload.new);
           // Process the incoming message data
