@@ -149,9 +149,16 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           categorizedTestCases['5G_NR'].PERFORMANCE.length > 0 || 
           categorizedTestCases['5G_NR'].MOBILITY.length > 0 || 
           categorizedTestCases['5G_NR'].RF.length > 0) {
+        
+        const total5GNR = categorizedTestCases['5G_NR'].FUNCTIONAL.length + 
+                         categorizedTestCases['5G_NR'].PERFORMANCE.length + 
+                         categorizedTestCases['5G_NR'].MOBILITY.length + 
+                         categorizedTestCases['5G_NR'].RF.length;
+        
         testSuites.push({
           id: '5g-nr',
           name: '5G NR',
+          totalCount: total5GNR,
           expanded: true,
           children: [
             {
@@ -187,9 +194,16 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           categorizedTestCases['4G_LTE'].PERFORMANCE.length > 0 || 
           categorizedTestCases['4G_LTE'].MOBILITY.length > 0 || 
           categorizedTestCases['4G_LTE'].RF.length > 0) {
+        
+        const total4GLTE = categorizedTestCases['4G_LTE'].FUNCTIONAL.length + 
+                          categorizedTestCases['4G_LTE'].PERFORMANCE.length + 
+                          categorizedTestCases['4G_LTE'].MOBILITY.length + 
+                          categorizedTestCases['4G_LTE'].RF.length;
+        
         testSuites.push({
           id: '4g-lte',
           name: '4G LTE',
+          totalCount: total4GLTE,
           expanded: true,
           children: [
             {
@@ -225,6 +239,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         testSuites.push({
           id: 'core-network',
           name: 'Core Network',
+          totalCount: categorizedTestCases['CORE_NETWORK'].GENERAL.length,
           expanded: false,
           children: [
             {
@@ -242,6 +257,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         testSuites.push({
           id: 'call-flows',
           name: 'Call Flows',
+          totalCount: categorizedTestCases['CALL_FLOWS'].GENERAL.length,
           expanded: true,
           children: [
             {
@@ -259,6 +275,7 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
         testSuites.push({
           id: 'other',
           name: 'Other',
+          totalCount: categorizedTestCases['OTHER'].GENERAL.length,
           expanded: false,
           children: [
             {
@@ -683,10 +700,19 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
                         className: 'font-medium text-gray-900'
                       }, suite.name)
                     ]),
-                    React.createElement('span', {
-                      key: 'suite-count',
-                      className: 'text-sm text-gray-500'
-                    }, suite.children.reduce((sum, child) => sum + child.count, 0))
+                    React.createElement('div', {
+                      key: 'suite-counts',
+                      className: 'flex items-center space-x-2'
+                    }, [
+                      React.createElement('span', {
+                        key: 'total-count',
+                        className: 'text-sm font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-full'
+                      }, suite.totalCount || 0),
+                      React.createElement('span', {
+                        key: 'sub-count',
+                        className: 'text-xs text-gray-500'
+                      }, `(${suite.children.reduce((sum, child) => sum + child.count, 0)})`)
+                    ])
                   ])
                 ]),
                 selectedTestSuite === suite.id && React.createElement('div', {
