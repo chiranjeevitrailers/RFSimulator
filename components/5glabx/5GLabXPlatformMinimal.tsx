@@ -65,7 +65,7 @@ import { APIProvider } from './services/APIIntegration';
 // Services are loaded via DataFlowProvider - no need for separate script loading
 
 // Import components
-import TestManagerDataDebug from './components/TestManagerDataDebug';
+// TestManagerDataDebug component removed during cleanup
 import DirectDataInjector from './components/DirectDataInjector';
 import SimpleDataDisplay from './components/SimpleDataDisplay';
 import ThreeGPPComplianceDashboard from './components/ThreeGPPComplianceDashboard';
@@ -265,7 +265,7 @@ const DashboardView: React.FC = () => {
       )}
       
       {/* Debug Component */}
-      <TestManagerDataDebug />
+      {/* TestManagerDataDebug component removed during cleanup */}
       
       {/* Direct Data Injector */}
       <DirectDataInjector />
