@@ -13,14 +13,87 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
     const [isRunning, setIsRunning] = React.useState(false);
     const [scrollPosition, setScrollPosition] = React.useState(0);
     
-    // TODO: Integrate with existing Supabase implementation
-    // Load test cases and counts from Supabase database
-    // The implementation is already available, just need to connect here
+    // Integrate with existing working Supabase implementation
     React.useEffect(() => {
-      // Load test cases from Supabase
-      // loadTestCasesFromSupabase();
-      // loadTestSuiteCountsFromSupabase();
+      // Load test cases from existing Supabase test_cases table
+      loadTestCasesFromSupabase();
+      // Load test suite counts from existing data
+      loadTestSuiteCountsFromSupabase();
+      // Connect to 5GLabX backend for real-time log analysis
+      const ws = connectTo5GLabX();
+      
+      // Cleanup WebSocket connection on unmount
+      return () => {
+        if (ws) {
+          ws.close();
+        }
+      };
     }, []);
+
+    // Connect to existing Supabase test_cases table
+    const loadTestCasesFromSupabase = async () => {
+      try {
+        // Use existing Supabase client and test_cases table
+        const { data, error } = await supabase
+          .from('test_cases')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // Transform Supabase data to match our frontend structure
+        const transformedTestCases = data.map(testCase => ({
+          id: testCase.id,
+          name: testCase.name,
+          component: testCase.component,
+          status: testCase.status || 'Not Started',
+          iterations: testCase.iterations || 'Never',
+          successRate: testCase.success_rate || 'N/A',
+          lastRun: testCase.last_run || 'N/A',
+          duration: testCase.duration || '',
+          priority: testCase.priority || 'Medium',
+          selected: false
+        }));
+        
+        setTestCases(transformedTestCases);
+        addLog('INFO', `Loaded ${transformedTestCases.length} test cases from Supabase`);
+      } catch (error) {
+        console.error('Error loading test cases:', error);
+        addLog('ERROR', `Failed to load test cases: ${error.message}`);
+      }
+    };
+
+    // Load test suite counts from existing Supabase data
+    const loadTestSuiteCountsFromSupabase = async () => {
+      try {
+        // Get counts from existing test_cases table grouped by category
+        const { data, error } = await supabase
+          .from('test_cases')
+          .select('category, subcategory')
+          .not('category', 'is', null);
+        
+        if (error) throw error;
+        
+        // Process counts for each category and subcategory
+        const counts = {};
+        data.forEach(item => {
+          if (!counts[item.category]) {
+            counts[item.category] = { total: 0, subcategories: {} };
+          }
+          counts[item.category].total++;
+          if (item.subcategory) {
+            counts[item.category].subcategories[item.subcategory] = 
+              (counts[item.category].subcategories[item.subcategory] || 0) + 1;
+          }
+        });
+        
+        addLog('INFO', 'Loaded test suite counts from Supabase');
+        return counts;
+      } catch (error) {
+        console.error('Error loading test suite counts:', error);
+        addLog('ERROR', `Failed to load test suite counts: ${error.message}`);
+      }
+    };
     const [logs, setLogs] = React.useState([
       { timestamp: '2024-01-18 00:40:15', level: 'INFO', message: 'Initializing RAN-Core Test Manager' },
       { timestamp: '2024-01-18 00:40:16', level: 'INFO', message: 'loading component configurations' },
@@ -279,31 +352,126 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       setLogs(prev => [...prev, { timestamp, level, message }]);
     };
 
-    const handleRunTest = (testId) => {
+    const handleRunTest = async (testId) => {
       setIsRunning(true);
       addLog('INFO', `Starting test execution: ${testId}`);
       
-      // Simulate test execution
-      setTimeout(() => {
-        setIsRunning(false);
-        addLog('INFO', `Test execution completed: ${testId}`);
+      try {
+        // Use existing API endpoint for test execution
+        const response = await fetch(`/api/test-execution/${testId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            testId: testId,
+            action: 'start'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Test execution failed: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        addLog('INFO', `Test execution started: ${testId}`);
+        
+        // Update test case status
         setTestCases(prev => prev.map(tc => 
-          tc.id === testId ? { ...tc, status: 'Completed', lastRun: new Date().toLocaleString() } : tc
+          tc.id === testId ? { ...tc, status: 'Running' } : tc
         ));
-      }, 3000);
+        
+        // Monitor test execution status
+        monitorTestExecution(testId);
+        
+      } catch (error) {
+        console.error('Error running test:', error);
+        addLog('ERROR', `Failed to run test ${testId}: ${error.message}`);
+        setIsRunning(false);
+        setTestCases(prev => prev.map(tc => 
+          tc.id === testId ? { ...tc, status: 'Failed' } : tc
+        ));
+      }
     };
 
-    const handleRunAllTests = () => {
+    // Monitor test execution using existing WebSocket/Streaming
+    const monitorTestExecution = async (testId) => {
+      try {
+        // Connect to existing 5GLabX backend WebSocket for real-time updates
+        const ws = new WebSocket(`ws://localhost:8080/test-execution/${testId}`);
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'test_completed') {
+            setIsRunning(false);
+            addLog('INFO', `Test execution completed: ${testId}`);
+            setTestCases(prev => prev.map(tc => 
+              tc.id === testId ? { 
+                ...tc, 
+                status: data.success ? 'Completed' : 'Failed',
+                lastRun: new Date().toLocaleString(),
+                successRate: data.success_rate || tc.successRate,
+                duration: data.duration || tc.duration
+              } : tc
+            ));
+            ws.close();
+          } else if (data.type === 'log_message') {
+            addLog('INFO', data.message);
+          }
+        };
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          addLog('ERROR', `Connection error for test ${testId}`);
+          setIsRunning(false);
+        };
+        
+      } catch (error) {
+        console.error('Error monitoring test execution:', error);
+        addLog('ERROR', `Failed to monitor test ${testId}: ${error.message}`);
+        setIsRunning(false);
+      }
+    };
+
+    const handleRunAllTests = async () => {
       setIsRunning(true);
       addLog('INFO', 'Starting batch test execution');
       
-      setTimeout(() => {
+      try {
+        // Use existing API endpoint for batch test execution
+        const response = await fetch('/api/test-execution/batch', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'start_all',
+            testIds: testCases.map(tc => tc.id)
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Batch test execution failed: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        addLog('INFO', 'Batch test execution started');
+        
+        // Update all test cases to running status
+        setTestCases(prev => prev.map(tc => ({ ...tc, status: 'Running' })));
+        
+        // Monitor batch execution
+        monitorBatchExecution();
+        
+      } catch (error) {
+        console.error('Error running batch tests:', error);
+        addLog('ERROR', `Failed to run batch tests: ${error.message}`);
         setIsRunning(false);
-        addLog('INFO', 'Batch test execution completed');
-      }, 5000);
+      }
     };
 
-    const handleRunSelectedTests = () => {
+    const handleRunSelectedTests = async () => {
       const selectedTests = testCases.filter(tc => tc.selected);
       if (selectedTests.length === 0) {
         addLog('WARN', 'No tests selected for execution');
@@ -313,18 +481,113 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       setIsRunning(true);
       addLog('INFO', `Starting execution of ${selectedTests.length} selected tests`);
       
-      // Update selected tests to running status
-      setTestCases(prev => prev.map(tc => 
-        tc.selected ? { ...tc, status: 'Running' } : tc
-      ));
-      
-      setTimeout(() => {
-        setIsRunning(false);
-        addLog('INFO', `Completed execution of ${selectedTests.length} selected tests`);
+      try {
+        // Use existing API endpoint for selected test execution
+        const response = await fetch('/api/test-execution/batch', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'start_selected',
+            testIds: selectedTests.map(tc => tc.id)
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Selected test execution failed: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        addLog('INFO', `Started execution of ${selectedTests.length} selected tests`);
+        
+        // Update selected tests to running status
         setTestCases(prev => prev.map(tc => 
-          tc.selected ? { ...tc, status: 'Completed', lastRun: new Date().toLocaleString() } : tc
+          tc.selected ? { ...tc, status: 'Running' } : tc
         ));
-      }, 3000);
+        
+        // Monitor selected execution
+        monitorSelectedExecution(selectedTests.map(tc => tc.id));
+        
+      } catch (error) {
+        console.error('Error running selected tests:', error);
+        addLog('ERROR', `Failed to run selected tests: ${error.message}`);
+        setIsRunning(false);
+      }
+    };
+
+    // Monitor batch test execution
+    const monitorBatchExecution = async () => {
+      try {
+        const ws = new WebSocket('ws://localhost:8080/test-execution/batch');
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'batch_completed') {
+            setIsRunning(false);
+            addLog('INFO', 'Batch test execution completed');
+            setTestCases(prev => prev.map(tc => ({ 
+              ...tc, 
+              status: 'Completed', 
+              lastRun: new Date().toLocaleString() 
+            })));
+            ws.close();
+          } else if (data.type === 'test_update') {
+            setTestCases(prev => prev.map(tc => 
+              tc.id === data.testId ? { 
+                ...tc, 
+                status: data.status,
+                successRate: data.success_rate || tc.successRate,
+                duration: data.duration || tc.duration
+              } : tc
+            ));
+          }
+        };
+        
+      } catch (error) {
+        console.error('Error monitoring batch execution:', error);
+        addLog('ERROR', `Failed to monitor batch execution: ${error.message}`);
+        setIsRunning(false);
+      }
+    };
+
+    // Monitor selected test execution
+    const monitorSelectedExecution = async (testIds) => {
+      try {
+        const ws = new WebSocket(`ws://localhost:8080/test-execution/selected?ids=${testIds.join(',')}`);
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'selected_completed') {
+            setIsRunning(false);
+            addLog('INFO', `Completed execution of ${testIds.length} selected tests`);
+            setTestCases(prev => prev.map(tc => 
+              testIds.includes(tc.id) ? { 
+                ...tc, 
+                status: 'Completed', 
+                lastRun: new Date().toLocaleString() 
+              } : tc
+            ));
+            ws.close();
+          } else if (data.type === 'test_update') {
+            setTestCases(prev => prev.map(tc => 
+              tc.id === data.testId ? { 
+                ...tc, 
+                status: data.status,
+                successRate: data.success_rate || tc.successRate,
+                duration: data.duration || tc.duration
+              } : tc
+            ));
+          }
+        };
+        
+      } catch (error) {
+        console.error('Error monitoring selected execution:', error);
+        addLog('ERROR', `Failed to monitor selected execution: ${error.message}`);
+        setIsRunning(false);
+      }
     };
 
     const handleSelectAll = () => {
@@ -341,6 +604,73 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       
       setTestCases(prev => prev.filter(tc => !tc.selected));
       addLog('INFO', `Deleted ${selectedTests.length} selected tests`);
+    };
+
+    // Fetch test execution data from existing Supabase tables
+    const fetchTestExecutionData = async (testId) => {
+      try {
+        // Fetch from existing test_case_executions table
+        const { data: executions, error: execError } = await supabase
+          .from('test_case_executions')
+          .select('*')
+          .eq('test_case_id', testId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        
+        if (execError) throw execError;
+        
+        // Fetch decoded messages from existing decoded_messages table
+        const { data: messages, error: msgError } = await supabase
+          .from('decoded_messages')
+          .select('*')
+          .eq('test_case_id', testId)
+          .order('timestamp', { ascending: false });
+        
+        if (msgError) throw msgError;
+        
+        addLog('INFO', `Fetched execution data for test ${testId}`);
+        return { executions, messages };
+        
+      } catch (error) {
+        console.error('Error fetching test execution data:', error);
+        addLog('ERROR', `Failed to fetch execution data for test ${testId}: ${error.message}`);
+        return null;
+      }
+    };
+
+    // Connect to 5GLabX backend for real-time log analysis
+    const connectTo5GLabX = () => {
+      try {
+        // Connect to existing 5GLabX WebSocket for log analysis
+        const ws = new WebSocket('ws://localhost:8080/5glabx/logs');
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'log_analysis') {
+            // Add log analysis results to the automation log
+            addLog('INFO', `5GLabX Analysis: ${data.analysis}`);
+          } else if (data.type === 'decoded_message') {
+            // Add decoded message to logs
+            addLog('INFO', `Decoded: ${data.message}`);
+          }
+        };
+        
+        ws.onopen = () => {
+          addLog('INFO', 'Connected to 5GLabX backend for log analysis');
+        };
+        
+        ws.onerror = (error) => {
+          console.error('5GLabX WebSocket error:', error);
+          addLog('ERROR', 'Failed to connect to 5GLabX backend');
+        };
+        
+        return ws;
+      } catch (error) {
+        console.error('Error connecting to 5GLabX:', error);
+        addLog('ERROR', `Failed to connect to 5GLabX: ${error.message}`);
+        return null;
+      }
     };
 
     const handleScroll = (e) => {
