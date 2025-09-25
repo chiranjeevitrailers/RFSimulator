@@ -30,170 +30,246 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
 
     // Test Suites Categories - Dynamic based on loaded test cases from Supabase
     const getTestSuites = () => {
-      const categories = {};
-      const testCasesByCategory = {};
-      
-      // Process test cases from Supabase
-      testCases.forEach(tc => {
-        const category = tc.category || 'Other';
-        if (!categories[category]) {
-          categories[category] = 0;
-          testCasesByCategory[category] = [];
-        }
-        categories[category]++;
-        testCasesByCategory[category].push(tc);
-      });
-
-      // Map database categories to test suite structure
-      const mapCategoryToSuite = (categoryName) => {
-        const upperCategory = categoryName?.toUpperCase();
-        if (upperCategory?.includes('5G') || upperCategory?.includes('NR')) {
+      // Helper function to categorize test cases
+      const categorizeTestCase = (testCase) => {
+        const category = testCase.category?.toUpperCase() || '';
+        const name = testCase.name?.toUpperCase() || '';
+        const description = testCase.description?.toUpperCase() || '';
+        
+        // Check for 5G NR
+        if (category.includes('5G') || category.includes('NR') || 
+            name.includes('5G') || name.includes('NR') ||
+            description.includes('5G') || description.includes('NR')) {
           return '5G_NR';
-        } else if (upperCategory?.includes('4G') || upperCategory?.includes('LTE')) {
+        }
+        
+        // Check for 4G LTE
+        if (category.includes('4G') || category.includes('LTE') || 
+            name.includes('4G') || name.includes('LTE') ||
+            description.includes('4G') || description.includes('LTE')) {
           return '4G_LTE';
-        } else if (upperCategory?.includes('CORE') || upperCategory?.includes('AMF') || upperCategory?.includes('SMF')) {
+        }
+        
+        // Check for Core Network
+        if (category.includes('CORE') || category.includes('AMF') || category.includes('SMF') || 
+            category.includes('UPF') || category.includes('AUSF') || category.includes('UDM') ||
+            name.includes('CORE') || name.includes('AMF') || name.includes('SMF') ||
+            description.includes('CORE') || description.includes('AMF') || description.includes('SMF')) {
           return 'CORE_NETWORK';
-        } else if (upperCategory?.includes('CALL') || upperCategory?.includes('FLOW') || 
-                   upperCategory?.includes('SIP') || upperCategory?.includes('IMS') ||
-                   upperCategory?.includes('VOICE') || upperCategory?.includes('VIDEO') ||
-                   upperCategory?.includes('VOLTE') || upperCategory?.includes('VONR')) {
+        }
+        
+        // Check for Call Flows
+        if (category.includes('CALL') || category.includes('FLOW') || category.includes('SIP') || 
+            category.includes('IMS') || category.includes('VOICE') || category.includes('VIDEO') ||
+            category.includes('VOLTE') || category.includes('VONR') ||
+            name.includes('CALL') || name.includes('FLOW') || name.includes('SIP') ||
+            name.includes('IMS') || name.includes('VOICE') || name.includes('VIDEO') ||
+            description.includes('CALL') || description.includes('FLOW') || description.includes('SIP')) {
           return 'CALL_FLOWS';
         }
+        
         return 'OTHER';
       };
 
-      // Group test cases by their mapped categories
-      const suiteCategories = {};
-      Object.keys(testCasesByCategory).forEach(category => {
-        const suiteCategory = mapCategoryToSuite(category);
-        if (!suiteCategories[suiteCategory]) {
-          suiteCategories[suiteCategory] = [];
+      // Helper function to get subcategory
+      const getSubcategory = (testCase, mainCategory) => {
+        const category = testCase.category?.toUpperCase() || '';
+        const name = testCase.name?.toUpperCase() || '';
+        const description = testCase.description?.toUpperCase() || '';
+        
+        if (mainCategory === '5G_NR' || mainCategory === '4G_LTE') {
+          // Check for Functional
+          if (category.includes('FUNCTIONAL') || name.includes('FUNCTIONAL') || 
+              description.includes('FUNCTIONAL') || category.includes('ATTACH') ||
+              category.includes('CONNECTIVITY') || name.includes('ATTACH') ||
+              name.includes('CONNECTIVITY')) {
+            return 'FUNCTIONAL';
+          }
+          
+          // Check for Performance
+          if (category.includes('PERFORMANCE') || name.includes('PERFORMANCE') || 
+              description.includes('PERFORMANCE') || category.includes('THROUGHPUT') ||
+              category.includes('LATENCY') || name.includes('THROUGHPUT') ||
+              name.includes('LATENCY')) {
+            return 'PERFORMANCE';
+          }
+          
+          // Check for Mobility
+          if (category.includes('MOBILITY') || name.includes('MOBILITY') || 
+              description.includes('MOBILITY') || category.includes('HANDOVER') ||
+              category.includes('HANDOFF') || name.includes('HANDOVER') ||
+              name.includes('HANDOFF')) {
+            return 'MOBILITY';
+          }
+          
+          // Check for RF
+          if (category.includes('RF') || name.includes('RF') || 
+              description.includes('RF') || category.includes('RADIO') ||
+              category.includes('BEAM') || name.includes('RADIO') ||
+              name.includes('BEAM')) {
+            return 'RF';
+          }
+          
+          // Default to Functional if no specific match
+          return 'FUNCTIONAL';
         }
-        suiteCategories[suiteCategory].push(...testCasesByCategory[category]);
+        
+        return 'GENERAL';
+      };
+
+      // Group test cases by main category and subcategory
+      const categorizedTestCases = {
+        '5G_NR': { FUNCTIONAL: [], PERFORMANCE: [], MOBILITY: [], RF: [] },
+        '4G_LTE': { FUNCTIONAL: [], PERFORMANCE: [], MOBILITY: [], RF: [] },
+        'CORE_NETWORK': { GENERAL: [] },
+        'CALL_FLOWS': { GENERAL: [] },
+        'OTHER': { GENERAL: [] }
+      };
+
+      // Categorize all test cases
+      testCases.forEach(testCase => {
+        const mainCategory = categorizeTestCase(testCase);
+        const subcategory = getSubcategory(testCase, mainCategory);
+        
+        if (categorizedTestCases[mainCategory] && categorizedTestCases[mainCategory][subcategory]) {
+          categorizedTestCases[mainCategory][subcategory].push(testCase);
+        } else if (categorizedTestCases[mainCategory]) {
+          categorizedTestCases[mainCategory].GENERAL = categorizedTestCases[mainCategory].GENERAL || [];
+          categorizedTestCases[mainCategory].GENERAL.push(testCase);
+        }
       });
 
-      return [
-        {
+      // Build test suites structure
+      const testSuites = [];
+
+      // 5G NR Test Suite
+      if (categorizedTestCases['5G_NR'].FUNCTIONAL.length > 0 || 
+          categorizedTestCases['5G_NR'].PERFORMANCE.length > 0 || 
+          categorizedTestCases['5G_NR'].MOBILITY.length > 0 || 
+          categorizedTestCases['5G_NR'].RF.length > 0) {
+        testSuites.push({
           id: '5g-nr',
-          name: '5G NR Test Suites',
+          name: '5G NR',
           expanded: true,
           children: [
-            { 
-              id: '5g-connectivity', 
-              name: '5G Connectivity', 
-              count: suiteCategories['5G_NR']?.length || 0,
-              testCases: suiteCategories['5G_NR'] || []
+            {
+              id: '5g-functional',
+              name: 'Functional',
+              count: categorizedTestCases['5G_NR'].FUNCTIONAL.length,
+              testCases: categorizedTestCases['5G_NR'].FUNCTIONAL
             },
-            { 
-              id: 'beam-management', 
-              name: 'Beam Management', 
-              count: 0,
-              testCases: []
+            {
+              id: '5g-performance',
+              name: 'Performance',
+              count: categorizedTestCases['5G_NR'].PERFORMANCE.length,
+              testCases: categorizedTestCases['5G_NR'].PERFORMANCE
             },
-            { 
-              id: 'network-slice', 
-              name: 'Network Slice Test', 
-              count: 0,
-              testCases: []
+            {
+              id: '5g-mobility',
+              name: 'Mobility',
+              count: categorizedTestCases['5G_NR'].MOBILITY.length,
+              testCases: categorizedTestCases['5G_NR'].MOBILITY
+            },
+            {
+              id: '5g-rf',
+              name: 'RF',
+              count: categorizedTestCases['5G_NR'].RF.length,
+              testCases: categorizedTestCases['5G_NR'].RF
             }
           ]
-        },
-        {
+        });
+      }
+
+      // 4G LTE Test Suite
+      if (categorizedTestCases['4G_LTE'].FUNCTIONAL.length > 0 || 
+          categorizedTestCases['4G_LTE'].PERFORMANCE.length > 0 || 
+          categorizedTestCases['4G_LTE'].MOBILITY.length > 0 || 
+          categorizedTestCases['4G_LTE'].RF.length > 0) {
+        testSuites.push({
           id: '4g-lte',
-          name: '4G LTE Test Suites',
+          name: '4G LTE',
           expanded: true,
           children: [
-            { 
-              id: 'lte-functional', 
-              name: 'Functional', 
-              count: suiteCategories['4G_LTE']?.length || 0,
-              testCases: suiteCategories['4G_LTE'] || []
+            {
+              id: '4g-functional',
+              name: 'Functional',
+              count: categorizedTestCases['4G_LTE'].FUNCTIONAL.length,
+              testCases: categorizedTestCases['4G_LTE'].FUNCTIONAL
+            },
+            {
+              id: '4g-performance',
+              name: 'Performance',
+              count: categorizedTestCases['4G_LTE'].PERFORMANCE.length,
+              testCases: categorizedTestCases['4G_LTE'].PERFORMANCE
+            },
+            {
+              id: '4g-mobility',
+              name: 'Mobility',
+              count: categorizedTestCases['4G_LTE'].MOBILITY.length,
+              testCases: categorizedTestCases['4G_LTE'].MOBILITY
+            },
+            {
+              id: '4g-rf',
+              name: 'RF',
+              count: categorizedTestCases['4G_LTE'].RF.length,
+              testCases: categorizedTestCases['4G_LTE'].RF
             }
           ]
-        },
-        {
+        });
+      }
+
+      // Core Network Test Suite
+      if (categorizedTestCases['CORE_NETWORK'].GENERAL.length > 0) {
+        testSuites.push({
           id: 'core-network',
-          name: 'Core Network Test Suites',
+          name: 'Core Network',
           expanded: false,
           children: [
-            { 
-              id: 'core-functional', 
-              name: 'Core Network', 
-              count: suiteCategories['CORE_NETWORK']?.length || 0,
-              testCases: suiteCategories['CORE_NETWORK'] || []
+            {
+              id: 'core-general',
+              name: 'Core Network',
+              count: categorizedTestCases['CORE_NETWORK'].GENERAL.length,
+              testCases: categorizedTestCases['CORE_NETWORK'].GENERAL
             }
           ]
-        },
-        {
+        });
+      }
+
+      // Call Flows Test Suite
+      if (categorizedTestCases['CALL_FLOWS'].GENERAL.length > 0) {
+        testSuites.push({
           id: 'call-flows',
-          name: 'CALL FLOWS',
+          name: 'Call Flows',
           expanded: true,
           children: [
-            { 
-              id: 'voice-calls', 
-              name: 'Voice Calls', 
-              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('VOICE') || 
-                tc.category?.toUpperCase().includes('VOLTE')
-              ).length || 0,
-              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('VOICE') || 
-                tc.category?.toUpperCase().includes('VOLTE')
-              ) || []
-            },
-            { 
-              id: 'video-calls', 
-              name: 'Video Calls', 
-              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('VIDEO') || 
-                tc.category?.toUpperCase().includes('VONR')
-              ).length || 0,
-              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('VIDEO') || 
-                tc.category?.toUpperCase().includes('VONR')
-              ) || []
-            },
-            { 
-              id: 'sip-ims', 
-              name: 'SIP/IMS', 
-              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('SIP') || 
-                tc.category?.toUpperCase().includes('IMS')
-              ).length || 0,
-              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('SIP') || 
-                tc.category?.toUpperCase().includes('IMS')
-              ) || []
-            },
-            { 
-              id: 'call-flow-general', 
-              name: 'Call Flow General', 
-              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('CALL') || 
-                tc.category?.toUpperCase().includes('FLOW')
-              ).length || 0,
-              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
-                tc.category?.toUpperCase().includes('CALL') || 
-                tc.category?.toUpperCase().includes('FLOW')
-              ) || []
+            {
+              id: 'call-flows-general',
+              name: 'Call Flows',
+              count: categorizedTestCases['CALL_FLOWS'].GENERAL.length,
+              testCases: categorizedTestCases['CALL_FLOWS'].GENERAL
             }
           ]
-        },
-        // Add Other category if there are uncategorized test cases
-        ...(suiteCategories['OTHER']?.length > 0 ? [{
+        });
+      }
+
+      // Other Test Suite (only if there are uncategorized test cases)
+      if (categorizedTestCases['OTHER'].GENERAL.length > 0) {
+        testSuites.push({
           id: 'other',
-          name: 'Other Test Suites',
+          name: 'Other',
           expanded: false,
           children: [
-            { 
-              id: 'other-functional', 
-              name: 'Other', 
-              count: suiteCategories['OTHER']?.length || 0,
-              testCases: suiteCategories['OTHER'] || []
+            {
+              id: 'other-general',
+              name: 'Other',
+              count: categorizedTestCases['OTHER'].GENERAL.length,
+              testCases: categorizedTestCases['OTHER'].GENERAL
             }
           ]
-        }] : [])
-      ];
+        });
+      }
+
+      return testSuites;
     };
 
     const testSuites = getTestSuites();
