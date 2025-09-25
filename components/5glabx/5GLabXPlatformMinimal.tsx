@@ -113,10 +113,10 @@ const DashboardView: React.FC = () => {
       const response = await fetch('/api/tests/runs/active');
       if (response.ok) {
         const activeRun = await response.json();
-        if (activeRun?.id) {
-          console.log('📊 5GLabX: Found active execution:', activeRun.id);
+        if (activeRun?.execution_id) {
+          console.log('📊 5GLabX: Found active execution:', activeRun.execution_id);
           // Subscribe to Supabase realtime for this execution
-          subscribeToExecutionData(activeRun.id);
+          subscribeToExecutionData(activeRun.execution_id);
         }
       }
     } catch (error) {
