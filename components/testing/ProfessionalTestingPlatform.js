@@ -71,28 +71,103 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
       setLogs(prev => [...prev, { timestamp, level, message }]);
     };
 
-    const handleRunTest = (testId) => {
+    const handleRunTest = async (testId) => {
       setIsRunning(true);
       addLog('INFO', `Starting test execution: ${testId}`);
       
-      // Simulate test execution
-      setTimeout(() => {
+      try {
+        // Call the test execution API
+        const response = await fetch('/api/test-execution/enhanced', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            testCaseId: testId,
+            userId: 'user-1',
+            executionMode: 'comprehensive',
+            configuration: {},
+            timeAcceleration: 1.0,
+            logLevel: 'detailed',
+            captureMode: 'full'
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        addLog('INFO', `Test execution API called successfully: ${result.executionId}`);
+        
+        // Send data to 5GLabX Platform via custom event
+        const testExecutionEvent = new CustomEvent('testCaseExecutionStarted', {
+          detail: {
+            executionId: result.executionId,
+            testCaseId: testId,
+            testCaseData: {
+              id: testId,
+              name: testCases.find(tc => tc.id === testId)?.name || 'Unknown Test',
+              component: testCases.find(tc => tc.id === testId)?.component || 'Unknown Component',
+              expectedLayerParameters: [
+                { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
+                { layer: 'MAC', parameter: 'CQI', value: '15' },
+                { layer: 'RLC', parameter: 'PDU Size', value: '1500 bytes' }
+              ]
+            },
+            timestamp: new Date().toISOString()
+          }
+        });
+        
+        window.dispatchEvent(testExecutionEvent);
+        addLog('INFO', `Data sent to 5GLabX Platform for execution: ${result.executionId}`);
+        
+        // Also send via postMessage for additional compatibility
+        window.postMessage({
+          type: '5GLABX_TEST_EXECUTION',
+          executionId: result.executionId,
+          testCaseId: testId,
+          data: result
+        }, '*');
+        
         setIsRunning(false);
         addLog('INFO', `Test execution completed: ${testId}`);
         setTestCases(prev => prev.map(tc => 
           tc.id === testId ? { ...tc, status: 'Completed', lastRun: new Date().toLocaleString() } : tc
         ));
-      }, 3000);
+        
+      } catch (error) {
+        setIsRunning(false);
+        addLog('ERROR', `Test execution failed: ${error.message}`);
+        console.error('Test execution error:', error);
+      }
     };
 
-    const handleRunAllTests = () => {
+    const handleRunAllTests = async () => {
       setIsRunning(true);
       addLog('INFO', 'Starting batch test execution');
       
-      setTimeout(() => {
+      try {
+        const selectedTests = testCases.filter(tc => tc.selected);
+        if (selectedTests.length === 0) {
+          addLog('WARNING', 'No tests selected for execution');
+          setIsRunning(false);
+          return;
+        }
+
+        for (const testCase of selectedTests) {
+          await handleRunTest(testCase.id);
+          // Small delay between tests
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
         setIsRunning(false);
         addLog('INFO', 'Batch test execution completed');
-      }, 5000);
+      } catch (error) {
+        setIsRunning(false);
+        addLog('ERROR', `Batch test execution failed: ${error.message}`);
+        console.error('Batch test execution error:', error);
+      }
     };
 
     const toggleTestSelection = (testId) => {
