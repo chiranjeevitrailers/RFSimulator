@@ -105,8 +105,17 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
-        const formattedTestCases = data.map(tc => ({
+        const responseData = await response.json();
+        console.log('API Response:', responseData);
+        
+        const testCases = responseData.data?.testCases || responseData || [];
+        console.log('Test Cases Array:', testCases);
+        
+        if (!Array.isArray(testCases)) {
+          throw new Error(`Expected array but got: ${typeof testCases}`);
+        }
+        
+        const formattedTestCases = testCases.map(tc => ({
           id: tc.id,
           name: tc.name,
           component: tc.category || 'Unknown',
