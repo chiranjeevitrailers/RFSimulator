@@ -53,6 +53,11 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
           return '4G_LTE';
         } else if (upperCategory?.includes('CORE') || upperCategory?.includes('AMF') || upperCategory?.includes('SMF')) {
           return 'CORE_NETWORK';
+        } else if (upperCategory?.includes('CALL') || upperCategory?.includes('FLOW') || 
+                   upperCategory?.includes('SIP') || upperCategory?.includes('IMS') ||
+                   upperCategory?.includes('VOICE') || upperCategory?.includes('VIDEO') ||
+                   upperCategory?.includes('VOLTE') || upperCategory?.includes('VONR')) {
+          return 'CALL_FLOWS';
         }
         return 'OTHER';
       };
@@ -116,6 +121,61 @@ function ProfessionalTestingPlatform({ appState, onStateChange }) {
               name: 'Core Network', 
               count: suiteCategories['CORE_NETWORK']?.length || 0,
               testCases: suiteCategories['CORE_NETWORK'] || []
+            }
+          ]
+        },
+        {
+          id: 'call-flows',
+          name: 'CALL FLOWS',
+          expanded: true,
+          children: [
+            { 
+              id: 'voice-calls', 
+              name: 'Voice Calls', 
+              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('VOICE') || 
+                tc.category?.toUpperCase().includes('VOLTE')
+              ).length || 0,
+              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('VOICE') || 
+                tc.category?.toUpperCase().includes('VOLTE')
+              ) || []
+            },
+            { 
+              id: 'video-calls', 
+              name: 'Video Calls', 
+              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('VIDEO') || 
+                tc.category?.toUpperCase().includes('VONR')
+              ).length || 0,
+              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('VIDEO') || 
+                tc.category?.toUpperCase().includes('VONR')
+              ) || []
+            },
+            { 
+              id: 'sip-ims', 
+              name: 'SIP/IMS', 
+              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('SIP') || 
+                tc.category?.toUpperCase().includes('IMS')
+              ).length || 0,
+              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('SIP') || 
+                tc.category?.toUpperCase().includes('IMS')
+              ) || []
+            },
+            { 
+              id: 'call-flow-general', 
+              name: 'Call Flow General', 
+              count: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('CALL') || 
+                tc.category?.toUpperCase().includes('FLOW')
+              ).length || 0,
+              testCases: suiteCategories['CALL_FLOWS']?.filter(tc => 
+                tc.category?.toUpperCase().includes('CALL') || 
+                tc.category?.toUpperCase().includes('FLOW')
+              ) || []
             }
           ]
         },
