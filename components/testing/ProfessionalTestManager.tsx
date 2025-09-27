@@ -26,7 +26,7 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1amRrbmh4c3J1Z3h3Y2ppZGFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0OTQ5NDUsImV4cCI6MjA3MDA3MDk0NX0.gyJXy01zbvRkue9fWinO_b1KmxE_92SOIR9oM1E87SI'
 );
 
-// Professional Testing Platform - QXDM/Keysight-like Interface (Corrected to match image)
+// Professional Testing Platform - QXDM/Keysight-like Interface (Syntax Fixed) (Corrected to match image)
 const ProfessionalTestManager: React.FC = () => {
   try {
     React.useEffect(() => {
