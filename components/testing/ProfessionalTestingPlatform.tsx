@@ -1,4 +1,4 @@
-// Professional Testing Platform - QXDM/Keysight-like Interface
+// Professional Testing Platform - QXDM/Keysight-like Interface (Fixed)
 import React from 'react';
 
 interface ProfessionalTestingPlatformProps {
