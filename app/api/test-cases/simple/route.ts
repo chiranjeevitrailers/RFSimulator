@@ -26,10 +26,11 @@ export async function GET(request: NextRequest) {
       query = query.eq('category', category);
     }
     
-    // Apply limit
+    // Apply limit (0 means no limit - return all)
     if (limit > 0) {
       query = query.limit(limit);
     }
+    // If limit is 0, don't apply any limit to get all test cases
     
     const { data: testCases, error } = await query;
     

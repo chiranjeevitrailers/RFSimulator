@@ -1,0 +1,129 @@
+🔄 COMPLETE BACKEND & FRONTEND INTEGRATION MAP
+================================================================
+
+📱 FRONTEND COMPONENTS
+├── ProfessionalTestManager.tsx (Main Test Manager UI)
+├── TestSuitesDashboard.tsx (Test Suite Management)
+├── DataFlowProvider.tsx (Real-time Data Flow)
+├── APIIntegration.tsx (API Service Layer)
+├── DataFlowIntegration.tsx (5GLabX Integration)
+└── EnhancedDataFlowIntegration.tsx (Advanced Integration)
+
+🌐 API ENDPOINTS (26 Total)
+├── Test Cases APIs
+│   ├── /api/test-cases/comprehensive (Main - 1800+ test cases)
+│   ├── /api/test-cases/simple (Basic test case data)
+│   ├── /api/test-cases/basic (Simple queries)
+│   ├── /api/test-cases/all (All test cases for sidebar)
+│   ├── /api/test-cases/create (Create new test cases)
+│   ├── /api/test-cases/update/[id] (Update test cases)
+│   ├── /api/test-cases/verify (Verify test cases)
+│   └── /api/test-cases/volte-vonr-conference-ims (Specialized)
+│
+├── Test Execution APIs
+│   ├── /api/test-execution/simple (Basic execution - WORKING)
+│   ├── /api/test-execution/comprehensive (Full execution data)
+│   ├── /api/test-execution/attach-flow (Attach flow simulation)
+│   ├── /api/test-execution/enhanced (Enhanced execution)
+│   ├── /api/test-execution/stream (Real-time streaming)
+│   └── /api/test-execution/trigger-protocol-layers (Protocol triggers)
+│
+├── Test Management APIs
+│   ├── /api/tests/run (Run tests)
+│   ├── /api/tests/run-simple (Simple test runs)
+│   ├── /api/tests/stats (Test statistics)
+│   ├── /api/tests/[id] (Individual test data)
+│   ├── /api/tests/runs/[id] (Test run data)
+│   ├── /api/tests/runs/[id]/messages (Test run messages)
+│   └── /api/tests/runs/active (Active test runs)
+│
+├── Data Creation APIs
+│   ├── /api/test-case-messages/create (Create test messages)
+│   ├── /api/test-case-information-elements/create (Create IEs)
+│   └── /api/test-case-layer-parameters/create (Create layer params)
+│
+└── Simulation APIs
+    └── /api/simulation/stream (Simulation streaming)
+
+🗄️ DATABASE TABLES (Supabase)
+├── test_cases (1800+ records) - Main test case definitions
+├── test_case_executions - Test execution records
+├── test_case_messages - Protocol messages for tests
+├── test_case_information_elements - 3GPP information elements
+├── test_case_layer_parameters - Protocol layer parameters
+├── decoded_messages - Real-time decoded protocol messages
+├── test_results - Test execution results
+├── execution_logs - Test execution logs
+├── users - User management
+└── user_activities - User activity tracking
+
+🔌 EXTERNAL SERVICES
+├── WebSocket Server (ws://localhost:8080)
+│   ├── /test-execution/* (Real-time test execution)
+│   └── /5glabx/logs (Real-time log analysis)
+└── 5GLabX Backend (Real-time protocol analysis)
+
+📊 DATA FLOW CONNECTIONS
+================================================================
+
+1. FRONTEND → API → DATABASE
+   ProfessionalTestManager.tsx
+   ├── fetch('/api/test-cases/comprehensive') → test_cases table
+   ├── fetch('/api/test-execution/simple') → test_case_executions + decoded_messages
+   └── WebSocket connection → Real-time updates
+
+2. WORKING INTEGRATION PATHS
+   ✅ /api/test-execution/simple (FULLY WORKING)
+   ├── GET: Fetches test case + execution data
+   ├── POST: Creates execution + populates decoded_messages
+   └── Real-time WebSocket updates
+
+   ✅ /api/test-cases/comprehensive (FULLY WORKING)
+   ├── Fetches 1800+ test cases from Supabase
+   ├── Includes messages, IEs, layer parameters
+   └── Used by ProfessionalTestManager for sidebar
+
+3. REAL-TIME DATA FLOW
+   Frontend → API → Supabase → 5GLabX → WebSocket → Frontend
+   ├── Test execution triggers
+   ├── Protocol message decoding
+   ├── Real-time log analysis
+   └── Live UI updates
+
+🚨 CURRENT ISSUE: ProfessionalTestManager.tsx
+================================================================
+❌ PROBLEM: Component is using React.useState instead of imported useState
+❌ PROBLEM: Not properly connected to working backend APIs
+❌ PROBLEM: Static frontend with no real database integration
+
+✅ SOLUTION NEEDED:
+1. Fix React hooks imports (useState, useEffect)
+2. Connect to working /api/test-execution/simple endpoint
+3. Implement real test case loading from /api/test-cases/comprehensive
+4. Add WebSocket connection for real-time updates
+5. Connect to 5GLabX backend for log analysis
+
+🔧 WORKING BACKEND ENDPOINTS (Ready to Use)
+================================================================
+✅ /api/test-execution/simple
+   - GET: Fetches test case data
+   - POST: Executes test and populates database
+   - Returns: Complete test case + execution data
+
+✅ /api/test-cases/comprehensive
+   - GET: Fetches all 1800+ test cases
+   - Includes: Messages, IEs, layer parameters
+   - Used for: Sidebar categories and test selection
+
+✅ WebSocket Integration
+   - ws://localhost:8080/test-execution/*
+   - Real-time test execution updates
+   - Live log streaming to 5GLabX tab
+
+🎯 NEXT STEPS TO FIX INTEGRATION
+================================================================
+1. Update ProfessionalTestManager.tsx to use proper React hooks
+2. Connect to /api/test-execution/simple for test execution
+3. Connect to /api/test-cases/comprehensive for test case loading
+4. Add WebSocket connection for real-time updates
+5. Test end-to-end data flow: Frontend → API → Database → 5GLabX
