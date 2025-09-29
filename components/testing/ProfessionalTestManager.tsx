@@ -1397,6 +1397,7 @@ const ProfessionalTestManager: React.FC = () => {
           ))
         ])
       ])
+      ])
     ]);
 
   } catch (error) {
