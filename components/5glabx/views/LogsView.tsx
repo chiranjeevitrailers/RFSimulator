@@ -578,15 +578,14 @@ const LogsView: React.FC<{
       }
     };
 
-    // Check for TestCasePlaybackService availability
+    // Check for TestCasePlaybackService availability (optional - don't retry)
     const checkTestCasePlaybackService = () => {
       if (window.TestCasePlaybackService) {
         console.log('✅ TestCasePlaybackService is available');
         console.log('📊 LogsView: TestCasePlaybackService integration ready');
       } else {
-        console.warn('⚠️  TestCasePlaybackService not available on window object');
-        // Retry after a short delay
-        setTimeout(checkTestCasePlaybackService, 1000);
+        console.log('ℹ️  TestCasePlaybackService not available - using Supabase Realtime instead');
+        // Don't retry - use Supabase Realtime as primary data source
       }
     };
 

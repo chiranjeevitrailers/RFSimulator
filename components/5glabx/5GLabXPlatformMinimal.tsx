@@ -706,7 +706,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   useEffect(() => {
     const connectTo5GLabX = () => {
       try {
-        const ws = new WebSocket('ws://localhost:8080/5glabx/logs');
+        const wsUrl = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8081';
+        const ws = new WebSocket(wsUrl);
         
         ws.onopen = () => {
           setIsConnected(true);
@@ -725,8 +726,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         
         ws.onclose = () => {
           setIsConnected(false);
-          console.log('Disconnected from 5GLabX WebSocket. Attempting to reconnect in 5 seconds...');
-          setTimeout(connectTo5GLabX, 5000);
+          console.log('Disconnected from 5GLabX WebSocket. Connection closed.');
+          // Don't auto-reconnect to avoid infinite loops
         };
         
         ws.onerror = (error) => {
