@@ -81,71 +81,14 @@ const LogsView: React.FC<{
         console.log(`📋 LogsView: Processing ${logs.length} logs from event`);
         console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
 
-        // FORCE IMMEDIATE DISPLAY - Multiple attempts
-        console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 1 (5GLABX_TEST_EXECUTION)');
+        // Normal state update
         setLogs(prev => {
           const newLogs = [...prev, ...logs];
-          console.log(`✅ LogsView: Added ${logs.length} log entries from event`);
-          console.log(`📊 Total logs now: ${newLogs.length}`);
           return newLogs;
         });
 
         setIsReceivingData(true);
         setLastDataReceived(new Date());
-
-        // FORCE DISPLAY ATTEMPT 2
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 2 (5GLABX_TEST_EXECUTION)');
-          setLogs(current => [...current]);
-        }, 50);
-
-        // FORCE DISPLAY ATTEMPT 3
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 3 (5GLABX_TEST_EXECUTION)');
-          if (onStateChange) {
-            onStateChange({
-              currentView: 'logs',
-              testExecutionActive: true,
-              testExecutionStatus: 'active',
-              logs: logs
-            });
-          }
-        }, 100);
-
-        // FORCE DISPLAY ATTEMPT 4 - Visual indicator
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 4 (5GLABX_TEST_EXECUTION)');
-          try {
-            const indicator = document.createElement('div');
-            indicator.style.cssText = `
-              position: fixed;
-              top: 50%;
-              right: 10px;
-              background: #ff6600;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 5px;
-              font-family: monospace;
-              font-size: 12px;
-              z-index: 9999;
-              max-width: 400px;
-              word-wrap: break-word;
-            `;
-            indicator.innerHTML = `
-              <strong>🚨 5GLABX EVENT RECEIVED</strong><br>
-              Test Case: ${testCaseId}<br>
-              Logs: ${logs.length}<br>
-              Time: ${new Date().toLocaleTimeString()}
-            `;
-            document.body.appendChild(indicator);
-
-            setTimeout(() => {
-              indicator.remove();
-            }, 5000);
-          } catch (error) {
-            console.warn('DOM manipulation failed:', error);
-          }
-        }, 200);
       } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
         console.log('🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event');
 
@@ -243,8 +186,7 @@ const LogsView: React.FC<{
       // Force immediate UI update for real-time display
       console.log('🚀 LogsView: Processing data immediately for display');
 
-      // FORCE UI UPDATE - Process data even if services are not available
-      console.log('🔥 LogsView: FORCE PROCESSING DATA despite service warnings');
+      // Process data through normal flow
 
       // Force UI update even with minimal data
       if (!data.testCaseData) {
@@ -333,22 +275,7 @@ const LogsView: React.FC<{
 
         console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`);
 
-        // FORCE IMMEDIATE UI UPDATE - Multiple times to ensure display
-        console.log('🔥 LogsView: FORCING IMMEDIATE UI UPDATE');
-        setTimeout(() => {
-          setLogs(current => [...current]);
-          console.log('🔥 LogsView: First forced update');
-        }, 50);
-
-        setTimeout(() => {
-          setLogs(current => [...current]);
-          console.log('🔥 LogsView: Second forced update');
-        }, 100);
-
-        setTimeout(() => {
-          setLogs(current => [...current]);
-          console.log('🔥 LogsView: Third forced update - data should be visible now');
-        }, 200);
+        // Normal state update - no forced updates needed
 
         // Also trigger state change in parent component
         setTimeout(() => {
@@ -375,59 +302,7 @@ const LogsView: React.FC<{
           console.log('📋 Test case data structure:', Object.keys(testCaseData));
         }
 
-        // DIRECT INJECTION BYPASS - Force data display regardless of service availability
-        console.log('🔥 LogsView: ATTEMPTING DIRECT INJECTION BYPASS');
-
-        // Create a fallback display mechanism
-        const directInjectionData = {
-          testCaseId: testCaseId,
-          testCaseData: testCaseData,
-          messages: messages,
-          source: source,
-          timestamp: Date.now()
-        };
-
-        // Force immediate display using direct manipulation
-        if (typeof window !== 'undefined') {
-          // Create a global function for immediate data injection
-          window.forceLogsUpdate = (data) => {
-            console.log('🔥 FORCE LOGS UPDATE CALLED with:', data.testCaseData?.name || 'Unknown');
-
-            const forcedLogs = (data.testCaseData?.expectedMessages || data.testCaseData?.realtimeMessages || data.messages || []).map((msg, idx) => ({
-              id: `forced-${Date.now()}-${idx}`,
-              timestamp: (Date.now() / 1000).toFixed(1),
-              level: 'I',
-              component: msg.layer || 'TEST',
-              message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
-              type: 'FORCED_UPDATE',
-              source: 'ForceUpdate',
-              testCaseId: data.testCaseId,
-              direction: msg.direction || 'UL',
-              protocol: msg.protocol || '5G_NR',
-              rawData: JSON.stringify(msg.messagePayload || {}, null, 2),
-              informationElements: msg.informationElements || {},
-              layerParameters: msg.layerParameters || {}
-            }));
-
-            setLogs(prev => [...prev, ...forcedLogs]);
-            console.log(`✅ FORCE UPDATE: Added ${forcedLogs.length} log entries immediately`);
-
-            // Force multiple re-renders
-            setTimeout(() => setLogs(current => [...current]), 10);
-            setTimeout(() => setLogs(current => [...current]), 50);
-            setTimeout(() => setLogs(current => [...current]), 100);
-
-            return forcedLogs;
-          };
-
-          // Auto-trigger the forced update
-          setTimeout(() => {
-            if (window.forceLogsUpdate) {
-              console.log('🚀 AUTO-TRIGGERING FORCE UPDATE');
-              window.forceLogsUpdate(directInjectionData);
-            }
-          }, 100);
-        }
+        // Removed direct injection bypass - system now only processes real data through normal flow
 
         // If no messages but we have test case data, create a summary log
         if (testCaseData && (testCaseData.name || testCaseData.testCaseName)) {
@@ -614,22 +489,9 @@ const LogsView: React.FC<{
             };
           }
 
-          // Set up a global data receiver for immediate processing
-          if (typeof window !== 'undefined') {
-            (window as any).injectTestDataToLogsView = (data: any) => {
-              console.log('🚀 Injecting test data directly to LogsView:', data);
-              processTestData(data, 'DirectInjection');
-            };
+          // Removed global data injection - system now only processes real data through normal events
 
-            // Also set up a direct data bridge
-            if (!window.directDataBridge) {
-              window.directDataBridge = {
-                inject: (data: any) => {
-                  console.log('🔗 DirectDataBridge: Injecting data to LogsView');
-                  processTestData(data, 'DirectDataBridge');
-                }
-              };
-            }
+            // Removed direct data bridge - system now only processes real data through normal events
           }
     }
 
