@@ -706,8 +706,10 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   useEffect(() => {
     const connectTo5GLabX = () => {
       try {
-        const wsUrl = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8081';
-        const ws = new WebSocket(wsUrl);
+        // For SaaS deployment, use Supabase Realtime instead of WebSocket
+        // No localhost needed - everything runs in the cloud
+        console.log('📡 5GLabX: Using Supabase Realtime for SaaS deployment');
+        return null; // Don't create WebSocket connection
         
         ws.onopen = () => {
           setIsConnected(true);

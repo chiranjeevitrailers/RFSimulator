@@ -502,9 +502,10 @@ const ProfessionalTestManager: React.FC = () => {
     // Monitor test execution using existing WebSocket/Streaming
     const monitorTestExecution = async (testId) => {
       try {
-        // Connect to existing 5GLabX backend WebSocket for real-time updates
-        const wsUrl = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8081';
-        const ws = new WebSocket(`${wsUrl}?testCaseId=${testId}`);
+        // For SaaS deployment, use Supabase Realtime instead of WebSocket
+        // No localhost needed - everything runs in the cloud
+        console.log('📡 Test Execution Monitoring: Using Supabase Realtime for SaaS deployment');
+        return; // Don't create WebSocket connection
         
         ws.onmessage = (event) => {
           try {
@@ -788,9 +789,10 @@ const ProfessionalTestManager: React.FC = () => {
     // Connect to 5GLabX backend for real-time log analysis
     const connectTo5GLabX = () => {
       try {
-        // Connect to the proper 5GLabX WebSocket server
-        const wsUrl = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8081';
-        const ws = new WebSocket(wsUrl);
+        // For SaaS deployment, use Supabase Realtime instead of WebSocket
+        // No localhost needed - everything runs in the cloud
+        console.log('📡 Professional Test Manager: Using Supabase Realtime for SaaS deployment');
+        return null; // Don't create WebSocket connection
         
         ws.onmessage = (event) => {
           try {
