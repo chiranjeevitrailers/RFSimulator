@@ -146,11 +146,11 @@ const LogsView: React.FC<{
             console.warn('DOM manipulation failed:', error);
           }
         }, 200);
-      } else if (testCaseData && testCaseData.expectedMessages) {
+      } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
         console.log('🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event');
 
-        // Process the test case data directly
-        const messages = testCaseData.expectedMessages;
+        // Process the test case data directly - handle both expectedMessages and realtimeMessages
+        const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || [];
         console.log(`📋 Processing ${messages.length} messages from testCaseData`);
 
         const processedLogs = messages.map((message, index) => ({
@@ -231,7 +231,7 @@ const LogsView: React.FC<{
       console.log('📊 LogsView processing test case data:', {
         testCaseId: data.testCaseId,
         testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
-        messageCount: data.testCaseData?.expectedMessages?.length || 0,
+        messageCount: (data.testCaseData?.expectedMessages?.length || data.testCaseData?.realtimeMessages?.length || 0),
         dataSource: source,
         dataType: data.type,
         hasTestCaseData: !!data.testCaseData,
@@ -284,6 +284,8 @@ const LogsView: React.FC<{
       let messages = [];
       if (testCaseData.expectedMessages) {
         messages = testCaseData.expectedMessages;
+      } else if (testCaseData.realtimeMessages) {
+        messages = testCaseData.realtimeMessages;
       } else if (testCaseData.messages) {
         messages = testCaseData.messages;
       } else if (Array.isArray(testCaseData)) {
@@ -392,7 +394,7 @@ const LogsView: React.FC<{
           window.forceLogsUpdate = (data) => {
             console.log('🔥 FORCE LOGS UPDATE CALLED with:', data.testCaseData?.name || 'Unknown');
 
-            const forcedLogs = (data.testCaseData?.expectedMessages || data.messages || []).map((msg, idx) => ({
+            const forcedLogs = (data.testCaseData?.expectedMessages || data.testCaseData?.realtimeMessages || data.messages || []).map((msg, idx) => ({
               id: `forced-${Date.now()}-${idx}`,
               timestamp: (Date.now() / 1000).toFixed(1),
               level: 'I',
@@ -478,7 +480,7 @@ const LogsView: React.FC<{
           testCaseId: event.data.testCaseId,
           runId: event.data.runId,
           hasTestCaseData: !!event.data.testCaseData,
-          messageCount: event.data.testCaseData?.expectedMessages?.length || 0,
+          messageCount: (event.data.testCaseData?.expectedMessages?.length || event.data.testCaseData?.realtimeMessages?.length || 0),
           dataKeys: Object.keys(event.data)
         });
         processTestData(event.data, 'PostMessage');

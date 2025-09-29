@@ -275,13 +275,9 @@ const DashboardView: React.FC = () => {
       // Fallback: Check for active test executions on mount
       checkForActiveExecutions();
       
-      // 🔥 FALLBACK: Inject sample data if no real data is available after 3 seconds
-      setTimeout(() => {
-        if (!testManagerData || !testManagerData.executionId) {
-          console.log('📊 5GLabX: No real data available, injecting sample data for demonstration');
-          injectSampleData();
-        }
-      }, 3000);
+      // 🔥 FALLBACK: Only inject sample data if explicitly requested (not during real test execution)
+      // Removed automatic demo injection to prevent interference with real test data
+      // Demo data can be manually triggered via browser console if needed for testing
     }
 
     return () => {

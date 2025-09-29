@@ -16,11 +16,14 @@ export const EventBridge: React.FC = () => {
       
       const { testCaseId, testCaseData, executionId } = event.detail;
       
-      if (testCaseData && testCaseData.expectedMessages) {
-        console.log(`🔗 EventBridge: Converting ${testCaseData.expectedMessages.length} messages to logs format`);
+      // Handle both expectedMessages and realtimeMessages structures
+      const messages = testCaseData?.expectedMessages || testCaseData?.realtimeMessages || [];
+      
+      if (testCaseData && messages.length > 0) {
+        console.log(`🔗 EventBridge: Converting ${messages.length} messages to logs format`);
         
-        // Convert expectedMessages to logs format
-        const logs = testCaseData.expectedMessages.map((message: any, index: number) => ({
+        // Convert messages to logs format (works with both expectedMessages and realtimeMessages)
+        const logs = messages.map((message: any, index: number) => ({
           id: `bridge-${testCaseId}-${index}-${Date.now()}`,
           timestamp: (Date.now() / 1000).toFixed(1),
           level: 'I',
@@ -107,7 +110,7 @@ export const EventBridge: React.FC = () => {
         console.log(`🔗 EventBridge: Dispatched layerTraceUpdate with ${logs.length} logs`);
         
       } else {
-        console.warn('🔗 EventBridge: No expectedMessages found in testCaseData');
+        console.warn('🔗 EventBridge: No messages found in testCaseData (checked both expectedMessages and realtimeMessages)');
       }
     };
 
@@ -118,11 +121,14 @@ export const EventBridge: React.FC = () => {
         
         const { testCaseId, testCaseData, executionId } = event.data;
         
-        if (testCaseData && testCaseData.expectedMessages) {
-          console.log(`🔗 EventBridge: Converting postMessage ${testCaseData.expectedMessages.length} messages to logs format`);
+        // Handle both expectedMessages and realtimeMessages structures
+        const messages = testCaseData?.expectedMessages || testCaseData?.realtimeMessages || [];
+        
+        if (testCaseData && messages.length > 0) {
+          console.log(`🔗 EventBridge: Converting postMessage ${messages.length} messages to logs format`);
           
-          // Convert expectedMessages to logs format
-          const logs = testCaseData.expectedMessages.map((message: any, index: number) => ({
+          // Convert messages to logs format (works with both expectedMessages and realtimeMessages)
+          const logs = messages.map((message: any, index: number) => ({
             id: `bridge-post-${testCaseId}-${index}-${Date.now()}`,
             timestamp: (Date.now() / 1000).toFixed(1),
             level: 'I',
