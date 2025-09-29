@@ -1340,8 +1340,6 @@ const ProfessionalTestManager: React.FC = () => {
               ))
             ])
           ])
-            ]) // Close table container
-          ]) // Close table-container
         ]),
 
         // Automation Log Section - Positioned below Test Cases Management
