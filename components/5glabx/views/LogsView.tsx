@@ -41,8 +41,8 @@ const LogsView: React.FC<{
         console.log(`📋 LogsView: Processing ${logs.length} immediate logs from ${source}`);
         console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
 
-        // FORCE IMMEDIATE DISPLAY - Multiple attempts to ensure visibility
-        console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 1');
+        // FIXED: Single atomic state update to prevent race conditions
+        console.log('🔥 LogsView: Processing immediate logs update');
         setLogs(prev => {
           const newLogs = [...prev, ...logs];
           console.log(`✅ LogsView: Added ${logs.length} immediate log entries`);
@@ -54,64 +54,15 @@ const LogsView: React.FC<{
         setIsReceivingData(true);
         setLastDataReceived(new Date());
 
-        // FORCE DISPLAY ATTEMPT 2 - After short delay
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 2');
-          setLogs(current => {
-            console.log(`📊 Current logs count: ${current.length}`);
-            // Force re-render even if logs are the same
-            return [...current];
+        // Notify parent component
+        if (onStateChange) {
+          onStateChange({
+            currentView: 'logs',
+            testExecutionActive: true,
+            testExecutionStatus: 'active',
+            logs: logs
           });
-        }, 50);
-
-        // FORCE DISPLAY ATTEMPT 3 - With parent component update
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 3');
-          if (onStateChange) {
-            onStateChange({
-              currentView: 'logs',
-              testExecutionActive: true,
-              testExecutionStatus: 'active',
-              logs: logs
-            });
-          }
-        }, 100);
-
-        // FORCE DISPLAY ATTEMPT 4 - Direct DOM manipulation fallback
-        setTimeout(() => {
-          console.log('🔥 FORCE IMMEDIATE DISPLAY ATTEMPT 4 - DOM fallback');
-          try {
-            // Create visual indicator that data is being processed
-            const indicator = document.createElement('div');
-            indicator.style.cssText = `
-              position: fixed;
-              top: 50%;
-              right: 10px;
-              background: #00ff00;
-              color: black;
-              padding: 10px 20px;
-              border-radius: 5px;
-              font-family: monospace;
-              font-size: 12px;
-              z-index: 9999;
-              max-width: 400px;
-              word-wrap: break-word;
-            `;
-            indicator.innerHTML = `
-              <strong>🚨 DATA RECEIVED</strong><br>
-              Source: ${source}<br>
-              Logs: ${logs.length}<br>
-              Time: ${new Date().toLocaleTimeString()}
-            `;
-            document.body.appendChild(indicator);
-
-            setTimeout(() => {
-              indicator.remove();
-            }, 5000);
-          } catch (error) {
-            console.warn('DOM manipulation failed:', error);
-          }
-        }, 200);
+        }
       } else {
         console.log('⚠️  No logs found in immediate-logs-update event:', event.detail);
       }

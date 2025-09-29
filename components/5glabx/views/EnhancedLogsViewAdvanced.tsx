@@ -55,8 +55,11 @@ const EnhancedLogsViewAdvanced: React.FC<{
                     source: 'TestManager'
                   };
 
-                  setLogs(prev => [...prev.slice(-99), enhancedLog]);
-                  console.log(`📊 Enhanced Logs Advanced: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
+                  setLogs(prev => {
+                    const newLogs = [...prev.slice(-99), enhancedLog];
+                    console.log(`📊 Enhanced Logs Advanced: Added message ${index + 1}/${testCaseData.expectedMessages.length} - ${message.messageName || 'Unknown'}`);
+                    return newLogs;
+                  });
                 } catch (error) {
                   console.error(`❌ Enhanced Logs Advanced: Error processing message ${index}:`, error);
                 }
@@ -91,8 +94,11 @@ const EnhancedLogsViewAdvanced: React.FC<{
           source: 'TestManager'
         };
 
-        setLogs(prev => [...prev.slice(-99), enhancedLog]);
-        console.log('📊 Enhanced Logs Advanced: Added direct log entry:', enhancedLog.message);
+        setLogs(prev => {
+          const newLogs = [...prev.slice(-99), enhancedLog];
+          console.log('📊 Enhanced Logs Advanced: Added direct log entry:', enhancedLog.message);
+          return newLogs;
+        });
       } catch (error) {
         console.error('❌ Enhanced Logs Advanced: Error handling direct log update:', error);
       }
