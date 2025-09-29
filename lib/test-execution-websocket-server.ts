@@ -242,7 +242,7 @@ class TestExecutionWebSocketServer {
       const now = Date.now();
 
       // Send heartbeat to all connected clients
-      for (const [clientId, client] of this.clients.entries()) {
+      Array.from(this.clients.entries()).forEach(([clientId, client]) => {
         if (client.ws.readyState === WebSocket.OPEN) {
           try {
             client.ws.send(JSON.stringify({
@@ -258,16 +258,16 @@ class TestExecutionWebSocketServer {
         } else {
           this.clients.delete(clientId);
         }
-      }
+      });
 
       // Clean up inactive clients (no activity for 5 minutes)
-      for (const [clientId, client] of this.clients.entries()) {
+      Array.from(this.clients.entries()).forEach(([clientId, client]) => {
         if (now - client.lastActivity > 300000) {
           client.ws.close(1000, 'Connection timeout');
           this.clients.delete(clientId);
           console.log(`Cleaned up inactive client: ${clientId}`);
         }
-      }
+      });
     }, 30000); // Heartbeat every 30 seconds
   }
 
