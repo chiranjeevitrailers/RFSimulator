@@ -473,26 +473,24 @@ const LogsView: React.FC<{
       // Check for TestCasePlaybackService availability
       checkTestCasePlaybackService();
 
-          // Also set up integration with FiveGLabXDataReceiver if available
-          if (window.FiveGLabXDataReceiver) {
-            console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
+      // Also set up integration with FiveGLabXDataReceiver if available
+      if (window.FiveGLabXDataReceiver) {
+        console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
 
-            // Override the receiver methods to process data
-            const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
-            window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
-              console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
-              console.log('📊 FiveGLabXDataReceiver data:', JSON.stringify(data, null, 2));
-              processTestData(data, 'FiveGLabXDataReceiver');
-              if (originalOnTestExecutionData) {
-                originalOnTestExecutionData(data);
-              }
-            };
+        // Override the receiver methods to process data
+        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
+        window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
+          console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
+          console.log('📊 FiveGLabXDataReceiver data:', JSON.stringify(data, null, 2));
+          processTestData(data, 'FiveGLabXDataReceiver');
+          if (originalOnTestExecutionData) {
+            originalOnTestExecutionData(data);
           }
+        };
+      }
 
-          // Removed global data injection - system now only processes real data through normal events
-
-            // Removed direct data bridge - system now only processes real data through normal events
-          }
+      // Removed global data injection - system now only processes real data through normal events
+      // Removed direct data bridge - system now only processes real data through normal events
     }
 
     return () => {
