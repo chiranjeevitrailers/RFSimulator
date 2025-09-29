@@ -524,7 +524,7 @@ const ProtocolAnalyzerViewer: React.FC<ProtocolAnalyzerViewerProps> = ({
                   <div key={index} className={`text-xs p-2 rounded ${getLogLevelColor(log.level)}`}>
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{log.source}</span>
-                      <span>{log.timestamp.toLocaleTimeString()}</span>
+                      <span>{log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'N/A'}</span>
                     </div>
                     <div className="mt-1">{log.message}</div>
                   </div>

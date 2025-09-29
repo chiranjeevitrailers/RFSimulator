@@ -441,7 +441,7 @@ const IntegrationTester: React.FC = () => {
                           {getStatusBadge(result.status)}
                         </div>
                         <span className="text-sm text-gray-500">
-                          {result.timestamp.toLocaleTimeString()}
+                          {result.timestamp ? new Date(result.timestamp).toLocaleTimeString() : 'N/A'}
                         </span>
                       </div>
                       <p className="text-sm text-gray-700 mb-2">{result.details}</p>

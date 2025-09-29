@@ -323,7 +323,7 @@ const DataFlowDebugger: React.FC = () => {
                           {getStatusBadge(event.status)}
                         </div>
                         <span className="text-sm text-gray-500">
-                          {event.timestamp.toLocaleTimeString()}
+                          {event.timestamp ? new Date(event.timestamp).toLocaleTimeString() : 'N/A'}
                         </span>
                       </div>
                       <div className="text-sm">

@@ -462,7 +462,7 @@ const LogViewerWithAdapter: React.FC<LogViewerProps> = ({
                                 <Badge variant="outline">{log.direction}</Badge>
                               )}
                               <span className="text-xs text-gray-500">
-                                {log.timestamp.toLocaleTimeString()}
+                                {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'N/A'}
                               </span>
                             </div>
                             

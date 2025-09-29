@@ -375,7 +375,7 @@ const LogViewer: React.FC<LogViewerProps> = ({
                         {getLevelIcon(log.level)}
                         {showTimestamp && (
                           <span className="text-xs text-gray-600">
-                            {log.timestamp.toLocaleTimeString()}
+                            {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'N/A'}
                           </span>
                         )}
                       </div>

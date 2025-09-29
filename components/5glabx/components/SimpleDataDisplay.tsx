@@ -143,7 +143,7 @@ const SimpleDataDisplay: React.FC = () => {
             {testData.map((data, index) => (
               <div key={index} className="bg-white p-3 rounded border">
                 <div className="text-sm">
-                  <div><strong>Time:</strong> {data.timestamp?.toLocaleTimeString() || 'N/A'}</div>
+                  <div><strong>Time:</strong> {data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : 'N/A'}</div>
                   <div><strong>Type:</strong> {data.type || 'Unknown'}</div>
                   <div><strong>Test Case:</strong> {data.testCaseId || 'N/A'}</div>
                   <div><strong>Messages:</strong> {data.testCaseData?.expectedMessages?.length || 0}</div>
