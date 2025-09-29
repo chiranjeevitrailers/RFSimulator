@@ -72,18 +72,7 @@ const DataFlowDebugger: React.FC = () => {
       setTestData((window as any).latestTestCaseData);
     }
 
-    // Check localStorage
-    try {
-      const storedData = localStorage.getItem('5glabx_test_data');
-      if (storedData) {
-        status.localStorage = true;
-        if (!status.globalVariable) {
-          setTestData(JSON.parse(storedData));
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to check localStorage:', e);
-    }
+    // Skip localStorage in SaaS
 
     setConnectionStatus(status);
     addEvent({

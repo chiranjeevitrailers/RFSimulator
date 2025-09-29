@@ -42,15 +42,13 @@ Professional Test Manager → API → Database → 5GLabX Platform
 
 ## 📡 **WebSocket Integration**
 
-### **WebSocket Server:**
-- ✅ Running on port 8081 (`ws://localhost:8081`)
-- ✅ Handles test execution monitoring
-- ✅ Provides real-time progress updates
+### **Realtime:**
+- ✅ Supabase Realtime (no custom WebSocket server)
+- ✅ Real-time progress updates
 - ✅ Supports multiple concurrent connections
 
-### **Professional Test Manager WebSocket:**
-- ✅ Connects to `ws://localhost:8081`
-- ✅ Sends test execution start messages
+### **Professional Test Manager Realtime:**
+- ✅ Uses Supabase Realtime
 - ✅ Receives progress updates and completion notifications
 - ✅ Handles connection errors gracefully
 
@@ -96,10 +94,11 @@ Professional Test Manager → API → Database → 5GLabX Platform
 
 The Professional Test Manager is now **fully integrated** and ready for production use:
 
-1. **Start Next.js Server:** `npm run dev`
-2. **Open User Dashboard:** `http://localhost:3000/user-dashboard`
-3. **Test Manager Tab:** Select and run test cases
-4. **5GLabX Tab:** View real-time log analysis
+1. Deploy on Netlify
+2. Configure Supabase env vars in Netlify
+3. Open your Netlify URL `/user-dashboard`
+4. Test Manager Tab: Select and run test cases
+5. 5GLabX Tab: View real-time log analysis
 5. **Complete Data Flow:** Working end-to-end
 
 ---

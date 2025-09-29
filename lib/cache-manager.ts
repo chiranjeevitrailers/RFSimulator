@@ -228,10 +228,18 @@ export class CacheManager<T> {
         stats: this.stats
       };
 
-      // In a real implementation, you would save to file system
-      // For now, we'll use localStorage as a fallback
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('cache_data', JSON.stringify(data));
+      // SaaS: avoid localStorage; optionally persist to Supabase if available
+      if (typeof window !== 'undefined' && (window as any).supabase) {
+        try {
+          const userId = (window as any).supabase?.auth?.getUser?.()?.id;
+          if (userId) {
+            await (window as any).supabase.from('cache_entries').upsert({
+              user_id: userId,
+              key: 'cache_data',
+              data
+            });
+          }
+        } catch {}
       }
     } catch (error) {
       console.error('Failed to save cache to persistence:', error);
@@ -244,15 +252,24 @@ export class CacheManager<T> {
     }
 
     try {
-      // In a real implementation, you would load from file system
-      // For now, we'll use localStorage as a fallback
-      if (typeof window !== 'undefined') {
-        const data = localStorage.getItem('cache_data');
-        if (data) {
-          const parsed = JSON.parse(data);
-          this.cache = new Map(parsed.entries);
-          this.stats = parsed.stats;
-        }
+      // SaaS: read from Supabase if available
+      if (typeof window !== 'undefined' && (window as any).supabase) {
+        try {
+          const userId = (window as any).supabase?.auth?.getUser?.()?.id;
+          if (userId) {
+            const { data, error } = await (window as any).supabase
+              .from('cache_entries')
+              .select('data')
+              .eq('user_id', userId)
+              .eq('key', 'cache_data')
+              .single();
+            if (!error && data) {
+              const parsed = data.data;
+              this.cache = new Map(parsed.entries);
+              this.stats = parsed.stats;
+            }
+          }
+        } catch {}
       }
     } catch (error) {
       console.error('Failed to load cache from persistence:', error);

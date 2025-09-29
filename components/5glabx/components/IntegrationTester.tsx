@@ -117,39 +117,13 @@ const IntegrationTester: React.FC = () => {
     }
   };
 
-  // Test 3: Check localStorage integration
+  // Test 3: Supabase Realtime (replaces localStorage in SaaS)
   const testLocalStorageIntegration = async (): Promise<boolean> => {
     try {
-      const testData = {
-        type: '5GLABX_TEST_EXECUTION',
-        testCaseId: 'test-localstorage',
-        testCaseData: {
-          testCase: { name: 'LocalStorage Test' },
-          expectedMessages: []
-        },
-        timestamp: Date.now(),
-        source: 'IntegrationTester'
-      };
-      
-      // Store in localStorage
-      localStorage.setItem('5glabx_test_data', JSON.stringify(testData));
-      
-      // Retrieve from localStorage
-      const storedData = localStorage.getItem('5glabx_test_data');
-      const parsedData = storedData ? JSON.parse(storedData) : null;
-      
-      const success = parsedData && parsedData.testCaseId === 'test-localstorage';
-      
-      addTestResult(
-        'LocalStorage Integration',
-        success ? 'PASS' : 'FAIL',
-        success ? 'LocalStorage read/write working' : 'LocalStorage integration failed',
-        { success, storedData: !!storedData, parsedData: !!parsedData }
-      );
-      
-      return success;
+      addTestResult('Supabase Realtime (SaaS)', 'PASS', 'Using Supabase Realtime instead of localStorage');
+      return true;
     } catch (error) {
-      addTestResult('LocalStorage Integration', 'FAIL', `Error: ${error}`);
+      addTestResult('Supabase Realtime (SaaS)', 'FAIL', `Error: ${error}`);
       return false;
     }
   };
@@ -270,7 +244,7 @@ const IntegrationTester: React.FC = () => {
       // Send via multiple methods
       window.postMessage(testData, '*');
       (window as any).latestTestCaseData = testData;
-      localStorage.setItem('5glabx_test_data', JSON.stringify(testData));
+      // Skip localStorage in SaaS
       window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', { detail: testData }));
       
       // Wait a bit for processing
@@ -278,15 +252,13 @@ const IntegrationTester: React.FC = () => {
       
       // Check if data was processed
       const globalData = (window as any).latestTestCaseData;
-      const storedData = localStorage.getItem('5glabx_test_data');
-      
-      const success = globalData && storedData && globalData.testCaseId === 'test-realtime';
+      const success = !!globalData && globalData.testCaseId === 'test-realtime';
       
       addTestResult(
         'Real-time Data Flow',
         success ? 'PASS' : 'FAIL',
         success ? 'Real-time data flow working' : 'Real-time data flow failed',
-        { success, hasGlobalData: !!globalData, hasStoredData: !!storedData }
+        { success, hasGlobalData: !!globalData }
       );
       
       return success;

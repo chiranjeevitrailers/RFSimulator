@@ -53,11 +53,17 @@ function ConfigCreator({ componentType, onSave, onClose }) {
         createdAt: new Date().toISOString()
       };
 
-      // Save to localStorage
-      const myConfigs = JSON.parse(localStorage.getItem('my_configs') || '{}');
-      if (!myConfigs[componentType]) myConfigs[componentType] = [];
-      myConfigs[componentType].push(newConfig);
-      localStorage.setItem('my_configs', JSON.stringify(myConfigs));
+      // Save to Supabase (SaaS)
+      if (window.supabase) {
+        const userId = window?.supabase?.auth?.getUser?.()?.id;
+        if (userId) {
+          await window.supabase.from('user_configs').insert({
+            user_id: userId,
+            component_type: componentType,
+            config: newConfig
+          });
+        }
+      }
 
       onSave(newConfig);
       onClose();

@@ -8,7 +8,8 @@ class WebSocketService {
     this.isConnected = false;
   }
 
-  connect(url = process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082') {
+  connect(url = process.env.NEXT_PUBLIC_5GLABX_WS_URL) {
+    // SaaS mode: prefer Supabase Realtime; do not default to localhost
     try {
       this.ws = new WebSocket(url);
       

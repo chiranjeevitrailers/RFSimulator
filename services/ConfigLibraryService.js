@@ -32,9 +32,27 @@ class ConfigLibraryService {
   }
 
   // Get user's custom configurations
-  getMyConfigs() {
+  async getMyConfigs() {
     try {
-      return JSON.parse(localStorage.getItem(this.myConfigsKey) || '{}');
+      if (typeof window === 'undefined') return {};
+      // Prefer Supabase table if available
+      if (window.supabase) {
+        const userId = window?.supabase?.auth?.getUser?.()?.id;
+        if (userId) {
+          const { data, error } = await window.supabase
+            .from('user_configs')
+            .select('component_type, config')
+            .eq('user_id', userId);
+          if (!error && Array.isArray(data)) {
+            return data.reduce((acc, row) => {
+              acc[row.component_type] = [...(acc[row.component_type] || []), row.config];
+              return acc;
+            }, {});
+          }
+        }
+      }
+      // Fallback: return empty for SaaS (avoid localStorage in prod)
+      return {};
     } catch (error) {
       console.error('Failed to load my configs:', error);
       return {};
@@ -56,7 +74,17 @@ class ConfigLibraryService {
         type: 'custom'
       });
 
-      localStorage.setItem(this.myConfigsKey, JSON.stringify(myConfigs));
+      // Persist to Supabase if available; otherwise no-op in SaaS
+      if (window.supabase) {
+        const userId = window?.supabase?.auth?.getUser?.()?.id;
+        if (userId) {
+          await window.supabase.from('user_configs').insert({
+            user_id: userId,
+            component_type: componentType,
+            config: config
+          });
+        }
+      }
       return true;
     } catch (error) {
       console.error('Failed to save config:', error);

@@ -44,8 +44,13 @@ function CLIBridge() {
           kamailio: { ...prev.kamailio, parser: window.KamailioCliParser ? window.KamailioCliParser() : null }
         }));
 
-        // Initialize WebSocket connection to backend server
-        const ws = new WebSocket(process.env.NEXT_PUBLIC_5GLABX_WS_URL || 'ws://localhost:8082');
+        // SaaS deployment: prefer Supabase Realtime; do not default to localhost
+        const wsUrl = process.env.NEXT_PUBLIC_5GLABX_WS_URL;
+        if (!wsUrl) {
+          console.log('CLIBridge: Skipping WebSocket (SaaS mode without WS URL). Using realtime/db.');
+          return;
+        }
+        const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
           console.log('CLIBridge: Connected to backend WebSocket server');

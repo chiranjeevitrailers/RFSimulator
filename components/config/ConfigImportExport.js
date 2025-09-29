@@ -15,7 +15,7 @@ function ConfigImportExport({ onClose }) {
       setIsImporting(true);
       try {
         const configs = JSON.parse(importData);
-        const myConfigs = JSON.parse(localStorage.getItem('my_configs') || '{}');
+        const myConfigs = {};
 
         const configsToImport = Array.isArray(configs) ? configs : [configs];
 
@@ -32,7 +32,14 @@ function ConfigImportExport({ onClose }) {
           myConfigs[componentType].push(newConfig);
         });
 
-        localStorage.setItem('my_configs', JSON.stringify(myConfigs));
+        if (window.supabase) {
+          const userId = window?.supabase?.auth?.getUser?.()?.id;
+          if (userId) {
+            await window.supabase.from('user_configs').upsert(
+              configsToImport.map((c) => ({ user_id: userId, component_type: c.componentType || 'general', config: c }))
+            );
+          }
+        }
         alert(`Imported ${configsToImport.length} configuration(s) successfully!`);
         setImportData('');
       } catch (error) {
@@ -45,7 +52,7 @@ function ConfigImportExport({ onClose }) {
     const handleExportAll = async () => {
       setIsExporting(true);
       try {
-        const myConfigs = JSON.parse(localStorage.getItem('my_configs') || '{}');
+        const myConfigs = {};
         const allConfigs = [];
 
         Object.entries(myConfigs).forEach(([type, configs]) => {

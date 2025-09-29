@@ -443,10 +443,18 @@ export class APIClient {
   }
 
   private getAuthToken(): string | null {
-    // This would get the auth token from Supabase or localStorage
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
-    }
+    // Use Supabase session (no localStorage in SaaS)
+    try {
+      if (typeof window !== 'undefined' && (window as any).supabase) {
+        const session = (window as any).supabase?.auth?.getSession?.();
+        // Handle promise-based API
+        if (session && typeof session.then === 'function') {
+          // Async retrieval should be handled by callers; return null here
+          return null;
+        }
+        return session?.access_token || null;
+      }
+    } catch {}
     return null;
   }
 
