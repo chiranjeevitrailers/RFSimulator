@@ -324,6 +324,7 @@ const LogsView: React.FC<{
           setLogs(prev => {
             const newLogs = [...prev, newLog];
             console.log(`✅ Added log entry ${index + 1}:`, newLog.message.substring(0, 100) + '...');
+            console.log('🔍 Total logs after adding message:', newLogs.length);
             return newLogs;
           });
         });
@@ -557,8 +558,12 @@ const LogsView: React.FC<{
         source: 'TestManager'
       };
       
-      setLogs(prev => [...prev.slice(-99), newLog]);
-      console.log('📊 LogsView: Added direct log entry:', newLog.message);
+      setLogs(prev => {
+        const newLogs = [...prev.slice(-99), newLog];
+        console.log('📊 LogsView: Added direct log entry:', newLog.message);
+        console.log('🔍 Total logs after direct entry:', newLogs.length);
+        return newLogs;
+      });
     };
 
     // Set up all event listeners
@@ -639,6 +644,17 @@ const LogsView: React.FC<{
     const matchesComponent = selectedComponent === 'all' || log.component === selectedComponent;
     
     return matchesSearch && matchesLevel && matchesComponent;
+  });
+
+  // Debug logging to help identify the issue
+  console.log('🔍 LogsView Debug:', {
+    totalLogs: logs.length,
+    filteredLogs: filteredLogs.length,
+    searchQuery,
+    selectedLevel,
+    selectedComponent,
+    isReceivingData,
+    lastDataReceived: lastDataReceived?.toLocaleTimeString()
   });
 
   const getLevelIcon = (level: string) => {
@@ -804,7 +820,12 @@ const LogsView: React.FC<{
                   }
                 ];
 
-                setLogs(prev => [...prev, ...testLogs]);
+                console.log('🧪 Adding test logs:', testLogs);
+                setLogs(prev => {
+                  const newLogs = [...prev, ...testLogs];
+                  console.log('🧪 Logs after adding test logs:', newLogs.length);
+                  return newLogs;
+                });
                 setIsReceivingData(true);
                 setLastDataReceived(new Date());
 
