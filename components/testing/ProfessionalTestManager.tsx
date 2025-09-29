@@ -41,8 +41,8 @@ const ProfessionalTestManager: React.FC = () => {
     useEffect(() => {
       // Load test cases from existing Supabase test_cases table
       loadTestCasesFromSupabase();
-      // Load test suite counts from existing data
-      loadTestSuiteCountsFromSupabase();
+      // Skip problematic test suite counts loading to avoid infinite recursion
+      // loadTestSuiteCountsFromSupabase();
       // Connect to 5GLabX backend for real-time log analysis
       const ws = connectTo5GLabX();
       
