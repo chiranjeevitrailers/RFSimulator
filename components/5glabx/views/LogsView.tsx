@@ -569,6 +569,40 @@ const LogsView: React.FC<{
     // Set up all event listeners
     if (typeof window !== 'undefined') {
       console.log('📡 LogsView: Setting up comprehensive event listeners...');
+      
+      // Add global debug function
+      (window as any).debugLogsView = () => {
+        console.log('🔍 LogsView Debug Info:', {
+          totalLogs: logs.length,
+          filteredLogs: filteredLogs.length,
+          searchQuery,
+          selectedLevel,
+          selectedComponent,
+          isReceivingData,
+          lastDataReceived: lastDataReceived?.toLocaleTimeString(),
+          componentMounted: true
+        });
+        
+        // Add a test log
+        const testLog = {
+          id: `debug-${Date.now()}`,
+          timestamp: (Date.now() / 1000).toFixed(1),
+          level: 'I',
+          component: 'DEBUG',
+          message: 'Debug test log entry',
+          type: 'DEBUG_MESSAGE',
+          source: 'ConsoleDebug'
+        };
+        
+        setLogs(prev => {
+          const newLogs = [...prev, testLog];
+          console.log('🔍 Debug: Added test log, total logs now:', newLogs.length);
+          return newLogs;
+        });
+        
+        setIsReceivingData(true);
+        setLastDataReceived(new Date());
+      };
 
       // Listen for all possible event types from test execution system
       window.addEventListener('message', handleMessageEvent);
@@ -654,8 +688,17 @@ const LogsView: React.FC<{
     selectedLevel,
     selectedComponent,
     isReceivingData,
-    lastDataReceived: lastDataReceived?.toLocaleTimeString()
+    lastDataReceived: lastDataReceived?.toLocaleTimeString(),
+    componentMounted: true,
+    timestamp: new Date().toLocaleTimeString()
   });
+  
+  // Force debug log on every render
+  if (logs.length === 0) {
+    console.log('⚠️ LogsView: No logs in state - this is why "No logs available" is showing');
+  } else {
+    console.log('✅ LogsView: Has logs in state:', logs.length);
+  }
 
   const getLevelIcon = (level: string) => {
     switch (level) {
@@ -766,6 +809,30 @@ const LogsView: React.FC<{
             )}
           </div>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => {
+                console.log('🧪 SIMPLE TEST: Adding single log entry');
+                const simpleLog = {
+                  id: `simple-test-${Date.now()}`,
+                  timestamp: (Date.now() / 1000).toFixed(1),
+                  level: 'I',
+                  component: 'TEST',
+                  message: 'Simple test log entry',
+                  type: 'TEST_MESSAGE',
+                  source: 'SimpleTest'
+                };
+                setLogs(prev => {
+                  const newLogs = [...prev, simpleLog];
+                  console.log('🧪 SIMPLE TEST: Logs after adding:', newLogs.length);
+                  return newLogs;
+                });
+                setIsReceivingData(true);
+                setLastDataReceived(new Date());
+              }}
+              className="text-sm text-green-600 hover:text-green-800 px-3 py-1 border border-green-300 rounded hover:bg-green-50"
+            >
+              Simple Test
+            </button>
             <button
               onClick={() => {
                 // Inject test data for demonstration
