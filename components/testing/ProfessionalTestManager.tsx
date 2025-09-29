@@ -486,6 +486,47 @@ const ProfessionalTestManager: React.FC = () => {
           tc.id === testId ? { ...tc, status: 'Running' } : tc
         ));
         
+        // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for real-time data flow
+        if (typeof window !== 'undefined') {
+          // Find the test case data
+          const testCase = testCases.find(tc => tc.id === testId);
+          
+          // Dispatch custom event for 5GLabX Platform
+          const testExecutionEvent = new CustomEvent('testCaseExecutionStarted', {
+            detail: {
+              executionId: result.executionId || result.id,
+              testCaseId: testId,
+              testCaseData: {
+                id: testId,
+                name: testCase?.name || 'Unknown Test',
+                component: testCase?.component || 'Unknown Component',
+                expectedLayerParameters: [
+                  { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
+                  { layer: 'MAC', parameter: 'CQI', value: '15' },
+                  { layer: 'RLC', parameter: 'PDU Size', value: '1500 bytes' }
+                ]
+              },
+              timestamp: new Date().toISOString(),
+              status: 'running'
+            }
+          });
+          
+          window.dispatchEvent(testExecutionEvent);
+          addLog('INFO', `📡 Data sent to 5GLabX Platform for execution: ${result.executionId || result.id}`);
+          
+          // Also send via postMessage for additional compatibility
+          window.postMessage({
+            type: '5GLABX_TEST_EXECUTION',
+            executionId: result.executionId || result.id,
+            testCaseId: testId,
+            data: result,
+            testCaseData: testCase,
+            timestamp: new Date().toISOString()
+          }, '*');
+          
+          addLog('INFO', `📨 PostMessage sent to 5GLabX Platform`);
+        }
+        
         // Monitor test execution status
         monitorTestExecution(testId);
         
@@ -609,6 +650,47 @@ const ProfessionalTestManager: React.FC = () => {
         // Update all test cases to running status
         setTestCases(prev => prev.map(tc => ({ ...tc, status: 'Running' })));
         
+        // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for batch execution
+        if (typeof window !== 'undefined') {
+          // Dispatch batch execution event
+          const batchExecutionEvent = new CustomEvent('testCaseExecutionStarted', {
+            detail: {
+              executionId: result.executionId || result.id || `batch-${Date.now()}`,
+              testCaseId: 'batch-execution',
+              testCaseData: {
+                id: 'batch-execution',
+                name: 'Batch Test Execution',
+                component: 'Multiple Components',
+                expectedLayerParameters: [
+                  { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
+                  { layer: 'MAC', parameter: 'CQI', value: '15' },
+                  { layer: 'RLC', parameter: 'PDU Size', value: '1500 bytes' }
+                ]
+              },
+              timestamp: new Date().toISOString(),
+              status: 'running',
+              batchMode: true,
+              testCount: testCases.length
+            }
+          });
+          
+          window.dispatchEvent(batchExecutionEvent);
+          addLog('INFO', `📡 Batch execution data sent to 5GLabX Platform: ${testCases.length} tests`);
+          
+          // Also send via postMessage for additional compatibility
+          window.postMessage({
+            type: '5GLABX_TEST_EXECUTION',
+            executionId: result.executionId || result.id || `batch-${Date.now()}`,
+            testCaseId: 'batch-execution',
+            data: result,
+            batchMode: true,
+            testCount: testCases.length,
+            timestamp: new Date().toISOString()
+          }, '*');
+          
+          addLog('INFO', `📨 Batch PostMessage sent to 5GLabX Platform`);
+        }
+        
         // Monitor batch execution
         monitorBatchExecution();
         
@@ -653,6 +735,49 @@ const ProfessionalTestManager: React.FC = () => {
         setTestCases(prev => prev.map(tc => 
           tc.selected ? { ...tc, status: 'Running' } : tc
         ));
+        
+        // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for selected execution
+        if (typeof window !== 'undefined') {
+          // Dispatch selected execution event
+          const selectedExecutionEvent = new CustomEvent('testCaseExecutionStarted', {
+            detail: {
+              executionId: result.executionId || result.id || `selected-${Date.now()}`,
+              testCaseId: 'selected-execution',
+              testCaseData: {
+                id: 'selected-execution',
+                name: 'Selected Test Execution',
+                component: 'Multiple Components',
+                expectedLayerParameters: [
+                  { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
+                  { layer: 'MAC', parameter: 'CQI', value: '15' },
+                  { layer: 'RLC', parameter: 'PDU Size', value: '1500 bytes' }
+                ]
+              },
+              timestamp: new Date().toISOString(),
+              status: 'running',
+              selectedMode: true,
+              testCount: selectedTests.length,
+              selectedTestIds: selectedTests.map(tc => tc.id)
+            }
+          });
+          
+          window.dispatchEvent(selectedExecutionEvent);
+          addLog('INFO', `📡 Selected execution data sent to 5GLabX Platform: ${selectedTests.length} tests`);
+          
+          // Also send via postMessage for additional compatibility
+          window.postMessage({
+            type: '5GLABX_TEST_EXECUTION',
+            executionId: result.executionId || result.id || `selected-${Date.now()}`,
+            testCaseId: 'selected-execution',
+            data: result,
+            selectedMode: true,
+            testCount: selectedTests.length,
+            selectedTestIds: selectedTests.map(tc => tc.id),
+            timestamp: new Date().toISOString()
+          }, '*');
+          
+          addLog('INFO', `📨 Selected PostMessage sent to 5GLabX Platform`);
+        }
         
         // Monitor selected execution
         monitorSelectedExecution(selectedTests.map(tc => tc.id));
