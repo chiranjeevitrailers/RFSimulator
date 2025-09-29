@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-// Professional Testing Platform - QXDM/Keysight-like Interface (Syntax Fixed) (Corrected to match image)
+// Professional Testing Platform - QXDM/Keysight-like Interface (Netlify Deployment Fix)
 const ProfessionalTestManager: React.FC = () => {
   try {
     React.useEffect(() => {
@@ -42,7 +42,7 @@ const ProfessionalTestManager: React.FC = () => {
       // Load test cases from existing Supabase test_cases table
       loadTestCasesFromSupabase();
       // Skip problematic test suite counts loading to avoid infinite recursion
-      // loadTestSuiteCountsFromSupabase();
+      // loadTestSuiteCountsFromSupabase(); // Fixed for Netlify deployment
       // Connect to 5GLabX backend for real-time log analysis
       const ws = connectTo5GLabX();
       
