@@ -1029,10 +1029,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to start test execution' }, { status: 500 });
     }
 
-    // Generate 3GPP-compliant messages
-    const expectedMessages = create3GPPCompliantMessages(testCase);
-    const expectedInformationElements = create3GPPCompliantIEs(testCase);
-    const expectedLayerParameters = create3GPPCompliantLayerParameters(testCase);
+    // Use REAL test case data from Supabase instead of generating fake data
+    const expectedMessages = testCase.test_data?.messages || testCase.test_data?.expectedMessages || [];
+    const expectedInformationElements = testCase.test_data?.informationElements || testCase.test_data?.ies || [];
+    const expectedLayerParameters = testCase.test_data?.layerParameters || testCase.test_data?.parameters || [];
 
     // Prepare messages for insertion into decoded_messages
     const decodedMessagesToInsert = expectedMessages.map((msg: any) => ({
@@ -1074,13 +1074,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Test execution started and data streamed',
+      message: 'Test execution started with REAL test case data from Supabase',
       executionId: executionId,
       testCaseData: {
-        ...testCase,
+        id: testCase.id,
+        name: testCase.name,
+        description: testCase.description,
+        category: testCase.category,
+        protocol: testCase.protocol,
+        complexity: testCase.complexity,
+        // Use REAL data from Supabase test_data field
         expectedMessages: expectedMessages,
         expectedInformationElements: expectedInformationElements,
         expectedLayerParameters: expectedLayerParameters,
+        // Include original test_data for reference
+        originalTestData: testCase.test_data,
+        expectedResults: testCase.expected_results
       },
     });
 

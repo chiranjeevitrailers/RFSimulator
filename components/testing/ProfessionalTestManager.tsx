@@ -491,7 +491,7 @@ const ProfessionalTestManager: React.FC = () => {
           // Find the test case data
           const testCase = testCases.find(tc => tc.id === testId);
           
-          // Dispatch custom event for 5GLabX Platform
+          // Dispatch custom event for 5GLabX Platform with REAL test case data from Supabase
           const testExecutionEvent = new CustomEvent('testCaseExecutionStarted', {
             detail: {
               executionId: result.executionId || result.id,
@@ -500,89 +500,16 @@ const ProfessionalTestManager: React.FC = () => {
                 id: testId,
                 name: testCase?.name || 'Unknown Test',
                 component: testCase?.component || 'Unknown Component',
-                expectedMessages: [
-                  {
-                    id: `msg-${testId}-1`,
-                    messageName: 'Initial UE Message',
-                    messageType: 'INITIAL_UE_MESSAGE',
-                    layer: 'RRC',
-                    direction: 'UL',
-                    protocol: '5G_NR',
-                    messagePayload: {
-                      ueId: 'UE-001',
-                      cellId: 'Cell-001',
-                      rrcEstablishmentCause: 'mo-Data',
-                      nasPdu: '0x1234567890ABCDEF'
-                    },
-                    informationElements: {
-                      'UE-Identity': { value: 'UE-001' },
-                      'Establishment-Cause': { value: 'mo-Data' },
-                      'Cell-ID': { value: 'Cell-001' }
-                    },
-                    layerParameters: {
-                      'RSRP': '-80 dBm',
-                      'CQI': '15',
-                      'PDU-Size': '1500 bytes'
-                    },
-                    standardReference: '3GPP TS 38.331',
-                    timestampMs: Date.now()
-                  },
-                  {
-                    id: `msg-${testId}-2`,
-                    messageName: 'RRC Setup',
-                    messageType: 'RRC_SETUP',
-                    layer: 'RRC',
-                    direction: 'DL',
-                    protocol: '5G_NR',
-                    messagePayload: {
-                      rrcTransactionIdentifier: 1,
-                      radioResourceConfigDedicated: {
-                        srbToAddModList: [{ srbIdentity: 1 }]
-                      }
-                    },
-                    informationElements: {
-                      'RRC-Transaction-Identifier': { value: 1 },
-                      'Radio-Resource-Config-Dedicated': { value: 'SRB1' }
-                    },
-                    layerParameters: {
-                      'RSRP': '-75 dBm',
-                      'CQI': '12',
-                      'PDU-Size': '200 bytes'
-                    },
-                    standardReference: '3GPP TS 38.331',
-                    timestampMs: Date.now() + 100
-                  },
-                  {
-                    id: `msg-${testId}-3`,
-                    messageName: 'RRC Setup Complete',
-                    messageType: 'RRC_SETUP_COMPLETE',
-                    layer: 'RRC',
-                    direction: 'UL',
-                    protocol: '5G_NR',
-                    messagePayload: {
-                      rrcTransactionIdentifier: 1,
-                      selectedPLMNIdentity: 1,
-                      registeredMME: 'MME-001'
-                    },
-                    informationElements: {
-                      'RRC-Transaction-Identifier': { value: 1 },
-                      'Selected-PLMN-Identity': { value: 1 },
-                      'Registered-MME': { value: 'MME-001' }
-                    },
-                    layerParameters: {
-                      'RSRP': '-78 dBm',
-                      'CQI': '14',
-                      'PDU-Size': '300 bytes'
-                    },
-                    standardReference: '3GPP TS 38.331',
-                    timestampMs: Date.now() + 200
-                  }
-                ],
-                expectedLayerParameters: [
-                  { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
-                  { layer: 'MAC', parameter: 'CQI', value: '15' },
-                  { layer: 'RLC', parameter: 'PDU Size', value: '1500 bytes' }
-                ]
+                // Use REAL data from API response (which comes from Supabase)
+                expectedMessages: result.testCaseData?.expectedMessages || [],
+                expectedInformationElements: result.testCaseData?.expectedInformationElements || [],
+                expectedLayerParameters: result.testCaseData?.expectedLayerParameters || [],
+                // Include original test data for reference
+                originalTestData: result.testCaseData?.originalTestData,
+                expectedResults: result.testCaseData?.expectedResults,
+                category: result.testCaseData?.category,
+                protocol: result.testCaseData?.protocol,
+                complexity: result.testCaseData?.complexity
               },
               timestamp: new Date().toISOString(),
               status: 'running'
@@ -602,59 +529,16 @@ const ProfessionalTestManager: React.FC = () => {
               id: testId,
               name: testCase?.name || 'Unknown Test',
               component: testCase?.component || 'Unknown Component',
-              expectedMessages: [
-                {
-                  id: `msg-${testId}-1`,
-                  messageName: 'Initial UE Message',
-                  messageType: 'INITIAL_UE_MESSAGE',
-                  layer: 'RRC',
-                  direction: 'UL',
-                  protocol: '5G_NR',
-                  messagePayload: {
-                    ueId: 'UE-001',
-                    cellId: 'Cell-001',
-                    rrcEstablishmentCause: 'mo-Data',
-                    nasPdu: '0x1234567890ABCDEF'
-                  },
-                  informationElements: {
-                    'UE-Identity': { value: 'UE-001' },
-                    'Establishment-Cause': { value: 'mo-Data' },
-                    'Cell-ID': { value: 'Cell-001' }
-                  },
-                  layerParameters: {
-                    'RSRP': '-80 dBm',
-                    'CQI': '15',
-                    'PDU-Size': '1500 bytes'
-                  },
-                  standardReference: '3GPP TS 38.331',
-                  timestampMs: Date.now()
-                },
-                {
-                  id: `msg-${testId}-2`,
-                  messageName: 'RRC Setup',
-                  messageType: 'RRC_SETUP',
-                  layer: 'RRC',
-                  direction: 'DL',
-                  protocol: '5G_NR',
-                  messagePayload: {
-                    rrcTransactionIdentifier: 1,
-                    radioResourceConfigDedicated: {
-                      srbToAddModList: [{ srbIdentity: 1 }]
-                    }
-                  },
-                  informationElements: {
-                    'RRC-Transaction-Identifier': { value: 1 },
-                    'Radio-Resource-Config-Dedicated': { value: 'SRB1' }
-                  },
-                  layerParameters: {
-                    'RSRP': '-75 dBm',
-                    'CQI': '12',
-                    'PDU-Size': '200 bytes'
-                  },
-                  standardReference: '3GPP TS 38.331',
-                  timestampMs: Date.now() + 100
-                }
-              ]
+              // Use REAL data from API response (which comes from Supabase)
+              expectedMessages: result.testCaseData?.expectedMessages || [],
+              expectedInformationElements: result.testCaseData?.expectedInformationElements || [],
+              expectedLayerParameters: result.testCaseData?.expectedLayerParameters || [],
+              // Include original test data for reference
+              originalTestData: result.testCaseData?.originalTestData,
+              expectedResults: result.testCaseData?.expectedResults,
+              category: result.testCaseData?.category,
+              protocol: result.testCaseData?.protocol,
+              complexity: result.testCaseData?.complexity
             },
             timestamp: new Date().toISOString()
           }, '*');
