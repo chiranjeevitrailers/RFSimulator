@@ -14,6 +14,9 @@ export const EventBridge: React.FC = () => {
     const handleTestCaseExecutionStarted = (event: CustomEvent) => {
       console.log('🔗 EventBridge: Received testCaseExecutionStarted event:', event.detail);
       
+      // Add error handling
+      try {
+      
       const { testCaseId, testCaseData, executionId } = event.detail;
       
       // Handle both expectedMessages and realtimeMessages structures
@@ -112,12 +115,18 @@ export const EventBridge: React.FC = () => {
       } else {
         console.warn('🔗 EventBridge: No messages found in testCaseData (checked both expectedMessages and realtimeMessages)');
       }
+      } catch (error) {
+        console.error('🔗 EventBridge: Error processing testCaseExecutionStarted event:', error);
+      }
     };
 
     // Bridge 5GLABX_TEST_EXECUTION postMessage to immediate-logs-update
     const handlePostMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
         console.log('🔗 EventBridge: Received 5GLABX_TEST_EXECUTION postMessage:', event.data);
+        
+        // Add error handling
+        try {
         
         const { testCaseId, testCaseData, executionId } = event.data;
         
@@ -165,6 +174,9 @@ export const EventBridge: React.FC = () => {
           
           window.dispatchEvent(immediateLogsEvent);
           console.log(`🔗 EventBridge: Dispatched immediate-logs-update from postMessage with ${logs.length} logs`);
+        }
+        } catch (error) {
+          console.error('🔗 EventBridge: Error processing postMessage event:', error);
         }
       }
     };

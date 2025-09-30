@@ -31,6 +31,17 @@ const LogsView: React.FC<{
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
     console.log('🔍 Enhanced Logs Advanced: Initializing event listeners...');
+    
+    // Add event retry mechanism for timing issues
+    const retryEventListeners = () => {
+      console.log('🔄 LogsView: Retrying event listener registration...');
+      // Re-register listeners if they were lost
+      window.addEventListener('immediate-logs-update', handleImmediateLogsUpdate);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+    };
+    
+    // Retry after 1 second to handle timing issues
+    const retryTimeout = setTimeout(retryEventListeners, 1000);
 
     // Listen for immediate logs update event
     const handleImmediateLogsUpdate = (event) => {

@@ -905,7 +905,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   return (
     <APIProvider>
       <ServiceIntegration>
-        <EventBridge />
+        <EventBridge key="event-bridge" />
         <div className="h-screen flex flex-col bg-gray-50">
           {/* Header with connection status */}
           <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
