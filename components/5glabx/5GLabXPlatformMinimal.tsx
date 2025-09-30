@@ -933,4 +933,4 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   );
 };
 
-export default FiveGLabXPlatformMinimal;
+export default FiveGLabXPlatformMinimal;// Force deployment - Tue Sep 30 02:00:40 AM UTC 2025
