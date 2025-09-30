@@ -1,0 +1,6 @@
+# Netlify Clear Cache Flag
+# This file triggers a cache clear on Netlify
+# Created: $(date)
+#
+# To clear Netlify cache, the presence of this file signals
+# that the next deployment should start with a clean build cache
