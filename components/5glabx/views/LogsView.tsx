@@ -464,7 +464,7 @@ const LogsView: React.FC<{
           lastDataReceived: lastDataReceived?.toLocaleTimeString(),
           componentMounted: true
         });
-        console.log('ℹ️ System now only handles real test data - no demo/test data injection');
+        console.log('ℹ️ System only handles real test data from Supabase database');
       };
 
       // Listen for all possible event types from test execution system
@@ -640,7 +640,7 @@ const LogsView: React.FC<{
           </div>
           <div className="flex items-center space-x-2">
             {/* Removed test buttons - system now only handles real test data */}
-            {/* Removed demo data button - system now only handles real test data */}
+            {/* System only handles real test data from Supabase database */}
             <button
               onClick={() => {
                 setLogs([]);

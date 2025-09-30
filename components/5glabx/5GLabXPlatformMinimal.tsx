@@ -124,7 +124,7 @@ const DashboardView: React.FC = () => {
     }
   };
 
-  // Removed demo data injection - system now only handles real test data
+  // System only handles real test data from Supabase database
 
   // Subscribe to Supabase realtime for execution data
   const subscribeToExecutionData = async (executionId: string) => {
@@ -198,9 +198,7 @@ const DashboardView: React.FC = () => {
       // Fallback: Check for active test executions on mount
       checkForActiveExecutions();
       
-      // 🔥 FALLBACK: Only inject sample data if explicitly requested (not during real test execution)
-      // Removed automatic demo injection to prevent interference with real test data
-      // Demo data can be manually triggered via browser console if needed for testing
+      // System only processes real test data from Supabase database
     }
 
     return () => {
