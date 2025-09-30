@@ -227,12 +227,6 @@ const DashboardView: React.FC = () => {
               <span className="text-sm text-blue-700">Live Test Data</span>
             </div>
           )}
-          <button
-            onClick={injectSampleData}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition-colors"
-          >
-            🎯 Load Demo Data
-          </button>
         </div>
       </div>
 
