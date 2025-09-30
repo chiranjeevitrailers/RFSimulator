@@ -59,7 +59,6 @@ import {
 } from './views/ViewWrappers';
 
 // Import service integration
-import ServiceIntegration from './services/ServiceIntegration';
 import { APIProvider } from './services/APIIntegration';
 import EventBridge from './services/EventBridge';
 
@@ -97,7 +96,7 @@ import ProtocolLayerDataTest from './components/ProtocolLayerDataTest';
 import DataFlowDebugger from './components/DataFlowDebugger';
 import TestDataGenerator from './components/TestDataGenerator';
 import IntegrationTester from './components/IntegrationTester';
-import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced';
+// import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced'; // File not found
 import PhyLayerViewEnhanced from './views/PhyLayerViewEnhanced';
 // import { DataFlowProvider } from './providers/DataFlowProvider'; // Temporarily disabled to isolate React hooks issue
 
@@ -788,7 +787,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
       case 'integration-tester':
         return <IntegrationTester />;
       case 'logs-advanced':
-        return <EnhancedLogsViewAdvanced />;
+        return <LogsView appState={appState} onStateChange={onStateChange} />;
       case 'phy-enhanced':
         return <PhyLayerViewEnhanced />;
       case 'phy-layer':
@@ -904,9 +903,8 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
 
   return (
     <APIProvider>
-      <ServiceIntegration>
-        <EventBridge key="event-bridge" />
-        <div className="h-screen flex flex-col bg-gray-50">
+      <EventBridge key="event-bridge" />
+      <div className="h-screen flex flex-col bg-gray-50">
           {/* Header with connection status */}
           <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
             <h1 className="text-lg font-semibold text-gray-900">5GLabX Platform</h1>
@@ -928,7 +926,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
             </div>
           </div>
         </div>
-      </ServiceIntegration>
     </APIProvider>
   );
 };
