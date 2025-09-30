@@ -500,6 +500,84 @@ const ProfessionalTestManager: React.FC = () => {
                 id: testId,
                 name: testCase?.name || 'Unknown Test',
                 component: testCase?.component || 'Unknown Component',
+                expectedMessages: [
+                  {
+                    id: `msg-${testId}-1`,
+                    messageName: 'Initial UE Message',
+                    messageType: 'INITIAL_UE_MESSAGE',
+                    layer: 'RRC',
+                    direction: 'UL',
+                    protocol: '5G_NR',
+                    messagePayload: {
+                      ueId: 'UE-001',
+                      cellId: 'Cell-001',
+                      rrcEstablishmentCause: 'mo-Data',
+                      nasPdu: '0x1234567890ABCDEF'
+                    },
+                    informationElements: {
+                      'UE-Identity': { value: 'UE-001' },
+                      'Establishment-Cause': { value: 'mo-Data' },
+                      'Cell-ID': { value: 'Cell-001' }
+                    },
+                    layerParameters: {
+                      'RSRP': '-80 dBm',
+                      'CQI': '15',
+                      'PDU-Size': '1500 bytes'
+                    },
+                    standardReference: '3GPP TS 38.331',
+                    timestampMs: Date.now()
+                  },
+                  {
+                    id: `msg-${testId}-2`,
+                    messageName: 'RRC Setup',
+                    messageType: 'RRC_SETUP',
+                    layer: 'RRC',
+                    direction: 'DL',
+                    protocol: '5G_NR',
+                    messagePayload: {
+                      rrcTransactionIdentifier: 1,
+                      radioResourceConfigDedicated: {
+                        srbToAddModList: [{ srbIdentity: 1 }]
+                      }
+                    },
+                    informationElements: {
+                      'RRC-Transaction-Identifier': { value: 1 },
+                      'Radio-Resource-Config-Dedicated': { value: 'SRB1' }
+                    },
+                    layerParameters: {
+                      'RSRP': '-75 dBm',
+                      'CQI': '12',
+                      'PDU-Size': '200 bytes'
+                    },
+                    standardReference: '3GPP TS 38.331',
+                    timestampMs: Date.now() + 100
+                  },
+                  {
+                    id: `msg-${testId}-3`,
+                    messageName: 'RRC Setup Complete',
+                    messageType: 'RRC_SETUP_COMPLETE',
+                    layer: 'RRC',
+                    direction: 'UL',
+                    protocol: '5G_NR',
+                    messagePayload: {
+                      rrcTransactionIdentifier: 1,
+                      selectedPLMNIdentity: 1,
+                      registeredMME: 'MME-001'
+                    },
+                    informationElements: {
+                      'RRC-Transaction-Identifier': { value: 1 },
+                      'Selected-PLMN-Identity': { value: 1 },
+                      'Registered-MME': { value: 'MME-001' }
+                    },
+                    layerParameters: {
+                      'RSRP': '-78 dBm',
+                      'CQI': '14',
+                      'PDU-Size': '300 bytes'
+                    },
+                    standardReference: '3GPP TS 38.331',
+                    timestampMs: Date.now() + 200
+                  }
+                ],
                 expectedLayerParameters: [
                   { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
                   { layer: 'MAC', parameter: 'CQI', value: '15' },
@@ -520,7 +598,64 @@ const ProfessionalTestManager: React.FC = () => {
             executionId: result.executionId || result.id,
             testCaseId: testId,
             data: result,
-            testCaseData: testCase,
+            testCaseData: {
+              id: testId,
+              name: testCase?.name || 'Unknown Test',
+              component: testCase?.component || 'Unknown Component',
+              expectedMessages: [
+                {
+                  id: `msg-${testId}-1`,
+                  messageName: 'Initial UE Message',
+                  messageType: 'INITIAL_UE_MESSAGE',
+                  layer: 'RRC',
+                  direction: 'UL',
+                  protocol: '5G_NR',
+                  messagePayload: {
+                    ueId: 'UE-001',
+                    cellId: 'Cell-001',
+                    rrcEstablishmentCause: 'mo-Data',
+                    nasPdu: '0x1234567890ABCDEF'
+                  },
+                  informationElements: {
+                    'UE-Identity': { value: 'UE-001' },
+                    'Establishment-Cause': { value: 'mo-Data' },
+                    'Cell-ID': { value: 'Cell-001' }
+                  },
+                  layerParameters: {
+                    'RSRP': '-80 dBm',
+                    'CQI': '15',
+                    'PDU-Size': '1500 bytes'
+                  },
+                  standardReference: '3GPP TS 38.331',
+                  timestampMs: Date.now()
+                },
+                {
+                  id: `msg-${testId}-2`,
+                  messageName: 'RRC Setup',
+                  messageType: 'RRC_SETUP',
+                  layer: 'RRC',
+                  direction: 'DL',
+                  protocol: '5G_NR',
+                  messagePayload: {
+                    rrcTransactionIdentifier: 1,
+                    radioResourceConfigDedicated: {
+                      srbToAddModList: [{ srbIdentity: 1 }]
+                    }
+                  },
+                  informationElements: {
+                    'RRC-Transaction-Identifier': { value: 1 },
+                    'Radio-Resource-Config-Dedicated': { value: 'SRB1' }
+                  },
+                  layerParameters: {
+                    'RSRP': '-75 dBm',
+                    'CQI': '12',
+                    'PDU-Size': '200 bytes'
+                  },
+                  standardReference: '3GPP TS 38.331',
+                  timestampMs: Date.now() + 100
+                }
+              ]
+            },
             timestamp: new Date().toISOString()
           }, '*');
           
@@ -661,6 +796,31 @@ const ProfessionalTestManager: React.FC = () => {
                 id: 'batch-execution',
                 name: 'Batch Test Execution',
                 component: 'Multiple Components',
+                expectedMessages: [
+                  {
+                    id: 'batch-msg-1',
+                    messageName: 'Batch Test Start',
+                    messageType: 'BATCH_TEST_START',
+                    layer: 'SYSTEM',
+                    direction: 'N/A',
+                    protocol: '5G_NR',
+                    messagePayload: {
+                      testCount: testCases.length,
+                      batchId: `batch-${Date.now()}`,
+                      startTime: new Date().toISOString()
+                    },
+                    informationElements: {
+                      'Test-Count': { value: testCases.length },
+                      'Batch-ID': { value: `batch-${Date.now()}` }
+                    },
+                    layerParameters: {
+                      'Total-Tests': testCases.length.toString(),
+                      'Status': 'Starting'
+                    },
+                    standardReference: 'Batch Execution',
+                    timestampMs: Date.now()
+                  }
+                ],
                 expectedLayerParameters: [
                   { layer: 'PHY', parameter: 'RSRP', value: '-80 dBm' },
                   { layer: 'MAC', parameter: 'CQI', value: '15' },
