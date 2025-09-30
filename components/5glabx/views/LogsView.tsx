@@ -1,460 +1,475 @@
-'use client';
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, RefreshCw, Eye, AlertTriangle, Info, CheckCircle, X } from 'lucide-react';
+import type React from "react"
+import { useState, useEffect } from "react"
+import { Search, Download, RefreshCw, Eye, AlertTriangle, Info, CheckCircle, X } from "lucide-react"
 
 const LogsView: React.FC<{
-  appState: any;
-  onStateChange: (state: any) => void;
+  appState: any
+  onStateChange: (state: any) => void
 }> = ({ appState, onStateChange }) => {
   // Initialize logs state - start empty to show real-time data
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([])
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState('all');
-  const [selectedComponent, setSelectedComponent] = useState('all');
-  const [selectedMessage, setSelectedMessage] = useState<any>(null);
-  const [showDecoder, setShowDecoder] = useState(false);
-  const [isReceivingData, setIsReceivingData] = useState(false);
-  const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null);
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedLevel, setSelectedLevel] = useState("all")
+  const [selectedComponent, setSelectedComponent] = useState("all")
+  const [selectedMessage, setSelectedMessage] = useState<any>(null)
+  const [showDecoder, setShowDecoder] = useState(false)
+  const [isReceivingData, setIsReceivingData] = useState(false)
+  const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null)
 
   // Auto-reset receiving status after 5 seconds of inactivity
   useEffect(() => {
     if (isReceivingData && lastDataReceived) {
       const timeout = setTimeout(() => {
-        setIsReceivingData(false);
-      }, 5000);
-      return () => clearTimeout(timeout);
+        setIsReceivingData(false)
+      }, 5000)
+      return () => clearTimeout(timeout)
     }
-  }, [isReceivingData, lastDataReceived]);
+  }, [isReceivingData, lastDataReceived])
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    console.log('🔍 Enhanced Logs Advanced: Initializing event listeners...');
-    
-    // Add event retry mechanism for timing issues
-    const retryEventListeners = () => {
-      console.log('🔄 LogsView: Retrying event listener registration...');
-      // Re-register listeners if they were lost
-      window.addEventListener('immediate-logs-update', handleImmediateLogsUpdate);
-      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
-    };
-    
-    // Retry after 1 second to handle timing issues
-    const retryTimeout = setTimeout(retryEventListeners, 1000);
+    console.log("[v0] 🔍 LogsView: Initializing event listeners...")
 
     // Listen for immediate logs update event
-    const handleImmediateLogsUpdate = (event) => {
-      console.log('🔥 LogsView: Received immediate-logs-update event:', event.detail);
-      const { logs, source } = event.detail;
+    const handleImmediateLogsUpdate = (event: any) => {
+      console.log("[v0] 🔥 LogsView: Received immediate-logs-update event")
+      console.log("[v0] 📊 LogsView: Event detail:", {
+        source: event.detail?.source,
+        logCount: event.detail?.logs?.length || 0,
+        testCaseId: event.detail?.testCaseId,
+        executionId: event.detail?.executionId,
+      })
+
+      const { logs, source } = event.detail
 
       if (logs && logs.length > 0) {
-        console.log(`📋 LogsView: Processing ${logs.length} immediate logs from ${source}`);
-        console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
+        console.log(`[v0] 📋 LogsView: Processing ${logs.length} immediate logs from ${source}`)
+        console.log("[v0] 📊 LogsView: First log structure:", JSON.stringify(logs[0], null, 2))
 
         // FIXED: Single atomic state update to prevent race conditions
-        console.log('🔥 LogsView: Processing immediate logs update');
-        setLogs(prev => {
-          const newLogs = [...prev, ...logs];
-          console.log(`✅ LogsView: Added ${logs.length} immediate log entries`);
-          console.log(`📊 Total logs now: ${newLogs.length}`);
-          return newLogs;
-        });
+        console.log("[v0] 🔥 LogsView: Updating logs state")
+        setLogs((prev) => {
+          const newLogs = [...prev, ...logs]
+          console.log(`[v0] ✅ LogsView: Added ${logs.length} immediate log entries, total now: ${newLogs.length}`)
+          return newLogs
+        })
 
         // Update receiving status
-        setIsReceivingData(true);
-        setLastDataReceived(new Date());
+        setIsReceivingData(true)
+        setLastDataReceived(new Date())
 
         // Notify parent component
         if (onStateChange) {
           onStateChange({
-            currentView: 'logs',
+            currentView: "logs",
             testExecutionActive: true,
-            testExecutionStatus: 'active',
-            logs: logs
-          });
+            testExecutionStatus: "active",
+            logs: logs,
+          })
         }
       } else {
-        console.log('⚠️  No logs found in immediate-logs-update event:', event.detail);
+        console.log("[v0] ⚠️ LogsView: No logs found in immediate-logs-update event:", event.detail)
       }
-    };
+    }
 
-    window.addEventListener('immediate-logs-update', handleImmediateLogsUpdate);
+    window.addEventListener("immediate-logs-update", handleImmediateLogsUpdate)
+    console.log("[v0] ✅ LogsView: immediate-logs-update listener registered")
+
+    // Add event retry mechanism for timing issues
+    const retryEventListeners = () => {
+      console.log("🔄 LogsView: Retrying event listener registration...")
+      // Re-register listeners if they were lost
+      window.addEventListener("immediate-logs-update", handleImmediateLogsUpdate)
+      window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
+    }
+
+    // Retry after 1 second to handle timing issues
+    const retryTimeout = setTimeout(retryEventListeners, 1000)
 
     // Also listen for the regular 5GLABX_TEST_EXECUTION event
     const handleTestExecution = (event) => {
-      console.log('🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:', event.detail);
-      console.log('📊 Event detail structure:', JSON.stringify(event.detail, null, 2));
+      console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
+      console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
 
-      const { testCaseId, testCaseData, logs } = event.detail;
+      const { testCaseId, testCaseData, logs } = event.detail
 
       if (logs && logs.length > 0) {
-        console.log(`📋 LogsView: Processing ${logs.length} logs from event`);
-        console.log('📊 Log data structure:', JSON.stringify(logs[0], null, 2));
+        console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
+        console.log("📊 Log data structure:", JSON.stringify(logs[0], null, 2))
 
         // Normal state update
-        setLogs(prev => {
-          const newLogs = [...prev, ...logs];
-          return newLogs;
-        });
+        setLogs((prev) => {
+          const newLogs = [...prev, ...logs]
+          return newLogs
+        })
 
-        setIsReceivingData(true);
-        setLastDataReceived(new Date());
+        setIsReceivingData(true)
+        setLastDataReceived(new Date())
       } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
-        console.log('🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event');
+        console.log("🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event")
 
         // Process the test case data directly - handle both expectedMessages and realtimeMessages
-        const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || [];
-        console.log(`📋 Processing ${messages.length} messages from testCaseData`);
+        const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
+        console.log(`📋 Processing ${messages.length} messages from testCaseData`)
 
         const processedLogs = messages.map((message, index) => ({
           id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
           timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
-          level: 'I',
-          component: message.layer || message.component || 'TEST',
-          message: `${message.messageName || message.messageType || 'Test Message'}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
-          type: message.messageType || message.type || 'TEST_MESSAGE',
-          source: '5GLABX_TEST_EXECUTION',
+          level: "I",
+          component: message.layer || message.component || "TEST",
+          message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
+          type: message.messageType || message.type || "TEST_MESSAGE",
+          source: "5GLABX_TEST_EXECUTION",
           testCaseId: testCaseId,
-          direction: message.direction || 'UL',
-          protocol: message.protocol || '5G_NR',
+          direction: message.direction || "UL",
+          protocol: message.protocol || "5G_NR",
           rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
           informationElements: message.informationElements || {},
           layerParameters: message.layerParameters || {},
-          standardReference: message.standardReference || 'Unknown',
+          standardReference: message.standardReference || "Unknown",
           messagePayload: message.messagePayload || message.payload || {},
-          ies: message.informationElements ?
-            Object.entries(message.informationElements).map(([k, v]) =>
-              `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
-            ).join(', ') :
-            Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
-        }));
+          ies: message.informationElements
+            ? Object.entries(message.informationElements)
+                .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                .join(", ")
+            : Object.entries(message.messagePayload || message.payload || {})
+                .map(([k, v]) => `${k}=${v}`)
+                .join(", "),
+        }))
 
-        console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`);
+        console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`)
 
         // FORCE DISPLAY ATTEMPT 1
-        setLogs(prev => {
-          const newLogs = [...prev, ...processedLogs];
-          console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData`);
-          return newLogs;
-        });
+        setLogs((prev) => {
+          const newLogs = [...prev, ...processedLogs]
+          console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData`)
+          return newLogs
+        })
 
-        setIsReceivingData(true);
-        setLastDataReceived(new Date());
+        setIsReceivingData(true)
+        setLastDataReceived(new Date())
 
         // FORCE DISPLAY ATTEMPT 2
         setTimeout(() => {
-          setLogs(current => [...current]);
-        }, 50);
+          setLogs((current) => [...current])
+        }, 50)
 
         // FORCE DISPLAY ATTEMPT 3
         setTimeout(() => {
           if (onStateChange) {
             onStateChange({
-              currentView: 'logs',
+              currentView: "logs",
               testExecutionActive: true,
-              testExecutionStatus: 'active',
-              logs: processedLogs
-            });
+              testExecutionStatus: "active",
+              logs: processedLogs,
+            })
           }
-        }, 100);
+        }, 100)
       } else {
-        console.log('⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:', event.detail);
+        console.log("⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:", event.detail)
 
         // Try to extract data from any format
-        if (event.detail && typeof event.detail === 'object') {
-          console.log('🔍 Attempting to extract data from event detail...');
-          console.log('📊 Event detail keys:', Object.keys(event.detail));
+        if (event.detail && typeof event.detail === "object") {
+          console.log("🔍 Attempting to extract data from event detail...")
+          console.log("📊 Event detail keys:", Object.keys(event.detail))
 
           if (event.detail.testCaseData) {
-            console.log('🔍 Found testCaseData in event detail');
+            console.log("🔍 Found testCaseData in event detail")
           }
         }
       }
-    };
+    }
 
-    window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+    window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
 
-    console.log('✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration');
-    console.log('🔥 Enhanced Logs Advanced: Listening for immediate-logs-update events');
-    console.log('🔥 Enhanced Logs Advanced: Listening for 5GLABX_TEST_EXECUTION events');
-    console.log('🔍 Enhanced Logs Advanced: Awaiting real-time events (with immediate fallback)');
+    console.log("✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration")
+    console.log("🔥 Enhanced Logs Advanced: Listening for immediate-logs-update events")
+    console.log("🔥 Enhanced Logs Advanced: Listening for 5GLABX_TEST_EXECUTION events")
+    console.log("🔍 Enhanced Logs Advanced: Awaiting real-time events (with immediate fallback)")
 
     // Process test data from various sources
-    const processTestData = (data: any, source: string = 'unknown') => {
-      console.log('📊 LogsView processing test case data:', {
+    const processTestData = (data: any, source = "unknown") => {
+      console.log("📊 LogsView processing test case data:", {
         testCaseId: data.testCaseId,
         testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
-        messageCount: (data.testCaseData?.expectedMessages?.length || data.testCaseData?.realtimeMessages?.length || 0),
+        messageCount: data.testCaseData?.expectedMessages?.length || data.testCaseData?.realtimeMessages?.length || 0,
         dataSource: source,
         dataType: data.type,
         hasTestCaseData: !!data.testCaseData,
-        hasExpectedMessages: !!(data.testCaseData?.expectedMessages),
+        hasExpectedMessages: !!data.testCaseData?.expectedMessages,
         dataKeys: Object.keys(data),
-        fullData: JSON.stringify(data, null, 2)
-      });
+        fullData: JSON.stringify(data, null, 2),
+      })
 
       // Force immediate UI update for real-time display
-      console.log('🚀 LogsView: Processing data immediately for display');
+      console.log("🚀 LogsView: Processing data immediately for display")
 
       // Process data through normal flow
 
       // Force UI update even with minimal data
       if (!data.testCaseData) {
-        console.log('⚠️  No testCaseData found, creating summary log');
+        console.log("⚠️  No testCaseData found, creating summary log")
         const summaryLog = {
           id: `test-summary-${Date.now()}-${Math.random()}`,
           timestamp: (Date.now() / 1000).toFixed(1),
-          level: 'I',
-          component: 'TEST',
+          level: "I",
+          component: "TEST",
           message: `Test Case Started: ${data.testCaseId} (${source})`,
-          type: 'TEST_EXECUTION_START',
-          source: source || 'TestManager',
+          type: "TEST_EXECUTION_START",
+          source: source || "TestManager",
           testCaseId: data.testCaseId,
-          direction: 'N/A',
-          protocol: '5G_NR',
+          direction: "N/A",
+          protocol: "5G_NR",
           rawData: JSON.stringify(data, null, 2),
           informationElements: {},
           layerParameters: {},
-          standardReference: 'Test Execution'
-        };
+          standardReference: "Test Execution",
+        }
 
-        setLogs(prev => [...prev, summaryLog]);
-        console.log('✅ Added summary log entry:', summaryLog.message);
+        setLogs((prev) => [...prev, summaryLog])
+        console.log("✅ Added summary log entry:", summaryLog.message)
 
         // Force re-render
         setTimeout(() => {
-          setLogs(current => [...current]);
-        }, 100);
+          setLogs((current) => [...current])
+        }, 100)
 
-        return;
+        return
       }
 
-      const testCaseData = data.testCaseData || data;
-      const testCaseId = data.testCaseId || testCaseData.testCaseId;
+      const testCaseData = data.testCaseData || data
+      const testCaseId = data.testCaseId || testCaseData.testCaseId
 
       // Handle different data formats
-      let messages = [];
+      let messages = []
       if (testCaseData.expectedMessages) {
-        messages = testCaseData.expectedMessages;
+        messages = testCaseData.expectedMessages
       } else if (testCaseData.realtimeMessages) {
-        messages = testCaseData.realtimeMessages;
+        messages = testCaseData.realtimeMessages
       } else if (testCaseData.messages) {
-        messages = testCaseData.messages;
+        messages = testCaseData.messages
       } else if (Array.isArray(testCaseData)) {
-        messages = testCaseData;
+        messages = testCaseData
       }
 
       if (messages.length > 0) {
-        console.log(`📋 Processing ${messages.length} messages from ${source}`);
+        console.log(`📋 Processing ${messages.length} messages from ${source}`)
 
         // Process each message as a log entry immediately (no setTimeout to ensure immediate display)
         messages.forEach((message: any, index: number) => {
           const newLog = {
             id: `test-${testCaseId}-${Date.now()}-${index}`,
             timestamp: (Date.now() / 1000).toFixed(1),
-            level: 'I',
-            component: message.layer || message.component || 'TEST',
-            message: `${message.messageName || message.messageType || 'Test Message'}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
-            type: message.messageType || message.type || 'TEST_MESSAGE',
-            source: source || 'TestManager',
+            level: "I",
+            component: message.layer || message.component || "TEST",
+            message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
+            type: message.messageType || message.type || "TEST_MESSAGE",
+            source: source || "TestManager",
             testCaseId: testCaseId,
-            direction: message.direction || 'UL',
-            protocol: message.protocol || '5G_NR',
+            direction: message.direction || "UL",
+            protocol: message.protocol || "5G_NR",
             // Enhanced data for IE viewing
             rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
             informationElements: message.informationElements || {},
             layerParameters: message.layerParameters || {},
-            standardReference: message.standardReference || 'Unknown',
+            standardReference: message.standardReference || "Unknown",
             messagePayload: message.messagePayload || message.payload || {},
-            ies: message.informationElements ?
-              Object.entries(message.informationElements).map(([k, v]: [string, any]) =>
-                `${k}=${typeof v === 'object' ? v.value || JSON.stringify(v) : v}`
-              ).join(', ') :
-              Object.entries(message.messagePayload || message.payload || {}).map(([k, v]) => `${k}=${v}`).join(', ')
-          };
+            ies: message.informationElements
+              ? Object.entries(message.informationElements)
+                  .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                  .join(", ")
+              : Object.entries(message.messagePayload || message.payload || {})
+                  .map(([k, v]) => `${k}=${v}`)
+                  .join(", "),
+          }
 
-          setLogs(prev => {
-            const newLogs = [...prev, newLog];
-            return newLogs;
-          });
-        });
+          setLogs((prev) => {
+            const newLogs = [...prev, newLog]
+            return newLogs
+          })
+        })
 
         // Update receiving status
-        setIsReceivingData(true);
-        setLastDataReceived(new Date());
+        setIsReceivingData(true)
+        setLastDataReceived(new Date())
 
-        console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`);
+        console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`)
 
         // Normal state update - no forced updates needed
 
         // Also trigger state change in parent component
         setTimeout(() => {
           onStateChange({
-            currentView: 'logs',
+            currentView: "logs",
             testExecutionActive: true,
-            testExecutionStatus: 'active',
-            logs: logs.concat(messages.map((msg, idx) => ({
-              id: `test-${testCaseId}-${Date.now()}-${idx}`,
-              timestamp: (Date.now() / 1000).toFixed(1),
-              level: 'I',
-              component: msg.layer || 'TEST',
-              message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
-              type: msg.messageType || 'TEST_MESSAGE',
-              source: source || 'TestManager'
-            })))
-          });
-        }, 300);
+            testExecutionStatus: "active",
+            logs: logs.concat(
+              messages.map((msg, idx) => ({
+                id: `test-${testCaseId}-${Date.now()}-${idx}`,
+                timestamp: (Date.now() / 1000).toFixed(1),
+                level: "I",
+                component: msg.layer || "TEST",
+                message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
+                type: msg.messageType || "TEST_MESSAGE",
+                source: source || "TestManager",
+              })),
+            ),
+          })
+        }, 300)
       } else {
-        console.log('⚠️  No messages found in test data, checking alternative formats...');
+        console.log("⚠️  No messages found in test data, checking alternative formats...")
 
         // Try to extract data from different formats
-        if (testCaseData && typeof testCaseData === 'object') {
-          console.log('📋 Test case data structure:', Object.keys(testCaseData));
+        if (testCaseData && typeof testCaseData === "object") {
+          console.log("📋 Test case data structure:", Object.keys(testCaseData))
         }
 
         // Removed direct injection bypass - system now only processes real data through normal flow
 
         // If no messages but we have test case data, create a summary log
         if (testCaseData && (testCaseData.name || testCaseData.testCaseName)) {
-          console.log('📋 Creating summary log entry for test case');
+          console.log("📋 Creating summary log entry for test case")
           const summaryLog = {
             id: `test-summary-${testCaseId}-${Date.now()}`,
             timestamp: (Date.now() / 1000).toFixed(1),
-            level: 'I',
-            component: 'TEST',
+            level: "I",
+            component: "TEST",
             message: `Test Case Started: ${testCaseData.name || testCaseData.testCaseName} (${testCaseId})`,
-            type: 'TEST_EXECUTION_START',
-            source: source || 'TestManager',
+            type: "TEST_EXECUTION_START",
+            source: source || "TestManager",
             testCaseId: testCaseId,
-            direction: 'N/A',
-            protocol: testCaseData.protocol || '5G_NR',
+            direction: "N/A",
+            protocol: testCaseData.protocol || "5G_NR",
             rawData: JSON.stringify(testCaseData, null, 2),
             informationElements: {},
             layerParameters: {},
-            standardReference: 'Test Execution'
-          };
+            standardReference: "Test Execution",
+          }
 
-          setLogs(prev => {
-            const newLogs = [...prev, summaryLog];
-            console.log('✅ Added summary log entry:', summaryLog.message);
-            return newLogs;
-          });
+          setLogs((prev) => {
+            const newLogs = [...prev, summaryLog]
+            console.log("✅ Added summary log entry:", summaryLog.message)
+            return newLogs
+          })
 
           // Update receiving status
-          setIsReceivingData(true);
-          setLastDataReceived(new Date());
+          setIsReceivingData(true)
+          setLastDataReceived(new Date())
 
           // Force UI updates for summary log too
           setTimeout(() => {
-            setLogs(current => [...current]);
-          }, 50);
+            setLogs((current) => [...current])
+          }, 50)
         }
       }
-    };
-    
+    }
+
     // Enhanced event handling for multiple data sources
     const handleMessageEvent = (event: MessageEvent) => {
-      console.log('📨 LogsView received message event:', event.data);
-      console.log('📨 Event origin:', event.origin);
-      console.log('📨 Event source:', event.source);
+      console.log("📨 LogsView received message event:", event.data)
+      console.log("📨 Event origin:", event.origin)
+      console.log("📨 Event source:", event.source)
 
-      if (event.data && event.data.type === '5GLABX_TEST_EXECUTION') {
-        console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION message');
-        console.log('📊 Message details:', {
+      if (event.data && event.data.type === "5GLABX_TEST_EXECUTION") {
+        console.log("📊 LogsView: Processing 5GLABX_TEST_EXECUTION message")
+        console.log("📊 Message details:", {
           testCaseId: event.data.testCaseId,
           runId: event.data.runId,
           hasTestCaseData: !!event.data.testCaseData,
-          messageCount: (event.data.testCaseData?.expectedMessages?.length || event.data.testCaseData?.realtimeMessages?.length || 0),
-          dataKeys: Object.keys(event.data)
-        });
-        processTestData(event.data, 'PostMessage');
+          messageCount:
+            event.data.testCaseData?.expectedMessages?.length || event.data.testCaseData?.realtimeMessages?.length || 0,
+          dataKeys: Object.keys(event.data),
+        })
+        processTestData(event.data, "PostMessage")
       } else if (event.data && event.data.testCaseId) {
-        console.log('📊 LogsView: Processing test case data from PostMessage');
-        processTestData(event.data, 'PostMessage');
+        console.log("📊 LogsView: Processing test case data from PostMessage")
+        processTestData(event.data, "PostMessage")
       }
-    };
+    }
 
     const handleCustomEvent = (event: CustomEvent) => {
-      console.log('📨 LogsView received custom event:', event.type, event.detail);
-      console.log('📨 Custom event detail keys:', Object.keys(event.detail || {}));
+      console.log("📨 LogsView received custom event:", event.type, event.detail)
+      console.log("📨 Custom event detail keys:", Object.keys(event.detail || {}))
 
-      if (event.type === '5GLABX_TEST_EXECUTION') {
-        console.log('📊 LogsView: Processing 5GLABX_TEST_EXECUTION custom event');
-        processTestData(event.detail, 'CustomEvent');
-      } else if (event.type === 'testCaseExecutionStarted') {
-        console.log('📊 LogsView: Processing testCaseExecutionStarted event');
-        console.log('📊 Event detail:', JSON.stringify(event.detail, null, 2));
-        processTestData(event.detail, 'TestExecutionStarted');
-      } else if (event.type === '5glabxLogAnalysis') {
-        console.log('📊 LogsView: Processing 5glabxLogAnalysis event');
-        processTestData(event.detail, 'LogAnalysis');
-      } else if (event.type === '5glabx-test-execution-start') {
-        console.log('📊 LogsView: Test execution starting');
+      if (event.type === "5GLABX_TEST_EXECUTION") {
+        console.log("📊 LogsView: Processing 5GLABX_TEST_EXECUTION custom event")
+        processTestData(event.detail, "CustomEvent")
+      } else if (event.type === "testCaseExecutionStarted") {
+        console.log("📊 LogsView: Processing testCaseExecutionStarted event")
+        console.log("📊 Event detail:", JSON.stringify(event.detail, null, 2))
+        processTestData(event.detail, "TestExecutionStarted")
+      } else if (event.type === "5glabxLogAnalysis") {
+        console.log("📊 LogsView: Processing 5glabxLogAnalysis event")
+        processTestData(event.detail, "LogAnalysis")
+      } else if (event.type === "5glabx-test-execution-start") {
+        console.log("📊 LogsView: Test execution starting")
         onStateChange({
-          currentView: 'logs',
+          currentView: "logs",
           testExecutionActive: true,
-          testExecutionStatus: 'starting'
-        });
-      } else if (event.type === '5glabx-test-execution-data') {
-        console.log('📊 LogsView: Processing test execution data');
-        console.log('📊 Event detail data:', JSON.stringify(event.detail, null, 2));
-        processTestData(event.detail, 'GlobalEvent');
-      } else if (event.type === '5glabx-test-execution-complete') {
-        console.log('📊 LogsView: Test execution completed');
+          testExecutionStatus: "starting",
+        })
+      } else if (event.type === "5glabx-test-execution-data") {
+        console.log("📊 LogsView: Processing test execution data")
+        console.log("📊 Event detail data:", JSON.stringify(event.detail, null, 2))
+        processTestData(event.detail, "GlobalEvent")
+      } else if (event.type === "5glabx-test-execution-complete") {
+        console.log("📊 LogsView: Test execution completed")
         onStateChange({
           testExecutionActive: false,
-          testExecutionStatus: 'completed'
-        });
+          testExecutionStatus: "completed",
+        })
       } else {
-        console.log('📊 LogsView: Unknown custom event type:', event.type);
+        console.log("📊 LogsView: Unknown custom event type:", event.type)
         // Try to process any event with test case data
         if (event.detail && event.detail.testCaseId) {
-          console.log('📊 Processing unknown event with test case data');
-          processTestData(event.detail, `CustomEvent-${event.type}`);
+          console.log("📊 Processing unknown event with test case data")
+          processTestData(event.detail, `CustomEvent-${event.type}`)
         }
       }
-    };
+    }
 
     // Check for TestCasePlaybackService availability (optional - don't retry)
     const checkTestCasePlaybackService = () => {
       if (window.TestCasePlaybackService) {
-        console.log('✅ TestCasePlaybackService is available');
-        console.log('📊 LogsView: TestCasePlaybackService integration ready');
+        console.log("✅ TestCasePlaybackService is available")
+        console.log("📊 LogsView: TestCasePlaybackService integration ready")
       } else {
-        console.log('ℹ️  TestCasePlaybackService not available - using Supabase Realtime instead');
+        console.log("ℹ️  TestCasePlaybackService not available - using Supabase Realtime instead")
         // Don't retry - use Supabase Realtime as primary data source
       }
-    };
+    }
 
     // Listen for direct log updates
     const handleDirectLogUpdate = (event: CustomEvent) => {
-      console.log('📊 LogsView: Direct log update received:', event.detail);
-      const logData = event.detail;
-      
+      console.log("📊 LogsView: Direct log update received:", event.detail)
+      const logData = event.detail
+
       const newLog = {
         id: logData.id || Date.now(),
         timestamp: logData.timestamp || (Date.now() / 1000).toFixed(1),
-        level: logData.level || 'I',
-        component: logData.component || logData.layer || 'TEST',
+        level: logData.level || "I",
+        component: logData.component || logData.layer || "TEST",
         message: logData.message || `${logData.messageType}: ${JSON.stringify(logData.payload || {})}`,
-        type: logData.messageType || logData.type || 'DATA',
-        source: 'TestManager'
-      };
-      
-      setLogs(prev => {
-        const newLogs = [...prev.slice(-99), newLog];
-        return newLogs;
-      });
-    };
+        type: logData.messageType || logData.type || "DATA",
+        source: "TestManager",
+      }
+
+      setLogs((prev) => {
+        const newLogs = [...prev.slice(-99), newLog]
+        return newLogs
+      })
+    }
 
     // Set up all event listeners
-    if (typeof window !== 'undefined') {
-      console.log('📡 LogsView: Setting up comprehensive event listeners...');
-      
+    if (typeof window !== "undefined") {
+      console.log("📡 LogsView: Setting up comprehensive event listeners...")
+
       // Add global debug function (read-only, no test data injection)
-      (window as any).debugLogsView = () => {
-        console.log('🔍 LogsView Debug Info:', {
+      ;(window as any).debugLogsView = () => {
+        console.log("🔍 LogsView Debug Info:", {
           totalLogs: logs.length,
           filteredLogs: filteredLogs.length,
           searchQuery,
@@ -462,42 +477,42 @@ const LogsView: React.FC<{
           selectedComponent,
           isReceivingData,
           lastDataReceived: lastDataReceived?.toLocaleTimeString(),
-          componentMounted: true
-        });
-        console.log('ℹ️ System only handles real test data from Supabase database');
-      };
+          componentMounted: true,
+        })
+        console.log("ℹ️ System only handles real test data from Supabase database")
+      }
 
       // Listen for all possible event types from test execution system
-      window.addEventListener('message', handleMessageEvent);
-      window.addEventListener('5GLABX_TEST_EXECUTION', handleCustomEvent as EventListener);
-      window.addEventListener('testCaseExecutionStarted', handleCustomEvent as EventListener);
-      window.addEventListener('5glabxLogAnalysis', handleCustomEvent as EventListener);
-      window.addEventListener('5glabx-test-execution-start', handleCustomEvent as EventListener);
-      window.addEventListener('5glabx-test-execution-data', handleCustomEvent as EventListener);
-      window.addEventListener('5glabx-test-execution-complete', handleCustomEvent as EventListener);
+      window.addEventListener("message", handleMessageEvent)
+      window.addEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
+      window.addEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
+      window.addEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
+      window.addEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
+      window.addEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
+      window.addEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
 
       // Legacy event listeners
-      window.addEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
+      window.addEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
 
-      console.log('✅ LogsView: All event listeners registered for Test Manager integration');
+      console.log("✅ LogsView: All event listeners registered for Test Manager integration")
 
       // Check for TestCasePlaybackService availability
-      checkTestCasePlaybackService();
+      checkTestCasePlaybackService()
 
       // Also set up integration with FiveGLabXDataReceiver if available
       if (window.FiveGLabXDataReceiver) {
-        console.log('📡 LogsView: Connected to FiveGLabXDataReceiver');
+        console.log("📡 LogsView: Connected to FiveGLabXDataReceiver")
 
         // Override the receiver methods to process data
-        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData;
+        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData
         window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
-          console.log('📊 LogsView: Received data via FiveGLabXDataReceiver');
-          console.log('📊 FiveGLabXDataReceiver data:', JSON.stringify(data, null, 2));
-          processTestData(data, 'FiveGLabXDataReceiver');
+          console.log("📊 LogsView: Received data via FiveGLabXDataReceiver")
+          console.log("📊 FiveGLabXDataReceiver data:", JSON.stringify(data, null, 2))
+          processTestData(data, "FiveGLabXDataReceiver")
           if (originalOnTestExecutionData) {
-            originalOnTestExecutionData(data);
+            originalOnTestExecutionData(data)
           }
-        };
+        }
       }
 
       // Removed global data injection - system now only processes real data through normal events
@@ -505,62 +520,63 @@ const LogsView: React.FC<{
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('message', handleMessageEvent);
-        window.removeEventListener('5GLABX_TEST_EXECUTION', handleCustomEvent as EventListener);
-        window.removeEventListener('testCaseExecutionStarted', handleCustomEvent as EventListener);
-        window.removeEventListener('5glabxLogAnalysis', handleCustomEvent as EventListener);
-        window.removeEventListener('5glabx-test-execution-start', handleCustomEvent as EventListener);
-        window.removeEventListener('5glabx-test-execution-data', handleCustomEvent as EventListener);
-        window.removeEventListener('5glabx-test-execution-complete', handleCustomEvent as EventListener);
-        window.removeEventListener('logsViewUpdate', handleDirectLogUpdate as EventListener);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("message", handleMessageEvent)
+        window.removeEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
+        window.removeEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
+        window.removeEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
+        window.removeEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
+        window.removeEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
+        window.removeEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
+        window.removeEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
       }
-    };
-  }, []);
+    }
+  }, [])
 
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         log.component.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         log.type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLevel = selectedLevel === 'all' || log.level === selectedLevel;
-    const matchesComponent = selectedComponent === 'all' || log.component === selectedComponent;
-    
-    return matchesSearch && matchesLevel && matchesComponent;
-  });
+  const filteredLogs = logs.filter((log) => {
+    const matchesSearch =
+      log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.component.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.type.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesLevel = selectedLevel === "all" || log.level === selectedLevel
+    const matchesComponent = selectedComponent === "all" || log.component === selectedComponent
+
+    return matchesSearch && matchesLevel && matchesComponent
+  })
 
   // Clean system - no debug logging interference
 
   const getLevelIcon = (level: string) => {
     switch (level) {
-      case 'E':
-        return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'W':
-        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-      case 'I':
-        return <Info className="w-4 h-4 text-blue-500" />;
+      case "E":
+        return <AlertTriangle className="w-4 h-4 text-red-500" />
+      case "W":
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />
+      case "I":
+        return <Info className="w-4 h-4 text-blue-500" />
       default:
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-green-500" />
     }
-  };
+  }
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'E':
-        return 'bg-red-100 text-red-800';
-      case 'W':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'I':
-        return 'bg-blue-100 text-blue-800';
+      case "E":
+        return "bg-red-100 text-red-800"
+      case "W":
+        return "bg-yellow-100 text-yellow-800"
+      case "I":
+        return "bg-blue-100 text-blue-800"
       default:
-        return 'bg-green-100 text-green-800';
+        return "bg-green-100 text-green-800"
     }
-  };
+  }
 
   // Decode message function (like Enhanced Logs)
   const decodeMessage = (log: any) => {
-    setSelectedMessage(log);
-    setShowDecoder(true);
-  };
+    setSelectedMessage(log)
+    setShowDecoder(true)
+  }
 
   return (
     <div className="p-6 space-y-6" data-component="LogsView">
@@ -621,21 +637,19 @@ const LogsView: React.FC<{
       <div className="bg-white p-4 rounded-lg border mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className={`flex items-center space-x-2 ${isReceivingData ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-3 h-3 rounded-full ${isReceivingData ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+            <div className={`flex items-center space-x-2 ${isReceivingData ? "text-green-600" : "text-gray-400"}`}>
+              <div
+                className={`w-3 h-3 rounded-full ${isReceivingData ? "bg-green-500 animate-pulse" : "bg-gray-300"}`}
+              ></div>
               <span className="text-sm font-medium">
-                {isReceivingData ? '🟢 Receiving Real-Time Data' : '⚪ Waiting for Data'}
+                {isReceivingData ? "🟢 Receiving Real-Time Data" : "⚪ Waiting for Data"}
               </span>
             </div>
             {lastDataReceived && (
-              <span className="text-xs text-gray-500">
-                Last update: {lastDataReceived.toLocaleTimeString()}
-              </span>
+              <span className="text-xs text-gray-500">Last update: {lastDataReceived.toLocaleTimeString()}</span>
             )}
             {logs.length > 0 && (
-              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                {logs.length} messages loaded
-              </span>
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">{logs.length} messages loaded</span>
             )}
           </div>
           <div className="flex items-center space-x-2">
@@ -643,9 +657,9 @@ const LogsView: React.FC<{
             {/* System only handles real test data from Supabase database */}
             <button
               onClick={() => {
-                setLogs([]);
-                setIsReceivingData(false);
-                setLastDataReceived(null);
+                setLogs([])
+                setIsReceivingData(false)
+                setLastDataReceived(null)
               }}
               className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
             >
@@ -670,9 +684,7 @@ const LogsView: React.FC<{
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Component
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Message
                 </th>
@@ -686,7 +698,9 @@ const LogsView: React.FC<{
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <div className={`w-12 h-12 rounded-full ${isReceivingData ? 'bg-green-100 animate-pulse' : 'bg-gray-100'} flex items-center justify-center mb-4`}>
+                      <div
+                        className={`w-12 h-12 rounded-full ${isReceivingData ? "bg-green-100 animate-pulse" : "bg-gray-100"} flex items-center justify-center mb-4`}
+                      >
                         {isReceivingData ? (
                           <div className="w-6 h-6 bg-green-500 rounded-full animate-bounce"></div>
                         ) : (
@@ -694,13 +708,12 @@ const LogsView: React.FC<{
                         )}
                       </div>
                       <p className="text-gray-500 text-sm mb-2">
-                        {isReceivingData ? '🎯 Waiting for test execution data...' : '📭 No logs available'}
+                        {isReceivingData ? "🎯 Waiting for test execution data..." : "📭 No logs available"}
                       </p>
                       <p className="text-gray-400 text-xs">
                         {isReceivingData
-                          ? 'Run a test case to see live data streaming here'
-                          : 'Start a test execution to populate this view with real-time data'
-                        }
+                          ? "Run a test case to see live data streaming here"
+                          : "Start a test execution to populate this view with real-time data"}
                       </p>
                     </div>
                   </td>
@@ -708,24 +721,18 @@ const LogsView: React.FC<{
               ) : (
                 filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                      {log.timestamp}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{log.timestamp}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelColor(log.level)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelColor(log.level)}`}
+                      >
                         {getLevelIcon(log.level)}
                         <span className="ml-1">{log.level}</span>
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {log.component}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {log.type}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-md truncate">
-                      {log.message}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.component}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.type}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 max-w-md truncate">{log.message}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => decodeMessage(log)}
@@ -752,15 +759,15 @@ const LogsView: React.FC<{
           <div className="flex items-center space-x-4 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              <span>Errors: {logs.filter(l => l.level === 'E').length}</span>
+              <span>Errors: {logs.filter((l) => l.level === "E").length}</span>
             </div>
             <div className="flex items-center space-x-1">
               <AlertTriangle className="w-4 h-4 text-yellow-500" />
-              <span>Warnings: {logs.filter(l => l.level === 'W').length}</span>
+              <span>Warnings: {logs.filter((l) => l.level === "W").length}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Info className="w-4 h-4 text-blue-500" />
-              <span>Info: {logs.filter(l => l.level === 'I').length}</span>
+              <span>Info: {logs.filter((l) => l.level === "I").length}</span>
             </div>
           </div>
         </div>
@@ -775,10 +782,7 @@ const LogsView: React.FC<{
                 <h3 className="text-xl font-semibold text-gray-900">
                   📊 Message Decoder - {selectedMessage.type} ({selectedMessage.component})
                 </h3>
-                <button
-                  onClick={() => setShowDecoder(false)}
-                  className="text-gray-500 hover:text-gray-700 p-2"
-                >
+                <button onClick={() => setShowDecoder(false)} className="text-gray-500 hover:text-gray-700 p-2">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -805,19 +809,23 @@ const LogsView: React.FC<{
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-600">Direction:</span>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          selectedMessage.direction === 'UL' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
-                        }`}>
-                          {selectedMessage.direction || 'N/A'}
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${
+                            selectedMessage.direction === "UL"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {selectedMessage.direction || "N/A"}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-600">Protocol:</span>
-                        <span className="font-mono">{selectedMessage.protocol || 'Unknown'}</span>
+                        <span className="font-mono">{selectedMessage.protocol || "Unknown"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-600">Standard:</span>
-                        <span className="text-blue-600 text-xs">{selectedMessage.standardReference || 'Unknown'}</span>
+                        <span className="text-blue-600 text-xs">{selectedMessage.standardReference || "Unknown"}</span>
                       </div>
                     </div>
                   </div>
@@ -825,54 +833,70 @@ const LogsView: React.FC<{
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">🔍 Information Elements (IEs)</h4>
                     <div className="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
-                      {selectedMessage.informationElements && Object.keys(selectedMessage.informationElements).length > 0 ? (
+                      {selectedMessage.informationElements &&
+                      Object.keys(selectedMessage.informationElements).length > 0 ? (
                         <div className="space-y-3">
-                          {Object.entries(selectedMessage.informationElements).map(([ieName, ieData]: [string, any]) => (
-                            <div key={ieName} className="border-l-4 border-blue-500 pl-3">
-                              <div className="font-medium text-gray-900">{ieName}</div>
-                              <div className="text-sm text-gray-600 space-y-1">
-                                {ieData.type && (
-                                  <div><span className="font-medium">Type:</span> {ieData.type}</div>
-                                )}
-                                {ieData.value !== undefined && (
-                                  <div><span className="font-medium">Value:</span> 
-                                    <span className="font-mono ml-1">
-                                      {typeof ieData.value === 'object' ? JSON.stringify(ieData.value) : String(ieData.value)}
-                                    </span>
-                                  </div>
-                                )}
-                                {ieData.presence && (
-                                  <div><span className="font-medium">Presence:</span> 
-                                    <span className={`ml-1 px-1 py-0.5 rounded text-xs ${
-                                      ieData.presence === 'mandatory' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                      {ieData.presence}
-                                    </span>
-                                  </div>
-                                )}
-                                {ieData.criticality && (
-                                  <div><span className="font-medium">Criticality:</span> 
-                                    <span className="ml-1 text-orange-600">{ieData.criticality}</span>
-                                  </div>
-                                )}
-                                {ieData.reference && (
-                                  <div><span className="font-medium">Reference:</span> 
-                                    <span className="ml-1 text-blue-600 text-xs">{ieData.reference}</span>
-                                  </div>
-                                )}
-                                {ieData.range && (
-                                  <div><span className="font-medium">Range:</span> 
-                                    <span className="ml-1 font-mono text-xs">{ieData.range}</span>
-                                  </div>
-                                )}
+                          {Object.entries(selectedMessage.informationElements).map(
+                            ([ieName, ieData]: [string, any]) => (
+                              <div key={ieName} className="border-l-4 border-blue-500 pl-3">
+                                <div className="font-medium text-gray-900">{ieName}</div>
+                                <div className="text-sm text-gray-600 space-y-1">
+                                  {ieData.type && (
+                                    <div>
+                                      <span className="font-medium">Type:</span> {ieData.type}
+                                    </div>
+                                  )}
+                                  {ieData.value !== undefined && (
+                                    <div>
+                                      <span className="font-medium">Value:</span>
+                                      <span className="font-mono ml-1">
+                                        {typeof ieData.value === "object"
+                                          ? JSON.stringify(ieData.value)
+                                          : String(ieData.value)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {ieData.presence && (
+                                    <div>
+                                      <span className="font-medium">Presence:</span>
+                                      <span
+                                        className={`ml-1 px-1 py-0.5 rounded text-xs ${
+                                          ieData.presence === "mandatory"
+                                            ? "bg-red-100 text-red-800"
+                                            : "bg-yellow-100 text-yellow-800"
+                                        }`}
+                                      >
+                                        {ieData.presence}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {ieData.criticality && (
+                                    <div>
+                                      <span className="font-medium">Criticality:</span>
+                                      <span className="ml-1 text-orange-600">{ieData.criticality}</span>
+                                    </div>
+                                  )}
+                                  {ieData.reference && (
+                                    <div>
+                                      <span className="font-medium">Reference:</span>
+                                      <span className="ml-1 text-blue-600 text-xs">{ieData.reference}</span>
+                                    </div>
+                                  )}
+                                  {ieData.range && (
+                                    <div>
+                                      <span className="font-medium">Range:</span>
+                                      <span className="ml-1 font-mono text-xs">{ieData.range}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ),
+                          )}
                         </div>
                       ) : (
                         <div className="text-center text-gray-500 py-4">
                           <div className="text-sm">No structured Information Elements available</div>
-                          <div className="text-xs mt-1">Raw IEs: {selectedMessage.ies || 'None'}</div>
+                          <div className="text-xs mt-1">Raw IEs: {selectedMessage.ies || "None"}</div>
                         </div>
                       )}
                     </div>
@@ -895,35 +919,38 @@ const LogsView: React.FC<{
                     <div className="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
                       {selectedMessage.layerParameters && Object.keys(selectedMessage.layerParameters).length > 0 ? (
                         <div className="space-y-2">
-                          {Object.entries(selectedMessage.layerParameters).map(([paramName, paramData]: [string, any]) => (
-                            <div key={paramName} className="border-l-4 border-green-500 pl-3">
-                              <div className="font-medium text-gray-900">{paramName}</div>
-                              <div className="text-sm text-gray-600">
-                                {paramData.value !== undefined && (
-                                  <div><span className="font-medium">Value:</span> 
-                                    <span className="font-mono ml-1">
-                                      {paramData.value} {paramData.unit && `${paramData.unit}`}
-                                    </span>
-                                  </div>
-                                )}
-                                {paramData.range && (
-                                  <div><span className="font-medium">Range:</span> 
-                                    <span className="ml-1 font-mono text-xs">{paramData.range}</span>
-                                  </div>
-                                )}
-                                {paramData.reference && (
-                                  <div><span className="font-medium">Reference:</span> 
-                                    <span className="ml-1 text-blue-600 text-xs">{paramData.reference}</span>
-                                  </div>
-                                )}
+                          {Object.entries(selectedMessage.layerParameters).map(
+                            ([paramName, paramData]: [string, any]) => (
+                              <div key={paramName} className="border-l-4 border-green-500 pl-3">
+                                <div className="font-medium text-gray-900">{paramName}</div>
+                                <div className="text-sm text-gray-600">
+                                  {paramData.value !== undefined && (
+                                    <div>
+                                      <span className="font-medium">Value:</span>
+                                      <span className="font-mono ml-1">
+                                        {paramData.value} {paramData.unit && `${paramData.unit}`}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {paramData.range && (
+                                    <div>
+                                      <span className="font-medium">Range:</span>
+                                      <span className="ml-1 font-mono text-xs">{paramData.range}</span>
+                                    </div>
+                                  )}
+                                  {paramData.reference && (
+                                    <div>
+                                      <span className="font-medium">Reference:</span>
+                                      <span className="ml-1 text-blue-600 text-xs">{paramData.reference}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ),
+                          )}
                         </div>
                       ) : (
-                        <div className="text-center text-gray-500 py-4 text-sm">
-                          No layer parameters available
-                        </div>
+                        <div className="text-center text-gray-500 py-4 text-sm">No layer parameters available</div>
                       )}
                     </div>
                   </div>
@@ -932,9 +959,15 @@ const LogsView: React.FC<{
                     <h4 className="font-semibold text-gray-900 mb-2">📊 Message Summary</h4>
                     <div className="bg-blue-50 p-4 rounded-lg text-sm">
                       <div className="space-y-1">
-                        <div><span className="font-medium">Source:</span> {selectedMessage.source}</div>
-                        <div><span className="font-medium">Test Case:</span> {selectedMessage.testCaseId || 'N/A'}</div>
-                        <div><span className="font-medium">Message:</span> {selectedMessage.message}</div>
+                        <div>
+                          <span className="font-medium">Source:</span> {selectedMessage.source}
+                        </div>
+                        <div>
+                          <span className="font-medium">Test Case:</span> {selectedMessage.testCaseId || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Message:</span> {selectedMessage.message}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -956,7 +989,7 @@ const LogsView: React.FC<{
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default LogsView;
+export default LogsView
