@@ -92,59 +92,76 @@ const LogViewer: React.FC<LogViewerProps> = ({
   
   const logContainerRef = useRef<HTMLDivElement>(null);
 
+  // WebSocket connection for real-time logs
   useEffect(() => {
-    // Simulate real-time log generation
-    const logInterval = setInterval(() => {
-      const newLog: LogEntry = {
-        id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: new Date(),
-        level: ['debug', 'info', 'warning', 'error'][Math.floor(Math.random() * 4)] as any,
-        source: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        layer: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'][Math.floor(Math.random() * 6)],
-        protocol: ['NR-PHY', 'NR-MAC', 'NR-RLC', 'NR-PDCP', 'NR-RRC', '5G-NAS'][Math.floor(Math.random() * 6)],
-        message: `Message processed: ${Math.random().toString(36).substr(2, 9)}`,
-        data: {
-          messageType: 'TestMessage',
-          direction: ['UL', 'DL'][Math.floor(Math.random() * 2)],
-          size: Math.floor(Math.random() * 1000) + 100
-        },
-        messageId: `msg_${Math.random().toString(36).substr(2, 9)}`,
-        stepId: `step_${Math.floor(Math.random() * 10) + 1}`,
-        direction: ['UL', 'DL', 'BIDIRECTIONAL'][Math.floor(Math.random() * 3)] as any,
-        rawData: Math.random().toString(16).substr(2, 16).toUpperCase(),
-        decodedData: {
-          field1: Math.floor(Math.random() * 100),
-          field2: Math.random().toString(36).substr(2, 8)
-        },
-        informationElements: [
-          {
-            name: 'test_ie',
-            type: 'integer',
-            value: Math.floor(Math.random() * 100),
-            hexValue: Math.random().toString(16).substr(2, 4).toUpperCase(),
-            mandatory: true,
-            validationStatus: 'valid'
-          }
-        ],
-        validationResult: {
-          isValid: Math.random() > 0.1,
-          errors: [],
-          warnings: [],
-          complianceScore: Math.floor(Math.random() * 20) + 80
-        },
-        performanceData: {
-          latency: Math.floor(Math.random() * 10) + 1,
-          processingTime: Math.random() * 5,
-          memoryUsage: Math.random() * 100,
-          cpuUsage: Math.random() * 100
-        }
-      };
-      
-      setLogs(prev => [...prev.slice(-999), newLog]); // Keep last 1000 logs
-    }, 500);
+    if (!executionId) {
+      console.error('No executionId provided for WebSocket connection');
+      return;
+    }
 
-    return () => clearInterval(logInterval);
-  }, []);
+    // Determine WebSocket URL based on environment
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${window.location.host}/api/ws/execution/${executionId}`;
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('WebSocket connected for execution:', executionId);
+      // Send initial handshake with execution details
+      ws.send(JSON.stringify({
+        type: 'init',
+        executionId,
+        testCaseId,
+        userId,
+        timestamp: new Date().toISOString()
+      }));
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        
+        if (message.type === 'log' || message.type === 'message') {
+          const logEntry: LogEntry = {
+            id: message.id || `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: new Date(message.timestamp || Date.now()),
+            level: message.level || 'info',
+            source: message.source || 'System',
+            layer: message.layer || message.data?.layer || 'N/A',
+            protocol: message.protocol || message.data?.protocol || 'N/A',
+            message: message.message || message.content || 'No message',
+            data: message.data || {},
+            messageId: message.messageId,
+            stepId: message.stepId,
+            direction: message.direction,
+            rawData: message.rawData,
+            decodedData: message.decodedData,
+            informationElements: message.informationElements,
+            validationResult: message.validationResult,
+            performanceData: message.performanceData
+          };
+          
+          setLogs(prev => [...prev.slice(-999), logEntry]);
+        }
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Cleanup function
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, [executionId, testCaseId, userId]);
 
   useEffect(() => {
     // Apply filters
