@@ -55,23 +55,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to start test execution" }, { status: 500 })
     }
 
-    // Extract REAL data from Supabase test_data field
-    const realTestData = testCase.test_data || {}
-    const expectedMessages = realTestData.messages || realTestData.expectedMessages || []
-    const expectedInformationElements = realTestData.informationElements || realTestData.ies || []
-    const expectedLayerParameters = realTestData.layerParameters || realTestData.parameters || []
+    // Extract REAL data from Supabase expected_results field (which contains message_flow)
+    const realTestData = testCase.expected_results || {}
+    let expectedMessages = Array.isArray(realTestData) ? realTestData : (realTestData.messages || realTestData.expectedMessages || [])
+
+    // For now, create sample IE and parameters since they're not in the seed data
+    const expectedInformationElements: any[] = []
+    const expectedLayerParameters: any[] = []
 
     console.log(`📊 Using REAL data from Supabase:`)
     console.log(`  - Messages: ${expectedMessages.length}`)
     console.log(`  - Information Elements: ${expectedInformationElements.length}`)
     console.log(`  - Layer Parameters: ${expectedLayerParameters.length}`)
 
+    // Transform messages from seed data format to expected format
+    if (expectedMessages.length > 0) {
+      expectedMessages = expectedMessages.map((msg: any, index: number) => ({
+        id: `msg-${testCase.id}-${index}`,
+        messageName: msg.message || msg.messageName || "Unknown Message",
+        messageType: msg.messageType || msg.message || "TEST_MESSAGE",
+        layer: msg.layer || "UNKNOWN",
+        direction: msg.direction || "UL",
+        protocol: testCase.protocol || "5G_NR",
+        messagePayload: msg.values || msg.messagePayload || {},
+        informationElements: {},
+        layerParameters: {},
+        standardReference: "3GPP Specification",
+        timestampMs: msg.timestamp || Date.now() + index * 1000,
+      }))
+    }
+
     // If no real data exists, CREATE SAMPLE DATA for testing
-    if (
-      expectedMessages.length === 0 &&
-      expectedInformationElements.length === 0 &&
-      expectedLayerParameters.length === 0
-    ) {
+    if (expectedMessages.length === 0) {
       console.warn(`⚠️  No real test data found, creating sample data for test case: ${testCase.name}`)
 
       const sampleMessages = [
@@ -197,16 +212,65 @@ export async function POST(request: NextRequest) {
         parameterCount: expectedLayerParameters.length,
       },
     })
+    // Broadcast test completion
+    if (executionId) {
+      try {
+        const { broadcastToExecution } = await import('@/app/api/ws/execution/[executionId]/route');
+        broadcastToExecution(executionId, {
+          type: 'test_completed',
+          executionId,
+          testCaseId: testCase.id,
+          timestamp: new Date().toISOString(),
+          status: 'completed',
+          message: 'Test execution completed successfully'
+        });
+      } catch (wsError) {
+        console.error('Error broadcasting test completion:', wsError);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      executionId,
+      message: 'Test execution started',
+      testCase: {
+        id: testCase.id,
+        name: testCase.name,
+        description: testCase.description,
+        complexity: testCase.complexity,
+        // Include other relevant test case data
+      },
+      startedAt: new Date().toISOString(),
+      // Include any other relevant data
+    });
   } catch (error) {
-    console.error("❌ Test execution error:", error)
+    console.error("❌ Test execution error:", error);
+    
+    // Broadcast error to WebSocket clients
+    if (executionId) {
+      try {
+        const { broadcastToExecution } = await import('@/app/api/ws/execution/[executionId]/route');
+        broadcastToExecution(executionId, {
+          type: 'error',
+          executionId,
+          timestamp: new Date().toISOString(),
+          error: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+          message: 'Test execution failed'
+        });
+      } catch (wsError) {
+        console.error('Error broadcasting error:', wsError);
+      }
+    }
+    
     return NextResponse.json(
       {
         error: "Internal server error",
-        message: error.message,
+        message: error instanceof Error ? error.message : "Unknown error",
         details: "Check server logs for more information",
       },
       { status: 500 },
-    )
+    );
   }
 }
 
