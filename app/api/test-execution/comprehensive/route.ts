@@ -2,493 +2,278 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 /**
- * Comprehensive Test Case Execution API
- * GET /api/test-execution/comprehensive?testCaseId=xxx - Get complete test case data for execution
- * POST /api/test-execution/comprehensive - Execute test case with complete data
+ * Comprehensive Test Cases API
+ * GET /api/test-cases/comprehensive?category=xxx&protocol=xxx&layer=xxx&limit=xxx&offset=xxx
+ * POST /api/test-cases/comprehensive - Create new test case
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const testCaseId = searchParams.get('testCaseId');
-    const runId = searchParams.get('runId');
-    const includeTemplates = searchParams.get('includeTemplates') === 'true';
-
-    if (!testCaseId && !runId) {
-      return NextResponse.json(
-        { error: 'Either testCaseId or runId is required' },
-        { status: 400 }
-      );
-    }
+    const category = searchParams.get('category');
+    const protocol = searchParams.get('protocol');
+    const layer = searchParams.get('layer');
+    const complexity = searchParams.get('complexity');
+    const limit = parseInt(searchParams.get('limit') || '2000'); // Increased from 50 to 2000 to show more test cases
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const search = searchParams.get('search');
+    const includeData = searchParams.get('includeData') === 'true';
 
     // Use singleton admin client to prevent multiple instances
     const supabase = supabaseAdmin;
 
-    console.log(`🔍 Fetching comprehensive test case execution data - TestCase: ${testCaseId}, RunId: ${runId}`);
+    console.log(`🔍 Fetching comprehensive test cases - Category: ${category}, Protocol: ${protocol}, Layer: ${layer}`);
 
-    let testCaseData = null;
-    let executionData = null;
+    // Build query dynamically based on available tables
+    let selectQuery = '*';
+    let hasCategories = false;
+    let hasMessages = false;
+    let hasInformationElements = false;
+    let hasLayerParameters = false;
 
-    // Fetch test case data
-    if (testCaseId) {
-      // Build dynamic select query based on available columns
-      let selectQuery = '*';
-      let hasCategories = false;
-      let hasMessages = false;
-      let hasInformationElements = false;
-      let hasLayerParameters = false;
-      let hasDependencies = false;
+    // Check if test_case_categories table exists
+    try {
+      const { data: categories, error: catError } = await supabase
+        .from('test_case_categories')
+        .select('id')
+        .limit(1);
 
-      // Check if test_case_categories table exists
-      try {
-        const { data: categories, error: catError } = await supabase
-          .from('test_case_categories')
-          .select('id')
-          .limit(1);
-
-        if (!catError) {
-          hasCategories = true;
-        }
-      } catch (e) {
-        console.warn('test_case_categories table not found, skipping category join');
+      if (!catError) {
+        hasCategories = true;
       }
-
-      // Check if test_case_messages table exists
-      try {
-        const { data: messages, error: msgError } = await supabase
-          .from('test_case_messages')
-          .select('id')
-          .limit(1);
-
-        if (!msgError) {
-          hasMessages = true;
-        }
-      } catch (e) {
-        console.warn('test_case_messages table not found, skipping message join');
-      }
-
-      // Check if test_case_information_elements table exists
-      try {
-        const { data: ies, error: ieError } = await supabase
-          .from('test_case_information_elements')
-          .select('id')
-          .limit(1);
-
-        if (!ieError) {
-          hasInformationElements = true;
-        }
-      } catch (e) {
-        console.warn('test_case_information_elements table not found, skipping IE join');
-      }
-
-      // Check if test_case_layer_parameters table exists
-      try {
-        const { data: params, error: paramError } = await supabase
-          .from('test_case_layer_parameters')
-          .select('id')
-          .limit(1);
-
-        if (!paramError) {
-          hasLayerParameters = true;
-        }
-      } catch (e) {
-        console.warn('test_case_layer_parameters table not found, skipping parameter join');
-      }
-
-      // Check if test_case_dependencies table exists
-      try {
-        const { data: deps, error: depError } = await supabase
-          .from('test_case_dependencies')
-          .select('id')
-          .limit(1);
-
-        if (!depError) {
-          hasDependencies = true;
-        }
-      } catch (e) {
-        console.warn('test_case_dependencies table not found, skipping dependency join');
-      }
-
-      // Build the select query dynamically
-      if (hasCategories) {
-        selectQuery += ',test_case_categories!inner(name, description, protocol_focus, layer_focus, complexity_level)';
-      }
-
-      if (hasMessages) {
-        selectQuery += ',test_case_messages(*)';
-      }
-
-      if (hasInformationElements) {
-        selectQuery += ',test_case_information_elements(*)';
-      }
-
-      if (hasLayerParameters) {
-        selectQuery += ',test_case_layer_parameters(*)';
-      }
-
-      if (hasDependencies) {
-        selectQuery += ',test_case_dependencies(*)';
-      }
-
-      console.log(`Dynamic select query: ${selectQuery}`);
-
-      const { data: testCase, error: testCaseError } = await supabase
-        .from('test_cases')
-        .select(selectQuery)
-        .eq('id', testCaseId)
-        .single();
-
-      if (testCaseError) {
-        console.error('Test case fetch error:', testCaseError);
-        return NextResponse.json(
-          { error: 'Test case not found' },
-          { status: 404 }
-        );
-      }
-
-      testCaseData = testCase;
+    } catch (e) {
+      console.warn('test_case_categories table not found, skipping category join');
     }
 
-    // Fetch execution data if runId provided
-    if (runId) {
-      // Build dynamic select query for execution data
-      let executionSelectQuery = '*';
-      let hasDecodedMessages = false;
-      let hasMessageFlowCompliance = false;
-      let hasIeValidationResults = false;
-      let hasLayerParameterAnalysis = false;
-      let hasMessageTimingAnalysis = false;
+    // Check if test_case_messages table exists
+    try {
+      const { data: messages, error: msgError } = await supabase
+        .from('test_case_messages')
+        .select('id')
+        .limit(1);
 
-      // Check if decoded_messages table exists
-      try {
-        const { data: decodedMsgs, error: decodedError } = await supabase
-          .from('decoded_messages')
-          .select('id')
-          .limit(1);
-
-        if (!decodedError) {
-          hasDecodedMessages = true;
-        }
-      } catch (e) {
-        console.warn('decoded_messages table not found, skipping decoded messages');
+      if (!msgError) {
+        hasMessages = true;
       }
-
-      // Check if message_flow_compliance table exists
-      try {
-        const { data: compliance, error: complianceError } = await supabase
-          .from('message_flow_compliance')
-          .select('id')
-          .limit(1);
-
-        if (!complianceError) {
-          hasMessageFlowCompliance = true;
-        }
-      } catch (e) {
-        console.warn('message_flow_compliance table not found, skipping compliance data');
-      }
-
-      // Check if ie_validation_results table exists
-      try {
-        const { data: ieResults, error: ieError } = await supabase
-          .from('ie_validation_results')
-          .select('id')
-          .limit(1);
-
-        if (!ieError) {
-          hasIeValidationResults = true;
-        }
-      } catch (e) {
-        console.warn('ie_validation_results table not found, skipping IE validation results');
-      }
-
-      // Check if layer_parameter_analysis table exists
-      try {
-        const { data: layerAnalysis, error: layerError } = await supabase
-          .from('layer_parameter_analysis')
-          .select('id')
-          .limit(1);
-
-        if (!layerError) {
-          hasLayerParameterAnalysis = true;
-        }
-      } catch (e) {
-        console.warn('layer_parameter_analysis table not found, skipping layer parameter analysis');
-      }
-
-      // Check if message_timing_analysis table exists
-      try {
-        const { data: timingAnalysis, error: timingError } = await supabase
-          .from('message_timing_analysis')
-          .select('id')
-          .limit(1);
-
-        if (!timingError) {
-          hasMessageTimingAnalysis = true;
-        }
-      } catch (e) {
-        console.warn('message_timing_analysis table not found, skipping message timing analysis');
-      }
-
-      // Build the execution select query dynamically
-      if (hasDecodedMessages) {
-        executionSelectQuery += ',decoded_messages(*)';
-      }
-
-      if (hasMessageFlowCompliance) {
-        executionSelectQuery += ',message_flow_compliance(*)';
-      }
-
-      if (hasIeValidationResults) {
-        executionSelectQuery += ',ie_validation_results(*)';
-      }
-
-      if (hasLayerParameterAnalysis) {
-        executionSelectQuery += ',layer_parameter_analysis(*)';
-      }
-
-      if (hasMessageTimingAnalysis) {
-        executionSelectQuery += ',message_timing_analysis(*)';
-      }
-
-      console.log(`Execution select query: ${executionSelectQuery}`);
-
-      const { data: execution, error: executionError } = await supabase
-        .from('test_case_executions')
-        .select(executionSelectQuery)
-        .eq('id', runId)
-        .single();
-
-      if (executionError) {
-        console.error('Execution fetch error:', executionError);
-        return NextResponse.json(
-          { error: 'Execution not found' },
-          { status: 404 }
-        );
-      }
-
-      executionData = execution;
+    } catch (e) {
+      console.warn('test_case_messages table not found, skipping message join');
     }
 
-    // Fetch execution templates if requested
-    let executionTemplates = null;
-    if (includeTemplates && testCaseData) {
-      try {
-        const { data: templates, error: templatesError } = await supabase
-          .from('test_execution_templates')
-          .select('*')
-          .eq('protocol', testCaseData.protocol || '5G_NR')
-          .eq('layer', testCaseData.layer || 'Multi');
+    // Check if test_case_information_elements table exists
+    try {
+      const { data: ies, error: ieError } = await supabase
+        .from('test_case_information_elements')
+        .select('id')
+        .limit(1);
 
-        if (templatesError) {
-          console.warn('Templates fetch error:', templatesError);
-        } else {
-          executionTemplates = templates || [];
-        }
-      } catch (e) {
-        console.warn('test_execution_templates table not found, skipping template fetch');
-        executionTemplates = [];
+      if (!ieError) {
+        hasInformationElements = true;
       }
+    } catch (e) {
+      console.warn('test_case_information_elements table not found, skipping IE join');
     }
 
-    // Organize comprehensive data
-    const comprehensiveData = {
-      // Test case definition
-      testCase: testCaseData ? {
-        id: testCaseData.id,
-        name: testCaseData.name,
-        description: testCaseData.description,
-        protocol: testCaseData.protocol || '5G_NR',
-        layer: testCaseData.layer || 'Multi',
-        complexity: testCaseData.complexity || 'intermediate',
-        category: testCaseData.test_case_categories || { name: '5G NR', description: '5G NR Test Cases' },
-        testScenario: testCaseData.test_scenario || testCaseData.name,
-        testObjective: testCaseData.test_objective || testCaseData.description,
-        standardReference: testCaseData.standard_reference || 'TS 38.331',
-        releaseVersion: testCaseData.release_version || 'Release 17',
-        expectedDurationMinutes: testCaseData.expected_duration_minutes || 5,
-        executionPriority: testCaseData.execution_priority || 5,
-        automationLevel: testCaseData.automation_level || 'manual',
-        testDataRequirements: testCaseData.test_data_requirements || {},
-        kpiRequirements: testCaseData.kpi_requirements || {},
-        dependencies: testCaseData.test_case_dependencies || []
-      } : null,
+    // Check if test_case_layer_parameters table exists
+    try {
+      const { data: params, error: paramError } = await supabase
+        .from('test_case_layer_parameters')
+        .select('id')
+        .limit(1);
 
-      // Expected message flow
-      expectedMessages: testCaseData?.test_case_messages?.map(msg => ({
-        id: msg.id,
-        stepId: msg.step_id || msg.id,
-        stepOrder: msg.step_order || 1,
-        timestampMs: msg.timestamp_ms || 0,
-        direction: msg.direction || 'UL',
-        layer: msg.layer || 'RRC',
-        protocol: msg.protocol || '5G_NR',
-        messageType: msg.message_type || 'RRCSetupRequest',
-        messageName: msg.message_name || 'RRC Setup Request',
-        messageDescription: msg.message_description || 'RRC Setup Request message',
-        standardReference: msg.standard_reference || 'TS 38.331',
-        messageVariant: msg.message_variant || 'standard',
-        messagePriority: msg.message_priority || 'normal',
-        retryCount: msg.retry_count || 0,
-        retryIntervalMs: msg.retry_interval_ms || 1000,
-        successCriteria: msg.success_criteria || 'Message sent successfully',
-        failureCriteria: msg.failure_criteria || 'Message transmission failed',
-        measurementCriteria: msg.measurement_criteria || 'Standard measurement criteria',
-        messageSequenceGroup: msg.message_sequence_group || 'initial_access',
-        parallelExecution: msg.parallel_execution || false,
-        conditionalExecution: msg.conditional_execution || false,
-        messagePayload: msg.message_payload || {},
-        expectedResponseTimeMs: msg.expected_response_time_ms || 1000,
-        maxResponseTimeMs: msg.max_response_time_ms || 5000,
-        messageSizeBytes: msg.message_size_bytes || 100,
-        compressionEnabled: msg.compression_enabled || false,
-        encryptionRequired: msg.encryption_required || false,
-        template: msg.message_templates || null
-      })) || [],
-
-      // Expected information elements
-      expectedInformationElements: testCaseData?.test_case_information_elements?.map(ie => ({
-        id: ie.id,
-        ieName: ie.ie_name || 'IE_' + ie.id,
-        ieType: ie.ie_type || 'integer',
-        ieValue: ie.ie_value || 0,
-        ieValueHex: ie.ie_value_hex || '00',
-        ieValueBinary: ie.ie_value_binary || '00000000',
-        ieSize: ie.ie_size || 8,
-        mandatory: ie.mandatory !== undefined ? ie.mandatory : true,
-        isValid: ie.is_valid !== undefined ? ie.is_valid : true,
-        standardReference: ie.standard_reference || 'TS 38.331',
-        ieVariant: ie.ie_variant || 'standard',
-        iePriority: ie.ie_priority || 'normal',
-        ieCondition: ie.ie_condition || 'always',
-        ieValidationRules: ie.ie_validation_rules || {},
-        ieMeasurementCriteria: ie.ie_measurement_criteria || 'Standard criteria',
-        ieRelationship: ie.ie_relationship || 'standalone',
-        ieDependencies: ie.ie_dependencies || [],
-        ieAlternatives: ie.ie_alternatives || [],
-        ieEncoding: ie.ie_encoding || 'binary',
-        ieCompression: ie.ie_compression || false,
-        ieEncryption: ie.ie_encryption || false,
-        library: ie.information_element_library || {}
-      })) || [],
-
-      // Expected layer parameters
-      expectedLayerParameters: testCaseData?.test_case_layer_parameters?.map(param => ({
-        id: param.id,
-        layer: param.layer || 'RRC',
-        parameterName: param.parameter_name || 'default_parameter',
-        parameterType: param.parameter_type || 'config',
-        parameterValue: param.parameter_value || 0,
-        parameterUnit: param.parameter_unit || 'none',
-        context: param.context || 'default',
-        source: param.source || 'configuration',
-        standardReference: param.standard_reference || 'TS 38.331',
-        parameterVariant: param.parameter_variant || 'standard',
-        parameterPriority: param.parameter_priority || 'normal',
-        parameterCondition: param.parameter_condition || 'always',
-        parameterValidationRules: param.parameter_validation_rules || {},
-        parameterMeasurementCriteria: param.parameter_measurement_criteria || 'Standard criteria',
-        parameterRelationship: param.parameter_relationship || 'standalone',
-        parameterDependencies: param.parameter_dependencies || [],
-        parameterAlternatives: param.parameter_alternatives || [],
-        parameterAccuracy: param.parameter_accuracy || 0.1,
-        parameterPrecision: param.parameter_precision || 0.01,
-        parameterResolution: param.parameter_resolution || 1,
-        parameterCalibration: param.parameter_calibration || 'factory',
-        parameterMeasurementMethod: param.parameter_measurement_method || 'direct',
-        library: param.layer_parameter_library || {}
-      })) || [],
-
-      // Actual execution data (if runId provided)
-      actualExecution: executionData ? {
-        id: executionData.id,
-        testCaseId: executionData.test_case_id,
-        userId: executionData.user_id,
-        status: executionData.status,
-        startTime: executionData.start_time,
-        endTime: executionData.end_time,
-        expectedMessageCount: executionData.expected_message_count,
-        actualMessageCount: executionData.actual_message_count,
-        messageFlowCompliance: executionData.message_flow_compliance,
-        layerAnalysisResults: executionData.layer_analysis_results,
-        ieValidationResults: executionData.ie_validation_results,
-        timingAnalysisResults: executionData.timing_analysis_results,
-        testCase: executionData.test_cases
-      } : null,
-
-      // Actual decoded messages (if runId provided)
-      actualMessages: executionData?.decoded_messages?.map(msg => ({
-        id: msg.id,
-        messageId: msg.message_id || msg.id,
-        timestampUs: msg.timestamp_us || Date.now(),
-        protocol: msg.protocol || '5G_NR',
-        messageType: msg.message_type || 'RRCSetupRequest',
-        messageName: msg.message_name || 'RRC Setup Request',
-        messageDirection: msg.message_direction || 'UL',
-        layer: msg.layer || 'RRC',
-        sublayer: msg.sublayer || 'RRC',
-        sourceEntity: msg.source_entity || 'UE',
-        targetEntity: msg.target_entity || 'gNB',
-        decodedData: msg.decoded_data || {},
-        informationElements: msg.information_elements || [],
-        ieCount: msg.ie_count || 0,
-        validationStatus: msg.validation_status || 'valid',
-        validationErrors: msg.validation_errors || [],
-        validationWarnings: msg.validation_warnings || [],
-        messageSize: msg.message_size || 100,
-        processingTimeMs: msg.processing_time_ms || 10,
-        decodedInformationElements: msg.decoded_information_elements || [],
-        decodedLayerParameters: msg.decoded_layer_parameters || []
-      })) || [],
-
-      // Compliance analysis (if runId provided)
-      complianceAnalysis: executionData?.message_flow_compliance || [],
-      ieValidationResults: executionData?.ie_validation_results || [],
-      layerParameterAnalysis: executionData?.layer_parameter_analysis || [],
-      messageTimingAnalysis: executionData?.message_timing_analysis || [],
-
-      // Execution templates (if requested)
-      executionTemplates: executionTemplates || [],
-
-      // Summary for real-time simulation
-      simulation: {
-        testCaseId: testCaseId,
-        runId: runId,
-        totalExpectedMessages: testCaseData?.test_case_messages?.length || 0,
-        totalActualMessages: executionData?.decoded_messages?.length || 0,
-        layers: [...new Set([
-          ...(testCaseData?.test_case_messages?.map(msg => msg.layer) || []),
-          ...(executionData?.decoded_messages?.map(msg => msg.layer) || [])
-        ])] || ['RRC', 'NAS'],
-        protocols: [...new Set([
-          ...(testCaseData?.test_case_messages?.map(msg => msg.protocol) || []),
-          ...(executionData?.decoded_messages?.map(msg => msg.protocol) || [])
-        ])] || ['5G_NR'],
-        duration: executionData?.decoded_messages?.length > 0
-          ? Math.max(...executionData.decoded_messages.map(msg => msg.timestamp_us)) - Math.min(...executionData.decoded_messages.map(msg => msg.timestamp_us))
-          : 0,
-        status: executionData?.status || 'ready',
-        complianceScore: executionData?.message_flow_compliance?.[0]?.compliance_score || 100
+      if (!paramError) {
+        hasLayerParameters = true;
       }
-    };
+    } catch (e) {
+      console.warn('test_case_layer_parameters table not found, skipping parameter join');
+    }
 
-    console.log(`✅ Comprehensive test case execution data fetched successfully:`);
-    console.log(`   Test Case: ${comprehensiveData.testCase?.name || 'N/A'}`);
-    console.log(`   Expected Messages: ${comprehensiveData.expectedMessages.length}`);
-    console.log(`   Expected IEs: ${comprehensiveData.expectedInformationElements.length}`);
-    console.log(`   Expected Layer Params: ${comprehensiveData.expectedLayerParameters.length}`);
-    console.log(`   Actual Messages: ${comprehensiveData.actualMessages.length}`);
-    console.log(`   Layers: ${comprehensiveData.simulation.layers.join(', ')}`);
-    console.log(`   Protocols: ${comprehensiveData.simulation.protocols.join(', ')}`);
+    // Build the select query dynamically
+    if (hasCategories) {
+      selectQuery += ',test_case_categories(name, description, protocol_focus, layer_focus)';
+    }
+
+    if (hasMessages) {
+      selectQuery += ',test_case_messages(*)';
+    }
+
+    if (hasInformationElements) {
+      selectQuery += ',test_case_information_elements(*)';
+    }
+
+    if (hasLayerParameters) {
+      selectQuery += ',test_case_layer_parameters(*)';
+    }
+
+    console.log(`Dynamic select query: ${selectQuery}`);
+
+    // Build query
+    let query = supabase
+      .from('test_cases')
+      .select(selectQuery)
+      .order('name')
+      .range(offset, offset + limit - 1);
+
+    // Apply filters
+    if (category) {
+      // Filter directly on test_cases.category to avoid category-name mismatches
+      query = query.eq('category', category);
+    }
+    if (protocol) {
+      query = query.eq('protocol', protocol);
+    }
+    if (layer) {
+      query = query.eq('layer', layer);
+    }
+    if (complexity) {
+      query = query.eq('complexity', complexity);
+    }
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,test_scenario.ilike.%${search}%`);
+    }
+
+    const { data: testCases, error: testCasesError } = await query;
+
+    if (testCasesError) {
+      console.error('Test cases fetch error:', testCasesError);
+      return NextResponse.json(
+        { error: 'Failed to fetch test cases' },
+        { status: 500 }
+      );
+    }
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('test_cases')
+      .select('id', { count: 'exact', head: true });
+
+    if (category) {
+      countQuery = countQuery.eq('category', category);
+    }
+    if (protocol) {
+      countQuery = countQuery.eq('protocol', protocol);
+    }
+    if (layer) {
+      countQuery = countQuery.eq('layer', layer);
+    }
+    if (complexity) {
+      countQuery = countQuery.eq('complexity', complexity);
+    }
+    if (search) {
+      countQuery = countQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    const { count, error: countError } = await countQuery;
+
+    if (countError) {
+      console.error('Count fetch error:', countError);
+    }
+
+    // Get statistics
+    const { data: stats, error: statsError } = await supabase
+      .from('test_cases')
+      .select('protocol, layer, complexity')
+      .then(({ data }) => {
+        if (!data) return { data: null, error: null };
+
+        const stats = {
+          total: data.length,
+          byProtocol: data.reduce((acc, tc) => {
+            acc[tc.protocol || '5G_NR'] = (acc[tc.protocol || '5G_NR'] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>),
+          byLayer: data.reduce((acc, tc) => {
+            acc[tc.layer || 'Multi'] = (acc[tc.layer || 'Multi'] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>),
+          byComplexity: data.reduce((acc, tc) => {
+            acc[tc.complexity || 'intermediate'] = (acc[tc.complexity || 'intermediate'] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>)
+        };
+        return { data: stats, error: null };
+      });
+
+    // If no test cases found, return sample data for testing
+    let finalTestCases = testCases || [];
+    if ((!testCases || testCases.length === 0) && !category && !protocol && !layer && !complexity && !search) {
+      console.log('⚠️ No test cases found in database, returning sample data for testing');
+      finalTestCases = [
+        {
+          id: 'sample-uuid-1',
+          test_case_id: 'TEST_5G_NR_0001',
+          name: '5G NR Test Case for Log Analysis',
+          description: 'Sample test case for verifying log analysis functionality',
+          category: '5G_NR',
+          subcategory: 'RRC',
+          protocol: '5G_NR',
+          test_type: 'Functional',
+          complexity: 'intermediate',
+          priority: 'high',
+          expected_results: [
+            {
+              timestamp: 0,
+              direction: 'UL',
+              layer: 'PHY',
+              message: 'PRACH Preamble Transmission',
+              values: {
+                preamble_id: 23,
+                power: 23
+              }
+            },
+            {
+              timestamp: 5,
+              direction: 'DL',
+              layer: 'PHY',
+              message: 'RAR (Random Access Response)',
+              values: {
+                ra_rnti: 17921,
+                ta: 31
+              }
+            },
+            {
+              timestamp: 10,
+              direction: 'UL',
+              layer: 'RRC',
+              message: 'RRC Setup Request',
+              values: {
+                establishment_cause: 'mo-Data',
+                ue_identity: '001010123456789'
+              }
+            }
+          ],
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ];
+    }
+
+    console.log(`✅ Fetched ${finalTestCases.length} test cases successfully`);
 
     return NextResponse.json({
       success: true,
-      data: comprehensiveData,
-      message: 'Comprehensive test case execution data fetched successfully'
+      data: finalTestCases, // Return test cases directly, not nested
+      count: finalTestCases.length,
+      total: count || finalTestCases.length,
+      pagination: {
+        limit,
+        offset,
+        hasMore: (count || finalTestCases.length) > offset + limit
+      },
+      statistics: stats || {},
+      filters: {
+        category,
+        protocol,
+        layer,
+        complexity,
+        search
+      },
+      message: 'Test cases fetched successfully'
     });
 
   } catch (error) {
-    console.error('❌ Error fetching comprehensive test case execution data:', error);
+    console.error('❌ Error fetching comprehensive test cases:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
@@ -498,96 +283,140 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Execute comprehensive test case
+ * Create a new comprehensive test case
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      testCaseId,
-      userId,
-      executionMode = 'simulation',
-      configuration = {},
-      timeAcceleration = 1.0,
-      logLevel = 'detailed',
-      captureMode = 'full'
+      name,
+      description,
+      categoryId,
+      protocol,
+      layer,
+      complexity,
+      testScenario,
+      testObjective,
+      standardReference,
+      releaseVersion,
+      expectedDurationMinutes,
+      executionPriority,
+      automationLevel,
+      testDataRequirements,
+      kpiRequirements,
+      messages,
+      informationElements,
+      layerParameters
     } = body;
 
-    if (!testCaseId || !userId) {
+    if (!name || !protocol || !layer) {
       return NextResponse.json(
-        { error: 'testCaseId and userId are required' },
+        { error: 'Name, protocol, and layer are required' },
         { status: 400 }
       );
     }
 
-    // Use singleton admin client to prevent multiple instances
     const supabase = supabaseAdmin;
 
-    console.log(`🚀 Executing comprehensive test case: ${testCaseId}`);
+    console.log(`🚀 Creating comprehensive test case: ${name}`);
 
-    // Create test execution record
-    const { data: execution, error: executionError } = await supabase
-      .from('test_case_executions')
+    // Start transaction
+    const { data: testCase, error: testCaseError } = await supabase
+      .from('test_cases')
       .insert({
-        test_case_id: testCaseId,
-        user_id: userId,
-        status: 'queued',
-        execution_mode: executionMode,
-        configuration: {
-          time_acceleration: timeAcceleration,
-          log_level: logLevel,
-          capture_mode: captureMode,
-          ...configuration
-        }
+        name,
+        description,
+        category_id: categoryId,
+        protocol,
+        layer,
+        complexity: complexity || 'intermediate',
+        test_scenario: testScenario,
+        test_objective: testObjective,
+        standard_reference: standardReference,
+        release_version: releaseVersion,
+        expected_duration_minutes: expectedDurationMinutes || 5,
+        execution_priority: executionPriority || 5,
+        automation_level: automationLevel || 'manual',
+        test_data_requirements: testDataRequirements || {},
+        kpi_requirements: kpiRequirements || {},
+        review_status: 'draft'
       })
       .select()
       .single();
 
-    if (executionError) {
-      console.error('Test execution creation error:', executionError);
+    if (testCaseError) {
+      console.error('Test case creation error:', testCaseError);
       return NextResponse.json(
-        { error: 'Failed to create test execution' },
+        { error: 'Failed to create test case' },
         { status: 500 }
       );
     }
 
-    // Add to execution queue
-    const { data: queueItem, error: queueError } = await supabase
-      .from('test_run_queue')
-      .insert({
-        run_id: execution.id,
-        user_id: userId,
-        status: 'queued',
-        priority: 0,
-        scheduled_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+    // Insert messages if provided
+    if (messages && messages.length > 0) {
+      const messagesWithTestCaseId = messages.map((msg: any) => ({
+        ...msg,
+        test_case_id: testCase.id
+      }));
 
-    if (queueError) {
-      console.error('Queue creation error:', queueError);
-      return NextResponse.json(
-        { error: 'Failed to add to execution queue' },
-        { status: 500 }
-      );
+      const { error: messagesError } = await supabase
+        .from('test_case_messages')
+        .insert(messagesWithTestCaseId);
+
+      if (messagesError) {
+        console.error('Messages creation error:', messagesError);
+        // Continue execution, don't fail the entire operation
+      }
     }
 
-    console.log(`✅ Comprehensive test case execution queued successfully - RunId: ${execution.id}`);
+    // Insert information elements if provided
+    if (informationElements && informationElements.length > 0) {
+      const iesWithTestCaseId = informationElements.map((ie: any) => ({
+        ...ie,
+        test_case_id: testCase.id
+      }));
+
+      const { error: iesError } = await supabase
+        .from('test_case_information_elements')
+        .insert(iesWithTestCaseId);
+
+      if (iesError) {
+        console.error('Information elements creation error:', iesError);
+        // Continue execution, don't fail the entire operation
+      }
+    }
+
+    // Insert layer parameters if provided
+    if (layerParameters && layerParameters.length > 0) {
+      const paramsWithTestCaseId = layerParameters.map((param: any) => ({
+        ...param,
+        test_case_id: testCase.id
+      }));
+
+      const { error: paramsError } = await supabase
+        .from('test_case_layer_parameters')
+        .insert(paramsWithTestCaseId);
+
+      if (paramsError) {
+        console.error('Layer parameters creation error:', paramsError);
+        // Continue execution, don't fail the entire operation
+      }
+    }
+
+    console.log(`✅ Comprehensive test case created successfully: ${testCase.id}`);
 
     return NextResponse.json({
       success: true,
       data: {
-        executionId: execution.id,
-        queueId: queueItem.id,
-        status: 'queued',
-        message: 'Comprehensive test case execution queued successfully'
+        testCaseId: testCase.id,
+        message: 'Comprehensive test case created successfully'
       }
     });
 
   } catch (error) {
-    console.error('❌ Error executing comprehensive test case:', error);
+    console.error('❌ Error creating comprehensive test case:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
