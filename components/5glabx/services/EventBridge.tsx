@@ -11,35 +11,27 @@ export const EventBridge: React.FC = () => {
   useEffect(() => {
     console.log("[v0] 🔗 EventBridge: Initializing event bridge service...")
 
-    // Bridge testCaseExecutionStarted to immediate-logs-update
     const handleTestCaseExecutionStarted = (event: CustomEvent) => {
       console.log("[v0] 🔗 EventBridge: Received testCaseExecutionStarted event")
       console.log("[v0] 📊 EventBridge: Event detail:", {
         executionId: event.detail.executionId,
         testCaseId: event.detail.testCaseId,
         hasTestCaseData: !!event.detail.testCaseData,
-        messageCount:
-          event.detail.testCaseData?.expectedMessages?.length ||
-          event.detail.testCaseData?.realtimeMessages?.length ||
-          0,
+        messageCount: event.detail.testCaseData?.expectedMessages?.length || 0,
       })
 
-      // Add error handling
       try {
         const { testCaseId, testCaseData, executionId } = event.detail
-
-        const messages = testCaseData?.expectedMessages || testCaseData?.realtimeMessages || []
+        const messages = testCaseData?.expectedMessages || []
 
         console.log("[v0] 🔗 EventBridge: Processing messages:", {
           messageCount: messages.length,
           hasExpectedMessages: !!testCaseData?.expectedMessages,
-          hasRealtimeMessages: !!testCaseData?.realtimeMessages,
         })
 
         if (testCaseData && messages.length > 0) {
           console.log(`[v0] 🔗 EventBridge: Converting ${messages.length} messages to logs format`)
 
-          // Convert messages to logs format (works with both expectedMessages and realtimeMessages)
           const logs = messages.map((message: any, index: number) => ({
             id: `bridge-${testCaseId}-${index}-${Date.now()}`,
             timestamp: (Date.now() / 1000).toFixed(1),
@@ -68,72 +60,22 @@ export const EventBridge: React.FC = () => {
 
           console.log("[v0] 🔗 EventBridge: Dispatching immediate-logs-update event with", logs.length, "logs")
 
-          // Dispatch immediate-logs-update event
-          const immediateLogsEvent = new CustomEvent("immediate-logs-update", {
-            detail: {
-              logs: logs,
-              source: "EventBridge",
-              testCaseId: testCaseId,
-              executionId: executionId,
-              originalEvent: "testCaseExecutionStarted",
-            },
-          })
+          setTimeout(() => {
+            const immediateLogsEvent = new CustomEvent("immediate-logs-update", {
+              detail: {
+                logs: logs,
+                source: "EventBridge",
+                testCaseId: testCaseId,
+                executionId: executionId,
+                originalEvent: "testCaseExecutionStarted",
+              },
+            })
 
-          window.dispatchEvent(immediateLogsEvent)
-          console.log(`[v0] ✅ EventBridge: Dispatched immediate-logs-update with ${logs.length} logs`)
-
-          // Also dispatch enhanced logs update
-          const enhancedLogsEvent = new CustomEvent("enhancedLogsUpdate", {
-            detail: logs.map((log) => ({
-              id: log.id,
-              timestamp: log.timestamp + ".123",
-              direction: log.direction,
-              layer: log.component,
-              channel: log.type,
-              sfn: Math.floor(Math.random() * 1024).toString(),
-              messageType: log.type,
-              rnti: "C-RNTI",
-              message: log.message,
-              rawData: log.rawData.substring(0, 20),
-              ies: log.ies,
-              source: "EventBridge",
-            })),
-          })
-
-          window.dispatchEvent(enhancedLogsEvent)
-          console.log(`[v0] ✅ EventBridge: Dispatched enhancedLogsUpdate with ${logs.length} enhanced logs`)
-
-          // Dispatch layer-specific events
-          const layers = ["PHY", "MAC", "RLC", "PDCP", "RRC", "NAS", "IMS"]
-          layers.forEach((layer) => {
-            const layerLogs = logs.filter((log) => log.component === layer)
-            if (layerLogs.length > 0) {
-              const layerEvent = new CustomEvent(`${layer.toLowerCase()}layerupdate`, {
-                detail: layerLogs,
-              })
-              window.dispatchEvent(layerEvent)
-              console.log(`[v0] ✅ EventBridge: Dispatched ${layer} layer update with ${layerLogs.length} logs`)
-            }
-          })
-
-          // Dispatch call flow update
-          const callFlowEvent = new CustomEvent("callFlowUpdate", {
-            detail: logs,
-          })
-          window.dispatchEvent(callFlowEvent)
-          console.log(`[v0] ✅ EventBridge: Dispatched callFlowUpdate with ${logs.length} logs`)
-
-          // Dispatch layer trace update
-          const layerTraceEvent = new CustomEvent("layerTraceUpdate", {
-            detail: logs,
-          })
-          window.dispatchEvent(layerTraceEvent)
-          console.log(`[v0] ✅ EventBridge: Dispatched layerTraceUpdate with ${logs.length} logs`)
+            window.dispatchEvent(immediateLogsEvent)
+            console.log(`[v0] ✅ EventBridge: Dispatched immediate-logs-update with ${logs.length} logs`)
+          }, 100) // 100ms delay to ensure listeners are ready
         } else {
-          console.warn(
-            "[v0] ⚠️ EventBridge: No messages found in testCaseData (checked both expectedMessages and realtimeMessages)",
-          )
-          console.warn("[v0] 📊 EventBridge: testCaseData structure:", testCaseData)
+          console.warn("[v0] ⚠️ EventBridge: No messages found in testCaseData")
         }
       } catch (error) {
         console.error("[v0] ❌ EventBridge: Error processing testCaseExecutionStarted event:", error)
@@ -211,7 +153,6 @@ export const EventBridge: React.FC = () => {
       }
     }
 
-    // Register event listeners
     if (typeof window !== "undefined") {
       window.addEventListener("testCaseExecutionStarted", handleTestCaseExecutionStarted as EventListener)
       window.addEventListener("message", handlePostMessage)
