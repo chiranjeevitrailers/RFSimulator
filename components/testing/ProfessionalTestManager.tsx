@@ -456,7 +456,6 @@ const ProfessionalTestManager: React.FC = () => {
     console.log("[v0] 🚀 TEST MANAGER: Starting test execution for:", testId)
 
     try {
-      // Use existing API endpoint for test execution
       const response = await fetch("/api/test-execution/simple/", {
         method: "POST",
         headers: {
