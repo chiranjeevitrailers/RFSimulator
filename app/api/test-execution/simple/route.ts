@@ -7,6 +7,9 @@ import { v4 as uuidv4 } from "uuid"
  * NO generated/simulated/fake data - only real test case data from database
  */
 export async function POST(request: NextRequest) {
+  // Generate execution ID at the top
+  const executionId = uuidv4()
+
   try {
     const body = await request.json()
     const { testCaseId, userId = "system" } = body
@@ -31,9 +34,6 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ Found REAL test case: ${testCase.name} (${testCase.category})`)
 
-    // Generate execution ID
-    const executionId = uuidv4()
-
     // Create test execution record in database
     const { data: executionResult, error: executionError } = await supabaseAdmin
       .from("test_case_executions")
@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to start test execution" }, { status: 500 })
     }
 
-    // Extract REAL data from Supabase expected_results field (which contains message_flow)
-    const realTestData = testCase.expected_results || {}
+    // Extract REAL data from Supabase expected_results or test_data field (which contains message_flow)
+    const realTestData = testCase.expected_results || testCase.test_data || {}
     let expectedMessages = Array.isArray(realTestData) ? realTestData : (realTestData.messages || realTestData.expectedMessages || [])
 
     // For now, create sample IE and parameters since they're not in the seed data
@@ -187,6 +187,23 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ Test execution completed with REAL data: ${executionId}`)
 
+    // Broadcast test completion
+    if (executionId) {
+      try {
+        const { broadcastToExecution } = await import('@/app/api/ws/execution/[executionId]/route');
+        broadcastToExecution(executionId, {
+          type: 'test_completed',
+          executionId,
+          testCaseId: testCase.id,
+          timestamp: new Date().toISOString(),
+          status: 'completed',
+          message: 'Test execution completed successfully'
+        });
+      } catch (wsError) {
+        console.error('Error broadcasting test completion:', wsError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: "Test execution completed using REAL data from Supabase database",
@@ -212,37 +229,6 @@ export async function POST(request: NextRequest) {
         parameterCount: expectedLayerParameters.length,
       },
     })
-    // Broadcast test completion
-    if (executionId) {
-      try {
-        const { broadcastToExecution } = await import('@/app/api/ws/execution/[executionId]/route');
-        broadcastToExecution(executionId, {
-          type: 'test_completed',
-          executionId,
-          testCaseId: testCase.id,
-          timestamp: new Date().toISOString(),
-          status: 'completed',
-          message: 'Test execution completed successfully'
-        });
-      } catch (wsError) {
-        console.error('Error broadcasting test completion:', wsError);
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      executionId,
-      message: 'Test execution started',
-      testCase: {
-        id: testCase.id,
-        name: testCase.name,
-        description: testCase.description,
-        complexity: testCase.complexity,
-        // Include other relevant test case data
-      },
-      startedAt: new Date().toISOString(),
-      // Include any other relevant data
-    });
   } catch (error) {
     console.error("❌ Test execution error:", error);
     
