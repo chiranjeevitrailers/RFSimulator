@@ -8,9 +8,7 @@ const LogsView: React.FC<{
   appState: any
   onStateChange: (state: any) => void
 }> = ({ appState, onStateChange }) => {
-  // Initialize logs state - start empty to show real-time data
   const [logs, setLogs] = useState<any[]>([])
-
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLevel, setSelectedLevel] = useState("all")
   const [selectedComponent, setSelectedComponent] = useState("all")
@@ -31,9 +29,8 @@ const LogsView: React.FC<{
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
-    console.log("[v0] 🔍 LogsView: Initializing event listeners...")
+    console.log("[v0] 🔍 LogsView: Initializing event listeners IMMEDIATELY...")
 
-    // Listen for immediate logs update event
     const handleImmediateLogsUpdate = (event: any) => {
       console.log("[v0] 🔥 LogsView: Received immediate-logs-update event")
       console.log("[v0] 📊 LogsView: Event detail:", {
@@ -43,17 +40,16 @@ const LogsView: React.FC<{
         executionId: event.detail?.executionId,
       })
 
-      const { logs, source } = event.detail
+      const { logs: incomingLogs, source } = event.detail
 
-      if (logs && logs.length > 0) {
-        console.log(`[v0] 📋 LogsView: Processing ${logs.length} immediate logs from ${source}`)
-        console.log("[v0] 📊 LogsView: First log structure:", JSON.stringify(logs[0], null, 2))
+      if (incomingLogs && incomingLogs.length > 0) {
+        console.log(`[v0] 📋 LogsView: Processing ${incomingLogs.length} immediate logs from ${source}`)
 
-        // FIXED: Single atomic state update to prevent race conditions
-        console.log("[v0] 🔥 LogsView: Updating logs state")
-        setLogs((prev) => {
-          const newLogs = [...prev, ...logs]
-          console.log(`[v0] ✅ LogsView: Added ${logs.length} immediate log entries, total now: ${newLogs.length}`)
+        setLogs((prevLogs) => {
+          const newLogs = [...prevLogs, ...incomingLogs]
+          console.log(
+            `[v0] ✅ LogsView: Updated logs state - Previous: ${prevLogs.length}, Added: ${incomingLogs.length}, Total: ${newLogs.length}`,
+          )
           return newLogs
         })
 
@@ -67,29 +63,27 @@ const LogsView: React.FC<{
             currentView: "logs",
             testExecutionActive: true,
             testExecutionStatus: "active",
-            logs: logs,
+            logs: incomingLogs,
           })
         }
       } else {
-        console.log("[v0] ⚠️ LogsView: No logs found in immediate-logs-update event:", event.detail)
+        console.log("[v0] ⚠️ LogsView: No logs found in immediate-logs-update event")
       }
     }
 
     window.addEventListener("immediate-logs-update", handleImmediateLogsUpdate)
-    console.log("[v0] ✅ LogsView: immediate-logs-update listener registered")
+    console.log("[v0] ✅ LogsView: immediate-logs-update listener registered IMMEDIATELY")
 
-    // Add event retry mechanism for timing issues
-    const retryEventListeners = () => {
-      console.log("🔄 LogsView: Retrying event listener registration...")
-      // Re-register listeners if they were lost
-      window.addEventListener("immediate-logs-update", handleImmediateLogsUpdate)
-      window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
+    return () => {
+      window.removeEventListener("immediate-logs-update", handleImmediateLogsUpdate)
+      console.log("[v0] 🔗 LogsView: Event listeners cleaned up")
     }
+  }, [onStateChange]) // Added onStateChange to dependency array
 
-    // Retry after 1 second to handle timing issues
-    const retryTimeout = setTimeout(retryEventListeners, 1000)
+  // Listen for the regular 5GLABX_TEST_EXECUTION event
+  useEffect(() => {
+    console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event")
 
-    // Also listen for the regular 5GLABX_TEST_EXECUTION event
     const handleTestExecution = (event) => {
       console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
       console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
@@ -185,189 +179,17 @@ const LogsView: React.FC<{
 
     window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
 
-    console.log("✅ Enhanced Logs Advanced: Event listeners registered for Test Manager integration")
-    console.log("🔥 Enhanced Logs Advanced: Listening for immediate-logs-update events")
     console.log("🔥 Enhanced Logs Advanced: Listening for 5GLABX_TEST_EXECUTION events")
-    console.log("🔍 Enhanced Logs Advanced: Awaiting real-time events (with immediate fallback)")
 
-    // Process test data from various sources
-    const processTestData = (data: any, source = "unknown") => {
-      console.log("📊 LogsView processing test case data:", {
-        testCaseId: data.testCaseId,
-        testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
-        messageCount: data.testCaseData?.expectedMessages?.length || data.testCaseData?.realtimeMessages?.length || 0,
-        dataSource: source,
-        dataType: data.type,
-        hasTestCaseData: !!data.testCaseData,
-        hasExpectedMessages: !!data.testCaseData?.expectedMessages,
-        dataKeys: Object.keys(data),
-        fullData: JSON.stringify(data, null, 2),
-      })
-
-      // Force immediate UI update for real-time display
-      console.log("🚀 LogsView: Processing data immediately for display")
-
-      // Process data through normal flow
-
-      // Force UI update even with minimal data
-      if (!data.testCaseData) {
-        console.log("⚠️  No testCaseData found, creating summary log")
-        const summaryLog = {
-          id: `test-summary-${Date.now()}-${Math.random()}`,
-          timestamp: (Date.now() / 1000).toFixed(1),
-          level: "I",
-          component: "TEST",
-          message: `Test Case Started: ${data.testCaseId} (${source})`,
-          type: "TEST_EXECUTION_START",
-          source: source || "TestManager",
-          testCaseId: data.testCaseId,
-          direction: "N/A",
-          protocol: "5G_NR",
-          rawData: JSON.stringify(data, null, 2),
-          informationElements: {},
-          layerParameters: {},
-          standardReference: "Test Execution",
-        }
-
-        setLogs((prev) => [...prev, summaryLog])
-        console.log("✅ Added summary log entry:", summaryLog.message)
-
-        // Force re-render
-        setTimeout(() => {
-          setLogs((current) => [...current])
-        }, 100)
-
-        return
-      }
-
-      const testCaseData = data.testCaseData || data
-      const testCaseId = data.testCaseId || testCaseData.testCaseId
-
-      // Handle different data formats
-      let messages = []
-      if (testCaseData.expectedMessages) {
-        messages = testCaseData.expectedMessages
-      } else if (testCaseData.realtimeMessages) {
-        messages = testCaseData.realtimeMessages
-      } else if (testCaseData.messages) {
-        messages = testCaseData.messages
-      } else if (Array.isArray(testCaseData)) {
-        messages = testCaseData
-      }
-
-      if (messages.length > 0) {
-        console.log(`📋 Processing ${messages.length} messages from ${source}`)
-
-        // Process each message as a log entry immediately (no setTimeout to ensure immediate display)
-        messages.forEach((message: any, index: number) => {
-          const newLog = {
-            id: `test-${testCaseId}-${Date.now()}-${index}`,
-            timestamp: (Date.now() / 1000).toFixed(1),
-            level: "I",
-            component: message.layer || message.component || "TEST",
-            message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
-            type: message.messageType || message.type || "TEST_MESSAGE",
-            source: source || "TestManager",
-            testCaseId: testCaseId,
-            direction: message.direction || "UL",
-            protocol: message.protocol || "5G_NR",
-            // Enhanced data for IE viewing
-            rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
-            informationElements: message.informationElements || {},
-            layerParameters: message.layerParameters || {},
-            standardReference: message.standardReference || "Unknown",
-            messagePayload: message.messagePayload || message.payload || {},
-            ies: message.informationElements
-              ? Object.entries(message.informationElements)
-                  .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                  .join(", ")
-              : Object.entries(message.messagePayload || message.payload || {})
-                  .map(([k, v]) => `${k}=${v}`)
-                  .join(", "),
-          }
-
-          setLogs((prev) => {
-            const newLogs = [...prev, newLog]
-            return newLogs
-          })
-        })
-
-        // Update receiving status
-        setIsReceivingData(true)
-        setLastDataReceived(new Date())
-
-        console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`)
-
-        // Normal state update - no forced updates needed
-
-        // Also trigger state change in parent component
-        setTimeout(() => {
-          onStateChange({
-            currentView: "logs",
-            testExecutionActive: true,
-            testExecutionStatus: "active",
-            logs: logs.concat(
-              messages.map((msg, idx) => ({
-                id: `test-${testCaseId}-${Date.now()}-${idx}`,
-                timestamp: (Date.now() / 1000).toFixed(1),
-                level: "I",
-                component: msg.layer || "TEST",
-                message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
-                type: msg.messageType || "TEST_MESSAGE",
-                source: source || "TestManager",
-              })),
-            ),
-          })
-        }, 300)
-      } else {
-        console.log("⚠️  No messages found in test data, checking alternative formats...")
-
-        // Try to extract data from different formats
-        if (testCaseData && typeof testCaseData === "object") {
-          console.log("📋 Test case data structure:", Object.keys(testCaseData))
-        }
-
-        // Removed direct injection bypass - system now only processes real data through normal flow
-
-        // If no messages but we have test case data, create a summary log
-        if (testCaseData && (testCaseData.name || testCaseData.testCaseName)) {
-          console.log("📋 Creating summary log entry for test case")
-          const summaryLog = {
-            id: `test-summary-${testCaseId}-${Date.now()}`,
-            timestamp: (Date.now() / 1000).toFixed(1),
-            level: "I",
-            component: "TEST",
-            message: `Test Case Started: ${testCaseData.name || testCaseData.testCaseName} (${testCaseId})`,
-            type: "TEST_EXECUTION_START",
-            source: source || "TestManager",
-            testCaseId: testCaseId,
-            direction: "N/A",
-            protocol: testCaseData.protocol || "5G_NR",
-            rawData: JSON.stringify(testCaseData, null, 2),
-            informationElements: {},
-            layerParameters: {},
-            standardReference: "Test Execution",
-          }
-
-          setLogs((prev) => {
-            const newLogs = [...prev, summaryLog]
-            console.log("✅ Added summary log entry:", summaryLog.message)
-            return newLogs
-          })
-
-          // Update receiving status
-          setIsReceivingData(true)
-          setLastDataReceived(new Date())
-
-          // Force UI updates for summary log too
-          setTimeout(() => {
-            setLogs((current) => [...current])
-          }, 50)
-        }
-      }
+    return () => {
+      window.removeEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
     }
+  }, [])
 
-    // Enhanced event handling for multiple data sources
+  // Process test data from various sources
+  useEffect(() => {
+    console.log("📡 LogsView: Setting up comprehensive event listeners...")
+
     const handleMessageEvent = (event: MessageEvent) => {
       console.log("📨 LogsView received message event:", event.data)
       console.log("📨 Event origin:", event.origin)
@@ -431,107 +253,261 @@ const LogsView: React.FC<{
       }
     }
 
-    // Check for TestCasePlaybackService availability (optional - don't retry)
-    const checkTestCasePlaybackService = () => {
-      if (window.TestCasePlaybackService) {
-        console.log("✅ TestCasePlaybackService is available")
-        console.log("📊 LogsView: TestCasePlaybackService integration ready")
-      } else {
-        console.log("ℹ️  TestCasePlaybackService not available - using Supabase Realtime instead")
-        // Don't retry - use Supabase Realtime as primary data source
-      }
-    }
+    // Listen for all possible event types from test execution system
+    window.addEventListener("message", handleMessageEvent)
+    window.addEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
+    window.addEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
+    window.addEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
+    window.addEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
+    window.addEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
+    window.addEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
 
-    // Listen for direct log updates
-    const handleDirectLogUpdate = (event: CustomEvent) => {
-      console.log("📊 LogsView: Direct log update received:", event.detail)
-      const logData = event.detail
+    // Legacy event listeners
+    window.addEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
 
-      const newLog = {
-        id: logData.id || Date.now(),
-        timestamp: logData.timestamp || (Date.now() / 1000).toFixed(1),
-        level: logData.level || "I",
-        component: logData.component || logData.layer || "TEST",
-        message: logData.message || `${logData.messageType}: ${JSON.stringify(logData.payload || {})}`,
-        type: logData.messageType || logData.type || "DATA",
-        source: "TestManager",
-      }
+    console.log("✅ LogsView: All event listeners registered for Test Manager integration")
 
-      setLogs((prev) => {
-        const newLogs = [...prev.slice(-99), newLog]
-        return newLogs
-      })
-    }
+    // Check for TestCasePlaybackService availability
+    checkTestCasePlaybackService()
 
-    // Set up all event listeners
-    if (typeof window !== "undefined") {
-      console.log("📡 LogsView: Setting up comprehensive event listeners...")
+    // Also set up integration with FiveGLabXDataReceiver if available
+    if (window.FiveGLabXDataReceiver) {
+      console.log("📡 LogsView: Connected to FiveGLabXDataReceiver")
 
-      // Add global debug function (read-only, no test data injection)
-      ;(window as any).debugLogsView = () => {
-        console.log("🔍 LogsView Debug Info:", {
-          totalLogs: logs.length,
-          filteredLogs: filteredLogs.length,
-          searchQuery,
-          selectedLevel,
-          selectedComponent,
-          isReceivingData,
-          lastDataReceived: lastDataReceived?.toLocaleTimeString(),
-          componentMounted: true,
-        })
-        console.log("ℹ️ System only handles real test data from Supabase database")
-      }
-
-      // Listen for all possible event types from test execution system
-      window.addEventListener("message", handleMessageEvent)
-      window.addEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
-      window.addEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
-      window.addEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
-      window.addEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
-      window.addEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
-      window.addEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
-
-      // Legacy event listeners
-      window.addEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
-
-      console.log("✅ LogsView: All event listeners registered for Test Manager integration")
-
-      // Check for TestCasePlaybackService availability
-      checkTestCasePlaybackService()
-
-      // Also set up integration with FiveGLabXDataReceiver if available
-      if (window.FiveGLabXDataReceiver) {
-        console.log("📡 LogsView: Connected to FiveGLabXDataReceiver")
-
-        // Override the receiver methods to process data
-        const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData
-        window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
-          console.log("📊 LogsView: Received data via FiveGLabXDataReceiver")
-          console.log("📊 FiveGLabXDataReceiver data:", JSON.stringify(data, null, 2))
-          processTestData(data, "FiveGLabXDataReceiver")
-          if (originalOnTestExecutionData) {
-            originalOnTestExecutionData(data)
-          }
+      // Override the receiver methods to process data
+      const originalOnTestExecutionData = window.FiveGLabXDataReceiver.onTestExecutionData
+      window.FiveGLabXDataReceiver.onTestExecutionData = (data) => {
+        console.log("📊 LogsView: Received data via FiveGLabXDataReceiver")
+        console.log("📊 FiveGLabXDataReceiver data:", JSON.stringify(data, null, 2))
+        processTestData(data, "FiveGLabXDataReceiver")
+        if (originalOnTestExecutionData) {
+          originalOnTestExecutionData(data)
         }
       }
-
-      // Removed global data injection - system now only processes real data through normal events
-      // Removed direct data bridge - system now only processes real data through normal events
     }
+
+    // Removed global data injection - system now only processes real data through normal events
+    // Removed direct data bridge - system now only processes real data through normal events
 
     return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("message", handleMessageEvent)
-        window.removeEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
-        window.removeEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
-        window.removeEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
-        window.removeEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
-        window.removeEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
-        window.removeEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
-        window.removeEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
-      }
+      window.removeEventListener("message", handleMessageEvent)
+      window.removeEventListener("5GLABX_TEST_EXECUTION", handleCustomEvent as EventListener)
+      window.removeEventListener("testCaseExecutionStarted", handleCustomEvent as EventListener)
+      window.removeEventListener("5glabxLogAnalysis", handleCustomEvent as EventListener)
+      window.removeEventListener("5glabx-test-execution-start", handleCustomEvent as EventListener)
+      window.removeEventListener("5glabx-test-execution-data", handleCustomEvent as EventListener)
+      window.removeEventListener("5glabx-test-execution-complete", handleCustomEvent as EventListener)
+      window.removeEventListener("logsViewUpdate", handleDirectLogUpdate as EventListener)
     }
   }, [])
+
+  const processTestData = (data: any, source = "unknown") => {
+    console.log("📊 LogsView processing test case data:", {
+      testCaseId: data.testCaseId,
+      testCaseName: data.testCaseData?.testCase?.name || data.testCaseData?.name,
+      messageCount: data.testCaseData?.expectedMessages?.length || data.testCaseData?.realtimeMessages?.length || 0,
+      dataSource: source,
+      dataType: data.type,
+      hasTestCaseData: !!data.testCaseData,
+      hasExpectedMessages: !!data.testCaseData?.expectedMessages,
+      dataKeys: Object.keys(data),
+      fullData: JSON.stringify(data, null, 2),
+    })
+
+    // Force immediate UI update for real-time display
+    console.log("🚀 LogsView: Processing data immediately for display")
+
+    // Process data through normal flow
+
+    // Force UI update even with minimal data
+    if (!data.testCaseData) {
+      console.log("⚠️  No testCaseData found, creating summary log")
+      const summaryLog = {
+        id: `test-summary-${Date.now()}-${Math.random()}`,
+        timestamp: (Date.now() / 1000).toFixed(1),
+        level: "I",
+        component: "TEST",
+        message: `Test Case Started: ${data.testCaseId} (${source})`,
+        type: "TEST_EXECUTION_START",
+        source: source || "TestManager",
+        testCaseId: data.testCaseId,
+        direction: "N/A",
+        protocol: "5G_NR",
+        rawData: JSON.stringify(data, null, 2),
+        informationElements: {},
+        layerParameters: {},
+        standardReference: "Test Execution",
+      }
+
+      setLogs((prev) => [...prev, summaryLog])
+      console.log("✅ Added summary log entry:", summaryLog.message)
+
+      // Force re-render
+      setTimeout(() => {
+        setLogs((current) => [...current])
+      }, 100)
+
+      return
+    }
+
+    const testCaseData = data.testCaseData || data
+    const testCaseId = data.testCaseId || testCaseData.testCaseId
+
+    // Handle different data formats
+    let messages = []
+    if (testCaseData.expectedMessages) {
+      messages = testCaseData.expectedMessages
+    } else if (testCaseData.realtimeMessages) {
+      messages = testCaseData.realtimeMessages
+    } else if (testCaseData.messages) {
+      messages = testCaseData.messages
+    } else if (Array.isArray(testCaseData)) {
+      messages = testCaseData
+    }
+
+    if (messages.length > 0) {
+      console.log(`📋 Processing ${messages.length} messages from ${source}`)
+
+      // Process each message as a log entry immediately (no setTimeout to ensure immediate display)
+      messages.forEach((message: any, index: number) => {
+        const newLog = {
+          id: `test-${testCaseId}-${Date.now()}-${index}`,
+          timestamp: (Date.now() / 1000).toFixed(1),
+          level: "I",
+          component: message.layer || message.component || "TEST",
+          message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
+          type: message.messageType || message.type || "TEST_MESSAGE",
+          source: source || "TestManager",
+          testCaseId: testCaseId,
+          direction: message.direction || "UL",
+          protocol: message.protocol || "5G_NR",
+          // Enhanced data for IE viewing
+          rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+          informationElements: message.informationElements || {},
+          layerParameters: message.layerParameters || {},
+          standardReference: message.standardReference || "Unknown",
+          messagePayload: message.messagePayload || message.payload || {},
+          ies: message.informationElements
+            ? Object.entries(message.informationElements)
+                .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                .join(", ")
+            : Object.entries(message.messagePayload || message.payload || {})
+                .map(([k, v]) => `${k}=${v}`)
+                .join(", "),
+        }
+
+        setLogs((prev) => {
+          const newLogs = [...prev, newLog]
+          return newLogs
+        })
+      })
+
+      // Update receiving status
+      setIsReceivingData(true)
+      setLastDataReceived(new Date())
+
+      console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`)
+
+      // Normal state update - no forced updates needed
+
+      // Also trigger state change in parent component
+      setTimeout(() => {
+        onStateChange({
+          currentView: "logs",
+          testExecutionActive: true,
+          testExecutionStatus: "active",
+          logs: logs.concat(
+            messages.map((msg, idx) => ({
+              id: `test-${testCaseId}-${Date.now()}-${idx}`,
+              timestamp: (Date.now() / 1000).toFixed(1),
+              level: "I",
+              component: msg.layer || "TEST",
+              message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
+              type: msg.messageType || "TEST_MESSAGE",
+              source: source || "TestManager",
+            })),
+          ),
+        })
+      }, 300)
+    } else {
+      console.log("⚠️  No messages found in test data, checking alternative formats...")
+
+      // Try to extract data from different formats
+      if (testCaseData && typeof testCaseData === "object") {
+        console.log("📋 Test case data structure:", Object.keys(testCaseData))
+      }
+
+      // Removed direct injection bypass - system now only processes real data through normal flow
+
+      // If no messages but we have test case data, create a summary log
+      if (testCaseData && (testCaseData.name || testCaseData.testCaseName)) {
+        console.log("📋 Creating summary log entry for test case")
+        const summaryLog = {
+          id: `test-summary-${testCaseId}-${Date.now()}`,
+          timestamp: (Date.now() / 1000).toFixed(1),
+          level: "I",
+          component: "TEST",
+          message: `Test Case Started: ${testCaseData.name || testCaseData.testCaseName} (${testCaseId})`,
+          type: "TEST_EXECUTION_START",
+          source: source || "TestManager",
+          testCaseId: testCaseId,
+          direction: "N/A",
+          protocol: testCaseData.protocol || "5G_NR",
+          rawData: JSON.stringify(testCaseData, null, 2),
+          informationElements: {},
+          layerParameters: {},
+          standardReference: "Test Execution",
+        }
+
+        setLogs((prev) => {
+          const newLogs = [...prev, summaryLog]
+          console.log("✅ Added summary log entry:", summaryLog.message)
+          return newLogs
+        })
+
+        // Update receiving status
+        setIsReceivingData(true)
+        setLastDataReceived(new Date())
+
+        // Force UI updates for summary log too
+        setTimeout(() => {
+          setLogs((current) => [...current])
+        }, 50)
+      }
+    }
+  }
+
+  // Direct log updates
+  const handleDirectLogUpdate = (event: CustomEvent) => {
+    console.log("📊 LogsView: Direct log update received:", event.detail)
+    const logData = event.detail
+
+    const newLog = {
+      id: logData.id || Date.now(),
+      timestamp: logData.timestamp || (Date.now() / 1000).toFixed(1),
+      level: logData.level || "I",
+      component: logData.component || logData.layer || "TEST",
+      message: logData.message || `${logData.messageType}: ${JSON.stringify(logData.payload || {})}`,
+      type: logData.messageType || logData.type || "DATA",
+      source: "TestManager",
+    }
+
+    setLogs((prev) => {
+      const newLogs = [...prev.slice(-99), newLog]
+      return newLogs
+    })
+  }
+
+  // Check for TestCasePlaybackService availability (optional - don't retry)
+  const checkTestCasePlaybackService = () => {
+    if (window.TestCasePlaybackService) {
+      console.log("✅ TestCasePlaybackService is available")
+      console.log("📊 LogsView: TestCasePlaybackService integration ready")
+    } else {
+      console.log("ℹ️  TestCasePlaybackService not available - using Supabase Realtime instead")
+      // Don't retry - use Supabase Realtime as primary data source
+    }
+  }
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
