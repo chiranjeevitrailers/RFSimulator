@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("❌ Test execution error:", error);
-    
+
     // Broadcast error to WebSocket clients
     if (executionId) {
       try {
@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
         console.error('Error broadcasting error:', wsError);
       }
     }
-    
+
     return NextResponse.json(
       {
         error: "Internal server error",
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
         details: "Check server logs for more information",
       },
       { status: 500 },
-    );
+    )
   }
 }
 
