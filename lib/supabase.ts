@@ -10,7 +10,7 @@ let _supabaseAdminClient: any = null
 // Helper: create a configured client using env vars (public anon)
 export const createClient = () => {
   if (_supabaseClient) {
-    return _supabaseClien
+    return _supabaseClient
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
