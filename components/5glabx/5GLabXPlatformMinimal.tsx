@@ -512,6 +512,16 @@ const Sidebar: React.FC<{
 
   const renderSection = (section: any, items: any[], title: string) => {
     const isCollapsed = collapsedSections[section]
+    
+    // Debug: Log section state
+    if (typeof window !== 'undefined' && !window.__sidebarDebugLogged) {
+      console.log(`🔍 Sidebar Section: ${title}`, {
+        isCollapsed,
+        itemCount: items.length,
+        sectionKey: section
+      })
+    }
+    
     return (
       <div className="space-y-1">
         <button
@@ -520,6 +530,7 @@ const Sidebar: React.FC<{
         >
           <ChevronRight className={`w-4 h-4 mr-2 transition-transform ${isCollapsed ? "rotate-0" : "rotate-90"}`} />
           <span className="flex-1 text-left">{title}</span>
+          <span className="text-xs text-gray-400 ml-2">({items.length})</span>
         </button>
         {!isCollapsed && <div className="ml-4 mt-1 space-y-1">{items.map((item: any) => renderMenuItem(item))}</div>}
       </div>
