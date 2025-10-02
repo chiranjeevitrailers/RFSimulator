@@ -98,22 +98,12 @@ import EventBridge from "./services/EventBridge"
 
 // Import components
 // TestManagerDataDebug component removed during cleanup
-import DirectDataInjector from "./components/DirectDataInjector"
-import SimpleDataDisplay from "./components/SimpleDataDisplay"
 import ThreeGPPComplianceDashboard from "./components/ThreeGPPComplianceDashboard"
 import LayerParametersTracker from "./components/LayerParametersTracker"
 import ChannelParametersTracker from "./components/ChannelParametersTracker"
 import LayerStatisticsDashboard from "./components/LayerStatisticsDashboard"
 
-// Make SimpleDataDisplay available globally for testing
-declare global {
-  interface Window {
-    SimpleDataDisplay?: any
-  }
-}
-if (typeof window !== "undefined") {
-  window.SimpleDataDisplay = SimpleDataDisplay
-}
+// Removed demo components and globals
 
 // Import working TSX layer views
 import PhyLayerViewTSX from "./views/PhyLayerViewTSX"
@@ -127,8 +117,7 @@ import ImsLayerView from "./views/ImsLayerView" // Declared here
 // Import protocol layer data test component
 import ProtocolLayerDataTest from "./components/ProtocolLayerDataTest"
 import DataFlowDebugger from "./components/DataFlowDebugger"
-import TestDataGenerator from "./components/TestDataGenerator"
-import IntegrationTester from "./components/IntegrationTester"
+// Removed demo generators/testers
 // import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced'; // File not found
 import PhyLayerViewEnhanced from "./views/PhyLayerViewEnhanced"
 // import { DataFlowProvider } from './providers/DataFlowProvider'; // Temporarily disabled to isolate React hooks issue
@@ -266,13 +255,7 @@ const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Test Case Data Display Component - Only shows real data from Test Manager */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔥 Real Test Case Data Display</h3>
-          <SimpleDataDisplay />
-        </div>
-      </div>
+      {/* Removed demo SimpleDataDisplay - rely on LogsView */}
 
       {testManagerData && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -306,8 +289,7 @@ const DashboardView: React.FC = () => {
       {/* Debug Component */}
       {/* TestManagerDataDebug component removed during cleanup */}
 
-      {/* Direct Data Injector */}
-      <DirectDataInjector />
+      {/* Removed DirectDataInjector - rely on real data only */}
 
       {/* 3GPP Compliance Dashboard */}
       <ThreeGPPComplianceDashboard testCaseData={testManagerData} />
@@ -323,123 +305,10 @@ const DashboardView: React.FC = () => {
 
       {/* Removed duplicate SimpleDataDisplay - already rendered above */}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Messages</h3>
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-blue-600" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-blue-600">1,247</p>
-          <p className="text-xs text-gray-500 mt-1">+12% from last hour</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Avg Throughput</h3>
-            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-green-600" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-green-600">156.7 Mbps</p>
-          <p className="text-xs text-gray-500 mt-1">Peak: 234.2 Mbps</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Error Rate</h3>
-            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4 text-red-600" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-red-600">0.02%</p>
-          <p className="text-xs text-gray-500 mt-1">-0.01% from last hour</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Success Rate</h3>
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-purple-600" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-purple-600">99.98%</p>
-          <p className="text-xs text-gray-500 mt-1">+0.01% from last hour</p>
-        </div>
-      </div>
+      {/* Removed demo metrics */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg border">
-          <h3 className="text-lg font-semibold mb-4">Message Distribution by Component</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">PHY Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">456</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">MAC Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">234</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">RLC Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">189</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">RRC Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">156</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">NAS Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">98</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">IMS Layer</span>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">114</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border">
-          <h3 className="text-lg font-semibold mb-4">Protocol Message Types</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span className="text-sm font-medium">PDSCH</span>
-              </div>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">234</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm font-medium">DL PDU</span>
-              </div>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">189</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span className="text-sm font-medium">RRC Setup</span>
-              </div>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">156</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                <span className="text-sm font-medium">NAS Attach</span>
-              </div>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">98</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="text-sm font-medium">SIP INVITE</span>
-              </div>
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">114</span>
-            </div>
-          </div>
-        </div>
+        {/* Removed demo aggregates */}
       </div>
 
       <div className="bg-white p-6 rounded-lg border">
@@ -549,13 +418,10 @@ const Sidebar: React.FC<{
     { id: "analytics", label: "Analytics", icon: BarChart3, badge: "LIVE" },
     { id: "protocol-layer-test", label: "Protocol Layer Test", icon: Activity, badge: "NEW" },
     { id: "data-flow-debugger", label: "Data Flow Debugger", icon: Activity, badge: "DEBUG" },
-    { id: "test-data-generator", label: "Test Data Generator", icon: Database, badge: "GEN" },
-    { id: "integration-tester", label: "Integration Tester", icon: CheckCircle, badge: "TEST" },
   ]
 
   const enhancedViewsItems = [
     { id: "logs-advanced", label: "Advanced Logs", icon: FileText, badge: "ADVANCED" },
-    { id: "phy-enhanced", label: "Enhanced PHY", icon: Radio, badge: "ENHANCED" },
   ]
 
   // Removed duplicate layerItems; using unified protocolLayers section below
@@ -801,10 +667,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <ProtocolLayerDataTest />
       case "data-flow-debugger":
         return <DataFlowDebugger />
-      case "test-data-generator":
-        return <TestDataGenerator />
-      case "integration-tester":
-        return <IntegrationTester />
       case "logs-advanced":
         return <LogsView appState={appState} onStateChange={onStateChange} />
       case "phy-enhanced":
@@ -923,7 +785,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   return (
     <APIProvider>
       <EventBridge />
-      <div className="h-screen flex flex-col bg-gray-50">
+      <div className="h-full flex flex-col bg-gray-50">
         {/* Header with connection status */}
         <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
           <h1 className="text-lg font-semibold text-gray-900">5GLabX Platform</h1>
