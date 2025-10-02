@@ -104,7 +104,7 @@ const UserDashboard: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-visible">
         {activeTab === "overview" && (
           <div className="space-y-6">
             {/* Welcome Section */}
@@ -137,7 +137,7 @@ const UserDashboard: React.FC = () => {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
+              <div className="min-h-[800px]">
                 <FiveGLabXPlatform />
               </div>
             </div>
