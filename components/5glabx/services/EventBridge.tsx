@@ -22,7 +22,12 @@ export const EventBridge: React.FC = () => {
 
       try {
         const { testCaseId, testCaseData, executionId } = event.detail
-        const messages = testCaseData?.expectedMessages || []
+        // Accept multiple shapes: expectedMessages (UI), realtimeMessages (UI), test_case_messages (DB)
+        const messages =
+          (testCaseData?.expectedMessages && Array.isArray(testCaseData.expectedMessages) && testCaseData.expectedMessages)
+          || (testCaseData?.realtimeMessages && Array.isArray(testCaseData.realtimeMessages) && testCaseData.realtimeMessages)
+          || (testCaseData?.test_case_messages && Array.isArray(testCaseData.test_case_messages) && testCaseData.test_case_messages)
+          || []
 
         console.log("[v0] 🔗 EventBridge: Processing messages:", {
           messageCount: messages.length,
@@ -37,23 +42,23 @@ export const EventBridge: React.FC = () => {
             timestamp: (Date.now() / 1000).toFixed(1),
             level: "I",
             component: message.layer || "RRC",
-            message: `${message.messageName || message.messageType}: ${JSON.stringify(message.messagePayload || {})}`,
-            type: message.messageType || "TEST_MESSAGE",
+            message: `${message.messageName || message.message_type || message.messageType || "Message"}: ${JSON.stringify((message.messagePayload || message.message_payload || message.payload || {}), null, 2)}`,
+            type: message.messageType || message.message_type || "TEST_MESSAGE",
             source: "TestManager",
             testCaseId: testCaseId,
             executionId: executionId,
-            direction: message.direction || "UL",
+            direction: message.direction || message.message_direction || "UL",
             protocol: message.protocol || "5G_NR",
-            rawData: JSON.stringify(message.messagePayload || {}, null, 2),
-            informationElements: message.informationElements || {},
-            layerParameters: message.layerParameters || {},
+            rawData: JSON.stringify((message.messagePayload || message.message_payload || message.payload || {}), null, 2),
+            informationElements: message.informationElements || message.test_case_information_elements || {},
+            layerParameters: message.layerParameters || message.test_case_layer_parameters || {},
             standardReference: message.standardReference || "Unknown",
-            messagePayload: message.messagePayload || {},
-            ies: message.informationElements
+            messagePayload: message.messagePayload || message.message_payload || message.payload || {},
+            ies: (message.informationElements || message.test_case_information_elements)
               ? Object.entries(message.informationElements)
                   .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
                   .join(", ")
-              : Object.entries(message.messagePayload || {})
+              : Object.entries(message.messagePayload || message.message_payload || message.payload || {})
                   .map(([k, v]) => `${k}=${v}`)
                   .join(", "),
           }))
