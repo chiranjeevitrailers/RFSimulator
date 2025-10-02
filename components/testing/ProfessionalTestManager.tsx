@@ -13,12 +13,9 @@ const ProfessionalTestManager: React.FC = () => {
   const [isPanelVisible, setIsPanelVisible] = useState(true)
   const [horizontalScrollPosition, setHorizontalScrollPosition] = useState(0)
   const [logs, setLogs] = useState([
-    { timestamp: "2024-01-18 00:40:15", level: "INFO", message: "Initializing RAN-Core Test Manager" },
-    { timestamp: "2024-01-18 00:40:16", level: "INFO", message: "loading component configurations" },
-    { timestamp: "2024-01-18 00:40:17", level: "INFO", message: "Preparing test environment" },
-    { timestamp: "2024-01-18 00:40:18", level: "INFO", message: "Test environment ready" },
-    { timestamp: "2024-01-18 00:40:19", level: "INFO", message: "Monitoring system status" },
-    { timestamp: "2024-01-18 00:40:20", level: "INFO", message: "All components online" },
+    { timestamp: new Date().toLocaleString(), level: "INFO", message: "🚀 RAN-Core Test Manager initialized" },
+    { timestamp: new Date().toLocaleString(), level: "INFO", message: "📡 Connected to Supabase database" },
+    { timestamp: new Date().toLocaleString(), level: "SUCCESS", message: "✅ System ready - Execute a test to begin" },
   ])
   const [testCases, setTestCases] = React.useState([
     {
