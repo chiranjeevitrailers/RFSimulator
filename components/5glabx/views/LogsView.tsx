@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Search, Download, RefreshCw, Eye, AlertTriangle, Info, CheckCircle, X } from "lucide-react"
+import { createClient } from "@/lib/supabase"
 
 const LogsView: React.FC<{
   appState: any
@@ -16,6 +17,7 @@ const LogsView: React.FC<{
   const [showDecoder, setShowDecoder] = useState(false)
   const [isReceivingData, setIsReceivingData] = useState(false)
   const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null)
+  const [activeExecutionId, setActiveExecutionId] = useState<string | null>(null)
 
   // Auto-reset receiving status after 5 seconds of inactivity
   useEffect(() => {
@@ -26,6 +28,69 @@ const LogsView: React.FC<{
       return () => clearTimeout(timeout)
     }
   }, [isReceivingData, lastDataReceived])
+
+  useEffect(() => {
+    console.log("[v0] 🔥 LogsView: Setting up Supabase Realtime subscription...")
+
+    const supabase = createClient()
+
+    // Subscribe to decoded_messages table for real-time updates
+    const channel = supabase
+      .channel("decoded_messages_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "decoded_messages",
+        },
+        (payload) => {
+          console.log("[v0] 📨 LogsView: Received real-time message from Supabase:", payload.new)
+
+          const message = payload.new
+
+          // Only process messages for the active execution
+          if (activeExecutionId && message.execution_id === activeExecutionId) {
+            const newLog = {
+              id: message.message_id || message.id,
+              timestamp: (message.timestamp_ms / 1000).toFixed(1),
+              level: "I",
+              component: message.layer || "TEST",
+              message: `${message.message_name || message.message_type}: ${JSON.stringify(message.message_payload || {}, null, 2)}`,
+              type: message.message_type || "TEST_MESSAGE",
+              source: "Supabase Realtime",
+              testCaseId: message.test_case_id,
+              direction: message.direction || "UL",
+              protocol: message.protocol || "5G_NR",
+              rawData: JSON.stringify(message.message_payload || {}, null, 2),
+              informationElements: message.information_elements || {},
+              layerParameters: message.layer_parameters || {},
+              standardReference: message.standard_reference || "Unknown",
+              messagePayload: message.message_payload || {},
+              ies: message.information_elements
+                ? Object.entries(message.information_elements)
+                    .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                    .join(", ")
+                : "",
+            }
+
+            setLogs((prev) => [...prev, newLog])
+            setIsReceivingData(true)
+            setLastDataReceived(new Date())
+
+            console.log("[v0] ✅ LogsView: Added real-time message to logs")
+          }
+        },
+      )
+      .subscribe((status) => {
+        console.log("[v0] 📡 Supabase Realtime subscription status:", status)
+      })
+
+    return () => {
+      console.log("[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime")
+      supabase.removeChannel(channel)
+    }
+  }, [activeExecutionId])
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
@@ -82,13 +147,18 @@ const LogsView: React.FC<{
 
   // Listen for the regular 5GLABX_TEST_EXECUTION event
   useEffect(() => {
-    console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event")
+    console.log("🔥 LogsView: Setting up 5GLABX_TEST_EXECUTION event listener")
 
     const handleTestExecution = (event) => {
       console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
       console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
 
-      const { testCaseId, testCaseData, logs } = event.detail
+      const { testCaseId, testCaseData, logs, executionId } = event.detail
+
+      if (executionId) {
+        console.log("[v0] 🎯 LogsView: Setting active execution ID:", executionId)
+        setActiveExecutionId(executionId)
+      }
 
       if (logs && logs.length > 0) {
         console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
@@ -636,6 +706,7 @@ const LogsView: React.FC<{
                 setLogs([])
                 setIsReceivingData(false)
                 setLastDataReceived(null)
+                setActiveExecutionId(null) // Clear active execution ID on clear logs
               }}
               className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
             >
