@@ -513,12 +513,12 @@ const Sidebar: React.FC<{
   const renderSection = (section: any, items: any[], title: string) => {
     const isCollapsed = collapsedSections[section]
     return (
-      <div className="mb-2">
+      <div className="space-y-1">
         <button
           onClick={() => toggleSection(section)}
-          className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md"
+          className="w-full flex items-center px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-gray-50 rounded-md"
         >
-          <ChevronRight className={`w-4 h-4 mr-3 transition-transform ${isCollapsed ? "rotate-0" : "rotate-90"}`} />
+          <ChevronRight className={`w-4 h-4 mr-2 transition-transform ${isCollapsed ? "rotate-0" : "rotate-90"}`} />
           <span className="flex-1 text-left">{title}</span>
         </button>
         {!isCollapsed && <div className="ml-4 mt-1 space-y-1">{items.map((item: any) => renderMenuItem(item))}</div>}
@@ -653,26 +653,22 @@ const Sidebar: React.FC<{
 
         {/* O-RAN Analysis */}
         <div className="mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">O-RAN ANALYSIS</h3>
-          <div className="space-y-1">{renderSection("oran-analysis", oranItems, "O-RAN ANALYSIS")}</div>
+          {renderSection("oran-analysis", oranItems, "O-RAN ANALYSIS")}
         </div>
 
         {/* NB-IoT Analysis */}
         <div className="mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">NB-IOT ANALYSIS</h3>
-          <div className="space-y-1">{renderSection("nbiot-analysis", nbiotItems, "NB-IOT ANALYSIS")}</div>
+          {renderSection("nbiot-analysis", nbiotItems, "NB-IOT ANALYSIS")}
         </div>
 
         {/* C-V2X Analysis */}
         <div className="mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">C-V2X ANALYSIS</h3>
-          <div className="space-y-1">{renderSection("v2x-analysis", v2xItems, "C-V2X ANALYSIS")}</div>
+          {renderSection("v2x-analysis", v2xItems, "C-V2X ANALYSIS")}
         </div>
 
         {/* NTN Analysis */}
         <div className="mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">NTN ANALYSIS</h3>
-          <div className="space-y-1">{renderSection("ntn-analysis", ntnItems, "NTN ANALYSIS")}</div>
+          {renderSection("ntn-analysis", ntnItems, "NTN ANALYSIS")}
         </div>
 
         {/* Protocol Layers */}
