@@ -98,22 +98,12 @@ import EventBridge from "./services/EventBridge"
 
 // Import components
 // TestManagerDataDebug component removed during cleanup
-import DirectDataInjector from "./components/DirectDataInjector"
-import SimpleDataDisplay from "./components/SimpleDataDisplay"
 import ThreeGPPComplianceDashboard from "./components/ThreeGPPComplianceDashboard"
 import LayerParametersTracker from "./components/LayerParametersTracker"
 import ChannelParametersTracker from "./components/ChannelParametersTracker"
 import LayerStatisticsDashboard from "./components/LayerStatisticsDashboard"
 
-// Make SimpleDataDisplay available globally for testing
-declare global {
-  interface Window {
-    SimpleDataDisplay?: any
-  }
-}
-if (typeof window !== "undefined") {
-  window.SimpleDataDisplay = SimpleDataDisplay
-}
+// Removed demo components and globals
 
 // Import working TSX layer views
 import PhyLayerViewTSX from "./views/PhyLayerViewTSX"
@@ -127,8 +117,7 @@ import ImsLayerView from "./views/ImsLayerView" // Declared here
 // Import protocol layer data test component
 import ProtocolLayerDataTest from "./components/ProtocolLayerDataTest"
 import DataFlowDebugger from "./components/DataFlowDebugger"
-import TestDataGenerator from "./components/TestDataGenerator"
-import IntegrationTester from "./components/IntegrationTester"
+// Removed demo generators/testers
 // import EnhancedLogsViewAdvanced from './views/EnhancedLogsViewAdvanced'; // File not found
 import PhyLayerViewEnhanced from "./views/PhyLayerViewEnhanced"
 // import { DataFlowProvider } from './providers/DataFlowProvider'; // Temporarily disabled to isolate React hooks issue
@@ -266,13 +255,7 @@ const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Test Case Data Display Component - Only shows real data from Test Manager */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔥 Real Test Case Data Display</h3>
-          <SimpleDataDisplay />
-        </div>
-      </div>
+      {/* Removed demo SimpleDataDisplay - rely on LogsView */}
 
       {testManagerData && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -306,8 +289,7 @@ const DashboardView: React.FC = () => {
       {/* Debug Component */}
       {/* TestManagerDataDebug component removed during cleanup */}
 
-      {/* Direct Data Injector */}
-      <DirectDataInjector />
+      {/* Removed DirectDataInjector - rely on real data only */}
 
       {/* 3GPP Compliance Dashboard */}
       <ThreeGPPComplianceDashboard testCaseData={testManagerData} />
@@ -436,13 +418,10 @@ const Sidebar: React.FC<{
     { id: "analytics", label: "Analytics", icon: BarChart3, badge: "LIVE" },
     { id: "protocol-layer-test", label: "Protocol Layer Test", icon: Activity, badge: "NEW" },
     { id: "data-flow-debugger", label: "Data Flow Debugger", icon: Activity, badge: "DEBUG" },
-    { id: "test-data-generator", label: "Test Data Generator", icon: Database, badge: "GEN" },
-    { id: "integration-tester", label: "Integration Tester", icon: CheckCircle, badge: "TEST" },
   ]
 
   const enhancedViewsItems = [
     { id: "logs-advanced", label: "Advanced Logs", icon: FileText, badge: "ADVANCED" },
-    { id: "phy-enhanced", label: "Enhanced PHY", icon: Radio, badge: "ENHANCED" },
   ]
 
   // Removed duplicate layerItems; using unified protocolLayers section below
@@ -688,10 +667,6 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
         return <ProtocolLayerDataTest />
       case "data-flow-debugger":
         return <DataFlowDebugger />
-      case "test-data-generator":
-        return <TestDataGenerator />
-      case "integration-tester":
-        return <IntegrationTester />
       case "logs-advanced":
         return <LogsView appState={appState} onStateChange={onStateChange} />
       case "phy-enhanced":
