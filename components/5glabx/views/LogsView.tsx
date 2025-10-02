@@ -427,36 +427,8 @@ const LogsView: React.FC<{
 
     // Process data through normal flow
 
-    // Force UI update even with minimal data
-    if (!data.testCaseData) {
-      console.log("⚠️  No testCaseData found, creating summary log")
-      const summaryLog = {
-        id: `test-summary-${Date.now()}-${Math.random()}`,
-        timestamp: (Date.now() / 1000).toFixed(1),
-        level: "I",
-        component: "TEST",
-        message: `Test Case Started: ${data.testCaseId} (${source})`,
-        type: "TEST_EXECUTION_START",
-        source: source || "TestManager",
-        testCaseId: data.testCaseId,
-        direction: "N/A",
-        protocol: "5G_NR",
-        rawData: JSON.stringify(data, null, 2),
-        informationElements: {},
-        layerParameters: {},
-        standardReference: "Test Execution",
-      }
-
-      setLogs((prev) => [...prev, summaryLog])
-      console.log("✅ Added summary log entry:", summaryLog.message)
-
-      // Force re-render
-      setTimeout(() => {
-        setLogs((current) => [...current])
-      }, 100)
-
-      return
-    }
+    // Require real testCaseData; do not synthesize logs
+    if (!data.testCaseData) return
 
     const testCaseData = data.testCaseData || data
     const testCaseId = data.testCaseId || testCaseData.testCaseId
