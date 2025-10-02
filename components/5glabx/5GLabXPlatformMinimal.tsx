@@ -474,7 +474,7 @@ const Sidebar: React.FC<{
   onNavigate: (viewId: string) => void
 }> = ({ currentView, onNavigate }) => {
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
-    "oran-analysis": false,
+    "oran-analysis": false,  // false = expanded, true = collapsed
     "nbiot-analysis": false,
     "v2x-analysis": false,
     "ntn-analysis": false,
