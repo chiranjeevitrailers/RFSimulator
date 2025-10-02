@@ -12,13 +12,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { testCaseId, userId = "system" } = body
+    const { testCaseId, userId } = body
 
     if (!testCaseId) {
       return NextResponse.json({ error: "Test case ID is required" }, { status: 400 })
     }
 
     console.log(`🚀 Starting test execution for REAL test case: ${testCaseId}`)
+    
+    // Use a default UUID for system executions (or create a system user in Supabase)
+    const effectiveUserId = userId || "00000000-0000-0000-0000-000000000000"
 
     // Fetch REAL test case data from Supabase
     const { data: testCase, error: testCaseError } = await supabaseAdmin
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
       .insert({
         execution_id: executionId,
         test_case_id: testCase.id,
-        user_id: userId,
+        user_id: effectiveUserId,
         status: "running",
         start_time: new Date().toISOString(),
         progress_percentage: 0,
