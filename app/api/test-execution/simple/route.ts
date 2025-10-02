@@ -34,18 +34,37 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ Found REAL test case: ${testCase.name} (${testCase.category})`)
 
-    // For testing purposes, skip database insertion and use mock execution
-    console.log("⚠️ Skipping database insertion for testing - using mock execution")
-    const executionResult = {
-      id: uuidv4(),
-      execution_id: executionId,
-      test_case_id: testCase.id,
-      status: "running"
+    console.log("✅ Creating test execution record in database...")
+    const { data: executionResult, error: executionError } = await supabaseAdmin
+      .from("test_case_executions")
+      .insert({
+        execution_id: executionId,
+        test_case_id: testCase.id,
+        user_id: userId,
+        status: "running",
+        start_time: new Date().toISOString(),
+        progress_percentage: 0,
+        current_step: "Initializing",
+        total_steps: 10,
+        completed_steps: 0,
+        results: {},
+        logs: [],
+      })
+      .select()
+      .single()
+
+    if (executionError) {
+      console.error("❌ Failed to create test execution:", executionError)
+      return NextResponse.json({ error: "Failed to create test execution" }, { status: 500 })
     }
+
+    console.log(`✅ Test execution created in database: ${executionId}`)
 
     // Extract REAL data from Supabase expected_results or test_data field (which contains message_flow)
     const realTestData = testCase.expected_results || testCase.test_data || {}
-    let expectedMessages = Array.isArray(realTestData) ? realTestData : (realTestData.messages || realTestData.expectedMessages || [])
+    let expectedMessages = Array.isArray(realTestData)
+      ? realTestData
+      : realTestData.messages || realTestData.expectedMessages || []
 
     // For now, create sample IE and parameters since they're not in the seed data
     const expectedInformationElements: any[] = []
@@ -134,8 +153,47 @@ export async function POST(request: NextRequest) {
       console.log(`✅ Created ${sampleMessages.length} sample messages for testing`)
     }
 
-    // Skip database operations for testing
-    console.log("⚠️ Skipping decoded_messages insertion and execution update for testing")
+    console.log("✅ Inserting decoded messages into database...")
+    const decodedMessagesToInsert = expectedMessages.map((msg: any, index: number) => ({
+      execution_id: executionId,
+      message_id: msg.id || `msg-${executionId}-${index}`,
+      message_name: msg.messageName,
+      message_type: msg.messageType,
+      layer: msg.layer,
+      direction: msg.direction,
+      protocol: msg.protocol,
+      timestamp_ms: msg.timestampMs,
+      message_payload: msg.messagePayload,
+      information_elements: msg.informationElements,
+      layer_parameters: msg.layerParameters,
+      standard_reference: msg.standardReference,
+      created_at: new Date().toISOString(),
+    }))
+
+    if (decodedMessagesToInsert.length > 0) {
+      const { error: messagesError } = await supabaseAdmin.from("decoded_messages").insert(decodedMessagesToInsert)
+
+      if (messagesError) {
+        console.error("⚠️ Failed to insert decoded messages:", messagesError)
+        // Don't fail the entire request, just log the error
+      } else {
+        console.log(`✅ Inserted ${decodedMessagesToInsert.length} decoded messages`)
+      }
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from("test_case_executions")
+      .update({
+        progress_percentage: 10,
+        current_step: "Data loaded",
+        completed_steps: 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("execution_id", executionId)
+
+    if (updateError) {
+      console.error("⚠️ Failed to update execution status:", updateError)
+    }
 
     console.log(`✅ Test execution completed with REAL data: ${executionId}`)
 
@@ -165,7 +223,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("❌ Test execution error:", error);
+    console.error("❌ Test execution error:", error)
 
     return NextResponse.json(
       {
@@ -174,7 +232,7 @@ export async function POST(request: NextRequest) {
         details: "Check server logs for more information",
       },
       { status: 500 },
-    );
+    )
   }
 }
 
