@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
 
     console.log(`🚀 Starting test execution for REAL test case: ${testCaseId}`)
     
-    // Use a default UUID for system executions (or create a system user in Supabase)
-    const effectiveUserId = userId || "00000000-0000-0000-0000-000000000000"
+    // Use NULL for system executions (RLS allows service role to insert with NULL user_id)
+    const effectiveUserId = userId || null
 
     // Fetch REAL test case data from Supabase
     const { data: testCase, error: testCaseError } = await supabaseAdmin
