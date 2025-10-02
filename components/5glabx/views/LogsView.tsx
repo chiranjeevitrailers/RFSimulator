@@ -47,38 +47,69 @@ const LogsView: React.FC<{
         (payload) => {
           console.log("[v0] 📨 LogsView: Received real-time message from Supabase:", payload.new)
 
-          const message = payload.new
+          const msg = payload.new as any
 
-          // Process ALL messages (removed activeExecutionId filter for real-time display)
-          // This allows viewing all test executions in real-time
+          // Normalize fields across schemas (enhanced vs legacy)
+          const tsUs = msg.timestamp_us || (typeof msg.timestamp_ms === "number" ? msg.timestamp_ms * 1000 : undefined)
+          const timestamp = tsUs ? (tsUs / 1_000_000).toFixed(1) : ((Date.now() / 1000).toFixed(1))
+          const direction = msg.message_direction || msg.direction || "UL"
+          const payloadData = msg.decoded_data || msg.message_payload || {}
+
+          // Normalize IEs (object or array)
+          let informationElements: any = msg.information_elements || msg.decoded_information_elements || {}
+          if (Array.isArray(informationElements)) {
+            informationElements = informationElements.reduce((acc: any, ie: any, idx: number) => {
+              const key = ie.ie_name || ie.name || `IE_${idx + 1}`
+              acc[key] = {
+                type: ie.ie_type || ie.type,
+                value: ie.ie_value ?? ie.value,
+                presence: ie.presence,
+                reference: ie.standard_reference || ie.reference,
+                range: ie.range,
+                criticality: ie.criticality,
+              }
+              return acc
+            }, {})
+          }
+
+          // Normalize Layer Parameters
+          let layerParameters: any = msg.layer_parameters || msg.decoded_layer_parameters || {}
+          if (Array.isArray(layerParameters)) {
+            layerParameters = layerParameters.reduce((acc: any, p: any) => {
+              const key = p.parameter_name || p.name
+              acc[key] = { value: p.parameter_value ?? p.value, unit: p.parameter_unit ?? p.unit, reference: p.standard_reference }
+              return acc
+            }, {})
+          }
+
           const newLog = {
-              id: message.message_id || message.id,
-              timestamp: (message.timestamp_ms / 1000).toFixed(1),
-              level: "I",
-              component: message.layer || "TEST",
-              message: `${message.message_name || message.message_type}: ${JSON.stringify(message.message_payload || {}, null, 2)}`,
-              type: message.message_type || "TEST_MESSAGE",
-              source: "Supabase Realtime",
-              testCaseId: message.test_case_id,
-              direction: message.direction || "UL",
-              protocol: message.protocol || "5G_NR",
-              rawData: JSON.stringify(message.message_payload || {}, null, 2),
-              informationElements: message.information_elements || {},
-              layerParameters: message.layer_parameters || {},
-              standardReference: message.standard_reference || "Unknown",
-              messagePayload: message.message_payload || {},
-              ies: message.information_elements
-                ? Object.entries(message.information_elements)
-                    .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                    .join(", ")
-                : "",
-            }
+            id: msg.message_id || msg.id,
+            timestamp,
+            level: "I",
+            component: msg.layer || "TEST",
+            message: `${msg.message_name || msg.message_type}: ${JSON.stringify(payloadData, null, 2)}`,
+            type: msg.message_type || "TEST_MESSAGE",
+            source: "Supabase Realtime",
+            testCaseId: msg.test_case_id || msg.testCaseId,
+            direction,
+            protocol: msg.protocol || "5G_NR",
+            rawData: JSON.stringify(payloadData, null, 2),
+            informationElements,
+            layerParameters,
+            standardReference: msg.standard_reference || "Unknown",
+            messagePayload: payloadData,
+            ies: informationElements && typeof informationElements === "object"
+              ? Object.entries(informationElements)
+                  .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? (v.value ?? JSON.stringify(v)) : String(v)}`)
+                  .join(", ")
+              : "",
+          }
 
-            setLogs((prev) => [...prev, newLog])
-            setIsReceivingData(true)
-            setLastDataReceived(new Date())
+          setLogs((prev) => [...prev, newLog])
+          setIsReceivingData(true)
+          setLastDataReceived(new Date())
 
-            console.log("[v0] ✅ LogsView: Added real-time message to logs")
+          console.log("[v0] ✅ LogsView: Added real-time message to logs")
         },
       )
       .subscribe((status) => {

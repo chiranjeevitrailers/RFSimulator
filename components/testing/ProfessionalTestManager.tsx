@@ -331,7 +331,7 @@ const ProfessionalTestManager: React.FC = () => {
   const loadTestCasesFromSupabase = async () => {
     try {
       // Use comprehensive API endpoint to get all 1800+ test cases
-      const response = await fetch("/api/test-cases/comprehensive/?limit=2000")
+      const response = await fetch("/api/test-cases/all")
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
@@ -453,7 +453,7 @@ const ProfessionalTestManager: React.FC = () => {
     console.log("[v0] 🚀 TEST MANAGER: Starting test execution for:", testId)
 
     try {
-      const response = await fetch("/api/test-execution/simple/", {
+      const response = await fetch("/api/test-execution/enhanced", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -461,6 +461,10 @@ const ProfessionalTestManager: React.FC = () => {
         body: JSON.stringify({
           testCaseId: testId,
           userId: "system",
+          executionMode: "comprehensive",
+          timeAcceleration: 10,
+          logLevel: "detailed",
+          captureMode: "full",
         }),
       })
 
@@ -472,30 +476,18 @@ const ProfessionalTestManager: React.FC = () => {
       console.log("[v0] 📦 TEST MANAGER: API Response received:", {
         executionId: result.executionId,
         testCaseId: testId,
-        hasTestCaseData: !!result.testCaseData,
-        messageCount: result.testCaseData?.expectedMessages?.length || 0,
-        ieCount: result.testCaseData?.expectedInformationElements?.length || 0,
-        paramCount: result.testCaseData?.expectedLayerParameters?.length || 0,
+        hasTestCaseData: !!result.data?.testCaseData,
+        websocketUrl: result.data?.websocketUrl,
       })
 
       // Add detailed execution logs
       addLog("SUCCESS", `✅ Test execution API call successful`)
-      addLog("INFO", `📋 Test Case: ${result.testCaseData?.name || testId}`)
+      addLog("INFO", `📋 Test Case: ${testId}`)
       addLog("INFO", `🆔 Execution ID: ${result.executionId}`)
-      addLog("INFO", `📊 Category: ${result.testCaseData?.category || 'N/A'}`)
-      addLog("INFO", `📡 Protocol: ${result.testCaseData?.protocol || 'N/A'}`)
-      addLog("INFO", `📨 Messages Generated: ${result.testCaseData?.messageCount || 0}`)
-      addLog("INFO", `🔧 Information Elements: ${result.testCaseData?.ieCount || 0}`)
-      addLog("INFO", `⚙️  Layer Parameters: ${result.testCaseData?.parameterCount || 0}`)
-      addLog("INFO", `💾 Data stored in Supabase database`)
+      addLog("INFO", `💾 Streaming decoded messages via Supabase Realtime`)
       
       // Log individual messages
-      if (result.testCaseData?.expectedMessages) {
-        addLog("INFO", `📋 Protocol Messages Generated:`)
-        result.testCaseData.expectedMessages.forEach((msg, idx) => {
-          addLog("INFO", `   ${idx + 1}. ${msg.layer} - ${msg.messageType} (${msg.direction})`)
-        })
-      }
+      // No static messages here; enhanced route streams to decoded_messages
       
       addLog("INFO", `📡 Broadcasting to 5GLabX Platform for real-time display`)
       addLog("INFO", `Test execution started: ${testId}`)
@@ -515,16 +507,10 @@ const ProfessionalTestManager: React.FC = () => {
             id: testId,
             name: testCase?.name || "Unknown Test",
             component: testCase?.component || "Unknown Component",
-            // Use REAL data from API response (which comes from Supabase)
-            expectedMessages: result.testCaseData?.expectedMessages || [],
-            expectedInformationElements: result.testCaseData?.expectedInformationElements || [],
-            expectedLayerParameters: result.testCaseData?.expectedLayerParameters || [],
-            // Include original test data for reference
-            originalTestData: result.testCaseData?.originalTestData,
-            expectedResults: result.testCaseData?.expectedResults,
-            category: result.testCaseData?.category,
-            protocol: result.testCaseData?.protocol,
-            complexity: result.testCaseData?.complexity,
+            realtimeMessages: [],
+            category: result.data?.testCaseData?.category,
+            protocol: result.data?.testCaseData?.protocol,
+            complexity: result.data?.testCaseData?.complexity,
           },
           timestamp: new Date().toISOString(),
           status: "running",
@@ -560,7 +546,6 @@ const ProfessionalTestManager: React.FC = () => {
         console.log("[v0] 📨 TEST MANAGER: Sending postMessage with data:", {
           type: postMessageData.type,
           executionId: postMessageData.executionId,
-          messageCount: postMessageData.testCaseData.expectedMessages.length,
         })
 
         window.postMessage(postMessageData, "*")
