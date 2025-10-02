@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: '5GLabX Protocol Simulator - Professional 3GPP Network Analysis Platform',
   description: 'Advanced 5G/4G network analysis platform with 1000+ test cases, real-time protocol simulation, and professional analyzer interface for 3GPP compliance testing.',
+  icons: {
+    icon: '/favicon.svg',
+  },
   keywords: [
     '5G',
     '4G',
