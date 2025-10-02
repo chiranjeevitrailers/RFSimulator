@@ -49,9 +49,9 @@ const LogsView: React.FC<{
 
           const message = payload.new
 
-          // Only process messages for the active execution
-          if (activeExecutionId && message.execution_id === activeExecutionId) {
-            const newLog = {
+          // Process ALL messages (removed activeExecutionId filter for real-time display)
+          // This allows viewing all test executions in real-time
+          const newLog = {
               id: message.message_id || message.id,
               timestamp: (message.timestamp_ms / 1000).toFixed(1),
               level: "I",
@@ -79,7 +79,6 @@ const LogsView: React.FC<{
             setLastDataReceived(new Date())
 
             console.log("[v0] ✅ LogsView: Added real-time message to logs")
-          }
         },
       )
       .subscribe((status) => {
@@ -90,7 +89,7 @@ const LogsView: React.FC<{
       console.log("[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime")
       supabase.removeChannel(channel)
     }
-  }, [activeExecutionId])
+  }, [])  // Remove activeExecutionId dependency to keep subscription alive
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
