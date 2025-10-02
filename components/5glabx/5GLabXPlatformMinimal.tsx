@@ -528,11 +528,11 @@ const Sidebar: React.FC<{
           onClick={() => toggleSection(section)}
           className="w-full flex items-center px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-gray-50 rounded-md"
         >
-          <ChevronRight className={`w-4 h-4 mr-2 transition-transform ${isCollapsed ? "rotate-0" : "rotate-90"}`} />
+          <ChevronRight className={`w-4 h-4 mr-2 transition-transform ${!isCollapsed ? "rotate-90" : "rotate-0"}`} />
           <span className="flex-1 text-left">{title}</span>
           <span className="text-xs text-gray-400 ml-2">({items.length})</span>
         </button>
-        {!isCollapsed && <div className="ml-4 mt-1 space-y-1">{items.map((item: any) => renderMenuItem(item))}</div>}
+        <div className="ml-4 mt-1 space-y-1">{items.map((item: any) => renderMenuItem(item))}</div>
       </div>
     )
   }
