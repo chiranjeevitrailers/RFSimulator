@@ -7,6 +7,14 @@ import { supabaseAdmin } from "@/lib/supabase"
  */
 export async function GET() {
   try {
+    // If Supabase admin client is not configured, return a non-error response
+    if (!supabaseAdmin) {
+      return NextResponse.json({
+        active: false,
+        message: "Supabase not configured",
+      }, { status: 200 })
+    }
+
     // Query for active/running test executions
     const { data: activeExecution, error } = await supabaseAdmin
       .from("test_case_executions")

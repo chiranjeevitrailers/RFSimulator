@@ -507,7 +507,20 @@ const ProfessionalTestManager: React.FC = () => {
             id: testId,
             name: testCase?.name || "Unknown Test",
             component: testCase?.component || "Unknown Component",
-            realtimeMessages: [],
+            // Seed realtimeMessages immediately from DB if available via enhanced route
+            realtimeMessages: Array.isArray(result.data?.testCaseData?.test_case_messages)
+              ? result.data.testCaseData.test_case_messages.map((m: any) => ({
+                  messageName: m.message_name,
+                  messageType: m.message_type,
+                  layer: m.layer,
+                  direction: m.direction || m.message_direction,
+                  protocol: result.data?.testCaseData?.protocol || "5G_NR",
+                  messagePayload: m.message_payload,
+                  informationElements: m.test_case_information_elements,
+                  layerParameters: m.test_case_layer_parameters,
+                  timestampMs: Date.now(),
+                }))
+              : [],
             category: result.data?.testCaseData?.category,
             protocol: result.data?.testCaseData?.protocol,
             complexity: result.data?.testCaseData?.complexity,

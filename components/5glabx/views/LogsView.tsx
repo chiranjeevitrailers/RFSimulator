@@ -32,9 +32,17 @@ const LogsView: React.FC<{
   useEffect(() => {
     console.log("[v0] 🔥 LogsView: Setting up Supabase Realtime subscription...")
 
-    const supabase = createClient()
+    let supabase: any = null
+    try {
+      supabase = createClient()
+    } catch (e) {
+      console.warn("[v0] ⚠️ LogsView: Supabase not configured, realtime disabled")
+    }
 
     // Subscribe to decoded_messages table for real-time updates
+    if (!supabase) {
+      return () => {}
+    }
     const channel = supabase
       .channel("decoded_messages_changes")
       .on(
