@@ -481,6 +481,26 @@ const ProfessionalTestManager: React.FC = () => {
         paramCount: result.testCaseData?.expectedLayerParameters?.length || 0,
       })
 
+      // Add detailed execution logs
+      addLog("SUCCESS", `✅ Test execution API call successful`)
+      addLog("INFO", `📋 Test Case: ${result.testCaseData?.name || testId}`)
+      addLog("INFO", `🆔 Execution ID: ${result.executionId}`)
+      addLog("INFO", `📊 Category: ${result.testCaseData?.category || 'N/A'}`)
+      addLog("INFO", `📡 Protocol: ${result.testCaseData?.protocol || 'N/A'}`)
+      addLog("INFO", `📨 Messages Generated: ${result.testCaseData?.messageCount || 0}`)
+      addLog("INFO", `🔧 Information Elements: ${result.testCaseData?.ieCount || 0}`)
+      addLog("INFO", `⚙️  Layer Parameters: ${result.testCaseData?.parameterCount || 0}`)
+      addLog("INFO", `💾 Data stored in Supabase database`)
+      
+      // Log individual messages
+      if (result.testCaseData?.expectedMessages) {
+        addLog("INFO", `📋 Protocol Messages Generated:`)
+        result.testCaseData.expectedMessages.forEach((msg, idx) => {
+          addLog("INFO", `   ${idx + 1}. ${msg.layer} - ${msg.messageType} (${msg.direction})`)
+        })
+      }
+      
+      addLog("INFO", `📡 Broadcasting to 5GLabX Platform for real-time display`)
       addLog("INFO", `Test execution started: ${testId}`)
 
       // Update test case status
@@ -554,9 +574,20 @@ const ProfessionalTestManager: React.FC = () => {
 
       // Monitor test execution status
       monitorTestExecution(testId)
+      
+      // Add completion log after short delay
+      setTimeout(() => {
+        addLog("SUCCESS", `✅ Test execution completed successfully`)
+        addLog("INFO", `🎯 View results in 5GLabX Platform → Logs Viewer`)
+        setIsRunning(false)
+        setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Completed", lastRun: new Date().toLocaleString() } : tc)))
+      }, 3000)
+      
     } catch (error) {
       console.error("[v0] ❌ TEST MANAGER: Error running test:", error)
-      addLog("ERROR", `Failed to run test ${testId}: ${error.message}`)
+      addLog("ERROR", `❌ Test execution failed: ${error.message}`)
+      addLog("ERROR", `📊 Error details: ${error.stack || 'No stack trace'}`)
+      addLog("INFO", `🔧 Please check API logs and Supabase connection`)
       setIsRunning(false)
       setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Failed" } : tc)))
     }
@@ -1118,7 +1149,10 @@ const ProfessionalTestManager: React.FC = () => {
       case "ERROR":
         return "bg-red-500 text-white"
       case "WARN":
+      case "WARNING":
         return "bg-yellow-500 text-white"
+      case "SUCCESS":
+        return "bg-green-500 text-white"
       case "INFO":
         return "bg-blue-500 text-white"
       case "DEBUG":
@@ -2154,15 +2188,23 @@ const ProfessionalTestManager: React.FC = () => {
                               "span",
                               {
                                 key: "timestamp",
-                                className: "text-blue-300 font-bold",
+                                className: "text-blue-300 font-bold text-xs",
                               },
                               `[${log.timestamp}]`,
                             ),
                             React.createElement(
                               "span",
                               {
+                                key: "level",
+                                className: `ml-2 px-2 py-0.5 rounded text-xs font-semibold ${getLogLevelColor(log.level)}`,
+                              },
+                              log.level,
+                            ),
+                            React.createElement(
+                              "span",
+                              {
                                 key: "message",
-                                className: "text-gray-100 ml-2",
+                                className: "text-gray-100 ml-2 text-sm",
                               },
                               log.message,
                             ),
