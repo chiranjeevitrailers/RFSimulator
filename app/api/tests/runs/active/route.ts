@@ -34,7 +34,7 @@ export async function GET() {
 
     if (error) {
       console.error("Error fetching active execution:", error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ active: false, message: "No active execution or query error" }, { status: 200 })
     }
 
     // No active execution found - this is normal
@@ -48,7 +48,7 @@ export async function GET() {
     // Return active execution
     return NextResponse.json({
       active: true,
-      execution_id: activeExecution.execution_id,
+      execution_id: activeExecution.execution_id || activeExecution.id,
       test_case_id: activeExecution.test_case_id,
       test_case_name: activeExecution.test_cases?.name,
       status: activeExecution.status,
@@ -58,12 +58,6 @@ export async function GET() {
     })
   } catch (error) {
     console.error("Unexpected error in active runs endpoint:", error)
-    return NextResponse.json(
-      { 
-        error: "Internal server error",
-        message: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({ active: false, message: "Internal error" }, { status: 200 })
   }
 }
