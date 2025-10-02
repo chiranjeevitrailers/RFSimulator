@@ -923,7 +923,7 @@ const FiveGLabXPlatformMinimal: React.FC = () => {
   return (
     <APIProvider>
       <EventBridge />
-      <div className="h-screen flex flex-col bg-gray-50">
+      <div className="h-full flex flex-col bg-gray-50">
         {/* Header with connection status */}
         <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
           <h1 className="text-lg font-semibold text-gray-900">5GLabX Platform</h1>
