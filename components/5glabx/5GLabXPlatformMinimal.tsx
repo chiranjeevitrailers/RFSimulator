@@ -598,6 +598,7 @@ const Sidebar: React.FC<{
     { id: "pdcp-layer", label: "PDCP Layer", icon: FileText },
     { id: "rrc-layer", label: "RRC Layer", icon: Network },
     { id: "nas-layer", label: "NAS Layer", icon: Server },
+    { id: "ims-layer", label: "IMS Layer", icon: Phone },
   ]
 
   const coreNetwork = [
