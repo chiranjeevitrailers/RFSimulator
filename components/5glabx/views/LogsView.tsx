@@ -18,6 +18,7 @@ const LogsView: React.FC<{
   const [isReceivingData, setIsReceivingData] = useState(false)
   const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null)
   const [activeExecutionId, setActiveExecutionId] = useState<string | null>(null)
+  const [debugMode, setDebugMode] = useState(false)
 
   // Auto-reset receiving status after 5 seconds of inactivity
   useEffect(() => {
@@ -82,11 +83,14 @@ const LogsView: React.FC<{
                   : "",
               }
 
-              setLogs((prev) => [...prev, newLog])
+              // SINGLE STATE UPDATE - Fix the React state batching issue
+              setLogs((prev) => {
+                const newLogs = [...prev, newLog]
+                console.log("[v0] ✅ LogsView: Added real-time message to logs. Total logs:", newLogs.length)
+                return newLogs
+              })
               setIsReceivingData(true)
               setLastDataReceived(new Date())
-
-              console.log("[v0] ✅ LogsView: Added real-time message to logs")
           },
         )
         .subscribe((status) => {
@@ -127,6 +131,7 @@ const LogsView: React.FC<{
       if (incomingLogs && incomingLogs.length > 0) {
         console.log(`[v0] 📋 LogsView: Processing ${incomingLogs.length} immediate logs from ${source}`)
 
+        // SINGLE STATE UPDATE - Fix the React state batching issue
         setLogs((prevLogs) => {
           const newLogs = [...prevLogs, ...incomingLogs]
           console.log(
@@ -183,9 +188,10 @@ const LogsView: React.FC<{
         console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
         console.log("📊 Log data structure:", JSON.stringify(logs[0], null, 2))
 
-        // Normal state update
+        // SINGLE STATE UPDATE - Fix the React state batching issue
         setLogs((prev) => {
           const newLogs = [...prev, ...logs]
+          console.log(`✅ LogsView: Added ${logs.length} logs from event. Total logs: ${newLogs.length}`)
           return newLogs
         })
 
@@ -225,34 +231,33 @@ const LogsView: React.FC<{
                 .join(", "),
         }))
 
-        console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`)
+        if (debugMode) {
+          console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`)
+          console.log("📊 Processed logs:", processedLogs)
+        }
 
-        // FORCE DISPLAY ATTEMPT 1
+        // SINGLE STATE UPDATE - Fix the React state batching issue
         setLogs((prev) => {
           const newLogs = [...prev, ...processedLogs]
-          console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData`)
+          if (debugMode) {
+            console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData. Total logs: ${newLogs.length}`)
+          }
           return newLogs
         })
 
+        // Update receiving status
         setIsReceivingData(true)
         setLastDataReceived(new Date())
 
-        // FORCE DISPLAY ATTEMPT 2
-        setTimeout(() => {
-          setLogs((current) => [...current])
-        }, 50)
-
-        // FORCE DISPLAY ATTEMPT 3
-        setTimeout(() => {
-          if (onStateChange) {
-            onStateChange({
-              currentView: "logs",
-              testExecutionActive: true,
-              testExecutionStatus: "active",
-              logs: processedLogs,
-            })
-          }
-        }, 100)
+        // Notify parent component with the processed logs
+        if (onStateChange) {
+          onStateChange({
+            currentView: "logs",
+            testExecutionActive: true,
+            testExecutionStatus: "active",
+            logs: processedLogs,
+          })
+        }
       } else {
         console.log("⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:", event.detail)
 
@@ -291,10 +296,14 @@ const LogsView: React.FC<{
                   : "",
               }))
 
-              setLogs((prev) => [...prev, ...processedLogs])
+              // SINGLE STATE UPDATE - Fix the React state batching issue
+              setLogs((prev) => {
+                const newLogs = [...prev, ...processedLogs]
+                console.log(`✅ LogsView: Added ${processedLogs.length} logs from nested testCaseData. Total logs: ${newLogs.length}`)
+                return newLogs
+              })
               setIsReceivingData(true)
               setLastDataReceived(new Date())
-              console.log(`✅ LogsView: Added ${processedLogs.length} logs from nested testCaseData`)
             }
           }
         }
@@ -492,67 +501,55 @@ const LogsView: React.FC<{
     if (messages.length > 0) {
       console.log(`📋 Processing ${messages.length} messages from ${source}`)
 
-      // Process each message as a log entry immediately (no setTimeout to ensure immediate display)
-      messages.forEach((message: any, index: number) => {
-        const newLog = {
-          id: `test-${testCaseId}-${Date.now()}-${index}`,
-          timestamp: (Date.now() / 1000).toFixed(1),
-          level: "I",
-          component: message.layer || message.component || "TEST",
-          message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
-          type: message.messageType || message.type || "TEST_MESSAGE",
-          source: source || "TestManager",
-          testCaseId: testCaseId,
-          direction: message.direction || "UL",
-          protocol: message.protocol || "5G_NR",
-          // Enhanced data for IE viewing
-          rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
-          informationElements: message.informationElements || {},
-          layerParameters: message.layerParameters || {},
-          standardReference: message.standardReference || "Unknown",
-          messagePayload: message.messagePayload || message.payload || {},
-          ies: message.informationElements
-            ? Object.entries(message.informationElements)
-                .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                .join(", ")
-            : Object.entries(message.messagePayload || message.payload || {})
-                .map(([k, v]) => `${k}=${v}`)
-                .join(", "),
-        }
+      // Process all messages and update state in a single batch
+      const newLogs = messages.map((message: any, index: number) => ({
+        id: `test-${testCaseId}-${Date.now()}-${index}`,
+        timestamp: (Date.now() / 1000).toFixed(1),
+        level: "I",
+        component: message.layer || message.component || "TEST",
+        message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || message.payload || {}, null, 2)}`,
+        type: message.messageType || message.type || "TEST_MESSAGE",
+        source: source || "TestManager",
+        testCaseId: testCaseId,
+        direction: message.direction || "UL",
+        protocol: message.protocol || "5G_NR",
+        // Enhanced data for IE viewing
+        rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+        informationElements: message.informationElements || {},
+        layerParameters: message.layerParameters || {},
+        standardReference: message.standardReference || "Unknown",
+        messagePayload: message.messagePayload || message.payload || {},
+        ies: message.informationElements
+          ? Object.entries(message.informationElements)
+              .map(([k, v]: [string, any]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+              .join(", ")
+          : Object.entries(message.messagePayload || message.payload || {})
+              .map(([k, v]) => `${k}=${v}`)
+              .join(", "),
+      }))
 
-        setLogs((prev) => {
-          const newLogs = [...prev, newLog]
-          return newLogs
-        })
+      // SINGLE STATE UPDATE - Fix the React state batching issue
+      setLogs((prev) => {
+        const updatedLogs = [...prev, ...newLogs]
+        console.log(`✅ LogsView: Added ${newLogs.length} logs from ${source}. Total logs: ${updatedLogs.length}`)
+        return updatedLogs
       })
 
       // Update receiving status
       setIsReceivingData(true)
       setLastDataReceived(new Date())
 
-      console.log(`✅ Processed ${messages.length} messages, logs count now: ${logs.length + messages.length}`)
+      console.log(`✅ Processed ${messages.length} messages from ${source}`)
 
-      // Normal state update - no forced updates needed
-
-      // Also trigger state change in parent component
-      setTimeout(() => {
+      // Notify parent component
+      if (onStateChange) {
         onStateChange({
           currentView: "logs",
           testExecutionActive: true,
           testExecutionStatus: "active",
-          logs: logs.concat(
-            messages.map((msg, idx) => ({
-              id: `test-${testCaseId}-${Date.now()}-${idx}`,
-              timestamp: (Date.now() / 1000).toFixed(1),
-              level: "I",
-              component: msg.layer || "TEST",
-              message: `${msg.messageName || msg.messageType}: ${JSON.stringify(msg.messagePayload || {}, null, 2)}`,
-              type: msg.messageType || "TEST_MESSAGE",
-              source: source || "TestManager",
-            })),
-          ),
+          logs: newLogs,
         })
-      }, 300)
+      }
     } else {
       console.log("⚠️  No messages found in test data, checking alternative formats...")
 
@@ -583,6 +580,7 @@ const LogsView: React.FC<{
           standardReference: "Test Execution",
         }
 
+        // SINGLE STATE UPDATE - Fix the React state batching issue
         setLogs((prev) => {
           const newLogs = [...prev, summaryLog]
           console.log("✅ Added summary log entry:", summaryLog.message)
@@ -592,11 +590,6 @@ const LogsView: React.FC<{
         // Update receiving status
         setIsReceivingData(true)
         setLastDataReceived(new Date())
-
-        // Force UI updates for summary log too
-        setTimeout(() => {
-          setLogs((current) => [...current])
-        }, 50)
       }
     }
   }
@@ -616,8 +609,10 @@ const LogsView: React.FC<{
       source: "TestManager",
     }
 
+    // SINGLE STATE UPDATE - Fix the React state batching issue
     setLogs((prev) => {
       const newLogs = [...prev.slice(-99), newLog]
+      console.log("✅ LogsView: Added direct log update. Total logs:", newLogs.length)
       return newLogs
     })
   }
@@ -733,6 +728,20 @@ const LogsView: React.FC<{
         </div>
       </div>
 
+      {/* Debug Information */}
+      {debugMode && (
+        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-4">
+          <h3 className="text-sm font-semibold text-yellow-800 mb-2">🐛 Debug Information</h3>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>Total Logs: {logs.length}</div>
+            <div>Receiving Data: {isReceivingData ? "Yes" : "No"}</div>
+            <div>Last Data: {lastDataReceived ? lastDataReceived.toLocaleTimeString() : "Never"}</div>
+            <div>Active Execution: {activeExecutionId || "None"}</div>
+            <div>Filtered Logs: {filteredLogs.length}</div>
+          </div>
+        </div>
+      )}
+
       {/* Data Reception Status Indicator */}
       <div className="bg-white p-4 rounded-lg border mb-4">
         <div className="flex items-center justify-between">
@@ -755,6 +764,16 @@ const LogsView: React.FC<{
           <div className="flex items-center space-x-2">
             {/* Removed test buttons - system now only handles real test data */}
             {/* System only handles real test data from Supabase database */}
+            <button
+              onClick={() => setDebugMode(!debugMode)}
+              className={`text-sm px-3 py-1 border rounded hover:bg-gray-50 ${
+                debugMode 
+                  ? "text-blue-700 border-blue-300 bg-blue-50" 
+                  : "text-gray-500 border-gray-300"
+              }`}
+            >
+              {debugMode ? "🐛 Debug ON" : "🐛 Debug OFF"}
+            </button>
             <button
               onClick={() => {
                 setLogs([])
