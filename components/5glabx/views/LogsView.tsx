@@ -169,8 +169,10 @@ const LogsView: React.FC<{
     const handleTestExecution = (event: any) => {
       console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
       console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
+      console.log("📊 Event detail keys:", Object.keys(event.detail || {}))
 
       const { testCaseId, testCaseData, logs, executionId } = event.detail
+      console.log("📊 Extracted data:", { testCaseId, hasTestCaseData: !!testCaseData, hasLogs: !!logs, executionId })
 
       if (executionId) {
         console.log("[v0] 🎯 LogsView: Setting active execution ID:", executionId)
@@ -191,9 +193,11 @@ const LogsView: React.FC<{
         setLastDataReceived(new Date())
       } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
         console.log("🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event")
+        console.log("📊 testCaseData structure:", JSON.stringify(testCaseData, null, 2))
 
         // Process the test case data directly - handle both expectedMessages and realtimeMessages
         const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
+        console.log(`📋 Found ${messages.length} messages to process`)
         console.log(`📋 Processing ${messages.length} messages from testCaseData`)
 
         const processedLogs = messages.map((message: any, index: number) => ({
@@ -259,6 +263,39 @@ const LogsView: React.FC<{
 
           if (event.detail.testCaseData) {
             console.log("🔍 Found testCaseData in event detail")
+            const nestedData = event.detail.testCaseData
+            if (nestedData.expectedMessages || nestedData.realtimeMessages) {
+              const messages = nestedData.expectedMessages || nestedData.realtimeMessages || []
+              console.log(`📋 Processing ${messages.length} messages from nested testCaseData`)
+              
+              const processedLogs = messages.map((message: any, index: number) => ({
+                id: message.id || `nested-${testCaseId}-${Date.now()}-${index}`,
+                timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
+                level: "I",
+                component: message.layer || message.component || "TEST",
+                message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
+                type: message.messageType || message.type || "TEST_MESSAGE",
+                source: "5GLABX_TEST_EXECUTION_NESTED",
+                testCaseId: testCaseId,
+                direction: message.direction || "UL",
+                protocol: message.protocol || "5G_NR",
+                rawData: JSON.stringify(message.messagePayload || {}, null, 2),
+                informationElements: message.informationElements || {},
+                layerParameters: message.layerParameters || {},
+                standardReference: message.standardReference || "Unknown",
+                messagePayload: message.messagePayload || {},
+                ies: message.informationElements
+                  ? Object.entries(message.informationElements)
+                      .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                      .join(", ")
+                  : "",
+              }))
+
+              setLogs((prev) => [...prev, ...processedLogs])
+              setIsReceivingData(true)
+              setLastDataReceived(new Date())
+              console.log(`✅ LogsView: Added ${processedLogs.length} logs from nested testCaseData`)
+            }
           }
         }
       }

@@ -658,14 +658,27 @@ const ProfessionalTestManager: React.FC = () => {
           paramCount: eventDetail.testCaseData.expectedLayerParameters.length,
         })
 
-        // Dispatch custom event for 5GLabX Platform with REAL test case data from Supabase
-        const testExecutionEvent = new CustomEvent("testCaseExecutionStarted", {
-          detail: eventDetail,
+        // Dispatch the main event that LogsView is listening for
+        const testExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
+          detail: {
+            executionId: result.executionId || result.id,
+            testCaseId: testId,
+            testCaseData: eventDetail.testCaseData,
+            logs: [], // Will be populated by real-time data
+            timestamp: new Date().toISOString(),
+            status: "running"
+          },
         })
 
         window.dispatchEvent(testExecutionEvent)
-        console.log("[v0] ✅ TEST MANAGER: testCaseExecutionStarted event dispatched")
+        console.log("[v0] ✅ TEST MANAGER: 5GLABX_TEST_EXECUTION event dispatched")
         addLog("INFO", `📡 Data sent to 5GLabX Platform for execution: ${result.executionId || result.id}`)
+
+        // Also dispatch the testCaseExecutionStarted event for other components
+        const testCaseStartedEvent = new CustomEvent("testCaseExecutionStarted", {
+          detail: eventDetail,
+        })
+        window.dispatchEvent(testCaseStartedEvent)
 
         // Also send via postMessage for additional compatibility
         const postMessageData = {
@@ -840,8 +853,8 @@ const ProfessionalTestManager: React.FC = () => {
 
       // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for batch execution
       if (typeof window !== "undefined") {
-        // Dispatch batch execution event
-        const batchExecutionEvent = new CustomEvent("testCaseExecutionStarted", {
+        // Dispatch the main event that LogsView is listening for
+        const batchExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
           detail: {
             executionId: result.executionId || result.id || `batch-${Date.now()}`,
             testCaseId: "batch-execution",
@@ -880,6 +893,7 @@ const ProfessionalTestManager: React.FC = () => {
                 { layer: "RLC", parameter: "PDU Size", value: "1500 bytes" },
               ],
             },
+            logs: [], // Will be populated by real-time data
             timestamp: new Date().toISOString(),
             status: "running",
             batchMode: true,
@@ -888,7 +902,57 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         window.dispatchEvent(batchExecutionEvent)
+        console.log("[v0] ✅ TEST MANAGER: Batch 5GLABX_TEST_EXECUTION event dispatched")
         addLog("INFO", `📡 Batch execution data sent to 5GLabX Platform: ${testCases.length} tests`)
+
+        // Also dispatch the testCaseExecutionStarted event for other components
+        const testCaseStartedEvent = new CustomEvent("testCaseExecutionStarted", {
+          detail: {
+            executionId: result.executionId || result.id || `batch-${Date.now()}`,
+            testCaseId: "batch-execution",
+            testCaseData: {
+              id: "batch-execution",
+              name: "Batch Test Execution",
+              component: "Multiple Components",
+              expectedMessages: [
+                {
+                  id: "batch-msg-1",
+                  messageName: "Batch Test Start",
+                  messageType: "BATCH_TEST_START",
+                  layer: "SYSTEM",
+                  direction: "N/A",
+                  protocol: "5G_NR",
+                  messagePayload: {
+                    testCount: testCases.length,
+                    batchId: `batch-${Date.now()}`,
+                    startTime: new Date().toISOString(),
+                  },
+                  informationElements: {
+                    "Test-Count": { value: testCases.length },
+                    "Batch-ID": { value: `batch-${Date.now()}` },
+                  },
+                  layerParameters: {
+                    "Total-Tests": testCases.length.toString(),
+                    Status: "Starting",
+                  },
+                  standardReference: "Batch Execution",
+                  timestampMs: Date.now(),
+                },
+              ],
+              expectedLayerParameters: [
+                { layer: "PHY", parameter: "RSRP", value: "-80 dBm" },
+                { layer: "MAC", parameter: "CQI", value: "15" },
+                { layer: "RLC", parameter: "PDU Size", value: "1500 bytes" },
+              ],
+            },
+            logs: [],
+            timestamp: new Date().toISOString(),
+            status: "running",
+            batchMode: true,
+            testCount: testCases.length,
+          },
+        })
+        window.dispatchEvent(testCaseStartedEvent)
 
         // Also send via postMessage for additional compatibility
         window.postMessage(
@@ -951,8 +1015,8 @@ const ProfessionalTestManager: React.FC = () => {
 
       // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for selected execution
       if (typeof window !== "undefined") {
-        // Dispatch selected execution event
-        const selectedExecutionEvent = new CustomEvent("testCaseExecutionStarted", {
+        // Dispatch the main event that LogsView is listening for
+        const selectedExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
           detail: {
             executionId: result.executionId || result.id || `selected-${Date.now()}`,
             testCaseId: "selected-execution",
@@ -966,6 +1030,7 @@ const ProfessionalTestManager: React.FC = () => {
                 { layer: "RLC", parameter: "PDU Size", value: "1500 bytes" },
               ],
             },
+            logs: [], // Will be populated by real-time data
             timestamp: new Date().toISOString(),
             status: "running",
             selectedMode: true,
@@ -975,7 +1040,33 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         window.dispatchEvent(selectedExecutionEvent)
+        console.log("[v0] ✅ TEST MANAGER: Selected 5GLABX_TEST_EXECUTION event dispatched")
         addLog("INFO", `📡 Selected execution data sent to 5GLabX Platform: ${selectedTests.length} tests`)
+
+        // Also dispatch the testCaseExecutionStarted event for other components
+        const testCaseStartedEvent = new CustomEvent("testCaseExecutionStarted", {
+          detail: {
+            executionId: result.executionId || result.id || `selected-${Date.now()}`,
+            testCaseId: "selected-execution",
+            testCaseData: {
+              id: "selected-execution",
+              name: "Selected Test Execution",
+              component: "Multiple Components",
+              expectedLayerParameters: [
+                { layer: "PHY", parameter: "RSRP", value: "-80 dBm" },
+                { layer: "MAC", parameter: "CQI", value: "15" },
+                { layer: "RLC", parameter: "PDU Size", value: "1500 bytes" },
+              ],
+            },
+            logs: [],
+            timestamp: new Date().toISOString(),
+            status: "running",
+            selectedMode: true,
+            testCount: selectedTests.length,
+            selectedTestIds: selectedTests.map((tc) => tc.id),
+          },
+        })
+        window.dispatchEvent(testCaseStartedEvent)
 
         // Also send via postMessage for additional compatibility
         window.postMessage(
