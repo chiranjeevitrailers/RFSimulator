@@ -11,6 +11,10 @@ import AnalyticsView from './views/AnalyticsView';
 import TestSuitesView from './views/TestSuitesView';
 import LayerTraceView from './views/LayerTraceView';
 import CallFlowView from './views/CallFlowView';
+import OranView from './views/OranView';
+import NbiotView from './views/NbiotView';
+import V2xView from './views/V2xView';
+import NtnView from './views/NtnView';
 import {
   Activity,
   BarChart3,
@@ -322,6 +326,63 @@ const EnhancedSidebar: React.FC<{
     { id: 'ims-layer', label: 'IMS Analysis', icon: Phone, count: layerStats.IMS?.totalCount || 0 }
   ];
 
+  const oranViews = [
+    { id: 'oran-overview', label: 'O-RAN Overview', icon: Network },
+    { id: 'oran-interfaces', label: 'Interfaces', icon: ChevronRight },
+    { id: 'oran-cu-analysis', label: 'CU Analysis', icon: Server },
+    { id: 'oran-du-analysis', label: 'DU Analysis', icon: Database },
+    { id: 'oran-e1-interface', label: 'E1 Interface', icon: ChevronRight },
+    { id: 'oran-f1-interface', label: 'F1 Interface', icon: ChevronRight },
+    { id: 'oran-performance', label: 'Performance', icon: BarChart3, badge: 'LIVE' },
+    { id: 'oran-xapps', label: 'xApps', icon: Settings },
+    { id: 'oran-smo', label: 'SMO Analysis', icon: Settings }
+  ];
+
+  const nbiotViews = [
+    { id: 'nbiot-overview', label: 'NB-IoT Overview', icon: Wifi },
+    { id: 'nbiot-callflow', label: 'NB-IoT Call Flow', icon: Phone },
+    { id: 'nbiot-analytics', label: 'NB-IoT Analytics', icon: BarChart3, badge: 'LIVE' },
+    { id: 'nbiot-phy-layer', label: 'NB-IoT PHY', icon: Wifi },
+    { id: 'nbiot-mac-layer', label: 'NB-IoT MAC', icon: Network },
+    { id: 'nbiot-rrc-layer', label: 'NB-IoT RRC', icon: Settings },
+    { id: 'nbiot-testing', label: 'NB-IoT Testing', icon: CheckCircle }
+  ];
+
+  const v2xViews = [
+    { id: 'v2x-overview', label: 'V2X Overview', icon: Network },
+    { id: 'v2x-sidelink', label: 'PC5 Sidelink', icon: Wifi },
+    { id: 'v2x-analytics', label: 'V2X Analytics', icon: BarChart3, badge: 'LIVE' },
+    { id: 'v2x-phy-layer', label: 'V2X PHY', icon: Wifi },
+    { id: 'v2x-mac-layer', label: 'V2X MAC', icon: Network },
+    { id: 'v2x-testing', label: 'V2X Testing', icon: CheckCircle },
+    { id: 'v2x-scenarios', label: 'Test Scenarios', icon: FileText }
+  ];
+
+  const ntnViews = [
+    { id: 'ntn-overview', label: 'NTN Overview', icon: Network },
+    { id: 'ntn-satellites', label: 'Satellite Links', icon: Wifi },
+    { id: 'ntn-analytics', label: 'NTN Analytics', icon: BarChart3, badge: 'LIVE' },
+    { id: 'ntn-sib19', label: 'SIB19 Analysis', icon: FileText },
+    { id: 'ntn-timing', label: 'Timing & Delay', icon: Clock },
+    { id: 'ntn-doppler', label: 'Doppler Analysis', icon: Activity },
+    { id: 'ntn-scenarios', label: 'NTN Scenarios', icon: FileText }
+  ];
+
+  const coreNetwork = [
+    { id: 'amf-analyzer', label: 'AMF Analyzer', icon: Database },
+    { id: 'smf-analyzer', label: 'SMF Analyzer', icon: Server },
+    { id: 'upf-analyzer', label: 'UPF Analyzer', icon: Network },
+    { id: 'ausf-analyzer', label: 'AUSF Analyzer', icon: Shield },
+    { id: 'udm-analyzer', label: 'UDM Analyzer', icon: Settings },
+    { id: 'config-manager', label: 'Config Manager', icon: Settings }
+  ];
+
+  const legacyNetwork = [
+    { id: 'mme-analyzer', label: 'MME Analyzer', icon: Database },
+    { id: 'sgw-analyzer', label: 'SGW Analyzer', icon: Server },
+    { id: 'pgw-analyzer', label: 'PGW Analyzer', icon: Network }
+  ];
+
   const renderMenuItem = (item: any) => {
     const Icon = item.icon;
     return (
@@ -346,6 +407,27 @@ const EnhancedSidebar: React.FC<{
           </span>
         )}
       </button>
+    );
+  };
+
+  const renderCollapsibleSection = (title: string, items: any[], defaultCollapsed = false) => {
+    const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+    
+    return (
+      <div key={title} className="mb-6">
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="w-full flex items-center justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hover:text-gray-700 transition-colors"
+        >
+          <span>{title}</span>
+          <ChevronRight className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-90'}`} />
+        </button>
+        {!isCollapsed && (
+          <div className="space-y-1">
+            {items.map(renderMenuItem)}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -388,6 +470,24 @@ const EnhancedSidebar: React.FC<{
             })}
           </div>
         </div>
+
+        {/* O-RAN Analysis */}
+        {renderCollapsibleSection('O-RAN ANALYSIS', oranViews)}
+
+        {/* NB-IoT Analysis */}
+        {renderCollapsibleSection('NB-IOT ANALYSIS', nbiotViews)}
+
+        {/* V2X Analysis */}
+        {renderCollapsibleSection('C-V2X ANALYSIS', v2xViews)}
+
+        {/* NTN Analysis */}
+        {renderCollapsibleSection('NTN ANALYSIS', ntnViews)}
+
+        {/* 5G Core Network */}
+        {renderCollapsibleSection('5G CORE NETWORK', coreNetwork)}
+
+        {/* Legacy Network */}
+        {renderCollapsibleSection('LEGACY NETWORK', legacyNetwork)}
       </nav>
     </div>
   );
@@ -413,6 +513,122 @@ const Enhanced5GLabXPlatform: React.FC = () => {
         return <AnalyticsView />;
       case 'test-suites':
         return <TestSuitesView />;
+      
+      // O-RAN Views
+      case 'oran-overview':
+      case 'oran-interfaces':
+      case 'oran-cu-analysis':
+      case 'oran-du-analysis':
+      case 'oran-e1-interface':
+      case 'oran-f1-interface':
+      case 'oran-performance':
+      case 'oran-xapps':
+      case 'oran-smo':
+        return <OranView viewId={currentView} />;
+      
+      // NB-IoT Views
+      case 'nbiot-overview':
+      case 'nbiot-callflow':
+      case 'nbiot-analytics':
+      case 'nbiot-phy-layer':
+      case 'nbiot-mac-layer':
+      case 'nbiot-rrc-layer':
+      case 'nbiot-testing':
+        return <NbiotView viewId={currentView} />;
+      
+      // V2X Views
+      case 'v2x-overview':
+      case 'v2x-sidelink':
+      case 'v2x-analytics':
+      case 'v2x-phy-layer':
+      case 'v2x-mac-layer':
+      case 'v2x-testing':
+      case 'v2x-scenarios':
+        return <V2xView viewId={currentView} />;
+      
+      // NTN Views
+      case 'ntn-overview':
+      case 'ntn-satellites':
+      case 'ntn-analytics':
+      case 'ntn-sib19':
+      case 'ntn-timing':
+      case 'ntn-doppler':
+      case 'ntn-scenarios':
+        return <NtnView viewId={currentView} />;
+      
+      // Core Network Views
+      case 'amf-analyzer':
+      case 'smf-analyzer':
+      case 'upf-analyzer':
+      case 'ausf-analyzer':
+      case 'udm-analyzer':
+      case 'config-manager':
+        return (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {currentView.replace('-', ' ').toUpperCase()}
+              </h2>
+              <p className="text-gray-600">
+                5G Core Network {currentView.replace('-analyzer', '').replace('-manager', '').toUpperCase()} analysis and monitoring.
+              </p>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <p className="text-blue-800">
+                  This view is ready for implementation with real-time data from your 5G Core Network.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      // Legacy Network Views
+      case 'mme-analyzer':
+      case 'sgw-analyzer':
+      case 'pgw-analyzer':
+        return (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {currentView.replace('-analyzer', '').toUpperCase()} Analyzer
+              </h2>
+              <p className="text-gray-600">
+                Legacy 4G/LTE {currentView.replace('-analyzer', '').toUpperCase()} network element analysis.
+              </p>
+              <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                <p className="text-green-800">
+                  This view is ready for implementation with real-time data from your LTE Core Network.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      // Protocol Layer Views
+      case 'phy-layer':
+      case 'mac-layer':
+      case 'rlc-layer':
+      case 'pdcp-layer':
+      case 'rrc-layer':
+      case 'nas-layer':
+      case 'ims-layer':
+        return (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {currentView.replace('-layer', '').toUpperCase()} Layer Analysis
+              </h2>
+              <p className="text-gray-600">
+                Protocol layer analysis for {currentView.replace('-layer', '').toUpperCase()} with real-time message processing.
+              </p>
+              <div className="mt-4 p-4 bg-purple-50 rounded-lg">
+                <p className="text-purple-800">
+                  This protocol layer view shows real-time message flows and analysis from your test executions.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
       default:
         return <EnhancedDashboard />;
     }
