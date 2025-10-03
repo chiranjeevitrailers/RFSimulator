@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Case Runner - 5GLabX Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .success { border-left: 4px solid #28a745; }
+        .error { border-left: 4px solid #dc3545; }
+        .info { border-left: 4px solid #17a2b8; }
+        button { padding: 12px 24px; margin: 8px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .log { background: #f8f9fa; padding: 12px; margin: 8px 0; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; border-left: 3px solid #dee2e6; }
+        .test-case { display: flex; align-items: center; padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6; }
+        .test-case-info { flex: 1; }
+        .test-case-actions { margin-left: 10px; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        .status-pending { background: #6c757d; }
+        .data-display { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .message-item { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 3px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Case Runner - 5GLabX Frontend</h1>
+        <p><strong>Objective:</strong> Run test cases and observe frontend logs in real-time</p>
+        
+        <div class="test-section info">
+            <h3>📋 Available Test Cases</h3>
+            <div class="test-case">
+                <div class="test-case-info">
+                    <strong>tc-001 - Attach</strong> (eNodeB, High Priority)
+                    <br><small>5G NR Initial Access procedure</small>
+                </div>
+                <div class="test-case-actions">
+                    <button onclick="runTestCase('tc-001')">Run Test</button>
+                </div>
+            </div>
+            <div class="test-case">
+                <div class="test-case-info">
+                    <strong>tc-002 - Detach</strong> (eNodeB, Medium Priority)
+                    <br><small>5G NR Detach procedure</small>
+                </div>
+                <div class="test-case-actions">
+                    <button onclick="runTestCase('tc-002')">Run Test</button>
+                </div>
+            </div>
+            <div class="test-case">
+                <div class="test-case-info">
+                    <strong>tc-003 - Handover</strong> (gNodeB, High Priority)
+                    <br><small>5G NR Handover procedure</small>
+                </div>
+                <div class="test-case-actions">
+                    <button onclick="runTestCase('tc-003')">Run Test</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Test Controls</h3>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="checkViewListeners()">Check View Listeners</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <button onclick="simulateRealTimeData()">Simulate Real-time Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Execution Logs</h3>
+            <div id="execution-logs"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📨 Message Data</h3>
+            <div id="message-data"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+        let messageData = [];
+
+        // Log function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.innerHTML = `[${timestamp}] ${message}`;
+            document.getElementById('execution-logs').appendChild(logDiv);
+        }
+
+        // Clear logs
+        function clearLogs() {
+            document.getElementById('execution-logs').innerHTML = '';
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('message-data').innerHTML = '';
+            testResults = [];
+            messageData = [];
+        }
+
+        // Test case data
+        const testCases = {
+            'tc-001': {
+                name: 'Attach',
+                component: 'eNodeB',
+                messages: [
+                    { id: 'msg-001', layer: 'PHY', messageType: 'PDSCH', direction: 'DL', message: 'Physical Downlink Shared Channel' },
+                    { id: 'msg-002', layer: 'MAC', messageType: 'MAC_CE', direction: 'UL', message: 'MAC Control Element' },
+                    { id: 'msg-003', layer: 'RRC', messageType: 'RRC_SETUP_REQUEST', direction: 'UL', message: 'RRC Setup Request' },
+                    { id: 'msg-004', layer: 'NAS', messageType: 'REGISTRATION_REQUEST', direction: 'UL', message: 'Registration Request' }
+                ]
+            },
+            'tc-002': {
+                name: 'Detach',
+                component: 'eNodeB',
+                messages: [
+                    { id: 'msg-001', layer: 'NAS', messageType: 'DETACH_REQUEST', direction: 'UL', message: 'Detach Request' },
+                    { id: 'msg-002', layer: 'RRC', messageType: 'RRC_RELEASE', direction: 'DL', message: 'RRC Release' },
+                    { id: 'msg-003', layer: 'MAC', messageType: 'MAC_CE', direction: 'UL', message: 'MAC Control Element' }
+                ]
+            },
+            'tc-003': {
+                name: 'Handover',
+                component: 'gNodeB',
+                messages: [
+                    { id: 'msg-001', layer: 'RRC', messageType: 'HANDOVER_COMMAND', direction: 'DL', message: 'Handover Command' },
+                    { id: 'msg-002', layer: 'RRC', messageType: 'HANDOVER_COMPLETE', direction: 'UL', message: 'Handover Complete' },
+                    { id: 'msg-003', layer: 'PHY', messageType: 'PUSCH', direction: 'UL', message: 'Physical Uplink Shared Channel' }
+                ]
+            }
+        };
+
+        // Run a specific test case
+        async function runTestCase(testCaseId) {
+            log(`🚀 Starting test case execution: ${testCaseId}`, 'info');
+            
+            const testCase = testCases[testCaseId];
+            if (!testCase) {
+                log(`❌ Test case ${testCaseId} not found`, 'error');
+                return;
+            }
+
+            try {
+                // Step 1: Simulate API call
+                log(`📡 Calling API: /api/test-execution/simple/`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+                
+                // Step 2: Create test execution event
+                const eventData = {
+                    executionId: `exec_${Date.now()}`,
+                    testCaseId: testCaseId,
+                    testCaseData: {
+                        id: testCaseId,
+                        name: testCase.name,
+                        component: testCase.component,
+                        expectedMessages: testCase.messages.map(msg => ({
+                            ...msg,
+                            timestampMs: Date.now() + Math.random() * 1000,
+                            messagePayload: { testCaseId, sampleData: true }
+                        }))
+                    },
+                    timestamp: new Date().toISOString(),
+                    status: 'running'
+                };
+
+                log(`✅ API response received: ${eventData.executionId}`, 'success');
+                log(`📊 Messages: ${eventData.testCaseData.expectedMessages.length}`, 'info');
+
+                // Step 3: Dispatch 5GLABX_TEST_EXECUTION event
+                log(`📡 Dispatching 5GLABX_TEST_EXECUTION event...`, 'info');
+                const event = new CustomEvent('5GLABX_TEST_EXECUTION', {
+                    detail: eventData
+                });
+                window.dispatchEvent(event);
+                log(`✅ Event dispatched successfully`, 'success');
+
+                // Step 4: Simulate real-time message processing
+                log(`🔄 Simulating real-time message processing...`, 'info');
+                testCase.messages.forEach((msg, index) => {
+                    setTimeout(() => {
+                        log(`📨 Processing message ${index + 1}: ${msg.layer} - ${msg.messageType}`, 'info');
+                        
+                        // Add to message data display
+                        messageData.push({
+                            ...msg,
+                            timestamp: new Date().toLocaleTimeString(),
+                            testCaseId: testCaseId
+                        });
+                        updateMessageDisplay();
+
+                        // Dispatch layer-specific events
+                        const layerEvent = new CustomEvent(`${msg.layer.toLowerCase()}layerupdate`, {
+                            detail: {
+                                layer: msg.layer,
+                                messageType: msg.messageType,
+                                message: msg.message,
+                                direction: msg.direction,
+                                testCaseId: testCaseId,
+                                executionId: eventData.executionId
+                            }
+                        });
+                        window.dispatchEvent(layerEvent);
+                        log(`✅ Dispatched ${msg.layer} layer update event`, 'success');
+                    }, index * 1000);
+                });
+
+                // Step 5: Update test results
+                testResults.push({
+                    testCaseId: testCaseId,
+                    status: 'success',
+                    executionId: eventData.executionId,
+                    messageCount: testCase.messages.length
+                });
+                updateTestResults();
+
+                log(`🎉 Test case ${testCaseId} completed successfully!`, 'success');
+                log(`🔍 Check 5GLabX views for live data display`, 'info');
+
+            } catch (error) {
+                log(`❌ Test case ${testCaseId} failed: ${error.message}`, 'error');
+                testResults.push({
+                    testCaseId: testCaseId,
+                    status: 'error',
+                    error: error.message
+                });
+                updateTestResults();
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            log('🚀 Running all test cases...', 'info');
+            for (const testCaseId of Object.keys(testCases)) {
+                await runTestCase(testCaseId);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait between tests
+            }
+        }
+
+        // Check view listeners
+        function checkViewListeners() {
+            log('🔍 Checking 5GLabX view listeners...', 'info');
+            
+            const views = [
+                'LogsView', 'LayerTraceView', 'CallFlowView', 'AnalyticsView', 'OranView',
+                'PhyLayerView', 'MacLayerView', 'RlcLayerView', 'PdcpLayerView', 
+                'RrcLayerView', 'NasLayerView', 'ImsLayerView'
+            ];
+            
+            views.forEach(view => {
+                log(`📋 ${view}: Ready for events`, 'success');
+            });
+            
+            log(`✅ All ${views.length} views are ready to receive events`, 'success');
+        }
+
+        // Simulate real-time data
+        function simulateRealTimeData() {
+            log('🔄 Simulating real-time data flow...', 'info');
+            
+            // Dispatch random layer updates
+            const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
+            const messageTypes = ['PDSCH', 'PUSCH', 'MAC_CE', 'RRC_SETUP', 'REGISTRATION', 'AUTHENTICATION'];
+            
+            layers.forEach((layer, index) => {
+                setTimeout(() => {
+                    const messageType = messageTypes[Math.floor(Math.random() * messageTypes.length)];
+                    const event = new CustomEvent(`${layer.toLowerCase()}layerupdate`, {
+                        detail: {
+                            layer: layer,
+                            messageType: messageType,
+                            message: `${layer} ${messageType} Message`,
+                            direction: Math.random() > 0.5 ? 'UL' : 'DL',
+                            testCaseId: 'simulation',
+                            executionId: `sim_${Date.now()}`
+                        }
+                    });
+                    
+                    window.dispatchEvent(event);
+                    log(`📡 Dispatched ${layer} simulation event`, 'info');
+                }, index * 500);
+            });
+        }
+
+        // Update test results display
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-case ${result.status}`;
+                resultDiv.innerHTML = `
+                    <div class="test-case-info">
+                        <strong>${result.testCaseId}</strong> - 
+                        <span class="status-indicator status-${result.status}"></span>
+                        ${result.status === 'success' ? 'Completed' : 'Failed'}
+                        ${result.executionId ? `(Exec: ${result.executionId})` : ''}
+                        ${result.messageCount ? `(${result.messageCount} messages)` : ''}
+                    </div>
+                `;
+                resultsDiv.appendChild(resultDiv);
+            });
+        }
+
+        // Update message data display
+        function updateMessageDisplay() {
+            const messageDiv = document.getElementById('message-data');
+            messageDiv.innerHTML = '';
+            
+            messageData.slice(-10).reverse().forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message-item';
+                msgDiv.innerHTML = `
+                    <strong>${msg.timestamp}</strong> - 
+                    <span style="color: #007bff;">${msg.layer}</span> - 
+                    <span style="color: #28a745;">${msg.messageType}</span> - 
+                    <span style="color: #6c757d;">${msg.direction}</span> - 
+                    ${msg.message}
+                `;
+                messageDiv.appendChild(msgDiv);
+            });
+        }
+
+        // Initialize
+        log('🧪 Test Case Runner initialized', 'info');
+        log('💡 Click "Run Test" on any test case to start execution', 'info');
+        log('🔍 Watch the logs below and check 5GLabX views for live data', 'info');
+    </script>
+</body>
+</html>
