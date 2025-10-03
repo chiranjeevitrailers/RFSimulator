@@ -105,15 +105,19 @@ export interface UserActivity {
 // Helper function to check if supabase is available
 const checkSupabase = () => {
   if (!supabase) {
-    throw new Error("Supabase client not initialized. Please check environment variables.")
+    console.warn("Supabase client not initialized. Please check environment variables.")
+    return false
   }
+  return true
 }
 
 // Database helper functions
 export const db = {
   // User operations
   async createUser(userData: Partial<User>) {
-    checkSupabase()
+    if (!checkSupabase()) {
+      throw new Error("Supabase client not available")
+    }
 
     const { data, error } = await supabase!.from("users").insert([userData]).select().single()
 
@@ -122,7 +126,9 @@ export const db = {
   },
 
   async getUserById(id: string) {
-    checkSupabase()
+    if (!checkSupabase()) {
+      throw new Error("Supabase client not available")
+    }
     const { data, error } = await supabase!.from("users").select("*").eq("id", id).single()
 
     if (error) throw error
@@ -130,7 +136,9 @@ export const db = {
   },
 
   async getUserByEmail(email: string) {
-    checkSupabase()
+    if (!checkSupabase()) {
+      throw new Error("Supabase client not available")
+    }
     const { data, error } = await supabase!.from("users").select("*").eq("email", email).single()
 
     if (error) throw error
@@ -138,7 +146,9 @@ export const db = {
   },
 
   async updateUser(id: string, updates: Partial<User>) {
-    checkSupabase()
+    if (!checkSupabase()) {
+      throw new Error("Supabase client not available")
+    }
     const { data, error } = await supabase!.from("users").update(updates).eq("id", id).select().single()
 
     if (error) throw error
@@ -146,7 +156,9 @@ export const db = {
   },
 
   async getAllUsers(limit = 50, offset = 0) {
-    checkSupabase()
+    if (!checkSupabase()) {
+      throw new Error("Supabase client not available")
+    }
     const { data, error } = await supabase!
       .from("users")
       .select("*")

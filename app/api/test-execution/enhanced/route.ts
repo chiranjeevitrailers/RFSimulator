@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import TestExecutionWebSocketServer from '@/lib/test-execution-websocket-server';
 
+// Initialize WebSocket server if not already running
+let wsServer: TestExecutionWebSocketServer | null = null;
+try {
+  wsServer = TestExecutionWebSocketServer.getInstance();
+  if (!wsServer.getClientCount || wsServer.getClientCount() === 0) {
+    wsServer.start(8082);
+    console.log('✅ WebSocket server started on port 8082');
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize WebSocket server:', error);
+}
+
 const activeExecutions = new Map<string, any>();
 
 export async function POST(request: NextRequest) {
@@ -131,7 +143,7 @@ async function startTestExecution(executionId: string, testCaseData: any) {
 
   try {
     // Get the WebSocket server instance
-    const wsServer = TestExecutionWebSocketServer.getInstance();
+    const wsServerInstance = wsServer || TestExecutionWebSocketServer.getInstance();
     const supabase = supabaseAdmin;
 
     // Process messages sequentially based on their timestamps
@@ -188,8 +200,8 @@ async function startTestExecution(executionId: string, testCaseData: any) {
           .eq('id', executionId);
 
         // Send to WebSocket clients
-        if (wsServer) {
-          wsServer['sendToClient'](executionId, {
+        if (wsServerInstance) {
+          wsServerInstance['sendToClient'](executionId, {
             type: 'message',
             timestamp: Date.now(),
             executionId: executionId,
@@ -226,8 +238,8 @@ async function startTestExecution(executionId: string, testCaseData: any) {
       .eq('id', executionId);
 
     // Send completion message
-    if (wsServer) {
-      wsServer['sendToClient'](executionId, {
+    if (wsServerInstance) {
+      wsServerInstance['sendToClient'](executionId, {
         type: 'complete',
         timestamp: Date.now(),
         executionId: executionId,
@@ -255,8 +267,8 @@ async function startTestExecution(executionId: string, testCaseData: any) {
       .eq('id', executionId);
 
     // Send error message
-    if (wsServer) {
-      wsServer['sendToClient'](executionId, {
+    if (wsServerInstance) {
+      wsServerInstance['sendToClient'](executionId, {
         type: 'error',
         timestamp: Date.now(),
         executionId: executionId,

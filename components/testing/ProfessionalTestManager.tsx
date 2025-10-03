@@ -319,12 +319,76 @@ const ProfessionalTestManager: React.FC = () => {
     // Connect to 5GLabX backend for real-time log analysis
     const ws = connectTo5GLabX()
 
-    // Cleanup WebSocket connection on unmount
+    // Cleanup WebSocket connection and event listeners on unmount
     return () => {
       if (ws) {
         ws.close()
       }
+      // Clean up 5GLabX event listeners
+      cleanup5GLabXEventListeners();
     }
+  }, [])
+
+  // Set up Supabase Realtime subscription with proper cleanup
+  useEffect(() => {
+    let subscription: any = null;
+    let isSubscribed = false;
+
+    const setupSupabaseRealtime = async () => {
+      try {
+        if (!supabase) {
+          console.warn('Supabase client not available, using fallback mode');
+          return;
+        }
+
+        // Set up Supabase Realtime subscription for test executions
+        subscription = supabase
+          .channel('test_executions')
+          .on('postgres_changes', 
+            { 
+              event: '*', 
+              schema: 'public', 
+              table: 'test_case_executions' 
+            }, 
+            (payload) => {
+              console.log('📡 Supabase Realtime update:', payload);
+              addLog('INFO', `Test execution update: ${payload.eventType}`);
+            }
+          )
+          .on('postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'decoded_messages'
+            },
+            (payload) => {
+              console.log('📡 Decoded message update:', payload);
+              addLog('INFO', `New decoded message: ${payload.eventType}`);
+            }
+          )
+          .subscribe((status) => {
+            console.log(`[v0] 📡 Supabase Realtime subscription status: ${status}`);
+            isSubscribed = status === 'SUBSCRIBED';
+          });
+
+        console.log('✅ Supabase Realtime subscription established');
+
+      } catch (error) {
+        console.error('❌ Failed to set up Supabase Realtime:', error);
+        addLog('ERROR', `Supabase Realtime setup failed: ${error.message}`);
+      }
+    };
+
+    setupSupabaseRealtime();
+
+    // Cleanup function
+    return () => {
+      if (subscription && isSubscribed) {
+        console.log('[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime');
+        supabase.removeChannel(subscription);
+        console.log('[v0] 📡 Supabase Realtime subscription status: CLOSED');
+      }
+    };
   }, [])
 
   // Connect to existing Supabase test_cases table
@@ -1023,53 +1087,55 @@ const ProfessionalTestManager: React.FC = () => {
       // For SaaS deployment, use Supabase Realtime instead of WebSocket
       // No localhost needed - everything runs in the cloud
       console.log("📡 Professional Test Manager: Using Supabase Realtime for SaaS deployment")
+      
+      // Set up event listeners for 5GLabX integration
+      setup5GLabXEventListeners();
+      
       return null // Don't create WebSocket connection
 
-      // Declare ws here to satisfy the linter and make the code runnable.
-      // In a real application, this would be a properly initialized WebSocket connection.
-      const ws: WebSocket | null = null
-
-      if (ws) {
-        // This check is now valid
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data)
-
-            if (data.type === "log_analysis") {
-              // Add log analysis results to the automation log
-              addLog("INFO", `5GLabX Analysis: ${data.analysis}`)
-            } else if (data.type === "decoded_message") {
-              // Add decoded message to logs
-              addLog("INFO", `Decoded: ${data.message}`)
-            } else if (data.type === "test_execution_update") {
-              // Handle test execution updates
-              addLog("INFO", `Test Execution Update: ${data.message}`)
-            }
-          } catch (parseError) {
-            console.error("Error parsing WebSocket message:", parseError)
-          }
-        }
-
-        ws.onopen = () => {
-          addLog("INFO", "Connected to 5GLabX backend for log analysis")
-        }
-
-        ws.onerror = (error) => {
-          console.error("5GLabX WebSocket error:", error)
-          addLog("ERROR", "Failed to connect to 5GLabX backend - WebSocket server may not be running")
-        }
-
-        ws.onclose = () => {
-          addLog("WARNING", "5GLabX WebSocket connection closed")
-        }
-      }
-      return ws // Return the ws instance
     } catch (error) {
       console.error("Error connecting to 5GLabX:", error)
       addLog("ERROR", `Failed to connect to 5GLabX: ${error.message}`)
       return null
     }
   }
+
+  // Set up 5GLabX event listeners with proper cleanup
+  const setup5GLabXEventListeners = () => {
+    // Clean up existing listeners first
+    cleanup5GLabXEventListeners();
+
+    // Set up new event listeners
+    const handleTestExecution = (event: CustomEvent) => {
+      console.log('🔥 Enhanced Logs Advanced: Listening for 5GLABX_TEST_EXECUTION events');
+      addLog("INFO", `5GLabX Test Execution: ${event.detail?.testCaseId || 'Unknown'}`);
+    };
+
+    const handleImmediateLogsUpdate = (event: CustomEvent) => {
+      console.log('[v0] ✅ LogsView: immediate-logs-update listener registered IMMEDIATELY');
+      addLog("INFO", `Immediate logs update: ${event.detail?.message || 'Update received'}`);
+    };
+
+    // Add event listeners
+    window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution as EventListener);
+    window.addEventListener('immediate-logs-update', handleImmediateLogsUpdate as EventListener);
+
+    // Store cleanup function
+    (window as any).cleanup5GLabXEventListeners = () => {
+      window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution as EventListener);
+      window.removeEventListener('immediate-logs-update', handleImmediateLogsUpdate as EventListener);
+    };
+
+    console.log('✅ 5GLabX DataFlow event listeners registered');
+  };
+
+  // Clean up 5GLabX event listeners
+  const cleanup5GLabXEventListeners = () => {
+    if ((window as any).cleanup5GLabXEventListeners) {
+      (window as any).cleanup5GLabXEventListeners();
+      (window as any).cleanup5GLabXEventListeners = null;
+    }
+  };
 
   const handleScroll = (e) => {
     const scrollTop = e.target.scrollTop

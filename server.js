@@ -486,10 +486,16 @@ class RealCLILogServer {
     try {
       // Start the test execution WebSocket server on port 8082
       this.testExecutionWebSocketServer = TestExecutionWebSocketServer.getInstance();
-      this.testExecutionWebSocketServer.start(8082);
-      console.log('Test Execution WebSocket server initialized on port 8082');
+      
+      // Check if server is already running
+      if (!this.testExecutionWebSocketServer.getClientCount || this.testExecutionWebSocketServer.getClientCount() === 0) {
+        this.testExecutionWebSocketServer.start(8082);
+        console.log('✅ Test Execution WebSocket server initialized on port 8082');
+      } else {
+        console.log('ℹ️ Test Execution WebSocket server already running on port 8082');
+      }
     } catch (error) {
-      console.error('Test Execution WebSocket initialization error:', error);
+      console.error('❌ Test Execution WebSocket initialization error:', error);
     }
   }
 
