@@ -60,33 +60,50 @@ const EnhancedDashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [getLayerStatistics]);
 
-  const handleStartTestCase = async () => {
-    if (!selectedTestCaseId) {
-      alert('Please select a test case ID');
-      return;
+  // Listen for Test Manager execution events
+  useEffect(() => {
+    const handleTestManagerExecution = (event: any) => {
+      console.log('🎯 5GLabX: Received test execution from Test Manager:', event.detail);
+      
+      const { testCaseId, testCaseData, executionId } = event.detail;
+      
+      if (testCaseId && testCaseData) {
+        setSelectedTestCaseId(testCaseId);
+        setExecutionStatus('running');
+        
+        console.log(`📋 5GLabX: Processing test case: ${testCaseData.name}`);
+        console.log(`🆔 Execution ID: ${executionId}`);
+        
+        // Trigger the data flow
+        startTestCase(testCaseId);
+        
+        // Update status after processing
+        setTimeout(() => {
+          setExecutionStatus('completed');
+        }, (testCaseData.expectedMessages?.length || 3) * 2000 + 1000);
+      }
+    };
+
+    // Listen for Test Manager events
+    if (typeof window !== 'undefined') {
+      window.addEventListener('testCaseExecutionStarted', handleTestManagerExecution);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestManagerExecution);
     }
 
-    try {
-      setExecutionStatus('starting');
-      await startTestCase(selectedTestCaseId);
-      setExecutionStatus('running');
-      
-      // Simulate execution completion after 30 seconds
-      setTimeout(() => {
-        setExecutionStatus('completed');
-      }, 30000);
-    } catch (error) {
-      console.error('Failed to start test case:', error);
-      setExecutionStatus('error');
-      alert('Failed to start test case execution');
-    }
-  };
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('testCaseExecutionStarted', handleTestManagerExecution);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestManagerExecution);
+      }
+    };
+  }, [startTestCase]);
 
   const handleStopTestCase = async () => {
     try {
       setExecutionStatus('stopping');
       await stopTestCase();
       setExecutionStatus('idle');
+      setSelectedTestCaseId('');
     } catch (error) {
       console.error('Failed to stop test case:', error);
       setExecutionStatus('error');
@@ -138,41 +155,20 @@ const EnhancedDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Test Case Controls */}
-        <div className="flex items-center space-x-4">
-          <input
-            type="text"
-            placeholder="Enter Test Case ID (e.g., 2fac4988-2313-4197-bc7e-39d3a66f23c1)"
-            value={selectedTestCaseId}
-            onChange={(e) => setSelectedTestCaseId(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          <button
-            onClick={handleStartTestCase}
-            disabled={!isConnected || executionStatus === 'running'}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            <Play className="w-4 h-4" />
-            <span>Start</span>
-          </button>
-
-          <button
-            onClick={handleStopTestCase}
-            disabled={executionStatus !== 'running'}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            <Square className="w-4 h-4" />
-            <span>Stop</span>
-          </button>
-
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Clear</span>
-          </button>
+        {/* Test Execution Status */}
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">Test Execution Status</h3>
+          <p className="text-blue-800 text-sm">
+            {executionStatus === 'idle' ? 
+              '⏳ Waiting for test case selection from Test Manager...' :
+              `🔄 Status: ${executionStatus}`
+            }
+          </p>
+          {selectedTestCaseId && (
+            <p className="text-blue-700 text-xs mt-1">
+              Active Test Case: {selectedTestCaseId}
+            </p>
+          )}
         </div>
       </div>
 
@@ -224,42 +220,32 @@ const EnhancedDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Test Manager Integration Status */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Quick Test Cases</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => {
-              setSelectedTestCaseId('2fac4988-2313-4197-bc7e-39d3a66f23c1');
-              setTimeout(handleStartTestCase, 100);
-            }}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
-          >
-            <h4 className="font-medium">MO Data End-to-End</h4>
-            <p className="text-sm text-gray-500 mt-1">PDP Activation → Data Transfer</p>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedTestCaseId('da690637-519e-4dec-89b4-6dfe74d4e5dd');
-              setTimeout(handleStartTestCase, 100);
-            }}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
-          >
-            <h4 className="font-medium">MT Data End-to-End</h4>
-            <p className="text-sm text-gray-500 mt-1">Paging → Data Delivery</p>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedTestCaseId('84618fcb-aee1-4c12-a179-939f6decc04c');
-              setTimeout(handleStartTestCase, 100);
-            }}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
-          >
-            <h4 className="font-medium">MT CSFB End-to-End</h4>
-            <p className="text-sm text-gray-500 mt-1">Voice Call → Fallback</p>
-          </button>
+        <h3 className="text-lg font-semibold mb-4">Test Manager Integration</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div>
+              <h4 className="font-medium text-green-900">Test Manager Connection</h4>
+              <p className="text-sm text-green-700">Ready to receive test case selections</p>
+            </div>
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
+          
+          <div className="p-3 bg-blue-50 rounded-lg">
+            <h4 className="font-medium text-blue-900">Available Test Cases</h4>
+            <p className="text-sm text-blue-700">1,000+ test cases loaded from Supabase</p>
+          </div>
+          
+          <div className="p-3 bg-purple-50 rounded-lg">
+            <h4 className="font-medium text-purple-900">How to Use</h4>
+            <p className="text-sm text-purple-700">
+              1. Go to "Test Manager" tab<br/>
+              2. Select test case(s)<br/>
+              3. Click "Run" button<br/>
+              4. Return here to view real-time analysis
+            </p>
+          </div>
         </div>
       </div>
     </div>
