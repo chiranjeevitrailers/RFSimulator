@@ -165,7 +165,7 @@ const LogsView: React.FC<{
       window.removeEventListener("immediate-logs-update", handleImmediateLogsUpdate)
       console.log("[v0] 🔗 LogsView: Event listeners cleaned up")
     }
-  }, [onStateChange]) // Added onStateChange to dependency array
+  }, []) // Empty dependency array to prevent re-running
 
   // Listen for the regular 5GLABX_TEST_EXECUTION event
   useEffect(() => {
