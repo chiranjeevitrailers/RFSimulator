@@ -62,12 +62,14 @@ export default function LayerTraceView() {
       }
     };
 
+    // Define layers array outside the if block so it's accessible in cleanup
+    const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
+
     if (typeof window !== 'undefined') {
       window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       window.addEventListener('layerTraceUpdate', handleLayerUpdate);
       
       // Listen for layer-specific events
-      const layers = ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS', 'IMS'];
       layers.forEach(layer => {
         window.addEventListener(`${layer.toLowerCase()}layerupdate`, handleLayerUpdate);
       });
