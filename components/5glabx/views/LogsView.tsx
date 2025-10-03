@@ -44,7 +44,7 @@ const LogsView: React.FC<{
           schema: "public",
           table: "decoded_messages",
         },
-        (payload) => {
+        (payload: any) => {
           console.log("[v0] 📨 LogsView: Received real-time message from Supabase:", payload.new)
 
           const message = payload.new
@@ -148,7 +148,7 @@ const LogsView: React.FC<{
   useEffect(() => {
     console.log("🔥 LogsView: Setting up 5GLABX_TEST_EXECUTION event listener")
 
-    const handleTestExecution = (event) => {
+    const handleTestExecution = (event: any) => {
       console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
       console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
 
@@ -178,7 +178,7 @@ const LogsView: React.FC<{
         const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
         console.log(`📋 Processing ${messages.length} messages from testCaseData`)
 
-        const processedLogs = messages.map((message, index) => ({
+        const processedLogs = messages.map((message: any, index: number) => ({
           id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
           timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
           level: "I",
