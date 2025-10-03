@@ -673,8 +673,16 @@ const ProfessionalTestManager: React.FC = () => {
           },
         })
 
+        console.log("[v0] 🚀 TEST MANAGER: Dispatching 5GLABX_TEST_EXECUTION event with data:", {
+          executionId: result.executionId || result.id,
+          testCaseId: testId,
+          messageCount: eventDetail.testCaseData.expectedMessages.length,
+          testCaseDataKeys: Object.keys(eventDetail.testCaseData),
+          expectedMessagesSample: eventDetail.testCaseData.expectedMessages[0]
+        })
+
         window.dispatchEvent(testExecutionEvent)
-        console.log("[v0] ✅ TEST MANAGER: 5GLABX_TEST_EXECUTION event dispatched")
+        console.log("[v0] ✅ TEST MANAGER: 5GLABX_TEST_EXECUTION event dispatched successfully")
         addLog("INFO", `📡 Data sent to 5GLabX Platform for execution: ${result.executionId || result.id}`)
 
         // Also dispatch the testCaseExecutionStarted event for other components
