@@ -9,6 +9,7 @@ const LogsView: React.FC<{
   appState: any
   onStateChange: (state: any) => void
 }> = ({ appState, onStateChange }) => {
+  console.log("🔄 LogsView: Component rendering/remounting")
   const [logs, setLogs] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLevel, setSelectedLevel] = useState("all")
@@ -20,6 +21,14 @@ const LogsView: React.FC<{
   const [activeExecutionId, setActiveExecutionId] = useState<string | null>(null)
   const [debugMode, setDebugMode] = useState(false)
   const currentExecutionIdRef = useRef<string | null>(null)
+
+  // Track component lifecycle
+  useEffect(() => {
+    console.log("🔄 LogsView: Component mounted")
+    return () => {
+      console.log("🔄 LogsView: Component unmounting")
+    }
+  }, [])
 
   // Auto-reset receiving status after 5 seconds of inactivity
   useEffect(() => {
