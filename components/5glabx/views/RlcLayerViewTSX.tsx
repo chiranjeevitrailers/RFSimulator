@@ -11,7 +11,20 @@ const RlcLayerViewTSX: React.FC<{
   appState?: any;
   onStateChange?: (state: any) => void;
 }> = ({ appState, onStateChange }) => {
-  const [rlcData, setRlcData] = useState<LayerSpecificData>({});
+  const [rlcData, setRlcData] = useState<LayerSpecificData>({
+    amModeStats: {
+      txPdus: 0,
+      rxPdus: 0,
+      retransmissions: 0,
+      sequenceNumber: 0
+    },
+    umModeStats: {
+      txPdus: 0,
+      rxPdus: 0,
+      outOfOrder: 0,
+      duplicates: 0
+    }
+  });
   const [messages, setMessages] = useState<ProtocolLayerMessage[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -160,19 +173,19 @@ const RlcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">TX PDUs:</span>
-              <span className="font-medium">{rlcData.amModeStats.txPdus}</span>
+              <span className="font-medium">{rlcData.amModeStats?.txPdus || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">RX PDUs:</span>
-              <span className="font-medium">{rlcData.amModeStats.rxPdus}</span>
+              <span className="font-medium">{rlcData.amModeStats?.rxPdus || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Retransmissions:</span>
-              <span className="font-medium">{rlcData.amModeStats.retransmissions}</span>
+              <span className="font-medium">{rlcData.amModeStats?.retransmissions || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Sequence Number:</span>
-              <span className="font-medium">{rlcData.amModeStats.sequenceNumber}</span>
+              <span className="font-medium">{rlcData.amModeStats?.sequenceNumber || 0}</span>
             </div>
           </div>
         </div>
@@ -185,19 +198,19 @@ const RlcLayerViewTSX: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">TX PDUs:</span>
-              <span className="font-medium">{rlcData.umModeStats.txPdus}</span>
+              <span className="font-medium">{rlcData.umModeStats?.txPdus || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">RX PDUs:</span>
-              <span className="font-medium">{rlcData.umModeStats.rxPdus}</span>
+              <span className="font-medium">{rlcData.umModeStats?.rxPdus || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Out of Order:</span>
-              <span className="font-medium">{rlcData.umModeStats.outOfOrder}</span>
+              <span className="font-medium">{rlcData.umModeStats?.outOfOrder || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Duplicates:</span>
-              <span className="font-medium">{rlcData.umModeStats.duplicates}</span>
+              <span className="font-medium">{rlcData.umModeStats?.duplicates || 0}</span>
             </div>
           </div>
         </div>
