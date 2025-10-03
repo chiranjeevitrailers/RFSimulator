@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
-import FiveGLabXPlatform from "@/components/5glabx/5GLabXPlatformMinimal"
+import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
 
 const UserDashboard: React.FC = () => {
   const router = useRouter()
@@ -138,7 +138,7 @@ const UserDashboard: React.FC = () => {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="h-[800px]">
-                <FiveGLabXPlatform />
+                <Enhanced5GLabXPlatform />
               </div>
             </div>
           </div>
