@@ -735,7 +735,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const subscribeToLayer = (layer: string, callback: (data: any) => void) => {
     setLayerSubscribers(prev => ({
       ...prev,
-      [layer]: new Set([...(prev[layer] || []), callback])
+      [layer]: new Set([...Array.from(prev[layer] || []), callback])
     }));
 
     // Return unsubscribe function
