@@ -13,7 +13,7 @@ export async function GET(
     
     // Get test run details
     const { data: testRun, error: runError } = await supabase
-      .from('test_case_executions')
+      .from('test_executions')
       .select('*')
       .eq('id', runId)
       .single();
@@ -23,16 +23,8 @@ export async function GET(
       return NextResponse.json({ error: 'Test run not found' }, { status: 404 });
     }
     
-    // Get test results
-    const { data: testResults, error: resultsError } = await supabase
-      .from('test_case_results')
-      .select('*')
-      .eq('execution_id', runId);
-    
-    if (resultsError) {
-      console.error('Database error:', resultsError);
-      return NextResponse.json({ error: 'Failed to fetch test results' }, { status: 500 });
-    }
+    // Get test results from the results field in test_executions
+    const testResults = testRun.results ? [testRun.results] : [];
     
     // Calculate summary statistics
     const totalTests = testResults?.length || 0;
@@ -50,23 +42,14 @@ export async function GET(
     }
     
     // Get current test being executed
-    let currentTest = null;
-    if (testRun.current_test_id) {
-      const { data: currentTestData } = await supabase
-        .from('test_cases')
-        .select('test_case_id, name')
-        .eq('id', testRun.current_test_id)
-        .single();
-      
-      currentTest = currentTestData?.test_case_id;
-    }
+    let currentTest = testRun.current_message || null;
     
     // Calculate estimated completion time
     let estimatedCompletion = null;
     if (testRun.status === 'running' && testRun.start_time) {
       const startTime = new Date(testRun.start_time);
       const elapsed = Date.now() - startTime.getTime();
-      const estimatedTotal = testRun.estimated_duration_minutes * 60 * 1000;
+      const estimatedTotal = 30 * 1000; // 30 seconds default
       const remaining = Math.max(0, estimatedTotal - elapsed);
       estimatedCompletion = new Date(Date.now() + remaining).toISOString();
     }
@@ -86,14 +69,15 @@ export async function GET(
         failed_tests: failedTests,
         success_rate: successRate
       },
-      test_results: testResults?.map(result => ({
-        test_id: result.test_case_id,
-        status: result.status,
-        duration_seconds: result.duration_seconds,
-        metrics: result.metrics,
-        errors: result.errors,
-        warnings: result.warnings
-      })) || []
+      test_results: [{
+        test_id: testRun.test_case_id,
+        status: testRun.status,
+        duration_seconds: testRun.end_time && testRun.start_time ? 
+          (new Date(testRun.end_time).getTime() - new Date(testRun.start_time).getTime()) / 1000 : 0,
+        metrics: testRun.results || {},
+        errors: [],
+        warnings: []
+      }]
     });
     
   } catch (error) {
@@ -107,7 +91,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
+    const supabase = supabaseAdmin;
     const runId = params.id;
     
     // Get user from request (you'll need to implement auth)
@@ -115,7 +99,7 @@ export async function DELETE(
     
     // Check if user owns this test run
     const { data: testRun, error: runError } = await supabase
-      .from('test_case_executions')
+      .from('test_executions')
       .select('user_id, status')
       .eq('id', runId)
       .single();
@@ -135,7 +119,7 @@ export async function DELETE(
     
     // Cancel the test run
     const { error: cancelError } = await supabase
-      .from('test_case_executions')
+      .from('test_executions')
       .update({
         status: 'cancelled',
         end_time: new Date().toISOString()

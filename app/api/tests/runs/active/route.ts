@@ -9,16 +9,8 @@ export async function GET() {
   try {
     // Query for active/running test executions
     const { data: activeExecution, error } = await supabaseAdmin
-      .from("test_case_executions")
-      .select(`
-        *,
-        test_cases (
-          id,
-          name,
-          category,
-          protocol
-        )
-      `)
+      .from("test_executions")
+      .select("*")
       .eq("status", "running")
       .order("start_time", { ascending: false })
       .limit(1)
@@ -40,13 +32,13 @@ export async function GET() {
     // Return active execution
     return NextResponse.json({
       active: true,
-      execution_id: activeExecution.execution_id,
+      execution_id: activeExecution.id,
       test_case_id: activeExecution.test_case_id,
-      test_case_name: activeExecution.test_cases?.name,
+      test_case_name: activeExecution.current_message || 'Test Execution',
       status: activeExecution.status,
       start_time: activeExecution.start_time,
-      progress_percentage: activeExecution.progress_percentage,
-      current_step: activeExecution.current_step,
+      progress_percentage: activeExecution.progress || 0,
+      current_step: activeExecution.current_message,
     })
   } catch (error) {
     console.error("Unexpected error in active runs endpoint:", error)
