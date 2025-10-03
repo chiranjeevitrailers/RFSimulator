@@ -81,9 +81,53 @@ const RlcLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 RLC Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setCurrentExecutionId(executionId);
+            setIsConnected(true);
+            
+            // Process RLC messages from test case data
+            const rlcMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'RLC' || msg.messageType?.includes('RLC') ||
+              msg.messageType?.includes('PDU') || msg.messageType?.includes('AM') ||
+              msg.messageType?.includes('UM') || msg.messageType?.includes('TM')
+            );
+
+            console.log(`🔗 RLC Layer TSX: Processing ${rlcMessages.length} RLC messages from test case`);
+
+            // Add expected RLC logs
+            const rlcLogs = rlcMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `rlc-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'RLC',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...rlcLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ RLC Layer TSX: Added ${rlcLogs.length} RLC logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ RLC Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('rlclayerupdate', handleTestManagerData as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ RLC Layer TSX: Event listeners registered');
     }
 
@@ -91,6 +135,7 @@ const RlcLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('rlclayerupdate', handleTestManagerData as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, []);

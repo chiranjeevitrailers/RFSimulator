@@ -81,9 +81,52 @@ const PdcpLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 PDCP Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setIsConnected(true);
+            
+            // Process PDCP messages from test case data
+            const pdcpMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'PDCP' || msg.messageType?.includes('PDCP') ||
+              msg.messageType?.includes('cipher') || msg.messageType?.includes('integrity') ||
+              msg.messageType?.includes('sequence') || msg.messageType?.includes('compression')
+            );
+
+            console.log(`🔒 PDCP Layer TSX: Processing ${pdcpMessages.length} PDCP messages from test case`);
+
+            // Add expected PDCP logs
+            const pdcpLogs = pdcpMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `pdcp-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'PDCP',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...pdcpLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ PDCP Layer TSX: Added ${pdcpLogs.length} PDCP logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ PDCP Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('pdcplayerupdate', handleTestManagerData as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ PDCP Layer TSX: Event listeners registered');
     }
 
@@ -91,6 +134,7 @@ const PdcpLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('pdcplayerupdate', handleTestManagerData as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, []);

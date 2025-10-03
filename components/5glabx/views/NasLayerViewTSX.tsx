@@ -83,9 +83,52 @@ const NasLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 NAS Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setIsConnected(true);
+            
+            // Process NAS messages from test case data
+            const nasMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'NAS' || msg.messageType?.includes('NAS') ||
+              msg.messageType?.includes('registration') || msg.messageType?.includes('authentication') ||
+              msg.messageType?.includes('service') || msg.messageType?.includes('mobility')
+            );
+
+            console.log(`📱 NAS Layer TSX: Processing ${nasMessages.length} NAS messages from test case`);
+
+            // Add expected NAS logs
+            const nasLogs = nasMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `nas-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'NAS',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...nasLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ NAS Layer TSX: Added ${nasLogs.length} NAS logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ NAS Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('naslayerupdate', handleTestManagerData as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ NAS Layer TSX: Event listeners registered');
     }
 
@@ -93,6 +136,7 @@ const NasLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('naslayerupdate', handleTestManagerData as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, []);

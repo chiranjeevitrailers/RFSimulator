@@ -29,15 +29,57 @@ const ImsLayerView: React.FC<ImsLayerViewProps> = ({ appState, onStateChange }) 
       setLogs(imsLogs)
     }
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 IMS Layer: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            // Process IMS messages from test case data
+            const imsMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'IMS' || msg.messageType?.includes('IMS') ||
+              msg.messageType?.includes('SIP') || msg.messageType?.includes('INVITE') ||
+              msg.messageType?.includes('REGISTER') || msg.messageType?.includes('BYE')
+            );
+
+            console.log(`📞 IMS Layer: Processing ${imsMessages.length} IMS messages from test case`);
+
+            // Add expected IMS logs
+            const imsLogs = imsMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `ims-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'IMS',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...imsLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ IMS Layer: Added ${imsLogs.length} IMS logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ IMS Layer: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== "undefined") {
       window.addEventListener("imslayerupdate", handleImsUpdate as EventListener)
       window.addEventListener("immediate-logs-update", handleImsUpdate as EventListener)
+      window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
     }
 
     return () => {
       if (typeof window !== "undefined") {
         window.removeEventListener("imslayerupdate", handleImsUpdate as EventListener)
         window.removeEventListener("immediate-logs-update", handleImsUpdate as EventListener)
+        window.removeEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
       }
     }
   }, [])

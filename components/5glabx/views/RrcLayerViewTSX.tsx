@@ -113,9 +113,52 @@ const RrcLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 RRC Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setIsConnected(true);
+            
+            // Process RRC messages from test case data
+            const rrcMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'RRC' || msg.messageType?.includes('RRC') ||
+              msg.messageType?.includes('setup') || msg.messageType?.includes('reconfiguration') ||
+              msg.messageType?.includes('connection') || msg.messageType?.includes('handover')
+            );
+
+            console.log(`📡 RRC Layer TSX: Processing ${rrcMessages.length} RRC messages from test case`);
+
+            // Add expected RRC logs
+            const rrcLogs = rrcMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `rrc-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'RRC',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...rrcLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ RRC Layer TSX: Added ${rrcLogs.length} RRC logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ RRC Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('rrclayerupdate', handleTestManagerData as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ RRC Layer TSX: Event listeners registered');
     }
 
@@ -123,6 +166,7 @@ const RrcLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('rrclayerupdate', handleTestManagerData as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, [currentExecutionId]);

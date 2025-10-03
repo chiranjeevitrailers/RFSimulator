@@ -136,9 +136,53 @@ const PhyLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 PHY Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setCurrentExecutionId(executionId);
+            setIsConnected(true);
+            
+            // Process PHY messages from test case data
+            const phyMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'PHY' || msg.messageType?.includes('PHY') ||
+              msg.messageType?.includes('PDSCH') || msg.messageType?.includes('PUSCH') ||
+              msg.messageType?.includes('PSS') || msg.messageType?.includes('SSS')
+            );
+
+            console.log(`📡 PHY Layer TSX: Processing ${phyMessages.length} PHY messages from test case`);
+
+            // Add expected PHY logs
+            const phyLogs = phyMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `phy-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'PHY',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              channel: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...phyLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ PHY Layer TSX: Added ${phyLogs.length} PHY logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ PHY Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('phylayerupdate', handlePhyUpdate as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ PHY Layer TSX: Event listeners registered');
       
       // Try to load existing data immediately
@@ -151,6 +195,7 @@ const PhyLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('phylayerupdate', handlePhyUpdate as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, [currentExecutionId]);

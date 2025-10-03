@@ -103,9 +103,53 @@ const MacLayerViewTSX: React.FC<{
       }
     };
 
+    // Listen for 5GLABX_TEST_EXECUTION events (CustomEvent)
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log('🔥 MAC Layer TSX: Received 5GLABX_TEST_EXECUTION event:', event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setCurrentExecutionId(executionId);
+            setIsConnected(true);
+            
+            // Process MAC messages from test case data
+            const macMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === 'MAC' || msg.messageType?.includes('MAC') ||
+              msg.messageType?.includes('HARQ') || msg.messageType?.includes('grant') ||
+              msg.messageType?.includes('PDU') || msg.messageType?.includes('SDU')
+            );
+
+            console.log(`📦 MAC Layer TSX: Processing ${macMessages.length} MAC messages from test case`);
+
+            // Add expected MAC logs
+            const macLogs = macMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `mac-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: 'MAC',
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setLogs(prev => [...macLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ MAC Layer TSX: Added ${macLogs.length} MAC logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ MAC Layer TSX: Error handling test execution event:', error);
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleTestManagerData);
       window.addEventListener('maclayerupdate', handleTestManagerData as EventListener);
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       console.log('✅ MAC Layer TSX: Event listeners registered');
     }
 
@@ -113,6 +157,7 @@ const MacLayerViewTSX: React.FC<{
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleTestManagerData);
         window.removeEventListener('maclayerupdate', handleTestManagerData as EventListener);
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
       }
     };
   }, [currentExecutionId]);

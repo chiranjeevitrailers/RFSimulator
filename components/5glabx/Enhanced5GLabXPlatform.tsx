@@ -14,6 +14,13 @@ import OranView from './views/OranView';
 import NbiotView from './views/NbiotView';
 import V2xView from './views/V2xView';
 import NtnView from './views/NtnView';
+import PhyLayerViewTSX from './views/PhyLayerViewTSX';
+import MacLayerViewTSX from './views/MacLayerViewTSX';
+import RlcLayerViewTSX from './views/RlcLayerViewTSX';
+import PdcpLayerViewTSX from './views/PdcpLayerViewTSX';
+import RrcLayerViewTSX from './views/RrcLayerViewTSX';
+import NasLayerViewTSX from './views/NasLayerViewTSX';
+import ImsLayerView from './views/ImsLayerView';
 import {
   Activity,
   BarChart3,
@@ -35,6 +42,279 @@ import {
   XCircle,
   Clock
 } from 'lucide-react';
+
+// Core Network Analyzer Component
+const CoreNetworkAnalyzer: React.FC<{ analyzerType: string }> = ({ analyzerType }) => {
+  const [analyzerData, setAnalyzerData] = useState<any[]>([]);
+  const [isReceivingData, setIsReceivingData] = useState(false);
+  const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null);
+  const [executionId, setExecutionId] = useState<string | null>(null);
+
+  // Listen for 5GLABX_TEST_EXECUTION events
+  useEffect(() => {
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log(`🔥 ${analyzerType}: Received 5GLABX_TEST_EXECUTION event:`, event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setExecutionId(executionId);
+            setIsReceivingData(true);
+            setLastDataReceived(new Date());
+            
+            // Process messages for this analyzer
+            const analyzerMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === analyzerType.replace('-analyzer', '').toUpperCase() ||
+              msg.messageType?.includes(analyzerType.replace('-analyzer', '').toUpperCase()) ||
+              msg.messageType?.includes('CORE') || msg.messageType?.includes('5G')
+            );
+
+            console.log(`📡 ${analyzerType}: Processing ${analyzerMessages.length} messages from test case`);
+
+            // Add expected analyzer logs
+            const analyzerLogs = analyzerMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `${analyzerType}-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: analyzerType.replace('-analyzer', '').toUpperCase(),
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setAnalyzerData(prev => [...analyzerLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ ${analyzerType}: Added ${analyzerLogs.length} logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error(`❌ ${analyzerType}: Error handling test execution event:`, error);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+      }
+    };
+  }, [analyzerType]);
+
+  const analyzerName = analyzerType.replace('-analyzer', '').replace('-manager', '').toUpperCase();
+  const isCoreNetwork = !analyzerType.includes('manager');
+
+  return (
+    <div className="p-6">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {analyzerName} {isCoreNetwork ? 'Analyzer' : 'Manager'}
+          </h2>
+          <div className="flex items-center space-x-4">
+            <div className={`flex items-center space-x-2 ${isReceivingData ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-3 h-3 rounded-full ${isReceivingData ? "bg-green-500 animate-pulse" : "bg-gray-300"}`}></div>
+              <span className="text-sm font-medium">
+                {isReceivingData ? "🟢 Live Data" : "⚪ Waiting"}
+              </span>
+            </div>
+            {lastDataReceived && (
+              <span className="text-xs text-gray-500">
+                Last: {lastDataReceived.toLocaleTimeString()}
+              </span>
+            )}
+            {executionId && (
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                Exec: {executionId.slice(0, 8)}...
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="text-gray-600 mb-6">
+          {isCoreNetwork ? '5G Core Network' : '5G Core Network'} {analyzerName} analysis and monitoring.
+        </p>
+        
+        {analyzerData.length > 0 ? (
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2 flex items-center">
+                <Activity className="w-4 h-4 mr-2" />
+                Live {analyzerName} Messages ({analyzerData.length})
+              </h3>
+              <div className="max-h-64 overflow-y-auto space-y-2">
+                {analyzerData.slice(-10).reverse().map((msg, index) => (
+                  <div key={msg.id} className="flex items-center space-x-3 p-2 bg-white rounded border">
+                    <div className="text-xs text-gray-500 font-mono w-16">
+                      {msg.timestamp}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                          {msg.layer}
+                        </span>
+                        <span className="text-sm font-medium">{msg.message}</span>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        {msg.direction} • {msg.pduType}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <p className="text-blue-800">
+              This view is ready for implementation with real-time data from your 5G Core Network.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Legacy Network Analyzer Component
+const LegacyNetworkAnalyzer: React.FC<{ analyzerType: string }> = ({ analyzerType }) => {
+  const [analyzerData, setAnalyzerData] = useState<any[]>([]);
+  const [isReceivingData, setIsReceivingData] = useState(false);
+  const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null);
+  const [executionId, setExecutionId] = useState<string | null>(null);
+
+  // Listen for 5GLABX_TEST_EXECUTION events
+  useEffect(() => {
+    const handleTestExecution = (event: any) => {
+      try {
+        if (event.detail && event.detail.type === '5GLABX_TEST_EXECUTION') {
+          console.log(`🔥 ${analyzerType}: Received 5GLABX_TEST_EXECUTION event:`, event.detail);
+          
+          const { testCaseId, testCaseData, executionId } = event.detail;
+          
+          if (testCaseData && testCaseData.expectedMessages) {
+            setExecutionId(executionId);
+            setIsReceivingData(true);
+            setLastDataReceived(new Date());
+            
+            // Process messages for this analyzer
+            const analyzerMessages = testCaseData.expectedMessages.filter((msg: any) =>
+              msg.layer === analyzerType.replace('-analyzer', '').toUpperCase() ||
+              msg.messageType?.includes(analyzerType.replace('-analyzer', '').toUpperCase()) ||
+              msg.messageType?.includes('LTE') || msg.messageType?.includes('4G')
+            );
+
+            console.log(`📡 ${analyzerType}: Processing ${analyzerMessages.length} messages from test case`);
+
+            // Add expected analyzer logs
+            const analyzerLogs = analyzerMessages.map((msg: any, idx: number) => ({
+              id: msg.id || `${analyzerType}-${testCaseId}-${idx}`,
+              timestamp: new Date(msg.timestampMs || Date.now() + idx * 1000).toLocaleTimeString(),
+              layer: analyzerType.replace('-analyzer', '').toUpperCase(),
+              message: `${msg.messageName || 'Unknown Message'}: ${JSON.stringify(msg.messagePayload || {})}`,
+              pduType: msg.messageType || 'GENERIC',
+              direction: msg.direction || 'DL',
+              source: 'TestManager',
+              validationStatus: 'valid',
+              processingTime: Math.random() * 10 + 1
+            }));
+
+            setAnalyzerData(prev => [...analyzerLogs, ...prev.slice(0, 19)]);
+            console.log(`✅ ${analyzerType}: Added ${analyzerLogs.length} logs from test case`);
+          }
+        }
+      } catch (error) {
+        console.error(`❌ ${analyzerType}: Error handling test execution event:`, error);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('5GLABX_TEST_EXECUTION', handleTestExecution);
+      }
+    };
+  }, [analyzerType]);
+
+  const analyzerName = analyzerType.replace('-analyzer', '').toUpperCase();
+
+  return (
+    <div className="p-6">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {analyzerName} Analyzer
+          </h2>
+          <div className="flex items-center space-x-4">
+            <div className={`flex items-center space-x-2 ${isReceivingData ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-3 h-3 rounded-full ${isReceivingData ? "bg-green-500 animate-pulse" : "bg-gray-300"}`}></div>
+              <span className="text-sm font-medium">
+                {isReceivingData ? "🟢 Live Data" : "⚪ Waiting"}
+              </span>
+            </div>
+            {lastDataReceived && (
+              <span className="text-xs text-gray-500">
+                Last: {lastDataReceived.toLocaleTimeString()}
+              </span>
+            )}
+            {executionId && (
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                Exec: {executionId.slice(0, 8)}...
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="text-gray-600 mb-6">
+          Legacy 4G/LTE {analyzerName} network element analysis.
+        </p>
+        
+        {analyzerData.length > 0 ? (
+          <div className="space-y-4">
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2 flex items-center">
+                <Activity className="w-4 h-4 mr-2" />
+                Live {analyzerName} Messages ({analyzerData.length})
+              </h3>
+              <div className="max-h-64 overflow-y-auto space-y-2">
+                {analyzerData.slice(-10).reverse().map((msg, index) => (
+                  <div key={msg.id} className="flex items-center space-x-3 p-2 bg-white rounded border">
+                    <div className="text-xs text-gray-500 font-mono w-16">
+                      {msg.timestamp}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                          {msg.layer}
+                        </span>
+                        <span className="text-sm font-medium">{msg.message}</span>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        {msg.direction} • {msg.pduType}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 p-4 bg-green-50 rounded-lg">
+            <p className="text-green-800">
+              This view is ready for implementation with real-time data from your LTE Core Network.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Enhanced Dashboard Component
 const EnhancedDashboard: React.FC = () => {
@@ -558,71 +838,29 @@ const Enhanced5GLabXPlatform: React.FC = () => {
       case 'ausf-analyzer':
       case 'udm-analyzer':
       case 'config-manager':
-        return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {currentView.replace('-', ' ').toUpperCase()}
-              </h2>
-              <p className="text-gray-600">
-                5G Core Network {currentView.replace('-analyzer', '').replace('-manager', '').toUpperCase()} analysis and monitoring.
-              </p>
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <p className="text-blue-800">
-                  This view is ready for implementation with real-time data from your 5G Core Network.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <CoreNetworkAnalyzer analyzerType={currentView} />;
       
       // Legacy Network Views
       case 'mme-analyzer':
       case 'sgw-analyzer':
       case 'pgw-analyzer':
-        return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {currentView.replace('-analyzer', '').toUpperCase()} Analyzer
-              </h2>
-              <p className="text-gray-600">
-                Legacy 4G/LTE {currentView.replace('-analyzer', '').toUpperCase()} network element analysis.
-              </p>
-              <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                <p className="text-green-800">
-                  This view is ready for implementation with real-time data from your LTE Core Network.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <LegacyNetworkAnalyzer analyzerType={currentView} />;
       
       // Protocol Layer Views
       case 'phy-layer':
+        return <PhyLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'mac-layer':
+        return <MacLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'rlc-layer':
+        return <RlcLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'pdcp-layer':
+        return <PdcpLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'rrc-layer':
+        return <RrcLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'nas-layer':
+        return <NasLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'ims-layer':
-        return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {currentView.replace('-layer', '').toUpperCase()} Layer Analysis
-              </h2>
-              <p className="text-gray-600">
-                Protocol layer analysis for {currentView.replace('-layer', '').toUpperCase()} with real-time message processing.
-              </p>
-              <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-                <p className="text-purple-800">
-                  This protocol layer view shows real-time message flows and analysis from your test executions.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <ImsLayerView appState={{}} onStateChange={() => {}} />;
       
       default:
         return <EnhancedDashboard />;
