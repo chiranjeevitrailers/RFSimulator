@@ -678,6 +678,43 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           ...layerData
         }));
         
+        // Dispatch event for LogsView to receive
+        const logEvent = {
+          id: Date.now() + index,
+          timestamp: new Date().toISOString(),
+          timestampMs: Date.now(),
+          level: 'I',
+          component: message.layer || 'NAS',
+          message: message.message || 'Unknown Message',
+          messageName: message.message,
+          messagePayload: message.values || {},
+          layer: message.layer || 'NAS',
+          direction: message.direction || 'UL',
+          protocol: testCaseData.protocol || '5G_NR',
+          type: 'TEST_MESSAGE',
+          source: '5GLABX_TEST_EXECUTION'
+        };
+        
+        // Dispatch to LogsView
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('5GLABX_TEST_EXECUTION', {
+            detail: {
+              testCaseId: testCaseData.id,
+              logs: [logEvent],
+              testCaseData: testCaseData,
+              executionId: `exec_${Date.now()}`
+            }
+          }));
+          
+          window.dispatchEvent(new CustomEvent('immediate-logs-update', {
+            detail: {
+              logs: [logEvent],
+              source: '5GLabX_DataFlow',
+              testCaseId: testCaseData.id
+            }
+          }));
+        }
+        
         console.log(`📡 Processed message ${index + 1}/${messages.length}: ${message.message}`);
       }, index * 2000); // 2 second intervals
     });
