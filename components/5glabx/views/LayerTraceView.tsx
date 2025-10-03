@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Network, ArrowRight, ArrowDown, ArrowUp, Activity, Clock } from 'lucide-react';
 
 export default function LayerTraceView() {
@@ -8,6 +8,7 @@ export default function LayerTraceView() {
   const [isReceivingData, setIsReceivingData] = useState(false);
   const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null);
   const [executionId, setExecutionId] = useState<string | null>(null);
+  const currentExecutionIdRef = useRef<string | null>(null);
 
   // Listen for 5GLABX_TEST_EXECUTION events
   useEffect(() => {
@@ -16,8 +17,20 @@ export default function LayerTraceView() {
       
       const { testCaseId, testCaseData, executionId } = event.detail;
       
-      if (testCaseData && testCaseData.expectedMessages) {
+      // Clear existing data when new test case starts (different executionId)
+      if (executionId && executionId !== currentExecutionIdRef.current) {
+        console.log('🧹 LayerTraceView: New test case detected, clearing existing data');
+        setLayerMessages([]);
         setExecutionId(executionId);
+        currentExecutionIdRef.current = executionId;
+        setIsReceivingData(false);
+        setLastDataReceived(null);
+      } else if (executionId) {
+        setExecutionId(executionId);
+        currentExecutionIdRef.current = executionId;
+      }
+      
+      if (testCaseData && testCaseData.expectedMessages) {
         setIsReceivingData(true);
         setLastDataReceived(new Date());
         

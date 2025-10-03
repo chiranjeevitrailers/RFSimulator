@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Search, Download, RefreshCw, Eye, AlertTriangle, Info, CheckCircle, X } from "lucide-react"
 import { createClient } from "@/lib/supabase"
 
@@ -19,6 +19,7 @@ const LogsView: React.FC<{
   const [lastDataReceived, setLastDataReceived] = useState<Date | null>(null)
   const [activeExecutionId, setActiveExecutionId] = useState<string | null>(null)
   const [debugMode, setDebugMode] = useState(false)
+  const currentExecutionIdRef = useRef<string | null>(null)
 
   // Auto-reset receiving status after 5 seconds of inactivity
   useEffect(() => {
@@ -179,16 +180,25 @@ const LogsView: React.FC<{
       const { testCaseId, testCaseData, logs, executionId } = event.detail
       console.log("📊 Extracted data:", { testCaseId, hasTestCaseData: !!testCaseData, hasLogs: !!logs, executionId })
 
-      if (executionId) {
+      // Clear existing data when new test case starts (different executionId)
+      if (executionId && executionId !== currentExecutionIdRef.current) {
+        console.log("🧹 LogsView: New test case detected, clearing existing data")
+        setLogs([])
+        setActiveExecutionId(executionId)
+        currentExecutionIdRef.current = executionId
+        setIsReceivingData(false)
+        setLastDataReceived(null)
+      } else if (executionId) {
         console.log("[v0] 🎯 LogsView: Setting active execution ID:", executionId)
         setActiveExecutionId(executionId)
+        currentExecutionIdRef.current = executionId
       }
 
       if (logs && logs.length > 0) {
         console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
         console.log("📊 Log data structure:", JSON.stringify(logs[0], null, 2))
 
-        // SINGLE STATE UPDATE - Fix the React state batching issue
+        // SINGLE STATE UPDATE - Add logs to existing data (same execution)
         setLogs((prev) => {
           const newLogs = [...prev, ...logs]
           console.log(`✅ LogsView: Added ${logs.length} logs from event. Total logs: ${newLogs.length}`)
@@ -205,6 +215,13 @@ const LogsView: React.FC<{
         const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
         console.log(`📋 Found ${messages.length} messages to process`)
         console.log(`📋 Processing ${messages.length} messages from testCaseData`)
+
+        // Clear existing logs if this is a new execution
+        if (executionId && executionId !== currentExecutionIdRef.current) {
+          console.log("🧹 LogsView: Clearing existing logs for new test case")
+          setLogs([])
+          currentExecutionIdRef.current = executionId
+        }
 
         const processedLogs = messages.map((message: any, index: number) => ({
           id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
