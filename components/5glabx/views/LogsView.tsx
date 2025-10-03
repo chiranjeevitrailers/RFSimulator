@@ -30,66 +30,84 @@ const LogsView: React.FC<{
   }, [isReceivingData, lastDataReceived])
 
   useEffect(() => {
-    console.log("[v0] 🔥 LogsView: Setting up Supabase Realtime subscription...")
+    let isSubscribed = false;
+    let channel: any = null;
+    let mounted = true;
 
-    const supabase = createClient()
+    const setupSubscription = async () => {
+      if (!mounted || isSubscribed) return;
 
-    // Subscribe to decoded_messages table for real-time updates
-    const channel = supabase
-      .channel("decoded_messages_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "decoded_messages",
-        },
-        (payload: any) => {
-          console.log("[v0] 📨 LogsView: Received real-time message from Supabase:", payload.new)
+      console.log("[v0] 🔥 LogsView: Setting up Supabase Realtime subscription...")
 
-          const message = payload.new
+      const supabase = createClient()
 
-          // Process ALL messages (removed activeExecutionId filter for real-time display)
-          // This allows viewing all test executions in real-time
-          const newLog = {
-              id: message.message_id || message.id,
-              timestamp: (message.timestamp_ms / 1000).toFixed(1),
-              level: "I",
-              component: message.layer || "TEST",
-              message: `${message.message_name || message.message_type}: ${JSON.stringify(message.message_payload || {}, null, 2)}`,
-              type: message.message_type || "TEST_MESSAGE",
-              source: "Supabase Realtime",
-              testCaseId: message.test_case_id,
-              direction: message.direction || "UL",
-              protocol: message.protocol || "5G_NR",
-              rawData: JSON.stringify(message.message_payload || {}, null, 2),
-              informationElements: message.information_elements || {},
-              layerParameters: message.layer_parameters || {},
-              standardReference: message.standard_reference || "Unknown",
-              messagePayload: message.message_payload || {},
-              ies: message.information_elements
-                ? Object.entries(message.information_elements)
-                    .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                    .join(", ")
-                : "",
-            }
+      // Subscribe to decoded_messages table for real-time updates
+      channel = supabase
+        .channel("decoded_messages_changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "decoded_messages",
+          },
+          (payload: any) => {
+            if (!mounted) return;
+            console.log("[v0] 📨 LogsView: Received real-time message from Supabase:", payload.new)
 
-            setLogs((prev) => [...prev, newLog])
-            setIsReceivingData(true)
-            setLastDataReceived(new Date())
+            const message = payload.new
 
-            console.log("[v0] ✅ LogsView: Added real-time message to logs")
-        },
-      )
-      .subscribe((status) => {
-        console.log("[v0] 📡 Supabase Realtime subscription status:", status)
-      })
+            // Process ALL messages (removed activeExecutionId filter for real-time display)
+            // This allows viewing all test executions in real-time
+            const newLog = {
+                id: message.message_id || message.id,
+                timestamp: (message.timestamp_ms / 1000).toFixed(1),
+                level: "I",
+                component: message.layer || "TEST",
+                message: `${message.message_name || message.message_type}: ${JSON.stringify(message.message_payload || {}, null, 2)}`,
+                type: message.message_type || "TEST_MESSAGE",
+                source: "Supabase Realtime",
+                testCaseId: message.test_case_id,
+                direction: message.direction || "UL",
+                protocol: message.protocol || "5G_NR",
+                rawData: JSON.stringify(message.message_payload || {}, null, 2),
+                informationElements: message.information_elements || {},
+                layerParameters: message.layer_parameters || {},
+                standardReference: message.standard_reference || "Unknown",
+                messagePayload: message.message_payload || {},
+                ies: message.information_elements
+                  ? Object.entries(message.information_elements)
+                      .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                      .join(", ")
+                  : "",
+              }
+
+              setLogs((prev) => [...prev, newLog])
+              setIsReceivingData(true)
+              setLastDataReceived(new Date())
+
+              console.log("[v0] ✅ LogsView: Added real-time message to logs")
+          },
+        )
+        .subscribe((status) => {
+          if (!mounted) return;
+          console.log("[v0] 📡 Supabase Realtime subscription status:", status)
+          isSubscribed = status === 'SUBSCRIBED';
+        })
+    }
+
+    setupSubscription();
 
     return () => {
-      console.log("[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime")
-      supabase.removeChannel(channel)
+      mounted = false;
+      if (channel && isSubscribed) {
+        console.log("[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime")
+        const supabase = createClient()
+        supabase.removeChannel(channel)
+        console.log("[v0] 📡 Supabase Realtime subscription status: CLOSED")
+      }
     }
-  }, [])  // Remove activeExecutionId dependency to keep subscription alive
+  }, [])  // Empty dependency array to prevent re-subscription
 
   // Listen for Test Manager data and integrate with 5GLabX log analysis
   useEffect(() => {
