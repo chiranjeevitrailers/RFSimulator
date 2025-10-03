@@ -310,6 +310,43 @@ const ProfessionalTestManager: React.FC = () => {
     }
   }, [])
 
+  // Connect to existing Supabase test_cases table
+  const loadTestCasesFromSupabase = async () => {
+    try {
+      // Use comprehensive API endpoint to get all 1800+ test cases
+      const response = await fetch("/api/test-cases/comprehensive/?limit=2000")
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      const data = await response.json()
+      if (data.success && data.data) {
+        // Transform the data to match our component's expected format
+        const transformedTestCases = data.data.map((tc: any) => ({
+          id: tc.id,
+          name: tc.name,
+          component: tc.protocol || 'LTE',
+          status: 'Not Started',
+          iterations: 'Never',
+          successRate: 'N/A',
+          lastRun: 'N/A',
+          duration: '',
+          priority: tc.complexity === 'expert' ? 'High' : tc.complexity === 'intermediate' ? 'Medium' : 'Low',
+          selected: false,
+          category: tc.category,
+          protocol: tc.protocol,
+          description: tc.description
+        }))
+        setTestCases(transformedTestCases)
+        addLog('SUCCESS', `✅ Loaded ${transformedTestCases.length} test cases from Supabase`)
+      } else {
+        throw new Error('Invalid response format')
+      }
+    } catch (error) {
+      console.error('Failed to load test cases from Supabase:', error)
+      addLog('ERROR', `❌ Failed to load test cases: ${error.message}`)
+    }
+  }
+
   // Integrate with existing working Supabase implementation
   useEffect(() => {
     // Load test cases from existing Supabase test_cases table
@@ -333,6 +370,7 @@ const ProfessionalTestManager: React.FC = () => {
   useEffect(() => {
     let subscription: any = null;
     let isSubscribed = false;
+    let mounted = true;
 
     const setupSupabaseRealtime = async () => {
       try {
@@ -340,6 +378,9 @@ const ProfessionalTestManager: React.FC = () => {
           console.warn('Supabase client not available, using fallback mode');
           return;
         }
+
+        // Only set up subscription if component is still mounted
+        if (!mounted) return;
 
         // Set up Supabase Realtime subscription for test executions
         subscription = supabase
@@ -351,6 +392,7 @@ const ProfessionalTestManager: React.FC = () => {
               table: 'test_case_executions' 
             }, 
             (payload) => {
+              if (!mounted) return;
               console.log('📡 Supabase Realtime update:', payload);
               addLog('INFO', `Test execution update: ${payload.eventType}`);
             }
@@ -362,11 +404,13 @@ const ProfessionalTestManager: React.FC = () => {
               table: 'decoded_messages'
             },
             (payload) => {
+              if (!mounted) return;
               console.log('📡 Decoded message update:', payload);
               addLog('INFO', `New decoded message: ${payload.eventType}`);
             }
           )
           .subscribe((status) => {
+            if (!mounted) return;
             console.log(`[v0] 📡 Supabase Realtime subscription status: ${status}`);
             isSubscribed = status === 'SUBSCRIBED';
           });
@@ -383,58 +427,16 @@ const ProfessionalTestManager: React.FC = () => {
 
     // Cleanup function
     return () => {
+      mounted = false;
       if (subscription && isSubscribed) {
         console.log('[v0] 🔌 LogsView: Unsubscribing from Supabase Realtime');
         supabase.removeChannel(subscription);
         console.log('[v0] 📡 Supabase Realtime subscription status: CLOSED');
       }
     };
-  }, [])
+  }, []) // Empty dependency array to prevent re-subscription
 
   // Connect to existing Supabase test_cases table
-  const loadTestCasesFromSupabase = async () => {
-    try {
-      // Use comprehensive API endpoint to get all 1800+ test cases
-      const response = await fetch("/api/test-cases/comprehensive/?limit=2000")
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const result = await response.json()
-      const testCasesData = result.data || result
-
-      if (Array.isArray(testCasesData)) {
-        // Transform API data to match our frontend structure
-        const transformedTestCases = testCasesData.map((testCase) => ({
-          id: testCase.id,
-          name: testCase.name,
-          component: testCase.component || testCase.protocol,
-          status: testCase.status || "Not Started",
-          iterations: testCase.iterations || "Never",
-          successRate: testCase.success_rate || "N/A",
-          lastRun: testCase.last_run || "N/A",
-          duration: testCase.duration || "",
-          priority: testCase.priority || "Medium",
-          category: testCase.category,
-          protocol: testCase.protocol,
-          layer: testCase.layer,
-          complexity: testCase.complexity,
-          selected: false,
-        }))
-
-        setTestCases(transformedTestCases)
-        addLog(
-          "INFO",
-          `Loaded ${transformedTestCases.length} test cases from Supabase (Total: ${result.total || transformedTestCases.length})`,
-        )
-      } else {
-        addLog("ERROR", "Invalid test cases data format")
-      }
-    } catch (error) {
-      console.error("Error loading test cases:", error)
-      addLog("ERROR", `Failed to load test cases: ${error.message}`)
-    }
-  }
 
   // Load test suite counts from existing Supabase data
   const loadTestSuiteCountsFromSupabase = async () => {
