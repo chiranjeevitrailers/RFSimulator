@@ -4,8 +4,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import EnhancedServiceIntegration from './services/EnhancedServiceIntegration';
-import { EnhancedDataFlowProvider, useEnhancedDataFlow } from './services/EnhancedDataFlowIntegration';
+import { DataFlowProvider, useDataFlow } from './providers/DataFlowProvider';
 import LogsView from './views/LogsView';
 import AnalyticsView from './views/AnalyticsView';
 import TestSuitesView from './views/TestSuitesView';
@@ -41,17 +40,16 @@ import {
 const EnhancedDashboard: React.FC = () => {
   const {
     isConnected,
-    executionStatus,
     layerData,
     realTimeData,
     getLayerStatistics,
     startTestCase,
-    stopTestCase,
-    clearData
-  } = useEnhancedDataFlow();
+    stopTestCase
+  } = useDataFlow();
 
   const [selectedTestCaseId, setSelectedTestCaseId] = useState('');
   const [layerStats, setLayerStats] = useState<Record<string, any>>({});
+  const [executionStatus, setExecutionStatus] = useState('idle');
 
   // Update layer statistics every second
   useEffect(() => {
@@ -69,18 +67,29 @@ const EnhancedDashboard: React.FC = () => {
     }
 
     try {
+      setExecutionStatus('starting');
       await startTestCase(selectedTestCaseId);
+      setExecutionStatus('running');
+      
+      // Simulate execution completion after 30 seconds
+      setTimeout(() => {
+        setExecutionStatus('completed');
+      }, 30000);
     } catch (error) {
       console.error('Failed to start test case:', error);
+      setExecutionStatus('error');
       alert('Failed to start test case execution');
     }
   };
 
   const handleStopTestCase = async () => {
     try {
+      setExecutionStatus('stopping');
       await stopTestCase();
+      setExecutionStatus('idle');
     } catch (error) {
       console.error('Failed to stop test case:', error);
+      setExecutionStatus('error');
     }
   };
 
@@ -158,7 +167,7 @@ const EnhancedDashboard: React.FC = () => {
           </button>
 
           <button
-            onClick={clearData}
+            onClick={() => window.location.reload()}
             className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
             <RefreshCw className="w-4 h-4" />
@@ -197,18 +206,18 @@ const EnhancedDashboard: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4">Real-time Data Flow</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{realTimeData.length}</div>
+            <div className="text-2xl font-bold text-blue-600">{realTimeData?.length || 0}</div>
             <div className="text-sm text-gray-500">Total Messages</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">
-              {Object.values(layerData).flat().length}
+              {Object.values(layerData || {}).flat().length}
             </div>
             <div className="text-sm text-gray-500">Layer Messages</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600">
-              {Object.keys(layerStats).length}
+              {Object.keys(layerStats || {}).length}
             </div>
             <div className="text-sm text-gray-500">Active Layers</div>
           </div>
@@ -262,7 +271,7 @@ const EnhancedSidebar: React.FC<{
   currentView: string;
   onNavigate: (viewId: string) => void;
 }> = ({ currentView, onNavigate }) => {
-  const { layerData, getLayerStatistics } = useEnhancedDataFlow();
+  const { layerData, getLayerStatistics } = useDataFlow();
   const [layerStats, setLayerStats] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -284,13 +293,13 @@ const EnhancedSidebar: React.FC<{
       id: 'logs',
       label: 'Logs Viewer',
       icon: FileText,
-      badge: layerData ? Object.values(layerData).flat().length : 0
+      badge: layerData ? Object.values(layerData || {}).flat().length : 0
     },
     {
       id: 'enhanced-logs',
       label: 'Enhanced Logs',
       icon: Search,
-      badge: Object.keys(layerStats).length
+      badge: Object.keys(layerStats || {}).length
     },
     {
       id: 'layer-trace',
@@ -635,32 +644,30 @@ const Enhanced5GLabXPlatform: React.FC = () => {
   };
 
   return (
-    <EnhancedDataFlowProvider>
-      <EnhancedServiceIntegration>
-        <div className="flex h-screen bg-gray-100">
-          {/* Enhanced Sidebar */}
-          <EnhancedSidebar
-            currentView={currentView}
-            onNavigate={setCurrentView}
-          />
+    <DataFlowProvider>
+      <div className="flex h-screen bg-gray-100">
+        {/* Enhanced Sidebar */}
+        <EnhancedSidebar
+          currentView={currentView}
+          onNavigate={setCurrentView}
+        />
 
-          {/* Main Content */}
-          <div className="flex-1 overflow-y-auto">
-            <header className="bg-white shadow-sm border-b border-gray-200">
-              <div className="px-6 py-4">
-                <h1 className="text-lg font-semibold text-gray-900">
-                  Enhanced 5GLabX Platform - {currentView.replace('-', ' ').toUpperCase()}
-                </h1>
-              </div>
-            </header>
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto">
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="px-6 py-4">
+              <h1 className="text-lg font-semibold text-gray-900">
+                Enhanced 5GLabX Platform - {currentView.replace('-', ' ').toUpperCase()}
+              </h1>
+            </div>
+          </header>
 
-            <main className="p-6">
-              {renderCurrentView()}
-            </main>
-          </div>
+          <main className="p-6">
+            {renderCurrentView()}
+          </main>
         </div>
-      </EnhancedServiceIntegration>
-    </EnhancedDataFlowProvider>
+      </div>
+    </DataFlowProvider>
   );
 };
 

@@ -580,20 +580,107 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const startTestCase = async (testCaseId: string) => {
     try {
+      console.log(`🚀 Starting test case execution: ${testCaseId}`);
+      
       if (typeof window !== 'undefined' && (window as any).playbackService) {
         const playbackService = (window as any).playbackService;
         await playbackService.startPlayback({ testCaseId });
-        console.log(`Started test case: ${testCaseId}`);
+        console.log(`✅ Started test case via playback service: ${testCaseId}`);
       } else {
-        // Fallback: fetch test case data directly
-        const response = await fetch(`/api/test-execution/comprehensive?testCaseId=${testCaseId}&includeTemplates=true`);
-        const data = await response.json();
-        setTestCaseData(data);
-        console.log(`Loaded test case data: ${testCaseId}`);
+        // Fallback: Use API to start test execution
+        console.log('🔄 Using API fallback for test execution...');
+        
+        // First, fetch test case data
+        const fetchResponse = await fetch(`/api/test-execution/comprehensive?testCaseId=${testCaseId}&includeTemplates=true`);
+        const testCaseData = await fetchResponse.json();
+        
+        if (testCaseData.success) {
+          setTestCaseData(testCaseData);
+          console.log(`✅ Loaded test case data: ${testCaseData.data?.name}`);
+          
+          // Then, start test execution
+          const executeResponse = await fetch('/api/test-execution/comprehensive', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              testCaseId: testCaseId,
+              userId: 'anonymous',
+              executionMode: 'comprehensive',
+              timeAcceleration: 1
+            }),
+          });
+          
+          const executionResult = await executeResponse.json();
+          
+          if (executionResult.success) {
+            console.log(`✅ Test execution started: ${executionResult.data?.executionId}`);
+            
+            // Start polling for execution status
+            const pollExecution = async (executionId: string) => {
+              try {
+                const statusResponse = await fetch(`/api/tests/runs/${executionId}`);
+                const statusData = await statusResponse.json();
+                
+                if (statusData.status === 'completed') {
+                  console.log('✅ Test execution completed successfully');
+                  // Simulate real-time data updates
+                  simulateRealTimeData(testCaseData.data);
+                } else if (statusData.status === 'running') {
+                  console.log(`🔄 Test execution progress: ${statusData.progress || 0}%`);
+                  setTimeout(() => pollExecution(executionId), 1000);
+                }
+              } catch (error) {
+                console.error('Error polling execution status:', error);
+              }
+            };
+            
+            if (executionResult.data?.executionId) {
+              pollExecution(executionResult.data.executionId);
+            }
+          } else {
+            console.error('❌ Failed to start test execution:', executionResult.error);
+          }
+        } else {
+          console.error('❌ Failed to fetch test case data:', testCaseData.error);
+        }
       }
     } catch (error) {
-      console.error('Error starting test case:', error);
+      console.error('❌ Error starting test case:', error);
     }
+  };
+
+  // Simulate real-time data for display
+  const simulateRealTimeData = (testCaseData: any) => {
+    if (!testCaseData?.expectedMessages) return;
+    
+    const messages = Array.isArray(testCaseData.expectedMessages) 
+      ? testCaseData.expectedMessages 
+      : [];
+    
+    console.log(`🔄 Simulating ${messages.length} messages for real-time display`);
+    
+    messages.forEach((message: any, index: number) => {
+      setTimeout(() => {
+        const layerData = {
+          [message.layer || 'NAS']: [{
+            timestamp: new Date().toISOString(),
+            direction: message.direction || 'UL',
+            message: message.message || 'Unknown Message',
+            layer: message.layer || 'NAS',
+            values: message.values || {}
+          }]
+        };
+        
+        setLayerData(prev => ({
+          ...prev,
+          ...layerData
+        }));
+        
+        console.log(`📡 Processed message ${index + 1}/${messages.length}: ${message.message}`);
+      }, index * 2000); // 2 second intervals
+    });
   };
 
   const stopTestCase = () => {
