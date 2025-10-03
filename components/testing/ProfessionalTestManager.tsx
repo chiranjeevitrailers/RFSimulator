@@ -388,7 +388,9 @@ const ProfessionalTestManager: React.FC = () => {
           selected: false,
           category: tc.category,
           protocol: tc.protocol,
-          description: tc.description
+          description: tc.description,
+          // Store the full test case data for execution
+          fullTestCaseData: tc
         }))
         setTestCases(transformedTestCases)
         addLog('SUCCESS', `✅ Loaded ${transformedTestCases.length} test cases from Supabase`)
@@ -593,9 +595,9 @@ const ProfessionalTestManager: React.FC = () => {
         executionId: result.executionId,
         testCaseId: testId,
         hasTestCaseData: !!result.testCaseData,
-        messageCount: result.testCaseData?.expectedMessages?.length || 0,
-        ieCount: result.testCaseData?.expectedInformationElements?.length || 0,
-        paramCount: result.testCaseData?.expectedLayerParameters?.length || 0,
+        messageCount: result.testCaseData?.test_case_messages?.length || result.testCaseData?.expectedMessages?.length || 0,
+        ieCount: result.testCaseData?.test_case_information_elements?.length || result.testCaseData?.expectedInformationElements?.length || 0,
+        paramCount: result.testCaseData?.test_case_layer_parameters?.length || result.testCaseData?.expectedLayerParameters?.length || 0,
       })
 
       // Add detailed execution logs
@@ -636,9 +638,10 @@ const ProfessionalTestManager: React.FC = () => {
             name: testCase?.name || "Unknown Test",
             component: testCase?.component || "Unknown Component",
             // Use REAL data from API response (which comes from Supabase)
-            expectedMessages: result.testCaseData?.expectedMessages || [],
-            expectedInformationElements: result.testCaseData?.expectedInformationElements || [],
-            expectedLayerParameters: result.testCaseData?.expectedLayerParameters || [],
+            // Map the actual API response structure to expected format
+            expectedMessages: result.testCaseData?.test_case_messages || result.testCaseData?.expectedMessages || [],
+            expectedInformationElements: result.testCaseData?.test_case_information_elements || result.testCaseData?.expectedInformationElements || [],
+            expectedLayerParameters: result.testCaseData?.test_case_layer_parameters || result.testCaseData?.expectedLayerParameters || [],
             // Include original test data for reference
             originalTestData: result.testCaseData?.originalTestData,
             expectedResults: result.testCaseData?.expectedResults,
