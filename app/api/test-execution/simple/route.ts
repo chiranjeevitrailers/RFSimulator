@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     console.log(`🚀 Starting test execution for REAL test case: ${testCaseId}`)
     
     // Use NULL for system executions (RLS allows service role to insert with NULL user_id)
-    const effectiveUserId = userId || null
+    // If userId is provided but not a valid UUID, use NULL
+    const effectiveUserId = userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId) ? userId : null
 
     // Fetch REAL test case data from Supabase
     const { data: testCase, error: testCaseError } = await supabaseAdmin
@@ -38,27 +39,43 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Found REAL test case: ${testCase.name} (${testCase.category})`)
 
     console.log("✅ Creating test execution record in database...")
+    
+    // Create test execution record with proper RLS handling
+    const executionData = {
+      execution_id: executionId,
+      test_case_id: testCase.id,
+      user_id: effectiveUserId,
+      status: "running",
+      start_time: new Date().toISOString(),
+      progress_percentage: 0,
+      current_step: "Initializing",
+      total_steps: 10,
+      completed_steps: 0,
+      results: {},
+      logs: [],
+    }
+    
+    console.log("📊 Execution data to insert:", executionData)
+    
     const { data: executionResult, error: executionError } = await supabaseAdmin
       .from("test_case_executions")
-      .insert({
-        execution_id: executionId,
-        test_case_id: testCase.id,
-        user_id: effectiveUserId,
-        status: "running",
-        start_time: new Date().toISOString(),
-        progress_percentage: 0,
-        current_step: "Initializing",
-        total_steps: 10,
-        completed_steps: 0,
-        results: {},
-        logs: [],
-      })
+      .insert(executionData)
       .select()
       .single()
 
     if (executionError) {
       console.error("❌ Failed to create test execution:", executionError)
-      return NextResponse.json({ error: "Failed to create test execution" }, { status: 500 })
+      console.error("❌ Execution error details:", {
+        message: executionError.message,
+        details: executionError.details,
+        hint: executionError.hint,
+        code: executionError.code
+      })
+      return NextResponse.json({ 
+        error: "Failed to create test execution", 
+        details: executionError.message,
+        code: executionError.code 
+      }, { status: 500 })
     }
 
     console.log(`✅ Test execution created in database: ${executionId}`)
