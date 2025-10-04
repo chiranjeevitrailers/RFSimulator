@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
@@ -34,6 +34,11 @@ const UserDashboard: React.FC = () => {
     };
 
     loadDataFormatAdapter();
+  }, []);
+
+  // Memoize the 5GLabX Platform to prevent unnecessary remounting
+  const Memoized5GLabXPlatform = useMemo(() => {
+    return <Enhanced5GLabXPlatform />;
   }, []);
 
   const handleSignOut = () => {
@@ -155,7 +160,7 @@ const UserDashboard: React.FC = () => {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="h-[800px]">
-                <Enhanced5GLabXPlatform />
+                {Memoized5GLabXPlatform}
               </div>
             </div>
           </div>

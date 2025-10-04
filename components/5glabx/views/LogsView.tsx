@@ -248,7 +248,7 @@ const LogsView: React.FC<{
 
             const processedLogs = messages.map((message: any, index: number) => ({
               id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
-              timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
+              timestamp: message.timestampMs ? (message.timestampMs / 1000).toFixed(1) : (Date.now() / 1000).toFixed(1),
               level: "I",
               component: message.layer || message.component || "TEST",
               message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
