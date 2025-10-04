@@ -490,6 +490,7 @@ const ProfessionalTestManager: React.FC = () => {
   const handleRunTest = async (testId) => {
     console.log("🔥 DEBUG: handleRunTest called with testId:", testId)
     addLog("DEBUG", `🔥 handleRunTest function called with testId: ${testId}`)
+    alert(`🔥 FUNCTION CALL: handleRunTest called with testId: ${testId}`)
     
     setIsRunning(true)
     addLog("INFO", `🚀 Starting test execution: ${testId}`)
@@ -498,6 +499,8 @@ const ProfessionalTestManager: React.FC = () => {
     console.log("[v0] 🚀 TEST MANAGER: Starting test execution for:", testId)
 
     try {
+      console.log("🔥 DEBUG: Entering try block for API call")
+      addLog("DEBUG", `🔥 Entering try block for API call`)
       addLog("INFO", `📡 Making API call to /api/test-execution/simple/`)
       addLog("INFO", `📋 Request payload: ${JSON.stringify({ testCaseId: testId, userId: "system" })}`)
       
@@ -2154,7 +2157,11 @@ const ProfessionalTestManager: React.FC = () => {
                                                 key: "start",
                                                 className:
                                                   "bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 flex items-center space-x-1",
-                                                onClick: () => handleRunTest(testCase.id),
+                                                onClick: () => {
+                                                  console.log("🔥 BUTTON CLICK: Green Run button clicked for testId:", testCase.id);
+                                                  alert(`🔥 BUTTON CLICK: Green Run button clicked for testId: ${testCase.id}`);
+                                                  handleRunTest(testCase.id);
+                                                },
                                                 disabled: testCase.status === "Running",
                                               },
                                               [
@@ -2223,7 +2230,11 @@ const ProfessionalTestManager: React.FC = () => {
                                                 key: "run",
                                                 className:
                                                   "bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 flex items-center space-x-1",
-                                                onClick: () => handleRunTest(testCase.id),
+                                                onClick: () => {
+                                                  console.log("🔥 BUTTON CLICK: Blue Run button clicked for testId:", testCase.id);
+                                                  alert(`🔥 BUTTON CLICK: Blue Run button clicked for testId: ${testCase.id}`);
+                                                  handleRunTest(testCase.id);
+                                                },
                                                 disabled: isRunning,
                                               },
                                               [
