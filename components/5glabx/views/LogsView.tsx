@@ -189,11 +189,21 @@ const LogsView: React.FC<{
       console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
       console.log("📊 Event detail keys:", Object.keys(event.detail || {}))
 
-      const { testCaseId, testCaseData, logs, executionId } = event.detail
-      console.log("📊 Extracted data:", { testCaseId, hasTestCaseData: !!testCaseData, hasLogs: !!logs, executionId })
+      // ✅ FIXED: Better data extraction with type checking
+      const { testCaseId, testCaseData, logs, executionId, type } = event.detail || {}
+      console.log("📊 Extracted data:", { 
+        testCaseId, 
+        hasTestCaseData: !!testCaseData, 
+        hasLogs: !!logs, 
+        executionId, 
+        type,
+        eventType: event.type
+      })
 
-      // Clear existing data when new test case starts (different executionId)
-      if (executionId && executionId !== currentExecutionIdRef.current) {
+      // ✅ FIXED: Check both event.type and event.detail.type
+      if (event.type === '5GLABX_TEST_EXECUTION' || type === '5GLABX_TEST_EXECUTION' || event.detail?.type === '5GLABX_TEST_EXECUTION') {
+        // Clear existing data when new test case starts (different executionId)
+        if (executionId && executionId !== currentExecutionIdRef.current) {
         console.log("🧹 LogsView: New test case detected, clearing existing data")
         setLogs([])
         setActiveExecutionId(executionId)
