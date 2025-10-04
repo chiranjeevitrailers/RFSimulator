@@ -185,169 +185,129 @@ const LogsView: React.FC<{
     console.log("🔥 LogsView: Setting up 5GLABX_TEST_EXECUTION event listener")
 
     const handleTestExecution = (event: any) => {
-      console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
-      console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
-      console.log("📊 Event detail keys:", Object.keys(event.detail || {}))
+      try {
+        console.log("🔥 LogsView: Received 5GLABX_TEST_EXECUTION event:", event.detail)
+        console.log("📊 Event detail structure:", JSON.stringify(event.detail, null, 2))
+        console.log("📊 Event detail keys:", Object.keys(event.detail || {}))
 
-      // ✅ FIXED: Better data extraction with type checking
-      const { testCaseId, testCaseData, logs, executionId, type } = event.detail || {}
-      console.log("📊 Extracted data:", { 
-        testCaseId, 
-        hasTestCaseData: !!testCaseData, 
-        hasLogs: !!logs, 
-        executionId, 
-        type,
-        eventType: event.type
-      })
-
-      // ✅ FIXED: Check both event.type and event.detail.type
-      if (event.type === '5GLABX_TEST_EXECUTION' || type === '5GLABX_TEST_EXECUTION' || event.detail?.type === '5GLABX_TEST_EXECUTION') {
-        // Clear existing data when new test case starts (different executionId)
-        if (executionId && executionId !== currentExecutionIdRef.current) {
-        console.log("🧹 LogsView: New test case detected, clearing existing data")
-        setLogs([])
-        setActiveExecutionId(executionId)
-        currentExecutionIdRef.current = executionId
-        setIsReceivingData(false)
-        setLastDataReceived(null)
-      } else if (executionId) {
-        console.log("[v0] 🎯 LogsView: Setting active execution ID:", executionId)
-        setActiveExecutionId(executionId)
-        currentExecutionIdRef.current = executionId
-      }
-
-      if (logs && logs.length > 0) {
-        console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
-        console.log("📊 Log data structure:", JSON.stringify(logs[0], null, 2))
-
-        // SINGLE STATE UPDATE - Add logs to existing data (same execution)
-        setLogs((prev) => {
-          const newLogs = [...prev, ...logs]
-          console.log(`✅ LogsView: Added ${logs.length} logs from event. Total logs: ${newLogs.length}`)
-          return newLogs
+        // ✅ FIXED: Better data extraction with type checking
+        const { testCaseId, testCaseData, logs, executionId, type } = event.detail || {}
+        console.log("📊 Extracted data:", { 
+          testCaseId, 
+          hasTestCaseData: !!testCaseData, 
+          hasLogs: !!logs, 
+          executionId, 
+          type,
+          eventType: event.type
         })
 
-        setIsReceivingData(true)
-        setLastDataReceived(new Date())
-      } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
-        console.log("🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event")
-        console.log("📊 testCaseData structure:", JSON.stringify(testCaseData, null, 2))
-
-        // Process the test case data directly - handle both expectedMessages and realtimeMessages
-        const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
-        console.log(`📋 Found ${messages.length} messages to process`)
-        console.log(`📋 Processing ${messages.length} messages from testCaseData`)
-
-        // Clear existing logs if this is a new execution
-        if (executionId && executionId !== currentExecutionIdRef.current) {
-          console.log("🧹 LogsView: Clearing existing logs for new test case")
-          setLogs([])
-          currentExecutionIdRef.current = executionId
-        }
-
-        const processedLogs = messages.map((message: any, index: number) => ({
-          id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
-          timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
-          level: "I",
-          component: message.layer || message.component || "TEST",
-          message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
-          type: message.messageType || message.type || "TEST_MESSAGE",
-          source: "5GLABX_TEST_EXECUTION",
-          testCaseId: testCaseId,
-          direction: message.direction || "UL",
-          protocol: message.protocol || "5G_NR",
-          rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
-          informationElements: message.informationElements || {},
-          layerParameters: message.layerParameters || {},
-          standardReference: message.standardReference || "Unknown",
-          messagePayload: message.messagePayload || message.payload || {},
-          ies: message.informationElements
-            ? Object.entries(message.informationElements)
-                .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                .join(", ")
-            : Object.entries(message.messagePayload || message.payload || {})
-                .map(([k, v]) => `${k}=${v}`)
-                .join(", "),
-        }))
-
-        if (debugMode) {
-          console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`)
-          console.log("📊 Processed logs:", processedLogs)
-        }
-
-        // SINGLE STATE UPDATE - Fix the React state batching issue
-        setLogs((prev) => {
-          const newLogs = [...prev, ...processedLogs]
-          if (debugMode) {
-            console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData. Total logs: ${newLogs.length}`)
+        // ✅ FIXED: Check both event.type and event.detail.type
+        if (event.type === '5GLABX_TEST_EXECUTION' || type === '5GLABX_TEST_EXECUTION' || event.detail?.type === '5GLABX_TEST_EXECUTION') {
+          // Clear existing data when new test case starts (different executionId)
+          if (executionId && executionId !== currentExecutionIdRef.current) {
+            console.log("🧹 LogsView: New test case detected, clearing existing data")
+            setLogs([])
+            setActiveExecutionId(executionId)
+            currentExecutionIdRef.current = executionId
+            setIsReceivingData(false)
+            setLastDataReceived(null)
+          } else if (executionId) {
+            console.log("[v0] 🎯 LogsView: Setting active execution ID:", executionId)
+            setActiveExecutionId(executionId)
+            currentExecutionIdRef.current = executionId
           }
-          return newLogs
-        })
 
-        // Update receiving status
-        setIsReceivingData(true)
-        setLastDataReceived(new Date())
+          if (logs && logs.length > 0) {
+            console.log(`📋 LogsView: Processing ${logs.length} logs from event`)
+            console.log("📊 Log data structure:", JSON.stringify(logs[0], null, 2))
 
-        // Notify parent component with the processed logs
-        if (onStateChange) {
-          onStateChange({
-            currentView: "logs",
-            testExecutionActive: true,
-            testExecutionStatus: "active",
-            logs: processedLogs,
-          })
-        }
-      } else {
-        console.log("⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:", event.detail)
+            // SINGLE STATE UPDATE - Add logs to existing data (same execution)
+            setLogs((prev) => {
+              const newLogs = [...prev, ...logs]
+              console.log(`✅ LogsView: Added ${logs.length} logs from event. Total logs: ${newLogs.length}`)
+              return newLogs
+            })
 
-        // Try to extract data from any format
-        if (event.detail && typeof event.detail === "object") {
-          console.log("🔍 Attempting to extract data from event detail...")
-          console.log("📊 Event detail keys:", Object.keys(event.detail))
+            setIsReceivingData(true)
+            setLastDataReceived(new Date())
+          } else if (testCaseData && (testCaseData.expectedMessages || testCaseData.realtimeMessages)) {
+            console.log("🔥 LogsView: Processing testCaseData from 5GLABX_TEST_EXECUTION event")
+            console.log("📊 testCaseData structure:", JSON.stringify(testCaseData, null, 2))
 
-          if (event.detail.testCaseData) {
-            console.log("🔍 Found testCaseData in event detail")
-            const nestedData = event.detail.testCaseData
-            if (nestedData.expectedMessages || nestedData.realtimeMessages) {
-              const messages = nestedData.expectedMessages || nestedData.realtimeMessages || []
-              console.log(`📋 Processing ${messages.length} messages from nested testCaseData`)
-              
-              const processedLogs = messages.map((message: any, index: number) => ({
-                id: message.id || `nested-${testCaseId}-${Date.now()}-${index}`,
-                timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
-                level: "I",
-                component: message.layer || message.component || "TEST",
-                message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
-                type: message.messageType || message.type || "TEST_MESSAGE",
-                source: "5GLABX_TEST_EXECUTION_NESTED",
-                testCaseId: testCaseId,
-                direction: message.direction || "UL",
-                protocol: message.protocol || "5G_NR",
-                rawData: JSON.stringify(message.messagePayload || {}, null, 2),
-                informationElements: message.informationElements || {},
-                layerParameters: message.layerParameters || {},
-                standardReference: message.standardReference || "Unknown",
-                messagePayload: message.messagePayload || {},
-                ies: message.informationElements
-                  ? Object.entries(message.informationElements)
-                      .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
-                      .join(", ")
-                  : "",
-              }))
+            // Process the test case data directly - handle both expectedMessages and realtimeMessages
+            const messages = testCaseData.expectedMessages || testCaseData.realtimeMessages || []
+            console.log(`📋 Found ${messages.length} messages to process`)
+            console.log(`📋 Processing ${messages.length} messages from testCaseData`)
 
-              // SINGLE STATE UPDATE - Fix the React state batching issue
-              setLogs((prev) => {
-                const newLogs = [...prev, ...processedLogs]
-                console.log(`✅ LogsView: Added ${processedLogs.length} logs from nested testCaseData. Total logs: ${newLogs.length}`)
-                return newLogs
-              })
-              setIsReceivingData(true)
-              setLastDataReceived(new Date())
+            // Clear existing logs if this is a new execution
+            if (executionId && executionId !== currentExecutionIdRef.current) {
+              console.log("🧹 LogsView: Clearing existing logs for new test case")
+              setLogs([])
+              currentExecutionIdRef.current = executionId
             }
+
+            const processedLogs = messages.map((message: any, index: number) => ({
+              id: message.id || `event-${testCaseId}-${Date.now()}-${index}`,
+              timestamp: (message.timestampMs / 1000).toFixed(1) || (Date.now() / 1000).toFixed(1),
+              level: "I",
+              component: message.layer || message.component || "TEST",
+              message: `${message.messageName || message.messageType || "Test Message"}: ${JSON.stringify(message.messagePayload || {}, null, 2)}`,
+              type: message.messageType || message.type || "TEST_MESSAGE",
+              source: "5GLABX_TEST_EXECUTION",
+              testCaseId: testCaseId,
+              direction: message.direction || "UL",
+              protocol: message.protocol || "5G_NR",
+              rawData: JSON.stringify(message.messagePayload || message.payload || {}, null, 2),
+              informationElements: message.informationElements || {},
+              layerParameters: message.layerParameters || {},
+              standardReference: message.standardReference || "Unknown",
+              messagePayload: message.messagePayload || message.payload || {},
+              ies: message.informationElements
+                ? Object.entries(message.informationElements)
+                    .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                    .join(", ")
+                : Object.entries(message.messagePayload || message.payload || {})
+                    .map(([k, v]) => `${k}=${v}`)
+                    .join(", "),
+            }))
+
+            if (debugMode) {
+              console.log(`✅ LogsView: Processed ${processedLogs.length} log entries from testCaseData`)
+              console.log("📊 Processed logs:", processedLogs)
+            }
+
+            // SINGLE STATE UPDATE - Fix the React state batching issue
+            setLogs((prev) => {
+              const newLogs = [...prev, ...processedLogs]
+              if (debugMode) {
+                console.log(`✅ LogsView: Added ${processedLogs.length} log entries from testCaseData. Total logs: ${newLogs.length}`)
+              }
+              return newLogs
+            })
+
+            // Update receiving status
+            setIsReceivingData(true)
+            setLastDataReceived(new Date())
+
+            // Notify parent component with the processed logs
+            if (onStateChange) {
+              onStateChange({
+                currentView: "logs",
+                testExecutionActive: true,
+                testExecutionStatus: "active",
+                logs: processedLogs,
+              })
+            }
+          } else {
+            console.log("⚠️  No logs or testCaseData found in 5GLABX_TEST_EXECUTION event:", event.detail)
           }
+        } else {
+          console.log("🔍 Event not for this component:", event.type)
         }
+      } catch (error) {
+        console.error("❌ Error handling test execution event:", error);
       }
-    }
+    };
 
     window.addEventListener("5GLABX_TEST_EXECUTION", handleTestExecution)
 
