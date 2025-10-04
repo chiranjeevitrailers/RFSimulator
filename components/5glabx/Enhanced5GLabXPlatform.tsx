@@ -21,6 +21,7 @@ import PdcpLayerViewTSX from './views/PdcpLayerViewTSX';
 import RrcLayerViewTSX from './views/RrcLayerViewTSX';
 import NasLayerViewTSX from './views/NasLayerViewTSX';
 import ImsLayerView from './views/ImsLayerView';
+import RealDataDirectView from './views/RealDataDirectView';
 import {
   Activity,
   BarChart3,
@@ -865,6 +866,8 @@ const Enhanced5GLabXPlatform: React.FC = () => {
         return <NasLayerViewTSX appState={{}} onStateChange={() => {}} />;
       case 'ims-layer':
         return <ImsLayerView appState={{}} onStateChange={() => {}} />;
+      case 'real-data':
+        return <RealDataDirectView />;
       
       default:
         return <EnhancedDashboard />;
