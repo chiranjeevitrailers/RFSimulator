@@ -546,12 +546,67 @@ const ProfessionalTestManager: React.FC = () => {
       addLog("INFO", `⚙️  Layer Parameters: ${result.testCaseData?.parameterCount || 0}`)
       addLog("INFO", `💾 Data stored in Supabase database`)
       
-      // Log individual messages
-      if (result.testCaseData?.expectedMessages) {
-        addLog("INFO", `📋 Protocol Messages Generated:`)
+      // Add comprehensive test data logging
+      addLog("INFO", `📊 ===== TEST CASE DETAILS =====`)
+      addLog("INFO", `📋 Test Case ID: ${testId}`)
+      addLog("INFO", `📋 Test Case Name: ${result.testCaseData?.name || 'Unknown'}`)
+      addLog("INFO", `📋 Description: ${result.testCaseData?.description || 'No description'}`)
+      addLog("INFO", `📋 Category: ${result.testCaseData?.category || 'N/A'}`)
+      addLog("INFO", `📋 Protocol: ${result.testCaseData?.protocol || 'N/A'}`)
+      addLog("INFO", `📋 Complexity: ${result.testCaseData?.complexity || 'N/A'}`)
+      addLog("INFO", `📋 Data Source: ${result.testCaseData?.dataSource || 'Supabase Database'}`)
+      addLog("INFO", `📊 ===== END TEST CASE DETAILS =====`)
+      
+      // Log individual messages with detailed information
+      if (result.testCaseData?.expectedMessages && result.testCaseData.expectedMessages.length > 0) {
+        addLog("INFO", `📋 ===== PROTOCOL MESSAGES GENERATED =====`)
+        addLog("INFO", `📋 Total Messages: ${result.testCaseData.expectedMessages.length}`)
         result.testCaseData.expectedMessages.forEach((msg, idx) => {
-          addLog("INFO", `   ${idx + 1}. ${msg.layer} - ${msg.messageType} (${msg.direction})`)
+          addLog("INFO", `📋 Message ${idx + 1}:`)
+          addLog("INFO", `   📋 ID: ${msg.id || 'N/A'}`)
+          addLog("INFO", `   📋 Layer: ${msg.layer || 'N/A'}`)
+          addLog("INFO", `   📋 Type: ${msg.messageType || 'N/A'}`)
+          addLog("INFO", `   📋 Direction: ${msg.direction || 'N/A'}`)
+          addLog("INFO", `   📋 Protocol: ${msg.protocol || 'N/A'}`)
+          addLog("INFO", `   📋 Timestamp: ${msg.timestampMs ? new Date(msg.timestampMs).toLocaleString() : 'N/A'}`)
+          if (msg.messagePayload && Object.keys(msg.messagePayload).length > 0) {
+            addLog("INFO", `   📋 Payload: ${JSON.stringify(msg.messagePayload, null, 2)}`)
+          }
+          if (msg.informationElements && Object.keys(msg.informationElements).length > 0) {
+            addLog("INFO", `   📋 Information Elements: ${JSON.stringify(msg.informationElements, null, 2)}`)
+          }
+          if (msg.layerParameters && Object.keys(msg.layerParameters).length > 0) {
+            addLog("INFO", `   📋 Layer Parameters: ${JSON.stringify(msg.layerParameters, null, 2)}`)
+          }
+          addLog("INFO", `   📋 ---`)
         })
+        addLog("INFO", `📋 ===== END PROTOCOL MESSAGES =====`)
+      } else {
+        addLog("WARN", `⚠️  No protocol messages found in test case data`)
+      }
+      
+      // Log Information Elements
+      if (result.testCaseData?.expectedInformationElements && result.testCaseData.expectedInformationElements.length > 0) {
+        addLog("INFO", `🔧 ===== INFORMATION ELEMENTS =====`)
+        addLog("INFO", `🔧 Total IEs: ${result.testCaseData.expectedInformationElements.length}`)
+        result.testCaseData.expectedInformationElements.forEach((ie, idx) => {
+          addLog("INFO", `🔧 IE ${idx + 1}: ${ie.name || 'Unknown'} = ${ie.value || 'N/A'} (${ie.type || 'Unknown'})`)
+        })
+        addLog("INFO", `🔧 ===== END INFORMATION ELEMENTS =====`)
+      } else {
+        addLog("INFO", `🔧 No Information Elements found`)
+      }
+      
+      // Log Layer Parameters
+      if (result.testCaseData?.expectedLayerParameters && result.testCaseData.expectedLayerParameters.length > 0) {
+        addLog("INFO", `⚙️  ===== LAYER PARAMETERS =====`)
+        addLog("INFO", `⚙️  Total Parameters: ${result.testCaseData.expectedLayerParameters.length}`)
+        result.testCaseData.expectedLayerParameters.forEach((param, idx) => {
+          addLog("INFO", `⚙️  Param ${idx + 1}: ${param.name || 'Unknown'} = ${param.value || 'N/A'} ${param.unit || ''} (${param.type || 'Unknown'})`)
+        })
+        addLog("INFO", `⚙️  ===== END LAYER PARAMETERS =====`)
+      } else {
+        addLog("INFO", `⚙️  No Layer Parameters found`)
       }
       
       addLog("INFO", `📡 Broadcasting to 5GLabX Platform for real-time display`)
@@ -593,6 +648,8 @@ const ProfessionalTestManager: React.FC = () => {
         }
 
         addLog("INFO", `📡 Event detail prepared with ${eventDetail.testCaseData.expectedMessages.length} messages`)
+        addLog("INFO", `📡 Event contains ${eventDetail.testCaseData.expectedInformationElements.length} Information Elements`)
+        addLog("INFO", `📡 Event contains ${eventDetail.testCaseData.expectedLayerParameters.length} Layer Parameters`)
         console.log("[v0] 📡 TEST MANAGER: Dispatching testCaseExecutionStarted event with data:", {
           executionId: eventDetail.executionId,
           testCaseId: eventDetail.testCaseId,
@@ -602,6 +659,7 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         // Dispatch the main event that LogsView is listening for
+        addLog("INFO", `📡 ===== DISPATCHING EVENTS TO 5GLABX PLATFORM =====`)
         addLog("INFO", `📡 Dispatching 5GLABX_TEST_EXECUTION event...`)
         const testExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
           detail: {
@@ -660,9 +718,16 @@ const ProfessionalTestManager: React.FC = () => {
       
       // Add completion log after short delay
       setTimeout(() => {
+        addLog("SUCCESS", `✅ ===== TEST EXECUTION COMPLETED =====`)
         addLog("SUCCESS", `✅ Test execution completed successfully`)
         addLog("INFO", `🎯 View results in 5GLabX Platform → Logs Viewer`)
+        addLog("INFO", `📊 Test Case: ${result.testCaseData?.name || testId}`)
+        addLog("INFO", `🆔 Execution ID: ${result.executionId}`)
+        addLog("INFO", `📨 Messages Processed: ${result.testCaseData?.expectedMessages?.length || 0}`)
+        addLog("INFO", `🔧 Information Elements: ${result.testCaseData?.expectedInformationElements?.length || 0}`)
+        addLog("INFO", `⚙️  Layer Parameters: ${result.testCaseData?.expectedLayerParameters?.length || 0}`)
         addLog("INFO", `⏰ Execution completed at: ${new Date().toLocaleString()}`)
+        addLog("SUCCESS", `✅ ===== END TEST EXECUTION =====`)
         setIsRunning(false)
         setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Completed", lastRun: new Date().toLocaleString() } : tc)))
       }, 3000)
