@@ -56,9 +56,9 @@ import UEIMSLayer from './views/protocol/UEIMSLayer';
 import UENASLayer from './views/protocol/UENASLayer';
 import UERRCLayer from './views/protocol/UERRCLayer';
 import UEPDCPLayer from './views/protocol/UEPDCPLayer';
+import UEComprehensivePhyLayerView from './views/protocol/UEComprehensivePhyLayerView';
 import UERLCLayer from './views/protocol/UERLCLayer';
 import UEMACLayer from './views/protocol/UEMACLayer';
-import UEPHYLayer from './views/protocol/UEPHYLayer';
 
 // UE Performance Views
 import UEPerformanceAnalysis from './views/performance/UEPerformanceAnalysis';
@@ -263,7 +263,7 @@ const NewUEAnalysisPlatform: React.FC<NewUEAnalysisPlatformProps> = ({ className
       case 'ue-mac-layer':
         return <UEMACLayer executionId={executionId} />;
       case 'ue-phy-layer':
-        return <UEPHYLayer executionId={executionId} />;
+        return <UEComprehensivePhyLayerView executionId={executionId} />;
 
       // UE Performance Views
       case 'ue-performance':

@@ -80,9 +80,9 @@ import DopplerAnalysis from './views/ntn/DopplerAnalysis';
 import NtnScenarios from './views/ntn/NtnScenarios';
 
 // Protocol Layers Views
-import PhyLayerView from './views/protocol/PhyLayerView';
-import MacLayerView from './views/protocol/MacLayerView';
-import RlcLayerView from './views/protocol/RlcLayerView';
+import ComprehensivePhyLayerView from './views/protocol/ComprehensivePhyLayerView';
+import ComprehensiveMacLayerView from './views/protocol/ComprehensiveMacLayerView';
+import ComprehensiveRlcLayerView from './views/protocol/ComprehensiveRlcLayerView';
 import PdcpLayerView from './views/protocol/PdcpLayerView';
 import RrcLayerView from './views/protocol/RrcLayerView';
 import NasLayerView from './views/protocol/NasLayerView';
@@ -371,11 +371,11 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
 
       // Protocol Layers
       case 'phy-layer':
-        return <PhyLayerView executionId={executionId} />;
+        return <ComprehensivePhyLayerView executionId={executionId} />;
       case 'mac-layer':
-        return <MacLayerView executionId={executionId} />;
+        return <ComprehensiveMacLayerView executionId={executionId} />;
       case 'rlc-layer':
-        return <RlcLayerView executionId={executionId} />;
+        return <ComprehensiveRlcLayerView executionId={executionId} />;
       case 'pdcp-layer':
         return <PdcpLayerView executionId={executionId} />;
       case 'rrc-layer':
