@@ -3,9 +3,13 @@
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor } from "lucide-react"
+import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor, TestTube, Database, Smartphone, Layers } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
 import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
+import NewTestManager from "@/components/testing/NewTestManager_1/NewTestManager"
+import New5GLabXPlatform from "@/components/5glabx/New5GLabX_1/New5GLabXPlatform"
+import NewUEAnalysisPlatform from "@/components/ue-analysis/NewUEAnalysis_1/NewUEAnalysisPlatform"
+import ProfessionalAnalysisPlatform from "@/components/professional-log-analysis/ProfessionalAnalysisPlatform"
 
 const UserDashboard: React.FC = () => {
   const router = useRouter()
@@ -19,26 +23,46 @@ const UserDashboard: React.FC = () => {
   })
   const [activeTab, setActiveTab] = useState("overview")
 
-  // Load DataFormatAdapter
+  // Load DataFormatAdapter and DataFlowManager
   useEffect(() => {
-    const loadDataFormatAdapter = async () => {
+    const loadServices = async () => {
       try {
+        // Load DataFormatAdapter
         const { DataFormatAdapter } = await import('@/utils/DataFormatAdapter');
         if (typeof window !== 'undefined') {
           (window as any).DataFormatAdapter = DataFormatAdapter;
           console.log('✅ DataFormatAdapter loaded successfully');
         }
+
+        // Load DataFlowManager
+        const { dataFlowManager } = await import('@/utils/DataFlowManager');
+        if (typeof window !== 'undefined') {
+          (window as any).dataFlowManager = dataFlowManager;
+          console.log('✅ DataFlowManager loaded successfully');
+        }
       } catch (error) {
-        console.error('❌ Failed to load DataFormatAdapter:', error);
+        console.error('❌ Failed to load services:', error);
       }
     };
 
-    loadDataFormatAdapter();
+    loadServices();
   }, []);
 
-  // Memoize the 5GLabX Platform to prevent unnecessary remounting
+  // Memoize the platforms to prevent unnecessary remounting
   const Memoized5GLabXPlatform = useMemo(() => {
     return <Enhanced5GLabXPlatform />;
+  }, []);
+
+  const MemoizedNew5GLabXPlatform = useMemo(() => {
+    return <New5GLabXPlatform />;
+  }, []);
+
+  const MemoizedUEAnalysisPlatform = useMemo(() => {
+    return <NewUEAnalysisPlatform />;
+  }, []);
+
+  const MemoizedProfessionalAnalysisPlatform = useMemo(() => {
+    return <ProfessionalAnalysisPlatform executionId={null} platform="5GLABX" />;
   }, []);
 
   const handleSignOut = () => {
@@ -56,7 +80,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex-shrink-0">
                 <h1 className="text-xl font-bold text-primary-600">5GLabX</h1>
               </div>
-              <nav className="ml-10 flex space-x-8">
+              <nav className="ml-10 flex space-x-6">
                 <button
                   onClick={() => setActiveTab("overview")}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -74,8 +98,19 @@ const UserDashboard: React.FC = () => {
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <BarChart3 className="w-4 h-4 inline mr-2" />
+                  <TestTube className="w-4 h-4 inline mr-2" />
                   Test Manager
+                </button>
+                <button
+                  onClick={() => setActiveTab("new-test-manager")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === "new-test-manager"
+                      ? "bg-primary-100 text-primary-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4 inline mr-2" />
+                  New Test Manager
                 </button>
                 <button
                   onClick={() => setActiveTab("5glabx-platform")}
@@ -88,7 +123,39 @@ const UserDashboard: React.FC = () => {
                   <Monitor className="w-4 h-4 inline mr-2" />
                   5GLabX Platform
                 </button>
-
+                <button
+                  onClick={() => setActiveTab("new-5glabx")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === "new-5glabx"
+                      ? "bg-primary-100 text-primary-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Database className="w-4 h-4 inline mr-2" />
+                  New 5GLabX
+                </button>
+                <button
+                  onClick={() => setActiveTab("ue-analysis")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === "ue-analysis"
+                      ? "bg-primary-100 text-primary-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Smartphone className="w-4 h-4 inline mr-2" />
+                  UE Analysis
+                </button>
+                <button
+                  onClick={() => setActiveTab("professional-analysis")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    activeTab === "professional-analysis"
+                      ? "bg-primary-100 text-primary-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Layers className="w-4 h-4 inline mr-2" />
+                  Professional Analysis
+                </button>
                 <button
                   onClick={() => setActiveTab("settings")}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -132,17 +199,96 @@ const UserDashboard: React.FC = () => {
             {/* Welcome Section */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.full_name}!</h2>
-              <p className="text-gray-600">Your 5GLabX dashboard is ready for use.</p>
+              <p className="text-gray-600">Your 5GLabX Professional Analysis Platform is ready for use.</p>
             </div>
 
-            {/* Clean Dashboard */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Dashboard Status</h3>
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-green-600" />
+            {/* Platform Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Test Manager */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <TestTube className="w-8 h-8 text-blue-600 mr-3" />
+                  <h3 className="text-lg font-semibold text-gray-900">Test Manager</h3>
                 </div>
-                <p className="text-gray-600">Dashboard is clean and ready for new features</p>
+                <p className="text-gray-600 mb-4">Execute and manage test cases with real-time monitoring</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Professional Test Manager</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+
+              {/* 5GLabX Platform */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <Database className="w-8 h-8 text-green-600 mr-3" />
+                  <h3 className="text-lg font-semibold text-gray-900">5GLabX Platform</h3>
+                </div>
+                <p className="text-gray-600 mb-4">Network analysis and monitoring with professional tools</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">New 5GLabX Platform</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+
+              {/* UE Analysis */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <Smartphone className="w-8 h-8 text-purple-600 mr-3" />
+                  <h3 className="text-lg font-semibold text-gray-900">UE Analysis</h3>
+                </div>
+                <p className="text-gray-600 mb-4">UE log analysis and device monitoring</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">UE Analysis Platform</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+
+              {/* Professional Analysis */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center mb-4">
+                  <Layers className="w-8 h-8 text-orange-600 mr-3" />
+                  <h3 className="text-lg font-semibold text-gray-900">Professional Analysis</h3>
+                </div>
+                <p className="text-gray-600 mb-4">QXDM/Keysight-compatible professional analysis tools</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Industry Standard</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Features Overview */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:col-span-2 lg:col-span-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Features</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <Activity className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">Real-time Analysis</h4>
+                    <p className="text-xs text-gray-500">Live data streaming</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <Layers className="w-6 h-6 text-green-600" />
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">Protocol Layers</h4>
+                    <p className="text-xs text-gray-500">PHY, MAC, RLC, PDCP, RRC, NAS</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <BarChart3 className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">Professional UI</h4>
+                    <p className="text-xs text-gray-500">QXDM/Keysight compatible</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <Shield className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <h4 className="text-sm font-medium text-gray-900">3GPP Standards</h4>
+                    <p className="text-xs text-gray-500">Industry compliant</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -177,6 +323,74 @@ const UserDashboard: React.FC = () => {
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <ProfessionalTestManager />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "new-test-manager" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">New Test Manager</h2>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Online</span>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="h-[800px]">
+                <NewTestManager />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "new-5glabx" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">New 5GLabX Platform</h2>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Online</span>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="h-[800px]">
+                {MemoizedNew5GLabXPlatform}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "ue-analysis" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">UE Analysis Platform</h2>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Online</span>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="h-[800px]">
+                {MemoizedUEAnalysisPlatform}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "professional-analysis" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Professional Analysis Platform</h2>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-600">Live Analysis</span>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="h-[800px]">
+                {MemoizedProfessionalAnalysisPlatform}
+              </div>
             </div>
           </div>
         )}
