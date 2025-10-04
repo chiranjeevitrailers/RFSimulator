@@ -1,0 +1,485 @@
+{
+  "testCaseId": "lte-power-on-v1",
+  "name": "LTE Power-On Default Attach",
+  "description": "Complete LTE Power-On test procedure with end-to-end message sequence",
+  "technology": "LTE",
+  "category": "POWER_ON",
+  "version": "1.0",
+  "ueProfile": {
+    "id": "ue_iphone14_01",
+    "imsi": "404123456789012",
+    "imei": "359123456789012",
+    "deviceCapabilities": {
+      "bandwidthClass": "A",
+      "caSupport": true,
+      "mimoSupport": "2x2",
+      "features": ["VoLTE", "VoWiFi"]
+    },
+    "defaultApn": "internet",
+    "securitySupport": {
+      "EEA": ["EEA0", "EEA1", "EEA2"],
+      "EIA": ["EIA0", "EIA1", "EIA2"]
+    }
+  },
+  "cellConfig": {
+    "pci": 123,
+    "earfcn": 1850,
+    "bandwidth": 20,
+    "tac": 12345,
+    "mcc": "404",
+    "mnc": "12"
+  },
+  "expectedMessageSequence": [
+    {
+      "step": 1,
+      "eventType": "CELL_SYNC",
+      "layer": "PHY",
+      "description": "UE powers on and performs cell search & sync",
+      "expectedIEs": {
+        "cell_id": "123",
+        "pci": 123,
+        "earfcn": 1850,
+        "dl_bandwidth": 20,
+        "rrc_state": "IDLE",
+        "rsrp": -95,
+        "rsrq": -10,
+        "sinr": 15,
+        "timing_advance_estimate": 0,
+        "mib_sfn": 0,
+        "sib1_periodicity": 20
+      },
+      "assertions": {
+        "rsrp_dbm": {"min": -110, "max": -70},
+        "rsrq_db": {"min": -20, "max": -3},
+        "sinr_db": {"min": 0, "max": 30}
+      }
+    },
+    {
+      "step": 2,
+      "eventType": "PRACH_ATTEMPT",
+      "layer": "PHY",
+      "description": "Random Access procedure initiation",
+      "expectedIEs": {
+        "raPreambleIndex": 3,
+        "ra_RNTI": 0,
+        "prachFormat": 0,
+        "preambleTxPower": 23,
+        "prachTimingOffset": 0,
+        "numAttempts": 1
+      },
+      "assertions": {
+        "prach_attempts": {"max": 3},
+        "preamble_power": {"min": 10, "max": 30}
+      }
+    },
+    {
+      "step": 3,
+      "eventType": "PRACH_SUCCESS",
+      "layer": "PHY",
+      "description": "Random Access successful",
+      "expectedIEs": {
+        "raPreambleIndex": 3,
+        "ra_RNTI": 0x1a2,
+        "response_window": "SUCCESS",
+        "contentionResolutionID": "0x12345678",
+        "timing_advance": 10
+      },
+      "assertions": {
+        "prach_success": true,
+        "timing_advance": {"min": 0, "max": 1282}
+      }
+    },
+    {
+      "step": 4,
+      "eventType": "RRC_CONN_REQUEST",
+      "layer": "RRC",
+      "description": "RRC Connection Request",
+      "expectedIEs": {
+        "establishmentCause": "mo-signalling",
+        "s_TMSI": "0x12345678",
+        "ue_Identity": "random_12345",
+        "rntiCandidate": 0x5c
+      },
+      "assertions": {
+        "establishment_cause": "mo-signalling",
+        "ue_identity_present": true
+      }
+    },
+    {
+      "step": 5,
+      "eventType": "RRC_CONN_SETUP",
+      "layer": "RRC",
+      "description": "RRC Connection Setup from eNB",
+      "expectedIEs": {
+        "cfg_rlc": true,
+        "cfg_pdcp": true,
+        "initial_RRC_configuration": "DEFAULT",
+        "selected_PLMN": "404-12",
+        "radioResourceConfigDedicated": "SRB1_CONFIG",
+        "rntiAssigned": 0x5c
+      },
+      "assertions": {
+        "c_rnti_assigned": true,
+        "srb1_configured": true
+      }
+    },
+    {
+      "step": 6,
+      "eventType": "RRC_CONN_SETUP_COMPLETE",
+      "layer": "RRC",
+      "description": "RRC Connection Setup Complete with NAS Attach Request",
+      "expectedIEs": {
+        "ue_Capability": "LTE_CAPABILITIES",
+        "nas_PDU": "ATTACH_REQUEST",
+        "ue_Identity": 0x5c,
+        "selected_PLMN": "404-12"
+      },
+      "assertions": {
+        "nas_pdu_present": true,
+        "ue_capability_present": true
+      }
+    },
+    {
+      "step": 7,
+      "eventType": "S1AP_INITIAL_UE_MESSAGE",
+      "layer": "S1AP",
+      "description": "S1AP Initial UE Message from eNB to MME",
+      "expectedIEs": {
+        "enb_ue_s1ap_id": 12345,
+        "mme_ue_s1ap_id": null,
+        "nas_pdu": "ATTACH_REQUEST_HEX",
+        "ue_context_request": true,
+        "ue_security_capabilities": "EEA0,EEA1,EIA0,EIA1"
+      },
+      "assertions": {
+        "enb_ue_s1ap_id_present": true,
+        "nas_pdu_encapsulated": true
+      }
+    },
+    {
+      "step": 8,
+      "eventType": "NAS_ATTACH_REQUEST",
+      "layer": "NAS",
+      "description": "NAS Attach Request from UE to MME",
+      "expectedIEs": {
+        "messageType": "Attach Request",
+        "epsAttachType": "EPS_ATTACH",
+        "imsi": "404123456789012",
+        "imei": "359123456789012",
+        "ueNetworkCapability": {
+          "EEA": ["EEA0", "EEA1"],
+          "EIA": ["EIA0", "EIA1"]
+        },
+        "requestedAPN": "internet",
+        "securityContextAvailable": false,
+        "oldGUTI": null,
+        "msisdn": null
+      },
+      "assertions": {
+        "imsi_present": true,
+        "apn_requested": "internet",
+        "security_capabilities_present": true
+      }
+    },
+    {
+      "step": 9,
+      "eventType": "AUTH_REQUEST",
+      "layer": "NAS",
+      "description": "Authentication Request from MME to UE",
+      "expectedIEs": {
+        "rand": "0x1234567890abcdef1234567890abcdef",
+        "autn": "0xabcdef1234567890abcdef1234567890",
+        "securityAlgorithm": "EIA1",
+        "cipheringAlgorithm": "EEA1"
+      },
+      "assertions": {
+        "rand_present": true,
+        "autn_present": true,
+        "security_algorithm_valid": true
+      }
+    },
+    {
+      "step": 10,
+      "eventType": "AUTH_RESPONSE",
+      "layer": "NAS",
+      "description": "Authentication Response from UE to MME",
+      "expectedIEs": {
+        "res": "0x1234567890abcdef",
+        "xres": "0x1234567890abcdef",
+        "success": true,
+        "securityAlgorithm": "EIA1"
+      },
+      "assertions": {
+        "res_present": true,
+        "auth_success": true
+      }
+    },
+    {
+      "step": 11,
+      "eventType": "SEC_MODE_COMMAND",
+      "layer": "NAS",
+      "description": "Security Mode Command from MME to UE",
+      "expectedIEs": {
+        "selected_integ_algo": "EIA1",
+        "selected_cipher_algo": "EEA1",
+        "count": 0,
+        "nonce": "0x12345678"
+      },
+      "assertions": {
+        "integrity_algorithm": "EIA1",
+        "ciphering_algorithm": "EEA1"
+      }
+    },
+    {
+      "step": 12,
+      "eventType": "SEC_MODE_COMPLETE",
+      "layer": "NAS",
+      "description": "Security Mode Complete from UE to MME",
+      "expectedIEs": {
+        "selected_integ_algo": "EIA1",
+        "selected_cipher_algo": "EEA1",
+        "imeisv": "3591234567890123"
+      },
+      "assertions": {
+        "security_mode_complete": true,
+        "imeisv_present": true
+      }
+    },
+    {
+      "step": 13,
+      "eventType": "GTP_CREATE_SESSION_REQ",
+      "layer": "GTP",
+      "description": "GTP-C Create Session Request from MME to SGW/PGW",
+      "expectedIEs": {
+        "imsi": "404123456789012",
+        "msisdn": null,
+        "apn": "internet",
+        "mme_s11_teid": 0x12345678,
+        "sgw_s11_teid": null,
+        "pdn_type": "IPv4",
+        "bearer_ctx": {
+          "ebi": 5,
+          "qci": 9,
+          "ambr": {"ul": 1000000, "dl": 1000000},
+          "gwAddress": "192.168.1.100"
+        },
+        "pco": "INTERNET_PROTOCOL_CONFIGURATION"
+      },
+      "assertions": {
+        "apn_correct": "internet",
+        "pdn_type": "IPv4",
+        "qci": 9
+      }
+    },
+    {
+      "step": 14,
+      "eventType": "GTP_CREATE_SESSION_RESP",
+      "layer": "GTP",
+      "description": "GTP-C Create Session Response from SGW/PGW to MME",
+      "expectedIEs": {
+        "imsi": "404123456789012",
+        "mme_s11_teid": 0x12345678,
+        "sgw_s11_teid": 0x87654321,
+        "cause": "REQUEST_ACCEPTED",
+        "bearer_ctx": {
+          "ebi": 5,
+          "qci": 9,
+          "sgw_s1u_teid": 0x11111111,
+          "pgw_s5s8_teid": 0x22222222,
+          "pgw_address": "192.168.1.200"
+        },
+        "pdn_address": "10.0.0.100"
+      },
+      "assertions": {
+        "cause": "REQUEST_ACCEPTED",
+        "teids_assigned": true,
+        "pdn_address_allocated": true
+      }
+    },
+    {
+      "step": 15,
+      "eventType": "NAS_ATTACH_ACCEPT",
+      "layer": "NAS",
+      "description": "NAS Attach Accept from MME to UE",
+      "expectedIEs": {
+        "mmeAssignedGUTI": "404-12-1234567890",
+        "locationAreaIdentifier": "404-12-12345",
+        "tac": 12345,
+        "epsBearerContext": {
+          "ebi": 5,
+          "qci": 9,
+          "arp": 9,
+          "gbr": 0,
+          "mbr": 1000000
+        },
+        "apnRestriction": "NO_RESTRICTION",
+        "emm_cause": "ATTACH_ACCEPT"
+      },
+      "assertions": {
+        "guti_assigned": true,
+        "eps_bearer_created": true,
+        "qci": 9
+      }
+    },
+    {
+      "step": 16,
+      "eventType": "S1AP_INITIAL_CONTEXT_SETUP",
+      "layer": "S1AP",
+      "description": "S1AP Initial Context Setup from MME to eNB",
+      "expectedIEs": {
+        "eNB_UE_S1AP_ID": 12345,
+        "MME_UE_S1AP_ID": 67890,
+        "e_rab_to_be_setup_list": {
+          "e_rab_id": 5,
+          "transportLayerAddress": "192.168.1.100",
+          "gtp_teid": 0x11111111
+        },
+        "ueAggregateMaximumBitRate": {
+          "ul": 1000000,
+          "dl": 1000000
+        }
+      },
+      "assertions": {
+        "e_rab_configured": true,
+        "s1u_teid_assigned": true
+      }
+    },
+    {
+      "step": 17,
+      "eventType": "E_RAB_SETUP_RESPONSE",
+      "layer": "S1AP",
+      "description": "E-RAB Setup Response from eNB to MME",
+      "expectedIEs": {
+        "eNB_UE_S1AP_ID": 12345,
+        "MME_UE_S1AP_ID": 67890,
+        "e_rab_setup_list": {
+          "e_rab_id": 5,
+          "transportLayerAddress": "192.168.1.101",
+          "gtp_teid": 0x33333333
+        },
+        "cause": "SUCCESS"
+      },
+      "assertions": {
+        "e_rab_setup_success": true,
+        "s1u_teid_configured": true
+      }
+    },
+    {
+      "step": 18,
+      "eventType": "NAS_ATTACH_COMPLETE",
+      "layer": "NAS",
+      "description": "NAS Attach Complete from UE to MME",
+      "expectedIEs": {
+        "attachCompleteIndicator": true,
+        "pco_info": "INTERNET_PROTOCOL_CONFIGURATION",
+        "eps_bearer_status": "ACTIVE"
+      },
+      "assertions": {
+        "attach_complete": true,
+        "eps_bearer_active": true
+      }
+    },
+    {
+      "step": 19,
+      "eventType": "GTPU_DATA",
+      "layer": "GTP",
+      "description": "First GTP-U data packets (user plane active)",
+      "expectedIEs": {
+        "s1u_teid_dl": 0x11111111,
+        "s1u_teid_ul": 0x33333333,
+        "src_ip": "192.168.1.101",
+        "dst_ip": "192.168.1.100",
+        "src_port": 2152,
+        "dst_port": 2152,
+        "pdcp_pdu_count": 1,
+        "throughput_kbps": 10
+      },
+      "assertions": {
+        "user_plane_active": true,
+        "gtp_teids_correct": true,
+        "data_flow_established": true
+      }
+    }
+  ],
+  "layerParameters": {
+    "PHY": {
+      "rsrp": {"min": -110, "max": -70, "unit": "dBm"},
+      "rsrq": {"min": -20, "max": -3, "unit": "dB"},
+      "sinr": {"min": 0, "max": 30, "unit": "dB"},
+      "cqi": {"min": 0, "max": 15, "unit": ""},
+      "mcs": {"min": 0, "max": 28, "unit": ""},
+      "tx_power": {"min": 10, "max": 30, "unit": "dBm"},
+      "timing_advance": {"min": 0, "max": 1282, "unit": "Ts"}
+    },
+    "MAC": {
+      "c_rnti": {"type": "hex", "format": "0xXXXX"},
+      "harq_ack_count": {"min": 0, "max": 1000, "unit": "count"},
+      "harq_nack_count": {"min": 0, "max": 100, "unit": "count"},
+      "ul_grant_size": {"min": 0, "max": 100000, "unit": "bytes"},
+      "dl_grant_size": {"min": 0, "max": 100000, "unit": "bytes"},
+      "prach_attempts": {"min": 1, "max": 10, "unit": "count"}
+    },
+    "RLC": {
+      "mode": {"values": ["AM", "UM", "TM"]},
+      "tx_sn": {"min": 0, "max": 1023, "unit": ""},
+      "rx_sn": {"min": 0, "max": 1023, "unit": ""},
+      "retransmissions": {"min": 0, "max": 100, "unit": "count"},
+      "buffer_occupancy": {"min": 0, "max": 1000000, "unit": "bytes"}
+    },
+    "PDCP": {
+      "tx_sn": {"min": 0, "max": 4095, "unit": ""},
+      "rx_sn": {"min": 0, "max": 4095, "unit": ""},
+      "pdu_count": {"min": 0, "max": 10000, "unit": "count"},
+      "bytes_encrypted": {"min": 0, "max": 10000000, "unit": "bytes"},
+      "ciphering_algorithm": {"values": ["EEA0", "EEA1", "EEA2"]},
+      "integrity_algorithm": {"values": ["EIA0", "EIA1", "EIA2"]}
+    },
+    "RRC": {
+      "rrc_state": {"values": ["IDLE", "CONNECTED"]},
+      "t300_timer": {"min": 0, "max": 10000, "unit": "ms"},
+      "t304_timer": {"min": 0, "max": 10000, "unit": "ms"},
+      "ue_capabilities": {"type": "json", "required": true}
+    },
+    "NAS": {
+      "imsi": {"type": "string", "format": "15_digits"},
+      "guti": {"type": "string", "format": "mcc-mnc-mmei-m-tmsi"},
+      "emm_state": {"values": ["DEREGISTERED", "REGISTERED"]},
+      "attach_type": {"values": ["EPS_ATTACH", "COMBINED_ATTACH"]},
+      "security_context": {"type": "boolean"}
+    },
+    "S1AP": {
+      "enb_ue_s1ap_id": {"min": 0, "max": 16777215, "unit": ""},
+      "mme_ue_s1ap_id": {"min": 0, "max": 4294967295, "unit": ""},
+      "e_rab_id": {"min": 0, "max": 15, "unit": ""},
+      "qci": {"min": 1, "max": 9, "unit": ""}
+    },
+    "GTP": {
+      "s11_teid": {"type": "hex", "format": "0xXXXXXXXX"},
+      "s1u_teid": {"type": "hex", "format": "0xXXXXXXXX"},
+      "s5s8_teid": {"type": "hex", "format": "0xXXXXXXXX"},
+      "cause": {"values": ["REQUEST_ACCEPTED", "REQUEST_REJECTED"]}
+    }
+  },
+  "assertions": {
+    "attach_time_ms": {"max": 3000},
+    "rrc_setup_time_ms": {"max": 200},
+    "prach_attempts": {"max": 2},
+    "rsrp_dbm": {"min": -110},
+    "default_bearer_qci": 9,
+    "default_bearer_ebi": 5,
+    "gtp_session_created": true,
+    "user_plane_active": true
+  },
+  "testConfig": {
+    "numUes": 1,
+    "attachIntervalMs": 100,
+    "mobility": {"pattern": "static"},
+    "trafficProfile": {"enableUplinkTest": false},
+    "failureInjection": {
+      "authFailure": false,
+      "rrcReject": false,
+      "timerExpiry": false,
+      "rarTimeout": false
+    }
+  }
+}
