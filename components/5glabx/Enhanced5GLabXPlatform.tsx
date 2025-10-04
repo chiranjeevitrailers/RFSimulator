@@ -777,9 +777,8 @@ const Enhanced5GLabXPlatform: React.FC = () => {
       case 'dashboard':
         return <EnhancedDashboard />;
       case 'logs':
-        return <LogsView appState={{}} onStateChange={() => {}} />;
       case 'enhanced-logs':
-        return <LogsView appState={{ enhanced: true }} onStateChange={() => {}} />;
+        return <LogsView key="logs-view" appState={{ enhanced: currentView === 'enhanced-logs' }} onStateChange={() => {}} />;
       case 'layer-trace':
         return <LayerTraceView />;
       case 'callflow':
