@@ -663,16 +663,22 @@ const ProfessionalTestManager: React.FC = () => {
 
   const addLog = (level, message) => {
     const timestamp = new Date().toLocaleString()
-    setLogs((prev) => [...prev, { timestamp, level, message }])
+    const newLog = { timestamp, level, message }
+    setLogs((prev) => [...prev, newLog])
+    console.log(`📝 [${level}] ${message}`)
   }
 
   const handleRunTest = async (testId) => {
     setIsRunning(true)
-    addLog("INFO", `Starting test execution: ${testId}`)
+    addLog("INFO", `🚀 Starting test execution: ${testId}`)
+    addLog("INFO", `⏰ Execution started at: ${new Date().toLocaleString()}`)
 
     console.log("[v0] 🚀 TEST MANAGER: Starting test execution for:", testId)
 
     try {
+      addLog("INFO", `📡 Making API call to /api/test-execution/simple/`)
+      addLog("INFO", `📋 Request payload: ${JSON.stringify({ testCaseId: testId, userId: "system" })}`)
+      
       const response = await fetch("/api/test-execution/simple/", {
         method: "POST",
         headers: {
@@ -684,11 +690,17 @@ const ProfessionalTestManager: React.FC = () => {
         }),
       })
 
+      addLog("INFO", `📡 API Response Status: ${response.status} ${response.statusText}`)
+
       if (!response.ok) {
+        addLog("ERROR", `❌ API call failed: ${response.status} ${response.statusText}`)
         throw new Error(`Test execution failed: ${response.statusText}`)
       }
 
       const result = await response.json()
+      addLog("SUCCESS", `✅ API call successful - received response`)
+      addLog("INFO", `📦 Response data keys: ${Object.keys(result).join(', ')}`)
+      
       console.log("[v0] 📦 TEST MANAGER: API Response received:", {
         executionId: result.executionId,
         testCaseId: testId,
@@ -718,15 +730,19 @@ const ProfessionalTestManager: React.FC = () => {
       }
       
       addLog("INFO", `📡 Broadcasting to 5GLabX Platform for real-time display`)
-      addLog("INFO", `Test execution started: ${testId}`)
+      addLog("INFO", `🔄 Preparing event dispatch...`)
 
       // Update test case status
       setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Running" } : tc)))
+      addLog("INFO", `📊 Test case status updated to: Running`)
 
       // 🔥 CRITICAL: Dispatch events to 5GLabX Platform for real-time data flow
       if (typeof window !== "undefined") {
+        addLog("INFO", `🌐 Window object available - proceeding with event dispatch`)
+        
         // Find the test case data
         const testCase = testCases.find((tc) => tc.id === testId)
+        addLog("INFO", `📋 Found test case data: ${testCase?.name || 'Unknown'}`)
 
         const eventDetail = {
           executionId: result.executionId || result.id,
@@ -751,6 +767,7 @@ const ProfessionalTestManager: React.FC = () => {
           status: "running",
         }
 
+        addLog("INFO", `📡 Event detail prepared with ${eventDetail.testCaseData.expectedMessages.length} messages`)
         console.log("[v0] 📡 TEST MANAGER: Dispatching testCaseExecutionStarted event with data:", {
           executionId: eventDetail.executionId,
           testCaseId: eventDetail.testCaseId,
@@ -760,8 +777,10 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         // Dispatch the main event that LogsView is listening for
+        addLog("INFO", `📡 Dispatching 5GLABX_TEST_EXECUTION event...`)
         const testExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
           detail: {
+            type: "5GLABX_TEST_EXECUTION", // ✅ FIXED: Add missing type field
             executionId: result.executionId || result.id,
             testCaseId: testId,
             testCaseData: eventDetail.testCaseData,
@@ -772,16 +791,20 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         window.dispatchEvent(testExecutionEvent)
+        addLog("SUCCESS", `✅ 5GLABX_TEST_EXECUTION event dispatched successfully`)
         console.log("[v0] ✅ TEST MANAGER: 5GLABX_TEST_EXECUTION event dispatched")
         addLog("INFO", `📡 Data sent to 5GLabX Platform for execution: ${result.executionId || result.id}`)
 
         // Also dispatch the testCaseExecutionStarted event for other components
+        addLog("INFO", `📡 Dispatching testCaseExecutionStarted event...`)
         const testCaseStartedEvent = new CustomEvent("testCaseExecutionStarted", {
           detail: eventDetail,
         })
         window.dispatchEvent(testCaseStartedEvent)
+        addLog("SUCCESS", `✅ testCaseExecutionStarted event dispatched`)
 
         // Also send via postMessage for additional compatibility
+        addLog("INFO", `📨 Sending postMessage for additional compatibility...`)
         const postMessageData = {
           type: "5GLABX_TEST_EXECUTION",
           executionId: result.executionId || result.id,
@@ -798,18 +821,23 @@ const ProfessionalTestManager: React.FC = () => {
         })
 
         window.postMessage(postMessageData, "*")
+        addLog("SUCCESS", `✅ PostMessage sent successfully`)
         console.log("[v0] ✅ TEST MANAGER: postMessage sent")
 
         addLog("INFO", `📨 PostMessage sent to 5GLabX Platform`)
+      } else {
+        addLog("ERROR", `❌ Window object not available - cannot dispatch events`)
       }
 
       // Monitor test execution status
+      addLog("INFO", `🔄 Starting test execution monitoring...`)
       monitorTestExecution(testId)
       
       // Add completion log after short delay
       setTimeout(() => {
         addLog("SUCCESS", `✅ Test execution completed successfully`)
         addLog("INFO", `🎯 View results in 5GLabX Platform → Logs Viewer`)
+        addLog("INFO", `⏰ Execution completed at: ${new Date().toLocaleString()}`)
         setIsRunning(false)
         setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Completed", lastRun: new Date().toLocaleString() } : tc)))
       }, 3000)
@@ -818,7 +846,10 @@ const ProfessionalTestManager: React.FC = () => {
       console.error("[v0] ❌ TEST MANAGER: Error running test:", error)
       addLog("ERROR", `❌ Test execution failed: ${error.message}`)
       addLog("ERROR", `📊 Error details: ${error.stack || 'No stack trace'}`)
+      addLog("ERROR", `🔧 Error type: ${error.constructor.name}`)
+      addLog("ERROR", `🔧 Error name: ${error.name}`)
       addLog("INFO", `🔧 Please check API logs and Supabase connection`)
+      addLog("INFO", `⏰ Error occurred at: ${new Date().toLocaleString()}`)
       setIsRunning(false)
       setTestCases((prev) => prev.map((tc) => (tc.id === testId ? { ...tc, status: "Failed" } : tc)))
     }
@@ -2448,6 +2479,10 @@ const ProfessionalTestManager: React.FC = () => {
                                 key: "clear",
                                 className:
                                   "bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-700 flex items-center space-x-1",
+                                onClick: () => {
+                                  setLogs([])
+                                  addLog("INFO", "🧹 Automation log cleared")
+                                },
                               },
                               [
                                 React.createElement("i", {
