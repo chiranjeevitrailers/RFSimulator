@@ -470,7 +470,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (adapterAvailable && dataFormatAdapter) {
         try {
           logsByLayer[layer] = layerLogs.map(log => 
-            dataFormatAdapter.adaptLogForViewer(log)
+            (window as any).DataFormatAdapter.adaptLogForViewer(log)
           ).filter(log => log !== null);
         } catch (error) {
           console.warn(`Error processing logs for layer ${layer}:`, error);
@@ -779,9 +779,9 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       if (type === 'log') {
-        return dataFormatAdapter.adaptLogForViewer(data);
+        return (window as any).DataFormatAdapter.adaptLogForViewer(data);
       } else if (type === 'layer' && layer) {
-        return dataFormatAdapter.adaptForLayerView(data, layer);
+        return (window as any).DataFormatAdapter.adaptForLayerView(data, layer);
       }
       return data;
     } catch (error) {

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
@@ -18,6 +18,23 @@ const UserDashboard: React.FC = () => {
     subscription_status: "active",
   })
   const [activeTab, setActiveTab] = useState("overview")
+
+  // Load DataFormatAdapter
+  useEffect(() => {
+    const loadDataFormatAdapter = async () => {
+      try {
+        const { DataFormatAdapter } = await import('@/utils/DataFormatAdapter');
+        if (typeof window !== 'undefined') {
+          (window as any).DataFormatAdapter = DataFormatAdapter;
+          console.log('✅ DataFormatAdapter loaded successfully');
+        }
+      } catch (error) {
+        console.error('❌ Failed to load DataFormatAdapter:', error);
+      }
+    };
+
+    loadDataFormatAdapter();
+  }, []);
 
   const handleSignOut = () => {
     console.log("Sign out clicked")
