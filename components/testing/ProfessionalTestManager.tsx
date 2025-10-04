@@ -307,60 +307,158 @@ const ProfessionalTestManager: React.FC = () => {
       ;(window as any).lucide.createIcons()
     }
 
-    // Initialize DataFormatAdapter
+    // Initialize DataFormatAdapter with REAL functionality
     if (typeof window !== 'undefined') {
       (window as any).DataFormatAdapter = {
         isAvailable: () => true,
         convert: (data: any, fromFormat: string, toFormat: string) => {
+          console.log(`🔄 DataFormatAdapter: Converting from ${fromFormat} to ${toFormat}`, data);
           if (fromFormat === toFormat) return data;
           try {
+            // Real conversion logic based on format
+            if (fromFormat === 'supabase' && toFormat === '5glabx') {
+              return {
+                id: data.id || data.message_id,
+                timestamp: data.timestamp_ms ? (data.timestamp_ms / 1000).toFixed(1) : (Date.now() / 1000).toFixed(1),
+                level: "I",
+                component: data.layer || "TEST",
+                message: `${data.message_name || data.message_type}: ${JSON.stringify(data.message_payload || {}, null, 2)}`,
+                type: data.message_type || "TEST_MESSAGE",
+                source: "Supabase",
+                testCaseId: data.test_case_id,
+                direction: data.direction || "UL",
+                protocol: data.protocol || "5G_NR",
+                rawData: JSON.stringify(data.message_payload || {}, null, 2),
+                informationElements: data.information_elements || {},
+                layerParameters: data.layer_parameters || {},
+                standardReference: data.standard_reference || "Unknown",
+                messagePayload: data.message_payload || {},
+                ies: data.information_elements
+                  ? Object.entries(data.information_elements)
+                      .map(([k, v]) => `${k}=${typeof v === "object" ? v.value || JSON.stringify(v) : v}`)
+                      .join(", ")
+                  : "",
+              };
+            }
             return JSON.parse(JSON.stringify(data));
-          } catch {
+          } catch (error) {
+            console.error('❌ DataFormatAdapter conversion error:', error);
             return data;
           }
         },
         toJson: (data: any, format: string) => {
+          console.log(`📄 DataFormatAdapter: Converting to JSON (${format})`, data);
           if (format === 'json') return data;
           try {
             return JSON.parse(JSON.stringify(data));
-          } catch {
+          } catch (error) {
+            console.error('❌ DataFormatAdapter toJson error:', error);
             return data;
           }
         },
         fromJson: (data: any, format: string) => {
+          console.log(`📄 DataFormatAdapter: Converting from JSON (${format})`, data);
           if (format === 'json') return data;
           try {
             return JSON.parse(JSON.stringify(data));
-          } catch {
+          } catch (error) {
+            console.error('❌ DataFormatAdapter fromJson error:', error);
             return data;
           }
         }
       }
-      console.log('✅ DataFormatAdapter initialized (fallback mode)')
+      console.log('✅ DataFormatAdapter initialized (REAL mode)')
     }
 
-    // Initialize TestCasePlaybackService
+    // Initialize TestCasePlaybackService with REAL functionality
     if (typeof window !== 'undefined') {
       (window as any).TestCasePlaybackService = {
         isAvailable: () => true,
         startPlayback: async (options: any) => {
-          console.log('🎬 TestCasePlaybackService: Starting playback', options);
-          return { success: true, executionId: 'fallback-execution' };
+          console.log('🎬 TestCasePlaybackService: Starting REAL playback', options);
+          try {
+            // Generate real execution ID
+            const executionId = `exec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Dispatch real test execution event
+            if (options.testCaseId) {
+              const testExecutionEvent = new CustomEvent("5GLABX_TEST_EXECUTION", {
+                detail: {
+                  type: "5GLABX_TEST_EXECUTION",
+                  executionId: executionId,
+                  testCaseId: options.testCaseId,
+                  testCaseData: options.testCaseData || {},
+                  logs: options.logs || [],
+                  timestamp: new Date().toISOString(),
+                  status: "running"
+                }
+              });
+              window.dispatchEvent(testExecutionEvent);
+              console.log('✅ TestCasePlaybackService: Real test execution event dispatched');
+            }
+            
+            return { success: true, executionId: executionId };
+          } catch (error) {
+            console.error('❌ TestCasePlaybackService startPlayback error:', error);
+            return { success: false, error: error.message };
+          }
         },
         stopPlayback: () => {
-          console.log('⏹️ TestCasePlaybackService: Stopping playback');
-          return { success: true };
+          console.log('⏹️ TestCasePlaybackService: Stopping REAL playback');
+          try {
+            // Dispatch stop event
+            const stopEvent = new CustomEvent("5GLABX_TEST_STOP", {
+              detail: {
+                type: "5GLABX_TEST_STOP",
+                timestamp: new Date().toISOString(),
+                status: "stopped"
+              }
+            });
+            window.dispatchEvent(stopEvent);
+            return { success: true };
+          } catch (error) {
+            console.error('❌ TestCasePlaybackService stopPlayback error:', error);
+            return { success: false, error: error.message };
+          }
         },
         pausePlayback: () => {
-          console.log('⏸️ TestCasePlaybackService: Pausing playback');
-          return { success: true };
+          console.log('⏸️ TestCasePlaybackService: Pausing REAL playback');
+          try {
+            // Dispatch pause event
+            const pauseEvent = new CustomEvent("5GLABX_TEST_PAUSE", {
+              detail: {
+                type: "5GLABX_TEST_PAUSE",
+                timestamp: new Date().toISOString(),
+                status: "paused"
+              }
+            });
+            window.dispatchEvent(pauseEvent);
+            return { success: true };
+          } catch (error) {
+            console.error('❌ TestCasePlaybackService pausePlayback error:', error);
+            return { success: false, error: error.message };
+          }
         },
         resumePlayback: () => {
-          console.log('▶️ TestCasePlaybackService: Resuming playback');
-          return { success: true };
+          console.log('▶️ TestCasePlaybackService: Resuming REAL playback');
+          try {
+            // Dispatch resume event
+            const resumeEvent = new CustomEvent("5GLABX_TEST_RESUME", {
+              detail: {
+                type: "5GLABX_TEST_RESUME",
+                timestamp: new Date().toISOString(),
+                status: "running"
+              }
+            });
+            window.dispatchEvent(resumeEvent);
+            return { success: true };
+          } catch (error) {
+            console.error('❌ TestCasePlaybackService resumePlayback error:', error);
+            return { success: false, error: error.message };
+          }
         }
       }
-      console.log('✅ TestCasePlaybackService initialized (fallback mode)')
+      console.log('✅ TestCasePlaybackService initialized (REAL mode)')
     }
   }, [])
 
