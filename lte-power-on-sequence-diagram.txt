@@ -1,0 +1,220 @@
+LTE Power-On Test Procedure - Complete Sequence Diagram
+================================================================
+
+UE                    eNB                    MME                    SGW/PGW
+|                      |                      |                      |
+|-- POWER ON --------->|                      |                      |
+|                      |                      |                      |
+|-- PSS Detection ----->|                      |                      |
+|-- SSS Detection ----->|                      |                      |
+|-- PCI Calculation --->|                      |                      |
+|-- DMRS Detection ---->|                      |                      |
+|-- PBCH-MIB Decode -->|                      |                      |
+|-- PHICH Detection --->|                      |                      |
+|-- PCFICH Decode ----->|                      |                      |
+|-- PDCCH Decode ------>|                      |                      |
+|-- SIB1 Decode ------->|                      |                      |
+|-- SIB2 Decode ------->|                      |                      |
+|-- SIB3 Decode ------->|                      |                      |
+|                      |                      |                      |
+|-- PRACH Attempt ----->|                      |                      |
+|                      |                      |                      |
+|<-- RAR Response -----|                      |                      |
+|                      |                      |                      |
+|-- PRACH Success ----->|                      |                      |
+|                      |                      |                      |
+|-- RRC Conn Request -->|                      |                      |
+|                      |                      |                      |
+|<-- RRC Conn Setup ---|                      |                      |
+|                      |                      |                      |
+|-- RRC Setup Complete->|                      |                      |
+|                      |                      |                      |
+|                      |-- S1AP Initial UE Msg ->|                      |
+|                      |                      |                      |
+|                      |                      |-- NAS Attach Request ->|
+|                      |                      |                      |
+|                      |<-- Auth Request -------|                      |
+|                      |                      |                      |
+|-- Auth Request ------>|                      |                      |
+|                      |                      |                      |
+|-- Auth Response ----->|                      |                      |
+|                      |                      |                      |
+|                      |-- Auth Response ------>|                      |
+|                      |                      |                      |
+|                      |<-- Sec Mode Command ---|                      |
+|                      |                      |                      |
+|-- Sec Mode Command ->|                      |                      |
+|                      |                      |                      |
+|-- Sec Mode Complete->|                      |                      |
+|                      |                      |                      |
+|                      |-- Sec Mode Complete ->|                      |
+|                      |                      |                      |
+|                      |                      |-- GTP Create Session ->|
+|                      |                      |                      |
+|                      |                      |<-- GTP Create Session -|
+|                      |                      |                      |
+|                      |<-- Attach Accept ------|                      |
+|                      |                      |                      |
+|-- Attach Accept ----->|                      |                      |
+|                      |                      |                      |
+|                      |-- S1AP Initial Context Setup ->|              |
+|                      |                      |                      |
+|                      |<-- E-RAB Setup Response -------|              |
+|                      |                      |                      |
+|-- Attach Complete -->|                      |                      |
+|                      |                      |                      |
+|                      |-- Attach Complete --->|                      |
+|                      |                      |                      |
+|                      |<-- GTP-U Data -------|                      |
+|                      |                      |                      |
+|-- GTP-U Data ------->|                      |                      |
+|                      |                      |                      |
+|-- USER PLANE ACTIVE -|                      |                      |
+|                      |                      |                      |
+
+================================================================
+Enhanced PHY Layer Components in Cell Sync:
+================================================================
+
+1. PSS (Primary Synchronization Signal)
+   - Sequence: 0, 1, or 2
+   - Correlation peak: 0.8-1.0
+   - Timing/frequency offset detection
+   - SNR measurement
+
+2. SSS (Secondary Synchronization Signal)  
+   - Sequence: 0-167
+   - Correlation peak: 0.8-1.0
+   - Timing/frequency offset detection
+   - SNR measurement
+
+3. PCI (Physical Cell ID)
+   - Calculation: PCI = PCI_Group * 3 + PCI_Sector
+   - PCI_Group: 0-167 (from SSS)
+   - PCI_Sector: 0-2 (from PSS)
+   - Range: 0-503
+
+4. DMRS (Demodulation Reference Signal)
+   - Sequence ID: Same as PCI
+   - Correlation peak: 0.7-1.0
+   - Timing/frequency offset detection
+   - SNR measurement
+
+5. PBCH-MIB (Physical Broadcast Channel - Master Information Block)
+   - SFN: 0-1023
+   - DL Bandwidth: 6, 15, 25, 50, 75, 100 RB
+   - PHICH Configuration
+   - CRC check: PASS/FAIL
+   - Decode success: true/false
+
+6. PHICH (Physical Hybrid ARQ Indicator Channel)
+   - Duration: NORMAL/EXTENDED
+   - Resource: 0-7
+   - NG: 1-8
+   - ACK/NACK indication
+   - Power level
+
+7. PCFICH (Physical Control Format Indicator Channel)
+   - CFI: 1, 2, or 3
+   - CRC check: PASS/FAIL
+   - Decode success: true/false
+   - SNR measurement
+
+8. PDCCH (Physical Downlink Control Channel)
+   - Aggregation Level: 1, 2, 4, 8
+   - DCI Format: 1A, 1, 1B, 1C, 1D, 2, 2A, 2B, 2C, 3, 3A
+   - CCE Index: 0-15
+   - CRC check: PASS/FAIL
+   - Decode success: true/false
+   - SNR measurement
+
+9. SIB1 (System Information Block 1)
+   - PLMN List: MCC, MNC, Reserved
+   - Tracking Area Code: 0-65535
+   - Cell Identity: 0-268435455
+   - Cell Barred: true/false
+   - Intra-freq Reselection: ALLOWED/NOT_ALLOWED
+   - CS Restrict: true/false
+   - Q_RxLevMin: -140 to -44 dBm
+   - P_Max: -30 to 33 dBm
+   - Freq Band Indicator: 1-64
+   - Scheduling Info: Periodicity, Mapping
+   - TDD Config: null for FDD
+   - SI Window Length: 10
+   - System Info Value Tag: 0-31
+   - Decode success: true/false
+
+10. SIB2 (System Information Block 2)
+    - RACH Configuration
+    - PRACH Configuration  
+    - PUSCH Configuration
+    - PUCCH Configuration
+    - SRS Configuration
+    - Power Control Configuration
+    - UL CP Length: NORMAL/EXTENDED
+    - UL Bandwidth: 6, 15, 25, 50, 75, 100 RB
+    - Additional Spectrum Emission: 1-32
+    - Decode success: true/false
+
+11. SIB3 (System Information Block 3)
+    - Cell Reselection Info Common
+    - Cell Reselection Serving Freq Info
+    - Intra-freq Cell Reselection Info
+    - Decode success: true/false
+
+================================================================
+Key Metrics and Assertions:
+================================================================
+
+PHY Layer Assertions:
+- RSRP: -110 to -70 dBm
+- RSRQ: -20 to -3 dB
+- SINR: 0 to 30 dB
+- PCI: 0 to 503 (valid range)
+- PSS Detection: SUCCESS
+- SSS Detection: SUCCESS
+- MIB Decode: SUCCESS
+- SIB1 Decode: SUCCESS
+- SIB2 Decode: SUCCESS
+- SIB3 Decode: SUCCESS
+- Cell Barred: false
+
+Timing Assertions:
+- RRC Setup Time: < 200 ms
+- Attach Time: < 3000 ms
+- PRACH Attempts: ≤ 2
+- Authentication Time: < 500 ms
+
+Bearer Assertions:
+- Default Bearer EBI: 5
+- Default Bearer QCI: 9
+- GTP Session Created: true
+- User Plane Active: true
+
+================================================================
+Test Validation Checklist:
+================================================================
+
+□ PSS sequence detected and correlated
+□ SSS sequence detected and correlated  
+□ PCI calculated correctly from PSS/SSS
+□ DMRS sequence detected and correlated
+□ MIB decoded successfully with valid parameters
+□ PHICH configuration detected
+□ PCFICH decoded with valid CFI
+□ PDCCH decoded with valid DCI format
+□ SIB1 decoded with valid PLMN and cell info
+□ SIB2 decoded with valid RACH/PRACH config
+□ SIB3 decoded with valid reselection config
+□ Cell not barred, reselection allowed
+□ RRC connection established successfully
+□ NAS attach procedure completed
+□ Authentication successful
+□ Security mode established
+□ GTP session created with correct parameters
+□ Default EPS bearer activated
+□ User plane data flow established
+□ All timing requirements met
+□ All assertion criteria passed
+
+================================================================

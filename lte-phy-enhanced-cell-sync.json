@@ -1,0 +1,396 @@
+{
+  "step": 1,
+  "eventType": "CELL_SYNC",
+  "layer": "PHY",
+  "description": "UE powers on and performs complete LTE cell synchronization",
+  "subSteps": [
+    {
+      "subStep": "PSS_DETECTION",
+      "description": "Primary Synchronization Signal detection",
+      "parameters": {
+        "pss_sequence": 0,
+        "pss_correlation_peak": 0.95,
+        "pss_timing_offset": 0,
+        "pss_frequency_offset": 0,
+        "pss_snr": 15.2
+      }
+    },
+    {
+      "subStep": "SSS_DETECTION", 
+      "description": "Secondary Synchronization Signal detection",
+      "parameters": {
+        "sss_sequence": 25,
+        "sss_correlation_peak": 0.92,
+        "sss_timing_offset": 0,
+        "sss_frequency_offset": 0,
+        "sss_snr": 14.8
+      }
+    },
+    {
+      "subStep": "PCI_CALCULATION",
+      "description": "Physical Cell ID calculation from PSS and SSS",
+      "parameters": {
+        "pci": 123,
+        "pci_group": 41,
+        "pci_sector": 0,
+        "pci_verification": "SUCCESS"
+      }
+    },
+    {
+      "subStep": "DMRS_DETECTION",
+      "description": "Demodulation Reference Signal detection",
+      "parameters": {
+        "dmrs_sequence_id": 0,
+        "dmrs_correlation_peak": 0.88,
+        "dmrs_timing_offset": 0,
+        "dmrs_frequency_offset": 0,
+        "dmrs_snr": 14.5
+      }
+    },
+    {
+      "subStep": "PBCH_MIB_DECODE",
+      "description": "Physical Broadcast Channel - Master Information Block decoding",
+      "parameters": {
+        "mib_sfn": 0,
+        "mib_dl_bandwidth": 20,
+        "mib_phich_config": {
+          "phich_duration": "NORMAL",
+          "phich_resource": 1
+        },
+        "mib_system_frame_number": 0,
+        "mib_crc_check": "PASS",
+        "mib_decode_success": true
+      }
+    },
+    {
+      "subStep": "PHICH_DETECTION",
+      "description": "Physical Hybrid ARQ Indicator Channel detection",
+      "parameters": {
+        "phich_duration": "NORMAL",
+        "phich_resource": 1,
+        "phich_ng": 1,
+        "phich_ack_nack": "NACK",
+        "phich_power": -8.5
+      }
+    },
+    {
+      "subStep": "PCFICH_DECODE",
+      "description": "Physical Control Format Indicator Channel decoding",
+      "parameters": {
+        "cfi": 1,
+        "pcfich_crc_check": "PASS",
+        "pcfich_decode_success": true,
+        "pcfich_snr": 13.2
+      }
+    },
+    {
+      "subStep": "PDCCH_DECODE",
+      "description": "Physical Downlink Control Channel decoding",
+      "parameters": {
+        "pdcch_aggregation_level": 1,
+        "pdcch_dci_format": "1A",
+        "pdcch_cce_index": 0,
+        "pdcch_crc_check": "PASS",
+        "pdcch_decode_success": true,
+        "pdcch_snr": 12.8
+      }
+    },
+    {
+      "subStep": "SIB1_DECODE",
+      "description": "System Information Block 1 decoding",
+      "parameters": {
+        "sib1_plmn_list": [
+          {
+            "mcc": "404",
+            "mnc": "12",
+            "reserved": 0
+          }
+        ],
+        "sib1_tracking_area_code": 12345,
+        "sib1_cell_identity": 1234567890,
+        "sib1_cell_barred": false,
+        "sib1_intra_freq_reselection": "ALLOWED",
+        "sib1_cs_restrict": false,
+        "sib1_q_rxlevmin": -70,
+        "sib1_p_max": 23,
+        "sib1_freq_band_indicator": 3,
+        "sib1_scheduling_info": [
+          {
+            "si_periodicity": 8,
+            "si_mapping_info": 0
+          }
+        ],
+        "sib1_tdd_config": null,
+        "sib1_si_window_length": 10,
+        "sib1_system_info_value_tag": 0,
+        "sib1_decode_success": true
+      }
+    },
+    {
+      "subStep": "SIB2_DECODE",
+      "description": "System Information Block 2 decoding",
+      "parameters": {
+        "sib2_ac_barring_info": {
+          "ac_barring_factor": 0,
+          "ac_barring_time": 0,
+          "ac_barring_for_special_ac": 0
+        },
+        "sib2_radio_resource_config_common": {
+          "rach_config_common": {
+            "preamble_info": {
+              "number_of_ra_preambles": 64,
+              "preambles_group_a_config": {
+                "size_of_ra_preambles_group_a": 56,
+                "message_size_group_a": 56,
+                "message_power_offset_group_b": -1
+              }
+            },
+            "power_ramping_step": 0,
+            "preamble_initial_received_target_power": -120,
+            "preamble_max_transmissions": 10,
+            "ra_response_window_size": 10
+          },
+          "bcch_config": {
+            "modification_period_coeff": 2
+          },
+          "pcch_config": {
+            "default_paging_cycle": 128,
+            "nB": 4
+          },
+          "prach_config": {
+            "root_sequence_index": 0,
+            "prach_config_info": {
+              "prach_config_index": 0,
+              "high_speed_flag": false,
+              "zero_correlation_zone_config": 0,
+              "prach_freq_offset": 0
+            }
+          },
+          "pdsch_config_common": {
+            "reference_signal_power": -60,
+            "p_b": 0
+          },
+          "pusch_config_common": {
+            "pusch_config_basic": {
+              "n_sb": 1,
+              "hopping_mode": "INTRA_AND_INTER_SUBFRAME",
+              "pusch_hopping_offset": 0,
+              "enable_64_qam": false
+            },
+            "ul_reference_signals_pusch": {
+              "group_hopping_enabled": false,
+              "group_assignment_pusch": 0,
+              "sequence_hopping_enabled": false,
+              "cyclic_shift": 0
+            }
+          },
+          "pucch_config_common": {
+            "delta_pucch_shift": 1,
+            "n_rb_cqi": 0,
+            "n_cs_an": 0,
+            "n1_pucch_an": 0
+          },
+          "sounding_rs_ul_config_common": {
+            "srs_bw_config": 0,
+            "srs_subframe_config": 0,
+            "ack_nack_srs_simultaneous_transmission": false
+          },
+          "uplink_power_control_common": {
+            "p0_nominal_pusch": -70,
+            "alpha": 0,
+            "p0_nominal_pucch": -85,
+            "delta_flist_pucch": {
+              "delta_f_pucch_format1": 0,
+              "delta_f_pucch_format1b": 1,
+              "delta_f_pucch_format2": 0,
+              "delta_f_pucch_format2a": 2,
+              "delta_f_pucch_format2b": 2
+            },
+            "delta_preamble_msg3": 6
+          },
+          "ul_cp_length": "NORMAL",
+          "ul_bandwidth": 20,
+          "additional_spectrum_emission": 1
+        },
+        "sib2_ue_timers_and_constants": {
+          "t300": 1000,
+          "t301": 1000,
+          "t310": 1000,
+          "n310": 1,
+          "t311": 10000,
+          "n311": 1
+        },
+        "sib2_freq_info": {
+          "ul_carrier_freq": 1850,
+          "ul_bandwidth": 20,
+          "additional_spectrum_emission": 1
+        },
+        "sib2_decode_success": true
+      }
+    },
+    {
+      "subStep": "SIB3_DECODE",
+      "description": "System Information Block 3 decoding",
+      "parameters": {
+        "sib3_cell_reselection_info_common": {
+          "q_hyst": 0,
+          "speed_dependent_reselection_params": {
+            "mobility_state_params": {
+              "t_evaluation": 30,
+              "t_hyst_normal": 0,
+              "n_cell_change_medium": 1,
+              "n_cell_change_high": 1
+            },
+            "q_hyst_sf": {
+              "sf_medium": 0,
+              "sf_high": 0
+            }
+          }
+        },
+        "sib3_cell_reselection_serving_freq_info": {
+          "s_non_intra_search": 0,
+          "thresh_serving_low": 0,
+          "cell_reselection_priority": 0
+        },
+        "sib3_intra_freq_cell_reselection_info": {
+          "q_rxlevmin": -70,
+          "s_intra_search": 0,
+          "presence_antenna_port1": false,
+          "neighbour_cell_config": 0,
+          "t_reselection_eutra": 0
+        },
+        "sib3_decode_success": true
+      }
+    }
+  ],
+  "expectedIEs": {
+    "cell_id": "123",
+    "pci": 123,
+    "pci_group": 41,
+    "pci_sector": 0,
+    "earfcn": 1850,
+    "dl_bandwidth": 20,
+    "rrc_state": "IDLE",
+    "rsrp": -95,
+    "rsrq": -10,
+    "sinr": 15,
+    "timing_advance_estimate": 0,
+    "mib_sfn": 0,
+    "sib1_periodicity": 20,
+    "pss_sequence": 0,
+    "sss_sequence": 25,
+    "dmrs_sequence_id": 0,
+    "cfi": 1,
+    "phich_duration": "NORMAL",
+    "phich_resource": 1,
+    "pdcch_aggregation_level": 1,
+    "pdcch_dci_format": "1A",
+    "sib1_plmn": "404-12",
+    "sib1_tac": 12345,
+    "sib1_cell_identity": 1234567890,
+    "sib1_cell_barred": false,
+    "sib2_rach_config": "DEFAULT",
+    "sib2_prach_config": "DEFAULT",
+    "sib2_pusch_config": "DEFAULT",
+    "sib2_pucch_config": "DEFAULT",
+    "sib3_reselection_config": "DEFAULT"
+  },
+  "assertions": {
+    "rsrp_dbm": {"min": -110, "max": -70},
+    "rsrq_db": {"min": -20, "max": -3},
+    "sinr_db": {"min": 0, "max": 30},
+    "pci_valid": {"min": 0, "max": 503},
+    "pss_detection_success": true,
+    "sss_detection_success": true,
+    "mib_decode_success": true,
+    "sib1_decode_success": true,
+    "sib2_decode_success": true,
+    "sib3_decode_success": true,
+    "cell_barred": false
+  },
+  "layerParameters": {
+    "PSS": {
+      "sequence": {"min": 0, "max": 2, "unit": ""},
+      "correlation_peak": {"min": 0.5, "max": 1.0, "unit": ""},
+      "timing_offset": {"min": -10, "max": 10, "unit": "samples"},
+      "frequency_offset": {"min": -1000, "max": 1000, "unit": "Hz"},
+      "snr": {"min": 0, "max": 30, "unit": "dB"}
+    },
+    "SSS": {
+      "sequence": {"min": 0, "max": 167, "unit": ""},
+      "correlation_peak": {"min": 0.5, "max": 1.0, "unit": ""},
+      "timing_offset": {"min": -10, "max": 10, "unit": "samples"},
+      "frequency_offset": {"min": -1000, "max": 1000, "unit": "Hz"},
+      "snr": {"min": 0, "max": 30, "unit": "dB"}
+    },
+    "PCI": {
+      "pci": {"min": 0, "max": 503, "unit": ""},
+      "pci_group": {"min": 0, "max": 167, "unit": ""},
+      "pci_sector": {"min": 0, "max": 2, "unit": ""},
+      "verification": {"values": ["SUCCESS", "FAIL"]}
+    },
+    "DMRS": {
+      "sequence_id": {"min": 0, "max": 503, "unit": ""},
+      "correlation_peak": {"min": 0.5, "max": 1.0, "unit": ""},
+      "timing_offset": {"min": -10, "max": 10, "unit": "samples"},
+      "frequency_offset": {"min": -1000, "max": 1000, "unit": "Hz"},
+      "snr": {"min": 0, "max": 30, "unit": "dB"}
+    },
+    "PBCH_MIB": {
+      "sfn": {"min": 0, "max": 1023, "unit": ""},
+      "dl_bandwidth": {"values": [6, 15, 25, 50, 75, 100], "unit": "RB"},
+      "phich_duration": {"values": ["NORMAL", "EXTENDED"]},
+      "phich_resource": {"min": 0, "max": 7, "unit": ""},
+      "crc_check": {"values": ["PASS", "FAIL"]},
+      "decode_success": {"type": "boolean"}
+    },
+    "PHICH": {
+      "duration": {"values": ["NORMAL", "EXTENDED"]},
+      "resource": {"min": 0, "max": 7, "unit": ""},
+      "ng": {"min": 1, "max": 8, "unit": ""},
+      "ack_nack": {"values": ["ACK", "NACK"]},
+      "power": {"min": -20, "max": 0, "unit": "dBm"}
+    },
+    "PCFICH": {
+      "cfi": {"min": 1, "max": 3, "unit": ""},
+      "crc_check": {"values": ["PASS", "FAIL"]},
+      "decode_success": {"type": "boolean"},
+      "snr": {"min": 0, "max": 30, "unit": "dB"}
+    },
+    "PDCCH": {
+      "aggregation_level": {"values": [1, 2, 4, 8]},
+      "dci_format": {"values": ["1A", "1", "1B", "1C", "1D", "2", "2A", "2B", "2C", "3", "3A"]},
+      "cce_index": {"min": 0, "max": 15, "unit": ""},
+      "crc_check": {"values": ["PASS", "FAIL"]},
+      "decode_success": {"type": "boolean"},
+      "snr": {"min": 0, "max": 30, "unit": "dB"}
+    },
+    "SIB1": {
+      "plmn_list": {"type": "array", "max_items": 6},
+      "tracking_area_code": {"min": 0, "max": 65535, "unit": ""},
+      "cell_identity": {"min": 0, "max": 268435455, "unit": ""},
+      "cell_barred": {"type": "boolean"},
+      "intra_freq_reselection": {"values": ["ALLOWED", "NOT_ALLOWED"]},
+      "cs_restrict": {"type": "boolean"},
+      "q_rxlevmin": {"min": -140, "max": -44, "unit": "dBm"},
+      "p_max": {"min": -30, "max": 33, "unit": "dBm"},
+      "freq_band_indicator": {"min": 1, "max": 64, "unit": ""},
+      "decode_success": {"type": "boolean"}
+    },
+    "SIB2": {
+      "rach_config": {"type": "object"},
+      "prach_config": {"type": "object"},
+      "pusch_config": {"type": "object"},
+      "pucch_config": {"type": "object"},
+      "srs_config": {"type": "object"},
+      "power_control": {"type": "object"},
+      "decode_success": {"type": "boolean"}
+    },
+    "SIB3": {
+      "reselection_config": {"type": "object"},
+      "serving_freq_info": {"type": "object"},
+      "intra_freq_info": {"type": "object"},
+      "decode_success": {"type": "boolean"}
+    }
+  }
+}

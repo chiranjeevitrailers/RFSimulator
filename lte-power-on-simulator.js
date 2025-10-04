@@ -397,22 +397,245 @@ class LTEPowerOnSimulator {
 
     // Data generation methods for each message type
     generateCellSyncData() {
+        // Generate PSS detection
+        const pssSequence = Math.floor(Math.random() * 3);
+        const pssCorrelationPeak = 0.8 + Math.random() * 0.2;
+        
+        // Generate SSS detection
+        const sssSequence = Math.floor(Math.random() * 168);
+        const sssCorrelationPeak = 0.8 + Math.random() * 0.2;
+        
+        // Calculate PCI from PSS and SSS
+        const pciGroup = Math.floor(sssSequence / 3);
+        const pciSector = pssSequence;
+        const pci = pciGroup * 3 + pciSector;
+        
+        // Generate DMRS detection
+        const dmrsSequenceId = pci;
+        const dmrsCorrelationPeak = 0.7 + Math.random() * 0.3;
+        
+        // Generate MIB parameters
+        const mibSfn = Math.floor(Math.random() * 1024);
+        const dlBandwidth = this.cellConfig.bandwidth;
+        const phichDuration = Math.random() > 0.5 ? 'NORMAL' : 'EXTENDED';
+        const phichResource = Math.floor(Math.random() * 8);
+        
+        // Generate PCFICH
+        const cfi = 1 + Math.floor(Math.random() * 3);
+        
+        // Generate PDCCH
+        const pdcchAggregationLevel = [1, 2, 4, 8][Math.floor(Math.random() * 4)];
+        const pdcchDciFormat = ['1A', '1', '1B', '1C', '1D', '2', '2A', '2B', '2C'][Math.floor(Math.random() * 9)];
+        const pdcchCceIndex = Math.floor(Math.random() * 16);
+        
+        // Generate SIB1 parameters
+        const plmnList = [{
+            mcc: this.cellConfig.mcc,
+            mnc: this.cellConfig.mnc,
+            reserved: 0
+        }];
+        const tac = this.cellConfig.tac;
+        const cellIdentity = Math.floor(Math.random() * 268435456);
+        const cellBarred = false;
+        const intraFreqReselection = 'ALLOWED';
+        const csRestrict = false;
+        const qRxlevmin = -70 - Math.floor(Math.random() * 20);
+        const pMax = 20 + Math.floor(Math.random() * 10);
+        const freqBandIndicator = 3;
+        
+        // Generate SIB2 parameters
+        const rachConfig = {
+            preamble_info: {
+                number_of_ra_preambles: 64,
+                preambles_group_a_config: {
+                    size_of_ra_preambles_group_a: 56,
+                    message_size_group_a: 56,
+                    message_power_offset_group_b: -1
+                }
+            },
+            power_ramping_step: 0,
+            preamble_initial_received_target_power: -120,
+            preamble_max_transmissions: 10,
+            ra_response_window_size: 10
+        };
+        
+        const prachConfig = {
+            root_sequence_index: 0,
+            prach_config_info: {
+                prach_config_index: 0,
+                high_speed_flag: false,
+                zero_correlation_zone_config: 0,
+                prach_freq_offset: 0
+            }
+        };
+        
+        const puschConfig = {
+            pusch_config_basic: {
+                n_sb: 1,
+                hopping_mode: 'INTRA_AND_INTER_SUBFRAME',
+                pusch_hopping_offset: 0,
+                enable_64_qam: false
+            },
+            ul_reference_signals_pusch: {
+                group_hopping_enabled: false,
+                group_assignment_pusch: 0,
+                sequence_hopping_enabled: false,
+                cyclic_shift: 0
+            }
+        };
+        
+        const pucchConfig = {
+            delta_pucch_shift: 1,
+            n_rb_cqi: 0,
+            n_cs_an: 0,
+            n1_pucch_an: 0
+        };
+        
+        // Generate SIB3 parameters
+        const reselectionConfig = {
+            cell_reselection_info_common: {
+                q_hyst: 0,
+                speed_dependent_reselection_params: {
+                    mobility_state_params: {
+                        t_evaluation: 30,
+                        t_hyst_normal: 0,
+                        n_cell_change_medium: 1,
+                        n_cell_change_high: 1
+                    },
+                    q_hyst_sf: {
+                        sf_medium: 0,
+                        sf_high: 0
+                    }
+                }
+            },
+            cell_reselection_serving_freq_info: {
+                s_non_intra_search: 0,
+                thresh_serving_low: 0,
+                cell_reselection_priority: 0
+            },
+            intra_freq_cell_reselection_info: {
+                q_rxlevmin: qRxlevmin,
+                s_intra_search: 0,
+                presence_antenna_port1: false,
+                neighbour_cell_config: 0,
+                t_reselection_eutra: 0
+            }
+        };
+        
         return {
             ieMap: {
-                cell_id: this.cellConfig.pci.toString(),
-                pci: this.cellConfig.pci,
+                // Basic cell info
+                cell_id: pci.toString(),
+                pci: pci,
+                pci_group: pciGroup,
+                pci_sector: pciSector,
                 earfcn: this.cellConfig.earfcn,
-                dl_bandwidth: this.cellConfig.bandwidth,
+                dl_bandwidth: dlBandwidth,
                 rrc_state: 'IDLE',
+                
+                // Signal quality measurements
                 rsrp: -95 + Math.random() * 10,
                 rsrq: -10 + Math.random() * 5,
                 sinr: 15 + Math.random() * 10,
                 timing_advance_estimate: 0,
-                mib_sfn: 0,
+                
+                // PSS detection
+                pss_sequence: pssSequence,
+                pss_correlation_peak: pssCorrelationPeak,
+                pss_timing_offset: 0,
+                pss_frequency_offset: 0,
+                pss_snr: 15 + Math.random() * 5,
+                
+                // SSS detection
+                sss_sequence: sssSequence,
+                sss_correlation_peak: sssCorrelationPeak,
+                sss_timing_offset: 0,
+                sss_frequency_offset: 0,
+                sss_snr: 14 + Math.random() * 5,
+                
+                // DMRS detection
+                dmrs_sequence_id: dmrsSequenceId,
+                dmrs_correlation_peak: dmrsCorrelationPeak,
+                dmrs_timing_offset: 0,
+                dmrs_frequency_offset: 0,
+                dmrs_snr: 14 + Math.random() * 5,
+                
+                // MIB parameters
+                mib_sfn: mibSfn,
+                mib_dl_bandwidth: dlBandwidth,
+                mib_phich_config: {
+                    phich_duration: phichDuration,
+                    phich_resource: phichResource
+                },
+                mib_system_frame_number: mibSfn,
+                mib_crc_check: 'PASS',
+                mib_decode_success: true,
+                
+                // PHICH parameters
+                phich_duration: phichDuration,
+                phich_resource: phichResource,
+                phich_ng: 1,
+                phich_ack_nack: 'NACK',
+                phich_power: -8.5 + Math.random() * 2,
+                
+                // PCFICH parameters
+                cfi: cfi,
+                pcfich_crc_check: 'PASS',
+                pcfich_decode_success: true,
+                pcfich_snr: 13 + Math.random() * 3,
+                
+                // PDCCH parameters
+                pdcch_aggregation_level: pdcchAggregationLevel,
+                pdcch_dci_format: pdcchDciFormat,
+                pdcch_cce_index: pdcchCceIndex,
+                pdcch_crc_check: 'PASS',
+                pdcch_decode_success: true,
+                pdcch_snr: 12 + Math.random() * 3,
+                
+                // SIB1 parameters
+                sib1_plmn_list: plmnList,
+                sib1_tracking_area_code: tac,
+                sib1_cell_identity: cellIdentity,
+                sib1_cell_barred: cellBarred,
+                sib1_intra_freq_reselection: intraFreqReselection,
+                sib1_cs_restrict: csRestrict,
+                sib1_q_rxlevmin: qRxlevmin,
+                sib1_p_max: pMax,
+                sib1_freq_band_indicator: freqBandIndicator,
+                sib1_scheduling_info: [{
+                    si_periodicity: 8,
+                    si_mapping_info: 0
+                }],
+                sib1_tdd_config: null,
+                sib1_si_window_length: 10,
+                sib1_system_info_value_tag: 0,
+                sib1_decode_success: true,
+                
+                // SIB2 parameters
+                sib2_rach_config: rachConfig,
+                sib2_prach_config: prachConfig,
+                sib2_pusch_config: puschConfig,
+                sib2_pucch_config: pucchConfig,
+                sib2_decode_success: true,
+                
+                // SIB3 parameters
+                sib3_reselection_config: reselectionConfig,
+                sib3_decode_success: true,
+                
+                // Legacy parameters for compatibility
+                mib_sfn: mibSfn,
                 sib1_periodicity: 20
             },
             messageHex: '0x1234567890abcdef',
-            meta: { cell_sync_success: true },
+            meta: { 
+                cell_sync_success: true,
+                pss_detection_success: true,
+                sss_detection_success: true,
+                mib_decode_success: true,
+                sib1_decode_success: true,
+                sib2_decode_success: true,
+                sib3_decode_success: true
+            },
             sfn: 0,
             subframe: 0
         };
