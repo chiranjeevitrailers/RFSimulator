@@ -1,0 +1,226 @@
+LTE Power-On Test - Layer-wise Statistics Display
+====================================================
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           LTE Power-On Test - Layer Analysis                    │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  [PHY] [MAC] [RLC] [PDCP] [RRC] [NAS] [S1AP] [GTP] │  [Real-time] [Export]    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                PHY LAYER STATS                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Signal Quality Measurements                    │ Cell Synchronization            │
+│ ┌─────────────────────────────────────────────┐ │ ┌─────────────────────────────┐ │
+│ │ RSRP: -95.2 dBm     [████████████████████] │ │ │ PSS Sequence: 0    [✓]     │ │
+│ │ RSRQ: -10.5 dB      [████████████████████] │ │ │ SSS Sequence: 25   [✓]     │ │
+│ │ SINR: 15.8 dB       [████████████████████] │ │ │ PCI: 123          [✓]     │ │
+│ │ Status: GOOD        [████████████████████] │ │ │ DMRS ID: 123      [✓]     │ │
+│ └─────────────────────────────────────────────┘ │ └─────────────────────────────┘ │
+│                                                 │                                 │
+│ Channel Decoding Status                         │ MIMO Analysis                  │
+│ ┌─────────────────────────────────────────────┐ │ ┌─────────────────────────────┐ │
+│ │ MIB Decode:    SUCCESS [✓]                 │ │ │ MIMO Layers: 1              │ │
+│ │ PCFICH Decode: SUCCESS [✓]                 │ │ │ Mode: SINGLE_LAYER          │ │
+│ │ PDCCH Decode:  SUCCESS [✓]                 │ │ │ Antenna Ports: 1            │ │
+│ │ SIB1 Decode:   SUCCESS [✓]                 │ │ │ Beamforming: OFF            │ │
+│ │ SIB2 Decode:   SUCCESS [✓]                 │ │ │ Channel Rank: 1             │ │
+│ │ SIB3 Decode:   SUCCESS [✓]                 │ │ └─────────────────────────────┘ │
+│ └─────────────────────────────────────────────┘ │                                 │
+│                                                 │ MCS & CQI Analysis            │
+│ Real-time Charts:                               │ ┌─────────────────────────────┐ │
+│ ┌─────────────────────────────────────────────┐ │ │ MCS Index: 15 (16QAM)      │ │
+│ │ RSRP/RSRQ/SINR Trend                       │ │ │ Code Rate: 0.88            │ │
+│ │ 20 ┤                                      │ │ │ Spectral Eff: 3.52 b/s/Hz  │ │
+│ │ 15 ┤     ●                                │ │ │ CQI: 12 (16QAM)            │ │
+│ │ 10 ┤   ●   ●                              │ │ │ CQI Rate: 0.81             │ │
+│ │  5 ┤ ●       ●                            │ │ │ CQI Eff: 3.24 b/s/Hz       │ │
+│ │  0 ┤           ●                          │ │ └─────────────────────────────┘ │
+│ │    └─────────────────────────────────────  │                                 │
+│ │     0   5  10  15  20  25  30  35  40     │                                 │
+│ └─────────────────────────────────────────────┘ │                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                MAC LAYER STATS                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ UE Identification                    │ HARQ Processes                           │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ C-RNTI: 0x5c        [ASSIGNED] │ │ │ Active Processes: 1                 │ │
+│ │ RA-RNTI: 0x1a2      [TEMP]     │ │ │ Process ID: 3                       │ │
+│ │ Assignment Time: 120ms          │ │ │ Redundancy Version: 0               │ │
+│ └─────────────────────────────────┘ │ │ New Data Indicator: TRUE            │ │
+│                                     │ │ ACK Count: 0                        │ │
+│ Random Access Procedure             │ │ NACK Count: 0                       │ │
+│ ┌─────────────────────────────────┐ │ └─────────────────────────────────────┘ │
+│ │ PRACH Attempts: 1/10            │ │                                       │ │
+│ │ Preamble Index: 3               │ │ Scheduling Information               │ │
+│ │ Preamble Power: 23 dBm          │ │ ┌─────────────────────────────────┐ │
+│ │ Success Rate: 100%              │ │ │ UL Grant Size: 1024 bytes       │ │
+│ │ Contention Resolution: SUCCESS  │ │ │ DL Grant Size: 2048 bytes       │ │
+│ └─────────────────────────────────┘ │ │ Scheduling Freq: 10ms            │ │
+│                                     │ │ Pattern: REGULAR                 │ │
+│ Power Control                       │ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │                                       │ │
+│ │ Power Headroom: 2.5 dB          │ │ Real-time Charts:                   │ │
+│ │ TPC Command: 1 (INCREASE)       │ │ ┌─────────────────────────────────┐ │
+│ │ Power Offset: 1.2 dB            │ │ │ HARQ Performance                │ │
+│ │ Status: GOOD                    │ │ │ 10 ┤                          │ │
+│ └─────────────────────────────────┘ │ │  5 ┤   ●                        │ │
+│                                     │ │  0 ┤ ●   ●                      │ │
+│                                     │ │    └───────────────────────────  │ │
+│                                     │ │     0   5  10  15  20  25  30    │ │
+│                                     │ └─────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                RLC LAYER STATS                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ RLC Mode Configuration              │ Sequence Number Management                │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ RLC Mode: AM (Acknowledged)     │ │ │ TX SN: 0/1023                      │ │
+│ │ SRB Configuration: SRB1         │ │ │ RX SN: 0/1023                      │ │
+│ │ Priority: HIGH                  │ │ │ SN Window: 512                     │ │
+│ │ Status: ACTIVE                  │ │ │ Status: NORMAL                     │ │
+│ └─────────────────────────────────┘ │ └─────────────────────────────────────┘ │
+│                                     │                                         │
+│ ARQ Operations                       │ Buffer Status                           │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ Retransmissions: 0/4            │ │ │ TX Buffer: 0 bytes (0%)            │ │
+│ │ ARQ Timer: 100ms (RUNNING)      │ │ │ RX Buffer: 0 bytes (0%)            │ │
+│ │ Polling: DISABLED               │ │ │ BSR: NOT_TRIGGERED                 │ │
+│ │ Status: NORMAL                  │ │ │ Max Capacity: 1MB each             │ │
+│ └─────────────────────────────────┘ │ └─────────────────────────────────────┘ │
+│                                     │                                         │
+│ PDU Statistics                       │ Real-time Charts:                       │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ TX PDU Count: 0 (0 PDU/s)      │ │ │ Buffer Occupancy                   │ │
+│ │ RX PDU Count: 0 (0 PDU/s)      │ │ │ 1MB ┤                            │ │
+│ │ Average PDU Size: 0 bytes      │ │ │ 500K┤                            │ │
+│ │ Max PDU Size: 1500 bytes       │ │ │   0 ┤                            │ │
+│ └─────────────────────────────────┘ │ │     └────────────────────────────  │ │
+│                                     │ │      0   5  10  15  20  25  30     │ │
+│                                     │ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                PDCP LAYER STATS                                │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ PDCP Configuration                  │ Sequence Numbers                          │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ PDCP Mode: LTE R12              │ │ │ TX PDCP SN: 0/4095                 │ │
+│ │ Header Compression: ROHC        │ │ │ RX PDCP SN: 0/4095                 │ │
+│ │ Profile: UDP/IP                 │ │ │ SN Window: 2048                    │ │
+│ │ Status: ACTIVE                  │ │ │ Status: NORMAL                     │ │
+│ └─────────────────────────────────┘ │ └─────────────────────────────────────┘ │
+│                                     │                                         │
+│ Security Configuration              │ PDU Statistics                           │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ Ciphering: EEA1 (128-bit)      │ │ │ TX PDCP PDU: 0 (0 PDU/s)           │ │
+│ │ Integrity: EIA1 (128-bit)      │ │ │ RX PDCP PDU: 0 (0 PDU/s)           │ │
+│ │ Security Context: ESTABLISHED  │ │ │ Bytes Encrypted: 0 bytes           │ │
+│ │ Count: 0                       │ │ │ Compression Ratio: N/A             │ │
+│ │ Status: READY                  │ │ └─────────────────────────────────────┘ │
+│ └─────────────────────────────────┘ │                                         │
+│                                     │ Reordering & Duplication               │
+│                                     │ ┌─────────────────────────────────────┐ │
+│                                     │ │ Reordering Timer: 100ms (RUNNING)  │ │
+│                                     │ │ Duplication Events: 0              │ │
+│                                     │ │ Discard Count: 0                   │ │
+│                                     │ │ Status: NORMAL                     │ │
+│                                     │ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                RRC LAYER STATS                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ RRC State Management                │ Connection Management                     │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ Current State: CONNECTED        │ │ │ Connection Request: SUCCESS         │ │
+│ │ Previous State: IDLE            │ │ │ Cause: mo-signalling               │ │
+│ │ Transition Time: 150ms          │ │ │ Timestamp: 60ms                    │ │
+│ │ State Duration: 350ms           │ │ │ Connection Setup: SUCCESS           │ │
+│ │ Status: STABLE                  │ │ │ Duration: 60ms                     │ │
+│ └─────────────────────────────────┘ │ │ Connection Complete: SUCCESS        │ │
+│                                     │ │ Duration: 30ms                     │ │
+│ RRC Timers                          │ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │                                         │
+│ │ T300 Timer: 1000ms (STOPPED)    │ │ UE Capabilities                       │
+│ │ T304 Timer: 1000ms (STOPPED)    │ │ ┌─────────────────────────────────┐ │
+│ │ T310 Timer: 1000ms (STOPPED)    │ │ │ Bandwidth Class: A (100 RB)     │ │
+│ │ All Timers: NORMAL              │ │ │ CA Support: ENABLED (5 CC)      │ │
+│ └─────────────────────────────────┘ │ │ MIMO Support: 2x2 (2 layers)     │ │
+│                                     │ │ Features: VoLTE, VoWiFi          │ │
+│ Measurements                         │ │ Status: SUPPORTED                │ │
+│ ┌─────────────────────────────────┐ │ └─────────────────────────────────┘ │
+│ │ Measurement Objects: 1          │ │                                     │ │
+│ │ Type: INTRA_FREQ                │ │ Real-time Charts:                   │ │
+│ │ Measurement Reports: 0          │ │ ┌─────────────────────────────────┐ │
+│ │ Frequency: PERIODIC             │ │ │ RRC State Transitions           │ │
+│ │ Measurement Gaps: DISABLED      │ │ │ IDLE ──► CONNECTED              │ │
+│ │ Status: CONFIGURED              │ │ │   │        │                    │ │
+│ └─────────────────────────────────┘ │ │   └────────┘                    │ │
+│                                     │ │     150ms                       │ │
+│                                     │ └─────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                NAS LAYER STATS                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ EMM State Management                │ UE Identity Management                    │
+│ ┌─────────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ EMM State: REGISTERED           │ │ │ IMSI: 404***********012            │ │
+│ │ Previous State: DEREGISTERED    │ │ │ GUTI: 404-12-1234567890            │ │
+│ │ Transition Time: 450ms          │ │ │ IMEI: 359***********012            │ │
+│ │ EMM Sub-state: NORMAL_SERVICE   │ │ │ Status: ACTIVE                     │ │
+│ │ Status: ACTIVE                  │ │ └─────────────────────────────────────┘ │
+│ └─────────────────────────────────┘ │                                         │
+│                                     │ Attach Procedure                        │
+│ Security Management                 │ ┌─────────────────────────────────────┐ │
+│ ┌─────────────────────────────────┐ │ │ Attach Request: SENT (180ms)       │ │
+│ │ Authentication: SUCCESS         │ │ │ Type: EPS_ATTACH                   │ │
+│ │ Algorithm: MILENAGE             │ │ │ Attach Accept: RECEIVED (450ms)    │ │
+│ │ Timestamp: 250ms                │ │ │ Duration: 270ms                    │ │
+│ │ Security Mode: ESTABLISHED      │ │ │ Attach Complete: SENT (510ms)      │ │
+│ │ Integrity: EIA1                 │ │ │ Duration: 60ms                     │ │
+│ │ Ciphering: EEA1                 │ │ │ Status: SUCCESS                    │ │
+│ │ Timestamp: 320ms                │ │ └─────────────────────────────────────┘ │
+│ │ Security Context: ESTABLISHED   │ │                                         │
+│ │ Count: 0                        │ │ Session Management                   │
+│ │ Status: READY                   │ │ ┌─────────────────────────────────────┐ │
+│ └─────────────────────────────────┘ │ │ PDN Connectivity: ACTIVE            │ │
+│                                     │ │ APN: internet                       │ │
+│ Mobility Management                  │ │ Type: IPv4                          │ │
+│ ┌─────────────────────────────────┐ │ │ EPS Bearer: ACTIVE                  │ │
+│ │ Tracking Area: 12345            │ │ │ EBI: 5, QCI: 9                      │ │
+│ │ PLMN: 404-12                    │ │ │ ARP: 9, GBR: 0, MBR: 1000000       │ │
+│ │ Status: REGISTERED              │ │ │ Status: CONFIGURED                  │ │
+│ │ Location Update: PENDING        │ │ └─────────────────────────────────────┘ │
+│ │ Frequency: PERIODIC             │ │                                         │
+│ │ Mobility State: NORMAL          │ │ Real-time Charts:                     │ │
+│ │ Status: STABLE                  │ │ ┌─────────────────────────────────────┐ │
+│ └─────────────────────────────────┘ │ │ EMM State Transitions              │ │
+│                                     │ │ DEREGISTERED ──► REGISTERED        │ │
+│                                     │ │      │              │               │ │
+│                                     │ │      └──────────────┘               │ │
+│                                     │ │           450ms                     │ │
+│                                     │ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              REAL-TIME ALERTS & WARNINGS                       │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ 🟢 PHY: Signal quality GOOD (RSRP: -95.2 dBm, SINR: 15.8 dB)                  │
+│ 🟢 MAC: HARQ performance NORMAL (0 NACKs)                                      │
+│ 🟢 RLC: Buffer utilization LOW (0%)                                            │
+│ 🟢 PDCP: Security context ESTABLISHED                                          │
+│ 🟢 RRC: Connection STABLE (CONNECTED state)                                    │
+│ 🟢 NAS: Registration SUCCESS (EMM: REGISTERED)                                 │
+│                                                                                 │
+│ 📊 Performance Metrics:                                                        │
+│ • Attach Time: 330ms (Target: <3000ms) ✅                                     │
+│ • RRC Setup Time: 90ms (Target: <200ms) ✅                                    │
+│ • PRACH Attempts: 1 (Target: ≤2) ✅                                           │
+│ • Default Bearer: EBI=5, QCI=9 ✅                                             │
+│ • User Plane: ACTIVE ✅                                                       │
+└─────────────────────────────────────────────────────────────────────────────────┘

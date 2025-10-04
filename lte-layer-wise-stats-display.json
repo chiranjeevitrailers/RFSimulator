@@ -1,0 +1,885 @@
+{
+  "layerWiseStatsDisplay": {
+    "PHY": {
+      "title": "Physical Layer (PHY) Statistics",
+      "description": "Real-time physical layer measurements and signal quality",
+      "sections": {
+        "signalQuality": {
+          "title": "Signal Quality Measurements",
+          "parameters": [
+            {
+              "name": "RSRP",
+              "value": "-95.2 dBm",
+              "range": "-110 to -70 dBm",
+              "status": "GOOD",
+              "trend": "stable",
+              "chart": "line_chart"
+            },
+            {
+              "name": "RSRQ", 
+              "value": "-10.5 dB",
+              "range": "-20 to -3 dB",
+              "status": "GOOD",
+              "trend": "stable",
+              "chart": "line_chart"
+            },
+            {
+              "name": "SINR",
+              "value": "15.8 dB",
+              "range": "0 to 30 dB",
+              "status": "EXCELLENT",
+              "trend": "improving",
+              "chart": "line_chart"
+            }
+          ]
+        },
+        "cellSynchronization": {
+          "title": "Cell Synchronization",
+          "parameters": [
+            {
+              "name": "PSS Sequence",
+              "value": "0",
+              "status": "DETECTED",
+              "correlation_peak": "0.95"
+            },
+            {
+              "name": "SSS Sequence",
+              "value": "25", 
+              "status": "DETECTED",
+              "correlation_peak": "0.92"
+            },
+            {
+              "name": "PCI",
+              "value": "123",
+              "calculation": "PCI_Group(41) * 3 + PCI_Sector(0)",
+              "status": "VERIFIED"
+            },
+            {
+              "name": "DMRS Sequence ID",
+              "value": "123",
+              "status": "DETECTED",
+              "correlation_peak": "0.88"
+            }
+          ]
+        },
+        "channelDecoding": {
+          "title": "Channel Decoding Status",
+          "parameters": [
+            {
+              "name": "MIB Decode",
+              "status": "SUCCESS",
+              "sfn": "0",
+              "dl_bandwidth": "20 MHz",
+              "phich_duration": "NORMAL"
+            },
+            {
+              "name": "PCFICH Decode",
+              "status": "SUCCESS", 
+              "cfi": "1",
+              "snr": "13.2 dB"
+            },
+            {
+              "name": "PDCCH Decode",
+              "status": "SUCCESS",
+              "aggregation_level": "1",
+              "dci_format": "1A",
+              "snr": "12.8 dB"
+            }
+          ]
+        },
+        "systemInformation": {
+          "title": "System Information Blocks",
+          "parameters": [
+            {
+              "name": "SIB1",
+              "status": "DECODED",
+              "plmn": "404-12",
+              "tac": "12345",
+              "cell_barred": false
+            },
+            {
+              "name": "SIB2", 
+              "status": "DECODED",
+              "rach_config": "DEFAULT",
+              "prach_config": "DEFAULT"
+            },
+            {
+              "name": "SIB3",
+              "status": "DECODED", 
+              "reselection_config": "DEFAULT"
+            }
+          ]
+        },
+        "mimoAnalysis": {
+          "title": "MIMO Analysis",
+          "parameters": [
+            {
+              "name": "MIMO Layers",
+              "value": "1",
+              "mode": "SINGLE_LAYER",
+              "transmission_mode": "TM1"
+            },
+            {
+              "name": "Antenna Ports",
+              "value": "1",
+              "selection": "NO_ANTENNA_SELECTION",
+              "beamforming": false
+            },
+            {
+              "name": "Precoding Matrix",
+              "value": "0",
+              "channel_rank": "1"
+            }
+          ]
+        },
+        "mcsCqiAnalysis": {
+          "title": "MCS & CQI Analysis",
+          "parameters": [
+            {
+              "name": "MCS Index",
+              "value": "15",
+              "modulation": "16QAM",
+              "code_rate": "0.88",
+              "spectral_efficiency": "3.52 bits/s/Hz"
+            },
+            {
+              "name": "CQI",
+              "value": "12",
+              "modulation": "16QAM", 
+              "code_rate": "0.81",
+              "efficiency": "3.24 bits/s/Hz"
+            }
+          ]
+        },
+        "resourceAllocation": {
+          "title": "Resource Block Allocation",
+          "parameters": [
+            {
+              "name": "Allocated RBs",
+              "start": "10",
+              "length": "5",
+              "total_allocated": "5 RBs"
+            },
+            {
+              "name": "RB Power",
+              "average": "5.1 dBm",
+              "range": "4.8 to 5.5 dBm"
+            },
+            {
+              "name": "RB Interference",
+              "average": "-86.6 dBm",
+              "range": "-88.2 to -85.3 dBm"
+            }
+          ]
+        }
+      }
+    },
+    "MAC": {
+      "title": "Medium Access Control (MAC) Statistics",
+      "description": "MAC layer scheduling, HARQ, and access control",
+      "sections": {
+        "ueIdentification": {
+          "title": "UE Identification",
+          "parameters": [
+            {
+              "name": "C-RNTI",
+              "value": "0x5c",
+              "status": "ASSIGNED",
+              "assignment_time": "120ms"
+            },
+            {
+              "name": "RA-RNTI",
+              "value": "0x1a2",
+              "status": "TEMPORARY",
+              "validity": "RAR_WINDOW"
+            }
+          ]
+        },
+        "harqProcesses": {
+          "title": "HARQ Processes",
+          "parameters": [
+            {
+              "name": "Active Processes",
+              "value": "1",
+              "process_id": "3",
+              "redundancy_version": "0",
+              "new_data_indicator": true
+            },
+            {
+              "name": "HARQ ACK Count",
+              "value": "0",
+              "trend": "stable"
+            },
+            {
+              "name": "HARQ NACK Count", 
+              "value": "0",
+              "trend": "stable"
+            }
+          ]
+        },
+        "scheduling": {
+          "title": "Scheduling Information",
+          "parameters": [
+            {
+              "name": "UL Grant Size",
+              "value": "1024 bytes",
+              "trend": "increasing"
+            },
+            {
+              "name": "DL Grant Size",
+              "value": "2048 bytes", 
+              "trend": "stable"
+            },
+            {
+              "name": "Scheduling Frequency",
+              "value": "10 ms",
+              "pattern": "REGULAR"
+            }
+          ]
+        },
+        "randomAccess": {
+          "title": "Random Access Procedure",
+          "parameters": [
+            {
+              "name": "PRACH Attempts",
+              "value": "1",
+              "max_attempts": "10",
+              "success_rate": "100%"
+            },
+            {
+              "name": "Preamble Index",
+              "value": "3",
+              "power": "23 dBm",
+              "timing_offset": "0"
+            },
+            {
+              "name": "Contention Resolution",
+              "status": "SUCCESS",
+              "resolution_id": "0x12345678"
+            }
+          ]
+        },
+        "powerControl": {
+          "title": "Power Control",
+          "parameters": [
+            {
+              "name": "Power Headroom",
+              "value": "2.5 dB",
+              "range": "-10 to +10 dB",
+              "status": "GOOD"
+            },
+            {
+              "name": "TPC Command",
+              "value": "1",
+              "range": "0-3",
+              "effect": "INCREASE"
+            },
+            {
+              "name": "Power Control Offset",
+              "value": "1.2 dB",
+              "range": "-6 to +6 dB"
+            }
+          ]
+        }
+      }
+    },
+    "RLC": {
+      "title": "Radio Link Control (RLC) Statistics",
+      "description": "RLC layer segmentation, ARQ, and buffer management",
+      "sections": {
+        "rlcMode": {
+          "title": "RLC Mode Configuration",
+          "parameters": [
+            {
+              "name": "RLC Mode",
+              "value": "AM",
+              "description": "Acknowledged Mode",
+              "status": "ACTIVE"
+            },
+            {
+              "name": "SRB Configuration",
+              "value": "SRB1",
+              "priority": "HIGH",
+              "status": "CONFIGURED"
+            }
+          ]
+        },
+        "sequenceNumbers": {
+          "title": "Sequence Number Management",
+          "parameters": [
+            {
+              "name": "TX SN",
+              "value": "0",
+              "range": "0-1023",
+              "status": "INITIAL"
+            },
+            {
+              "name": "RX SN",
+              "value": "0",
+              "range": "0-1023", 
+              "status": "INITIAL"
+            },
+            {
+              "name": "SN Window",
+              "value": "512",
+              "status": "NORMAL"
+            }
+          ]
+        },
+        "arqOperations": {
+          "title": "ARQ Operations",
+          "parameters": [
+            {
+              "name": "Retransmissions",
+              "value": "0",
+              "max_retrans": "4",
+              "status": "NORMAL"
+            },
+            {
+              "name": "ARQ Timer",
+              "value": "100 ms",
+              "status": "RUNNING"
+            },
+            {
+              "name": "Polling",
+              "value": "DISABLED",
+              "status": "NORMAL"
+            }
+          ]
+        },
+        "bufferStatus": {
+          "title": "Buffer Status",
+          "parameters": [
+            {
+              "name": "TX Buffer Occupancy",
+              "value": "0 bytes",
+              "max_capacity": "1 MB",
+              "utilization": "0%"
+            },
+            {
+              "name": "RX Buffer Occupancy",
+              "value": "0 bytes",
+              "max_capacity": "1 MB",
+              "utilization": "0%"
+            },
+            {
+              "name": "Buffer Status Report",
+              "value": "NOT_TRIGGERED",
+              "last_report": "N/A"
+            }
+          ]
+        },
+        "pduStatistics": {
+          "title": "PDU Statistics",
+          "parameters": [
+            {
+              "name": "TX PDU Count",
+              "value": "0",
+              "rate": "0 PDU/s"
+            },
+            {
+              "name": "RX PDU Count",
+              "value": "0", 
+              "rate": "0 PDU/s"
+            },
+            {
+              "name": "PDU Size",
+              "average": "0 bytes",
+              "max": "1500 bytes"
+            }
+          ]
+        }
+      }
+    },
+    "PDCP": {
+      "title": "Packet Data Convergence Protocol (PDCP) Statistics",
+      "description": "PDCP layer header compression, security, and sequence numbering",
+      "sections": {
+        "pdcpConfiguration": {
+          "title": "PDCP Configuration",
+          "parameters": [
+            {
+              "name": "PDCP Mode",
+              "value": "LTE",
+              "version": "R12",
+              "status": "ACTIVE"
+            },
+            {
+              "name": "Header Compression",
+              "value": "ROHC",
+              "profile": "UDP/IP",
+              "status": "ENABLED"
+            }
+          ]
+        },
+        "sequenceNumbers": {
+          "title": "PDCP Sequence Numbers",
+          "parameters": [
+            {
+              "name": "TX PDCP SN",
+              "value": "0",
+              "range": "0-4095",
+              "status": "INITIAL"
+            },
+            {
+              "name": "RX PDCP SN",
+              "value": "0",
+              "range": "0-4095",
+              "status": "INITIAL"
+            },
+            {
+              "name": "SN Window",
+              "value": "2048",
+              "status": "NORMAL"
+            }
+          ]
+        },
+        "security": {
+          "title": "Security Configuration",
+          "parameters": [
+            {
+              "name": "Ciphering Algorithm",
+              "value": "EEA1",
+              "status": "ACTIVE",
+              "key_length": "128 bits"
+            },
+            {
+              "name": "Integrity Algorithm",
+              "value": "EIA1",
+              "status": "ACTIVE",
+              "key_length": "128 bits"
+            },
+            {
+              "name": "Security Context",
+              "value": "ESTABLISHED",
+              "count": "0",
+              "status": "READY"
+            }
+          ]
+        },
+        "pduStatistics": {
+          "title": "PDU Statistics",
+          "parameters": [
+            {
+              "name": "TX PDCP PDU Count",
+              "value": "0",
+              "rate": "0 PDU/s"
+            },
+            {
+              "name": "RX PDCP PDU Count",
+              "value": "0",
+              "rate": "0 PDU/s"
+            },
+            {
+              "name": "Bytes Encrypted",
+              "value": "0 bytes",
+              "rate": "0 bytes/s"
+            },
+            {
+              "name": "Compression Ratio",
+              "value": "N/A",
+              "efficiency": "N/A"
+            }
+          ]
+        },
+        "reordering": {
+          "title": "Reordering and Duplication",
+          "parameters": [
+            {
+              "name": "Reordering Timer",
+              "value": "100 ms",
+              "status": "RUNNING"
+            },
+            {
+              "name": "Duplication Events",
+              "value": "0",
+              "status": "NORMAL"
+            },
+            {
+              "name": "Discard Count",
+              "value": "0",
+              "status": "NORMAL"
+            }
+          ]
+        }
+      }
+    },
+    "RRC": {
+      "title": "Radio Resource Control (RRC) Statistics",
+      "description": "RRC layer connection management, mobility, and configuration",
+      "sections": {
+        "rrcState": {
+          "title": "RRC State Management",
+          "parameters": [
+            {
+              "name": "Current State",
+              "value": "CONNECTED",
+              "previous_state": "IDLE",
+              "transition_time": "150ms"
+            },
+            {
+              "name": "State Duration",
+              "value": "350ms",
+              "status": "STABLE"
+            }
+          ]
+        },
+        "connectionManagement": {
+          "title": "Connection Management",
+          "parameters": [
+            {
+              "name": "Connection Request",
+              "cause": "mo-signalling",
+              "timestamp": "60ms",
+              "status": "SUCCESS"
+            },
+            {
+              "name": "Connection Setup",
+              "timestamp": "120ms",
+              "duration": "60ms",
+              "status": "SUCCESS"
+            },
+            {
+              "name": "Connection Complete",
+              "timestamp": "150ms",
+              "duration": "30ms",
+              "status": "SUCCESS"
+            }
+          ]
+        },
+        "timers": {
+          "title": "RRC Timers",
+          "parameters": [
+            {
+              "name": "T300 Timer",
+              "value": "1000ms",
+              "status": "STOPPED",
+              "trigger": "CONNECTION_SETUP"
+            },
+            {
+              "name": "T304 Timer",
+              "value": "1000ms",
+              "status": "STOPPED",
+              "trigger": "HANDOVER"
+            },
+            {
+              "name": "T310 Timer",
+              "value": "1000ms",
+              "status": "STOPPED",
+              "trigger": "RL_FAILURE"
+            }
+          ]
+        },
+        "ueCapabilities": {
+          "title": "UE Capabilities",
+          "parameters": [
+            {
+              "name": "Bandwidth Class",
+              "value": "A",
+              "max_rb": "100",
+              "status": "SUPPORTED"
+            },
+            {
+              "name": "CA Support",
+              "value": "ENABLED",
+              "max_cc": "5",
+              "status": "SUPPORTED"
+            },
+            {
+              "name": "MIMO Support",
+              "value": "2x2",
+              "max_layers": "2",
+              "status": "SUPPORTED"
+            },
+            {
+              "name": "Features",
+              "value": "VoLTE, VoWiFi",
+              "status": "SUPPORTED"
+            }
+          ]
+        },
+        "measurements": {
+          "title": "RRC Measurements",
+          "parameters": [
+            {
+              "name": "Measurement Objects",
+              "value": "1",
+              "type": "INTRA_FREQ",
+              "status": "CONFIGURED"
+            },
+            {
+              "name": "Measurement Reports",
+              "value": "0",
+              "frequency": "PERIODIC",
+              "status": "PENDING"
+            },
+            {
+              "name": "Measurement Gaps",
+              "value": "DISABLED",
+              "status": "NORMAL"
+            }
+          ]
+        }
+      }
+    },
+    "NAS": {
+      "title": "Non-Access Stratum (NAS) Statistics",
+      "description": "NAS layer mobility management, session management, and security",
+      "sections": {
+        "emmState": {
+          "title": "EMM State Management",
+          "parameters": [
+            {
+              "name": "EMM State",
+              "value": "REGISTERED",
+              "previous_state": "DEREGISTERED",
+              "transition_time": "450ms"
+            },
+            {
+              "name": "EMM Sub-state",
+              "value": "NORMAL_SERVICE",
+              "status": "ACTIVE"
+            }
+          ]
+        },
+        "ueIdentity": {
+          "title": "UE Identity Management",
+          "parameters": [
+            {
+              "name": "IMSI",
+              "value": "404123456789012",
+              "masked": "404***********012",
+              "status": "ACTIVE"
+            },
+            {
+              "name": "GUTI",
+              "value": "404-12-1234567890",
+              "assigned_by": "MME",
+              "status": "ASSIGNED"
+            },
+            {
+              "name": "IMEI",
+              "value": "359123456789012",
+              "masked": "359***********012",
+              "status": "ACTIVE"
+            }
+          ]
+        },
+        "attachProcedure": {
+          "title": "Attach Procedure",
+          "parameters": [
+            {
+              "name": "Attach Request",
+              "timestamp": "180ms",
+              "type": "EPS_ATTACH",
+              "status": "SENT"
+            },
+            {
+              "name": "Attach Accept",
+              "timestamp": "450ms",
+              "duration": "270ms",
+              "status": "RECEIVED"
+            },
+            {
+              "name": "Attach Complete",
+              "timestamp": "510ms",
+              "duration": "60ms",
+              "status": "SENT"
+            }
+          ]
+        },
+        "security": {
+          "title": "Security Management",
+          "parameters": [
+            {
+              "name": "Authentication",
+              "status": "SUCCESS",
+              "algorithm": "MILENAGE",
+              "timestamp": "250ms"
+            },
+            {
+              "name": "Security Mode",
+              "status": "ESTABLISHED",
+              "integrity": "EIA1",
+              "ciphering": "EEA1",
+              "timestamp": "320ms"
+            },
+            {
+              "name": "Security Context",
+              "value": "ESTABLISHED",
+              "count": "0",
+              "status": "READY"
+            }
+          ]
+        },
+        "sessionManagement": {
+          "title": "Session Management",
+          "parameters": [
+            {
+              "name": "PDN Connectivity",
+              "apn": "internet",
+              "type": "IPv4",
+              "status": "ACTIVE"
+            },
+            {
+              "name": "EPS Bearer",
+              "ebi": "5",
+              "qci": "9",
+              "status": "ACTIVE"
+            },
+            {
+              "name": "Bearer Context",
+              "arp": "9",
+              "gbr": "0",
+              "mbr": "1000000",
+              "status": "CONFIGURED"
+            }
+          ]
+        },
+        "mobility": {
+          "title": "Mobility Management",
+          "parameters": [
+            {
+              "name": "Tracking Area",
+              "tac": "12345",
+              "plmn": "404-12",
+              "status": "REGISTERED"
+            },
+            {
+              "name": "Location Update",
+              "status": "PENDING",
+              "frequency": "PERIODIC"
+            },
+            {
+              "name": "Mobility State",
+              "value": "NORMAL",
+              "status": "STABLE"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "realTimeCharts": {
+    "phyCharts": [
+      {
+        "title": "Signal Quality Trend",
+        "parameters": ["rsrp", "rsrq", "sinr"],
+        "chartType": "multi_line",
+        "timeWindow": "60s"
+      },
+      {
+        "title": "MCS/CQI Trend", 
+        "parameters": ["mcs_index", "cqi"],
+        "chartType": "dual_line",
+        "timeWindow": "60s"
+      }
+    ],
+    "macCharts": [
+      {
+        "title": "HARQ Performance",
+        "parameters": ["harq_ack_count", "harq_nack_count"],
+        "chartType": "stacked_bar",
+        "timeWindow": "30s"
+      },
+      {
+        "title": "Grant Size Distribution",
+        "parameters": ["ul_grant_size", "dl_grant_size"],
+        "chartType": "histogram",
+        "timeWindow": "60s"
+      }
+    ],
+    "rlcCharts": [
+      {
+        "title": "Buffer Occupancy",
+        "parameters": ["tx_buffer_occupancy", "rx_buffer_occupancy"],
+        "chartType": "area",
+        "timeWindow": "30s"
+      },
+      {
+        "title": "PDU Throughput",
+        "parameters": ["tx_pdu_count", "rx_pdu_count"],
+        "chartType": "line",
+        "timeWindow": "60s"
+      }
+    ],
+    "pdcpCharts": [
+      {
+        "title": "PDCP PDU Rate",
+        "parameters": ["tx_pdcp_pdu_count", "rx_pdcp_pdu_count"],
+        "chartType": "line",
+        "timeWindow": "60s"
+      },
+      {
+        "title": "Encryption Throughput",
+        "parameters": ["bytes_encrypted"],
+        "chartType": "area",
+        "timeWindow": "60s"
+      }
+    ],
+    "rrcCharts": [
+      {
+        "title": "RRC State Transitions",
+        "parameters": ["rrc_state"],
+        "chartType": "state_diagram",
+        "timeWindow": "300s"
+      }
+    ],
+    "nasCharts": [
+      {
+        "title": "EMM State Transitions",
+        "parameters": ["emm_state"],
+        "chartType": "state_diagram", 
+        "timeWindow": "300s"
+      },
+      {
+        "title": "Attach Procedure Timeline",
+        "parameters": ["attach_request", "attach_accept", "attach_complete"],
+        "chartType": "timeline",
+        "timeWindow": "10s"
+      }
+    ]
+  },
+  "alertsAndWarnings": {
+    "phyAlerts": [
+      {
+        "condition": "rsrp < -110",
+        "severity": "WARNING",
+        "message": "Low RSRP - poor signal strength"
+      },
+      {
+        "condition": "sinr < 0",
+        "severity": "ERROR", 
+        "message": "Negative SINR - severe interference"
+      }
+    ],
+    "macAlerts": [
+      {
+        "condition": "harq_nack_count > 10",
+        "severity": "WARNING",
+        "message": "High HARQ NACK rate - poor channel quality"
+      }
+    ],
+    "rlcAlerts": [
+      {
+        "condition": "retransmissions > 4",
+        "severity": "ERROR",
+        "message": "Maximum RLC retransmissions exceeded"
+      }
+    ],
+    "rrcAlerts": [
+      {
+        "condition": "rrc_state == 'IDLE'",
+        "severity": "INFO",
+        "message": "RRC connection released"
+      }
+    ],
+    "nasAlerts": [
+      {
+        "condition": "emm_state == 'DEREGISTERED'",
+        "severity": "ERROR",
+        "message": "UE deregistered from network"
+      }
+    ]
+  }
+}
