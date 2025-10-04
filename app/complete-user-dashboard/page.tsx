@@ -20,21 +20,29 @@ const CompleteUserDashboard: React.FC = () => {
   })
   const [activeTab, setActiveTab] = useState("test-manager")
 
-  // Load DataFormatAdapter
+  // Load DataFormatAdapter and DataFlowManager
   useEffect(() => {
-    const loadDataFormatAdapter = async () => {
+    const loadServices = async () => {
       try {
+        // Load DataFormatAdapter
         const { DataFormatAdapter } = await import('@/utils/DataFormatAdapter');
         if (typeof window !== 'undefined') {
           (window as any).DataFormatAdapter = DataFormatAdapter;
           console.log('✅ DataFormatAdapter loaded successfully');
         }
+
+        // Load DataFlowManager
+        const { dataFlowManager } = await import('@/utils/DataFlowManager');
+        if (typeof window !== 'undefined') {
+          (window as any).dataFlowManager = dataFlowManager;
+          console.log('✅ DataFlowManager loaded successfully');
+        }
       } catch (error) {
-        console.error('❌ Failed to load DataFormatAdapter:', error);
+        console.error('❌ Failed to load services:', error);
       }
     };
 
-    loadDataFormatAdapter();
+    loadServices();
   }, []);
 
   // Memoize the platforms to prevent unnecessary remounting

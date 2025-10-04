@@ -18,6 +18,7 @@ import {
   Zap,
   Shield
 } from 'lucide-react';
+import { dataFlowManager, DataFlowEvent } from '@/utils/DataFlowManager';
 
 interface TestCase {
   id: string;
@@ -60,6 +61,33 @@ const NewTestManager: React.FC = () => {
   }>>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [dataFlowStatus, setDataFlowStatus] = useState<string>('disconnected');
+
+  // Initialize DataFlowManager
+  useEffect(() => {
+    const initializeDataFlow = () => {
+      try {
+        // Subscribe to data flow events
+        const unsubscribe = dataFlowManager.subscribe('ALL', (event: DataFlowEvent) => {
+          console.log(`📡 TestManager received event: ${event.type} from ${event.source}`);
+          addLog('INFO', 'DataFlow', `Received ${event.type} from ${event.source}`);
+          setLastUpdate(new Date());
+        });
+
+        setDataFlowStatus('connected');
+        addLog('INFO', 'DataFlow', 'DataFlowManager connected successfully');
+        
+        return unsubscribe;
+      } catch (error) {
+        console.error('❌ Error initializing DataFlowManager:', error);
+        addLog('ERROR', 'DataFlow', `Failed to initialize DataFlowManager: ${error.message}`);
+        setDataFlowStatus('error');
+      }
+    };
+
+    const unsubscribe = initializeDataFlow();
+    return unsubscribe;
+  }, []);
 
   // Load test cases from API
   useEffect(() => {
@@ -169,7 +197,12 @@ const NewTestManager: React.FC = () => {
       if (result.success && result.testCaseData) {
         addLog('INFO', 'TestManager', `Processing ${result.testCaseData.expectedMessages?.length || 0} messages`);
         
-        // Dispatch event to 5GLabX platform
+        // Use DataFlowManager to start test execution
+        addLog('INFO', 'DataFlow', 'Starting test execution via DataFlowManager');
+        const dataFlowExecutionId = dataFlowManager.startTestExecution(testCaseId, result.testCaseData);
+        addLog('INFO', 'DataFlow', `DataFlow execution ID: ${dataFlowExecutionId}`);
+        
+        // Dispatch legacy event for backward compatibility
         const testExecutionEvent = new CustomEvent('5GLABX_TEST_EXECUTION', {
           detail: {
             type: '5GLABX_TEST_EXECUTION',
@@ -181,14 +214,46 @@ const NewTestManager: React.FC = () => {
           }
         });
         
-        addLog('INFO', 'TestManager', 'Dispatching 5GLABX_TEST_EXECUTION event');
+        addLog('INFO', 'TestManager', 'Dispatching legacy 5GLABX_TEST_EXECUTION event');
         window.dispatchEvent(testExecutionEvent);
-        addLog('INFO', 'TestManager', 'Event dispatched successfully');
+        addLog('INFO', 'TestManager', 'Legacy event dispatched successfully');
+
+        // Dispatch DataFlow event
+        dataFlowManager.dispatch({
+          type: 'TEST_EXECUTION_STARTED',
+          source: 'TEST_MANAGER',
+          target: 'ALL',
+          data: {
+            executionId,
+            testCaseId,
+            testCaseData: result.testCaseData,
+            testCase: testCase
+          },
+          timestamp: Date.now(),
+          executionId,
+          testCaseId
+        });
 
         // Simulate test completion
         setTimeout(() => {
           setCurrentExecution(prev => prev ? { ...prev, status: 'COMPLETED', endTime: new Date() } : null);
           addLog('INFO', 'TestManager', 'Test execution completed successfully');
+          
+          // Dispatch completion event
+          dataFlowManager.dispatch({
+            type: 'TEST_EXECUTION_COMPLETED',
+            source: 'TEST_MANAGER',
+            target: 'ALL',
+            data: {
+              executionId,
+              testCaseId,
+              status: 'COMPLETED',
+              endTime: new Date()
+            },
+            timestamp: Date.now(),
+            executionId,
+            testCaseId
+          });
         }, 5000);
 
       } else {
@@ -206,7 +271,11 @@ const NewTestManager: React.FC = () => {
       addLog('INFO', 'TestManager', 'Stopping test execution');
       setCurrentExecution(prev => prev ? { ...prev, status: 'STOPPED', endTime: new Date() } : null);
       
-      // Dispatch stop event
+      // Use DataFlowManager to stop test execution
+      dataFlowManager.stopTestExecution(currentExecution.id);
+      addLog('INFO', 'DataFlow', 'Test execution stopped via DataFlowManager');
+      
+      // Dispatch legacy stop event
       const stopEvent = new CustomEvent('5GLABX_TEST_STOP', {
         detail: {
           type: '5GLABX_TEST_STOP',
@@ -215,6 +284,24 @@ const NewTestManager: React.FC = () => {
         }
       });
       window.dispatchEvent(stopEvent);
+      addLog('INFO', 'TestManager', 'Legacy stop event dispatched');
+      
+      // Dispatch DataFlow stop event
+      dataFlowManager.dispatch({
+        type: 'TEST_EXECUTION_STOPPED',
+        source: 'TEST_MANAGER',
+        target: 'ALL',
+        data: {
+          executionId: currentExecution.id,
+          testCaseId: currentExecution.testCaseId,
+          status: 'STOPPED',
+          endTime: new Date()
+        },
+        timestamp: Date.now(),
+        executionId: currentExecution.id,
+        testCaseId: currentExecution.testCaseId
+      });
+      
       addLog('INFO', 'TestManager', 'Test execution stopped');
     }
   };
@@ -261,6 +348,12 @@ const NewTestManager: React.FC = () => {
               isConnected ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
             }`}>
               {isConnected ? 'Connected' : 'Disconnected'}
+            </span>
+            <span className={`px-2 py-1 rounded text-xs font-medium ${
+              dataFlowStatus === 'connected' ? 'bg-blue-100 text-blue-800' : 
+              dataFlowStatus === 'error' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+            }`}>
+              DataFlow: {dataFlowStatus}
             </span>
           </div>
           <div className="flex items-center space-x-4">

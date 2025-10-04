@@ -38,6 +38,7 @@ import {
   Camera,
   Headphones
 } from 'lucide-react';
+import { dataFlowManager, DataFlowEvent } from '@/utils/DataFlowManager';
 
 // Import all UE view components
 import UELogsViewer from './views/UELogsViewer';
@@ -85,12 +86,46 @@ const NewUEAnalysisPlatform: React.FC<NewUEAnalysisPlatformProps> = ({ className
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [executionId, setExecutionId] = useState<string | null>(null);
+  const [dataFlowStatus, setDataFlowStatus] = useState<string>('disconnected');
+  const [receivedEvents, setReceivedEvents] = useState<DataFlowEvent[]>([]);
 
-  // Listen for test execution events
+  // Initialize DataFlowManager
+  useEffect(() => {
+    const initializeDataFlow = () => {
+      try {
+        // Subscribe to data flow events
+        const unsubscribe = dataFlowManager.subscribe('ALL', (event: DataFlowEvent) => {
+          console.log(`📡 NewUEAnalysis received event: ${event.type} from ${event.source}`);
+          setReceivedEvents(prev => [event, ...prev.slice(0, 49)]); // Keep last 50 events
+          setLastUpdate(new Date());
+          
+          // Handle specific events
+          if (event.type === 'TEST_EXECUTION_STARTED' || event.type === 'MESSAGE_TO_UE_ANALYSIS') {
+            setExecutionId(event.executionId || null);
+            setIsConnected(true);
+            console.log(`🔥 NewUEAnalysis: Processing ${event.type} event`);
+          }
+        });
+
+        setDataFlowStatus('connected');
+        console.log('✅ NewUEAnalysis: DataFlowManager connected successfully');
+        
+        return unsubscribe;
+      } catch (error) {
+        console.error('❌ Error initializing DataFlowManager in NewUEAnalysis:', error);
+        setDataFlowStatus('error');
+      }
+    };
+
+    const unsubscribe = initializeDataFlow();
+    return unsubscribe;
+  }, []);
+
+  // Listen for legacy test execution events (backward compatibility)
   useEffect(() => {
     const handleTestExecution = (event: any) => {
       if (event.type === '5GLABX_TEST_EXECUTION' && event.detail?.testCaseData) {
-        console.log('🔥 NewUEAnalysis: Received test execution event:', event.detail);
+        console.log('🔥 NewUEAnalysis: Received legacy test execution event:', event.detail);
         setExecutionId(event.detail.executionId);
         setIsConnected(true);
         setLastUpdate(new Date());

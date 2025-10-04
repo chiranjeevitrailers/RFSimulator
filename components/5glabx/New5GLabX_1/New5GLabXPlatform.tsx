@@ -29,6 +29,7 @@ import {
   Cpu,
   HardDrive
 } from 'lucide-react';
+import { dataFlowManager, DataFlowEvent } from '@/utils/DataFlowManager';
 
 // Import all view components
 import LogsViewer from './views/LogsViewer';
@@ -106,12 +107,46 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [executionId, setExecutionId] = useState<string | null>(null);
+  const [dataFlowStatus, setDataFlowStatus] = useState<string>('disconnected');
+  const [receivedEvents, setReceivedEvents] = useState<DataFlowEvent[]>([]);
 
-  // Listen for test execution events
+  // Initialize DataFlowManager
+  useEffect(() => {
+    const initializeDataFlow = () => {
+      try {
+        // Subscribe to data flow events
+        const unsubscribe = dataFlowManager.subscribe('ALL', (event: DataFlowEvent) => {
+          console.log(`📡 New5GLabX received event: ${event.type} from ${event.source}`);
+          setReceivedEvents(prev => [event, ...prev.slice(0, 49)]); // Keep last 50 events
+          setLastUpdate(new Date());
+          
+          // Handle specific events
+          if (event.type === 'TEST_EXECUTION_STARTED' || event.type === 'MESSAGE_TO_5GLABX') {
+            setExecutionId(event.executionId || null);
+            setIsConnected(true);
+            console.log(`🔥 New5GLabX: Processing ${event.type} event`);
+          }
+        });
+
+        setDataFlowStatus('connected');
+        console.log('✅ New5GLabX: DataFlowManager connected successfully');
+        
+        return unsubscribe;
+      } catch (error) {
+        console.error('❌ Error initializing DataFlowManager in New5GLabX:', error);
+        setDataFlowStatus('error');
+      }
+    };
+
+    const unsubscribe = initializeDataFlow();
+    return unsubscribe;
+  }, []);
+
+  // Listen for legacy test execution events (backward compatibility)
   useEffect(() => {
     const handleTestExecution = (event: any) => {
       if (event.type === '5GLABX_TEST_EXECUTION' && event.detail?.testCaseData) {
-        console.log('🔥 New5GLabX: Received test execution event:', event.detail);
+        console.log('🔥 New5GLabX: Received legacy test execution event:', event.detail);
         setExecutionId(event.detail.executionId);
         setIsConnected(true);
         setLastUpdate(new Date());
