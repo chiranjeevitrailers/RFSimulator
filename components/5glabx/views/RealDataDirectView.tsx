@@ -1,9 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Activity, Database, Wifi, Server, Phone, Shield } from 'lucide-react';
 
 interface RealTestData {
@@ -158,100 +155,106 @@ const RealDataDirectView: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
             <Database className="w-6 h-6 text-blue-600" />
-            <span>5GLabX Real Data Direct View</span>
-            <Badge variant={isConnected ? "default" : "secondary"}>
+            <h2 className="text-2xl font-bold text-gray-900">5GLabX Real Data Direct View</h2>
+            <span className={`px-2 py-1 rounded text-xs font-medium ${
+              isConnected ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+            }`}>
               {isConnected ? "Connected to Supabase" : "Disconnected"}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Button 
-                onClick={loadRealTestData} 
-                disabled={isLoading}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {isLoading ? 'Loading...' : 'Load Real Data from Supabase'}
-              </Button>
-              <div className="text-sm text-gray-600">
-                Last Update: {lastUpdate || 'Never'}
-              </div>
-            </div>
-            
-            {realTestData && (
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-green-900 mb-2">Real Test Case Data</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><strong>Test Case:</strong> {realTestData.testCaseData.name}</div>
-                  <div><strong>Protocol:</strong> {realTestData.testCaseData.protocol}</div>
-                  <div><strong>Category:</strong> {realTestData.testCaseData.category}</div>
-                  <div><strong>Messages:</strong> {realTestData.testCaseData.expectedMessages.length}</div>
-                </div>
-              </div>
-            )}
+            </span>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Activity className="w-6 h-6 text-green-600" />
-            <span>Real-Time Logs from Supabase</span>
-            <Badge variant="outline">{logs.length} messages</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {logs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No real data yet. Click "Load Real Data from Supabase" or run a test from Test Manager.
+        </div>
+        
+        <div className="space-y-4">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={loadRealTestData} 
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium disabled:opacity-50"
+            >
+              {isLoading ? 'Loading...' : 'Load Real Data from Supabase'}
+            </button>
+            <div className="text-sm text-gray-600">
+              Last Update: {lastUpdate || 'Never'}
             </div>
-          ) : (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {logs.map((log) => (
-                <div key={log.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0">
-                    {getLayerIcon(log.component)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <Badge className={getLevelColor(log.level)}>
-                        {log.level}
-                      </Badge>
-                      <Badge variant="outline">{log.component}</Badge>
-                      <Badge variant="outline">{log.direction}</Badge>
-                      <span className="text-xs text-gray-500">{log.timestamp}</span>
-                    </div>
-                    <div className="text-sm font-medium text-gray-900 mb-1">
-                      {log.message}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      <strong>Source:</strong> {log.source} | 
-                      <strong> Protocol:</strong> {log.protocol} |
-                      <strong> Type:</strong> {log.type}
-                    </div>
-                    {log.rawData && (
-                      <details className="mt-2">
-                        <summary className="text-xs text-blue-600 cursor-pointer">
-                          View Raw Data
-                        </summary>
-                        <pre className="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto">
-                          {log.rawData}
-                        </pre>
-                      </details>
-                    )}
-                  </div>
-                </div>
-              ))}
+          </div>
+          
+          {realTestData && (
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2">Real Test Case Data</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><strong>Test Case:</strong> {realTestData.testCaseData.name}</div>
+                <div><strong>Protocol:</strong> {realTestData.testCaseData.protocol}</div>
+                <div><strong>Category:</strong> {realTestData.testCaseData.category}</div>
+                <div><strong>Messages:</strong> {realTestData.testCaseData.expectedMessages.length}</div>
+              </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Activity className="w-6 h-6 text-green-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Real-Time Logs from Supabase</h2>
+            <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+              {logs.length} messages
+            </span>
+          </div>
+        </div>
+        
+        {logs.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No real data yet. Click "Load Real Data from Supabase" or run a test from Test Manager.
+          </div>
+        ) : (
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {logs.map((log) => (
+              <div key={log.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex-shrink-0">
+                  {getLayerIcon(log.component)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${getLevelColor(log.level)}`}>
+                      {log.level}
+                    </span>
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      {log.component}
+                    </span>
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      {log.direction}
+                    </span>
+                    <span className="text-xs text-gray-500">{log.timestamp}</span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-900 mb-1">
+                    {log.message}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    <strong>Source:</strong> {log.source} | 
+                    <strong> Protocol:</strong> {log.protocol} |
+                    <strong> Type:</strong> {log.type}
+                  </div>
+                  {log.rawData && (
+                    <details className="mt-2">
+                      <summary className="text-xs text-blue-600 cursor-pointer">
+                        View Raw Data
+                      </summary>
+                      <pre className="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto">
+                        {log.rawData}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
