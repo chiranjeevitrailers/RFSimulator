@@ -1,0 +1,178 @@
+{
+  "componentName": "PDCCHAnalysisView",
+  "description": "Professional PDCCH analysis component with MIMO, MCS, and physical layer parameters",
+  "features": [
+    "Real-time PDCCH monitoring",
+    "MIMO layer analysis",
+    "MCS and CQI tracking",
+    "Resource block allocation visualization",
+    "Power control monitoring",
+    "HARQ process tracking",
+    "Channel condition analysis",
+    "Professional parameter display"
+  ],
+  "displaySections": {
+    "pdcchOverview": {
+      "title": "PDCCH Overview",
+      "parameters": [
+        "aggregation_level",
+        "dci_format", 
+        "cce_index",
+        "crc_check",
+        "decode_success",
+        "snr"
+      ],
+      "displayType": "status_cards"
+    },
+    "mimoAnalysis": {
+      "title": "MIMO Analysis",
+      "parameters": [
+        "mimo_layers",
+        "mimo_mode",
+        "precoding_matrix",
+        "transmission_mode",
+        "antenna_ports",
+        "antenna_selection",
+        "beamforming",
+        "channel_rank"
+      ],
+      "displayType": "parameter_grid"
+    },
+    "mcsCqiAnalysis": {
+      "title": "MCS & CQI Analysis",
+      "parameters": [
+        "mcs_index",
+        "mcs_modulation",
+        "mcs_code_rate",
+        "mcs_spectral_efficiency",
+        "cqi",
+        "cqi_modulation",
+        "cqi_code_rate",
+        "cqi_efficiency"
+      ],
+      "displayType": "charts_and_tables"
+    },
+    "resourceAllocation": {
+      "title": "Resource Block Allocation",
+      "parameters": [
+        "resource_block_start",
+        "resource_block_length",
+        "resource_block_allocation"
+      ],
+      "displayType": "resource_grid"
+    },
+    "powerControl": {
+      "title": "Power Control",
+      "parameters": [
+        "tpc_command",
+        "power_headroom",
+        "power_control_offset"
+      ],
+      "displayType": "gauge_charts"
+    },
+    "harqProcess": {
+      "title": "HARQ Process",
+      "parameters": [
+        "harq_process_id",
+        "harq_redundancy_version",
+        "harq_new_data_indicator"
+      ],
+      "displayType": "process_timeline"
+    },
+    "timingAnalysis": {
+      "title": "Timing Analysis",
+      "parameters": [
+        "timing_advance",
+        "timing_advance_command",
+        "subframe_offset"
+      ],
+      "displayType": "timing_charts"
+    },
+    "channelState": {
+      "title": "Channel State Information",
+      "parameters": [
+        "channel_condition",
+        "interference_level",
+        "noise_level"
+      ],
+      "displayType": "channel_visualization"
+    }
+  },
+  "realTimeCharts": {
+    "mcsTrend": {
+      "title": "MCS Index Trend",
+      "xAxis": "Time",
+      "yAxis": "MCS Index",
+      "dataPoints": ["mcs_index"],
+      "chartType": "line"
+    },
+    "cqiTrend": {
+      "title": "CQI Trend",
+      "xAxis": "Time", 
+      "yAxis": "CQI",
+      "dataPoints": ["cqi"],
+      "chartType": "line"
+    },
+    "mimoLayersTrend": {
+      "title": "MIMO Layers Trend",
+      "xAxis": "Time",
+      "yAxis": "MIMO Layers",
+      "dataPoints": ["mimo_layers"],
+      "chartType": "step"
+    },
+    "powerHeadroomTrend": {
+      "title": "Power Headroom Trend",
+      "xAxis": "Time",
+      "yAxis": "Power Headroom (dB)",
+      "dataPoints": ["power_headroom"],
+      "chartType": "line"
+    },
+    "spectralEfficiencyTrend": {
+      "title": "Spectral Efficiency Trend",
+      "xAxis": "Time",
+      "yAxis": "Spectral Efficiency (bits/s/Hz)",
+      "dataPoints": ["mcs_spectral_efficiency"],
+      "chartType": "line"
+    }
+  },
+  "professionalFeatures": {
+    "parameterValidation": {
+      "mcsIndex": {"min": 0, "max": 28, "alerts": ["LOW_MCS", "HIGH_MCS"]},
+      "cqi": {"min": 0, "max": 15, "alerts": ["LOW_CQI", "HIGH_CQI"]},
+      "mimoLayers": {"min": 1, "max": 4, "alerts": ["SINGLE_LAYER", "MULTI_LAYER"]},
+      "powerHeadroom": {"min": -10, "max": 10, "alerts": ["LOW_POWER", "HIGH_POWER"]},
+      "channelCondition": {"values": ["VERY_POOR", "POOR", "FAIR", "GOOD", "EXCELLENT"], "alerts": ["POOR_CHANNEL", "EXCELLENT_CHANNEL"]}
+    },
+    "performanceMetrics": {
+      "throughputEstimate": "mcs_spectral_efficiency * resource_block_length * 180000",
+      "linkQuality": "cqi_efficiency / 3.52 * 100",
+      "mimoGain": "mimo_layers > 1 ? (mimo_layers - 1) * 10 : 0",
+      "powerEfficiency": "power_headroom / 10 * 100"
+    },
+    "alerts": {
+      "lowCQI": {"condition": "cqi < 4", "severity": "WARNING", "message": "Low CQI detected - poor channel quality"},
+      "highMCS": {"condition": "mcs_index > 20", "severity": "INFO", "message": "High MCS - excellent channel conditions"},
+      "singleLayer": {"condition": "mimo_layers == 1", "severity": "INFO", "message": "Single layer transmission"},
+      "lowPower": {"condition": "power_headroom < -5", "severity": "WARNING", "message": "Low power headroom"},
+      "poorChannel": {"condition": "channel_condition == 'VERY_POOR'", "severity": "ERROR", "message": "Very poor channel conditions"}
+    }
+  },
+  "industryStandards": {
+    "3gppCompliance": "TS 36.211, 36.212, 36.213",
+    "qxdmCompatibility": true,
+    "keysightCompatibility": true,
+    "parameterFormat": "3GPP standard",
+    "displayFormat": "Professional analysis tool"
+  },
+  "dataFlowIntegration": {
+    "eventTypes": ["PDCCH_DECODE", "MCS_UPDATE", "CQI_UPDATE", "MIMO_UPDATE"],
+    "realTimeUpdates": true,
+    "parameterMapping": {
+      "mcs_index": "Modulation and Coding Scheme",
+      "cqi": "Channel Quality Indicator", 
+      "mimo_layers": "MIMO Transmission Layers",
+      "power_headroom": "UE Power Headroom",
+      "channel_condition": "Channel Quality Assessment"
+    }
+  }
+}

@@ -423,10 +423,61 @@ class LTEPowerOnSimulator {
         // Generate PCFICH
         const cfi = 1 + Math.floor(Math.random() * 3);
         
-        // Generate PDCCH
+        // Generate PDCCH with realistic MIMO and MCS parameters
         const pdcchAggregationLevel = [1, 2, 4, 8][Math.floor(Math.random() * 4)];
         const pdcchDciFormat = ['1A', '1', '1B', '1C', '1D', '2', '2A', '2B', '2C'][Math.floor(Math.random() * 9)];
         const pdcchCceIndex = Math.floor(Math.random() * 16);
+        
+        // Generate realistic MIMO parameters
+        const mimoLayers = Math.random() > 0.3 ? (Math.random() > 0.5 ? 2 : 1) : 1; // 70% single layer, 30% dual layer
+        const mimoMode = mimoLayers === 1 ? 'SINGLE_LAYER' : 'DUAL_LAYER';
+        const precodingMatrix = mimoLayers === 1 ? 0 : Math.floor(Math.random() * 4);
+        const transmissionMode = mimoLayers === 1 ? 1 : (Math.random() > 0.5 ? 2 : 4);
+        
+        // Generate realistic MCS parameters
+        const mcsIndex = Math.floor(Math.random() * 29); // 0-28
+        const mcsTable = this.getMCSTable(mcsIndex);
+        const modulation = mcsTable.modulation;
+        const codeRate = mcsTable.codeRate;
+        const spectralEfficiency = mcsTable.spectralEfficiency;
+        
+        // Generate CQI and link adaptation parameters
+        const cqi = Math.floor(Math.random() * 16); // 0-15
+        const cqiTable = this.getCQITable(cqi);
+        const cqiModulation = cqiTable.modulation;
+        const cqiCodeRate = cqiTable.codeRate;
+        const cqiEfficiency = cqiTable.efficiency;
+        
+        // Generate resource allocation parameters
+        const resourceBlockStart = Math.floor(Math.random() * 50);
+        const resourceBlockLength = 1 + Math.floor(Math.random() * 20);
+        const resourceBlockAllocation = this.generateResourceBlockAllocation(resourceBlockStart, resourceBlockLength);
+        
+        // Generate power control parameters
+        const tpcCommand = Math.floor(Math.random() * 4); // 0-3
+        const powerHeadroom = -10 + Math.random() * 20; // -10 to +10 dB
+        const powerControlOffset = -6 + Math.random() * 12; // -6 to +6 dB
+        
+        // Generate HARQ parameters
+        const harqProcessId = Math.floor(Math.random() * 8); // 0-7
+        const harqRedundancyVersion = Math.floor(Math.random() * 4); // 0-3
+        const harqNewDataIndicator = Math.random() > 0.5;
+        
+        // Generate timing parameters
+        const timingAdvance = Math.floor(Math.random() * 1283); // 0-1282 Ts
+        const timingAdvanceCommand = Math.floor(Math.random() * 11); // 0-10
+        const subframeOffset = Math.floor(Math.random() * 10); // 0-9
+        
+        // Generate antenna parameters
+        const antennaPorts = mimoLayers === 1 ? 1 : 2;
+        const antennaSelection = Math.random() > 0.5 ? 'ANTENNA_SELECTION' : 'NO_ANTENNA_SELECTION';
+        const beamforming = Math.random() > 0.7; // 30% chance of beamforming
+        
+        // Generate channel state information
+        const channelRank = mimoLayers;
+        const channelCondition = this.getChannelCondition(cqi);
+        const interferenceLevel = -100 + Math.random() * 20; // -100 to -80 dBm
+        const noiseLevel = -120 + Math.random() * 10; // -120 to -110 dBm
         
         // Generate SIB1 parameters
         const plmnList = [{
@@ -591,6 +642,53 @@ class LTEPowerOnSimulator {
                 pdcch_crc_check: 'PASS',
                 pdcch_decode_success: true,
                 pdcch_snr: 12 + Math.random() * 3,
+                
+                // MIMO parameters
+                mimo_layers: mimoLayers,
+                mimo_mode: mimoMode,
+                precoding_matrix: precodingMatrix,
+                transmission_mode: transmissionMode,
+                antenna_ports: antennaPorts,
+                antenna_selection: antennaSelection,
+                beamforming: beamforming,
+                channel_rank: channelRank,
+                
+                // MCS parameters
+                mcs_index: mcsIndex,
+                mcs_modulation: modulation,
+                mcs_code_rate: codeRate,
+                mcs_spectral_efficiency: spectralEfficiency,
+                
+                // CQI parameters
+                cqi: cqi,
+                cqi_modulation: cqiModulation,
+                cqi_code_rate: cqiCodeRate,
+                cqi_efficiency: cqiEfficiency,
+                
+                // Resource allocation
+                resource_block_start: resourceBlockStart,
+                resource_block_length: resourceBlockLength,
+                resource_block_allocation: resourceBlockAllocation,
+                
+                // Power control
+                tpc_command: tpcCommand,
+                power_headroom: powerHeadroom,
+                power_control_offset: powerControlOffset,
+                
+                // HARQ parameters
+                harq_process_id: harqProcessId,
+                harq_redundancy_version: harqRedundancyVersion,
+                harq_new_data_indicator: harqNewDataIndicator,
+                
+                // Timing parameters
+                timing_advance: timingAdvance,
+                timing_advance_command: timingAdvanceCommand,
+                subframe_offset: subframeOffset,
+                
+                // Channel state information
+                channel_condition: channelCondition,
+                interference_level: interferenceLevel,
+                noise_level: noiseLevel,
                 
                 // SIB1 parameters
                 sib1_plmn_list: plmnList,
@@ -961,6 +1059,85 @@ class LTEPowerOnSimulator {
             sfn: 18,
             subframe: 18
         };
+    }
+
+    // Helper methods for realistic parameter generation
+    getMCSTable(mcsIndex) {
+        const mcsTable = [
+            { modulation: 'QPSK', codeRate: 0.12, spectralEfficiency: 0.15 },
+            { modulation: 'QPSK', codeRate: 0.19, spectralEfficiency: 0.23 },
+            { modulation: 'QPSK', codeRate: 0.30, spectralEfficiency: 0.38 },
+            { modulation: 'QPSK', codeRate: 0.44, spectralEfficiency: 0.60 },
+            { modulation: 'QPSK', codeRate: 0.59, spectralEfficiency: 0.88 },
+            { modulation: 'QPSK', codeRate: 0.74, spectralEfficiency: 1.18 },
+            { modulation: 'QPSK', codeRate: 0.85, spectralEfficiency: 1.33 },
+            { modulation: 'QPSK', codeRate: 0.93, spectralEfficiency: 1.48 },
+            { modulation: '16QAM', codeRate: 0.33, spectralEfficiency: 1.33 },
+            { modulation: '16QAM', codeRate: 0.41, spectralEfficiency: 1.64 },
+            { modulation: '16QAM', codeRate: 0.48, spectralEfficiency: 1.91 },
+            { modulation: '16QAM', codeRate: 0.56, spectralEfficiency: 2.25 },
+            { modulation: '16QAM', codeRate: 0.65, spectralEfficiency: 2.60 },
+            { modulation: '16QAM', codeRate: 0.73, spectralEfficiency: 2.91 },
+            { modulation: '16QAM', codeRate: 0.81, spectralEfficiency: 3.24 },
+            { modulation: '16QAM', codeRate: 0.88, spectralEfficiency: 3.52 },
+            { modulation: '64QAM', codeRate: 0.33, spectralEfficiency: 1.98 },
+            { modulation: '64QAM', codeRate: 0.41, spectralEfficiency: 2.46 },
+            { modulation: '64QAM', codeRate: 0.48, spectralEfficiency: 2.87 },
+            { modulation: '64QAM', codeRate: 0.56, spectralEfficiency: 3.38 },
+            { modulation: '64QAM', codeRate: 0.65, spectralEfficiency: 3.90 },
+            { modulation: '64QAM', codeRate: 0.73, spectralEfficiency: 4.38 },
+            { modulation: '64QAM', codeRate: 0.81, spectralEfficiency: 4.86 },
+            { modulation: '64QAM', codeRate: 0.88, spectralEfficiency: 5.30 },
+            { modulation: '64QAM', codeRate: 0.93, spectralEfficiency: 5.59 },
+            { modulation: '64QAM', codeRate: 0.98, spectralEfficiency: 5.88 },
+            { modulation: '64QAM', codeRate: 1.00, spectralEfficiency: 6.00 },
+            { modulation: '64QAM', codeRate: 1.00, spectralEfficiency: 6.00 },
+            { modulation: '64QAM', codeRate: 1.00, spectralEfficiency: 6.00 }
+        ];
+        return mcsTable[mcsIndex] || mcsTable[0];
+    }
+
+    getCQITable(cqi) {
+        const cqiTable = [
+            { modulation: 'OUT_OF_RANGE', codeRate: 0, efficiency: 0 },
+            { modulation: 'QPSK', codeRate: 0.08, efficiency: 0.15 },
+            { modulation: 'QPSK', codeRate: 0.12, efficiency: 0.23 },
+            { modulation: 'QPSK', codeRate: 0.19, efficiency: 0.38 },
+            { modulation: 'QPSK', codeRate: 0.30, efficiency: 0.60 },
+            { modulation: 'QPSK', codeRate: 0.44, efficiency: 0.88 },
+            { modulation: 'QPSK', codeRate: 0.59, efficiency: 1.18 },
+            { modulation: 'QPSK', codeRate: 0.74, efficiency: 1.48 },
+            { modulation: '16QAM', codeRate: 0.33, efficiency: 1.33 },
+            { modulation: '16QAM', codeRate: 0.41, efficiency: 1.64 },
+            { modulation: '16QAM', codeRate: 0.48, efficiency: 1.91 },
+            { modulation: '16QAM', codeRate: 0.56, efficiency: 2.25 },
+            { modulation: '16QAM', codeRate: 0.65, efficiency: 2.60 },
+            { modulation: '16QAM', codeRate: 0.73, efficiency: 2.91 },
+            { modulation: '16QAM', codeRate: 0.81, efficiency: 3.24 },
+            { modulation: '64QAM', codeRate: 0.88, efficiency: 3.52 }
+        ];
+        return cqiTable[cqi] || cqiTable[0];
+    }
+
+    generateResourceBlockAllocation(start, length) {
+        const allocation = [];
+        for (let i = start; i < start + length; i++) {
+            allocation.push({
+                rb_index: i,
+                allocated: true,
+                power: -10 + Math.random() * 20, // -10 to +10 dBm
+                interference: -100 + Math.random() * 20 // -100 to -80 dBm
+            });
+        }
+        return allocation;
+    }
+
+    getChannelCondition(cqi) {
+        if (cqi >= 13) return 'EXCELLENT';
+        if (cqi >= 10) return 'GOOD';
+        if (cqi >= 7) return 'FAIR';
+        if (cqi >= 4) return 'POOR';
+        return 'VERY_POOR';
     }
 
     delay(ms) {
