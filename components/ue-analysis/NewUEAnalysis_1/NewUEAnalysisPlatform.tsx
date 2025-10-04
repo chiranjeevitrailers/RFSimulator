@@ -47,6 +47,9 @@ import UELayerTraceView from './views/UELayerTraceView';
 import UECallFlowView from './views/UECallFlowView';
 import UEAnalyticsView from './views/UEAnalyticsView';
 
+// Import professional analysis components
+import ProfessionalAnalysisPlatform from '../professional-log-analysis/ProfessionalAnalysisPlatform';
+
 // UE Protocol Stack Views
 import UEApplicationLayer from './views/protocol/UEApplicationLayer';
 import UEIMSLayer from './views/protocol/UEIMSLayer';
@@ -138,6 +141,7 @@ const NewUEAnalysisPlatform: React.FC<NewUEAnalysisPlatformProps> = ({ className
 
   // Menu items with exact structure as specified
   const menuItems = [
+    { id: 'professional', label: 'Professional Analysis', icon: Activity, badge: 'NEW' },
     { id: 'ue-logs', label: 'UE Logs Viewer', icon: FileText },
     { id: 'ue-enhanced-logs', label: 'UE Enhanced Logs', icon: Search },
     { id: 'ue-layer-trace', label: 'UE Layer Trace', icon: Network },
@@ -230,6 +234,8 @@ const NewUEAnalysisPlatform: React.FC<NewUEAnalysisPlatformProps> = ({ className
   const renderCurrentView = () => {
     switch (currentView) {
       // Main Views
+      case 'professional':
+        return <ProfessionalAnalysisPlatform executionId={executionId} platform="UE_ANALYSIS" />;
       case 'ue-logs':
         return <UELogsViewer executionId={executionId} />;
       case 'ue-enhanced-logs':

@@ -38,6 +38,9 @@ import LayerTraceView from './views/LayerTraceView';
 import CallFlowView from './views/CallFlowView';
 import AnalyticsView from './views/AnalyticsView';
 
+// Import professional analysis components
+import ProfessionalAnalysisPlatform from '../professional-log-analysis/ProfessionalAnalysisPlatform';
+
 // O-RAN Analysis Views
 import OranOverview from './views/oran/OranOverview';
 import InterfacesView from './views/oran/InterfacesView';
@@ -159,6 +162,7 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
 
   // Menu items with exact structure as specified
   const menuItems = [
+    { id: 'professional', label: 'Professional Analysis', icon: Activity, badge: 'NEW' },
     { id: 'logs', label: 'Logs Viewer', icon: FileText },
     { id: 'enhanced-logs', label: 'Enhanced Logs', icon: Search },
     { id: 'layer-trace', label: 'Layer Trace', icon: Network },
@@ -284,6 +288,8 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
   const renderCurrentView = () => {
     switch (currentView) {
       // Main Views
+      case 'professional':
+        return <ProfessionalAnalysisPlatform executionId={executionId} platform="5GLABX" />;
       case 'logs':
         return <LogsViewer executionId={executionId} />;
       case 'enhanced-logs':
