@@ -9,7 +9,10 @@ const LogsView: React.FC<{
   appState: any
   onStateChange: (state: any) => void
 }> = ({ appState, onStateChange }) => {
-  console.log("🔄 LogsView: Component rendering/remounting")
+  console.log("🔄 LogsView: Component rendering/remounting", { 
+    enhanced: appState?.enhanced, 
+    timestamp: new Date().toISOString() 
+  })
   const [logs, setLogs] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLevel, setSelectedLevel] = useState("all")
