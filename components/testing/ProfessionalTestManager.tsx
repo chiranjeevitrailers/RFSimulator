@@ -2151,7 +2151,7 @@ const ProfessionalTestManager: React.FC = () => {
                                                 key: "start",
                                                 className:
                                                   "bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 flex items-center space-x-1",
-                                                onClick: () => handleStartTest(testCase.id),
+                                                onClick: () => handleRunTest(testCase.id),
                                                 disabled: testCase.status === "Running",
                                               },
                                               [
