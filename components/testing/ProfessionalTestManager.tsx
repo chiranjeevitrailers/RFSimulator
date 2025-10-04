@@ -488,6 +488,9 @@ const ProfessionalTestManager: React.FC = () => {
   }
 
   const handleRunTest = async (testId) => {
+    console.log("🔥 DEBUG: handleRunTest called with testId:", testId)
+    addLog("DEBUG", `🔥 handleRunTest function called with testId: ${testId}`)
+    
     setIsRunning(true)
     addLog("INFO", `🚀 Starting test execution: ${testId}`)
     addLog("INFO", `⏰ Execution started at: ${new Date().toLocaleString()}`)

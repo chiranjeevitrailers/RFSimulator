@@ -775,7 +775,7 @@ const Enhanced5GLabXPlatform: React.FC = () => {
   // Memoize the LogsView to prevent unnecessary remounting
   const LogsViewMemo = React.useMemo(() => {
     return <LogsView key="logs-view" appState={{ enhanced: currentView === 'enhanced-logs' }} onStateChange={() => {}} />;
-  }, [currentView]);
+  }, []); // Remove currentView dependency to prevent remounting
 
   const renderCurrentView = () => {
     switch (currentView) {
