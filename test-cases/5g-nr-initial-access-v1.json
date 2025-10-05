@@ -1,0 +1,136 @@
+{
+  "testCaseId": "5g-nr-initial-access-v1",
+  "name": "5G NR Initial Access Procedure",
+  "description": "Complete 5G NR UE initial access and registration procedure",
+  "technology": "5G_NR",
+  "category": "INITIAL_ACCESS",
+  "version": "1.0",
+  "ueProfile": {
+    "id": "ue_5g_samsung_s21",
+    "imsi": "404123456789013",
+    "imei": "359123456789013",
+    "deviceCapabilities": {
+      "bandwidthClass": "A",
+      "caSupport": true,
+      "mimoSupport": "4x4",
+      "features": ["VoNR", "eMBB", "URLLC", "mMTC"]
+    },
+    "defaultApn": "internet",
+    "securitySupport": {
+      "EEA": ["EEA0", "EEA1", "EEA2", "EEA3"],
+      "EIA": ["EIA0", "EIA1", "EIA2", "EIA3"]
+    }
+  },
+  "cellConfig": {
+    "pci": 456,
+    "nrarfcn": 632448,
+    "bandwidth": 100,
+    "tac": 54321,
+    "mcc": "404",
+    "mnc": "12"
+  },
+  "expectedMessageSequence": [
+    {
+      "step": 1,
+      "eventType": "SSB_DETECTION",
+      "layer": "PHY",
+      "description": "UE detects SSB and performs cell synchronization",
+      "duration": 3000,
+      "expectedIEs": {
+        "ssb_index": 0,
+        "ssb_power": -85.5,
+        "ssb_snr": 18.2,
+        "pci": 456,
+        "nrarfcn": 632448,
+        "ssb_periodicity": 20
+      },
+      "subSteps": [
+        "PSS_DETECTION",
+        "SSS_DETECTION",
+        "PBCH_DECODE",
+        "SIB1_DECODE"
+      ]
+    },
+    {
+      "step": 2,
+      "eventType": "RACH_ATTEMPT",
+      "layer": "PHY",
+      "description": "Random Access procedure initiation",
+      "duration": 2000,
+      "expectedIEs": {
+        "ra_preamble_index": 5,
+        "prach_format": 0,
+        "preamble_tx_power": -88,
+        "ra_slot": 0
+      }
+    },
+    {
+      "step": 3,
+      "eventType": "RRC_SETUP_REQUEST",
+      "layer": "RRC",
+      "description": "UE sends RRC Setup Request",
+      "duration": 1000,
+      "expectedIEs": {
+        "establishment_cause": "mo-signalling",
+        "ue_identity": "random",
+        "rrc_transaction_id": 0
+      }
+    },
+    {
+      "step": 4,
+      "eventType": "RRC_SETUP",
+      "layer": "RRC",
+      "description": "gNB sends RRC Setup",
+      "duration": 500,
+      "expectedIEs": {
+        "rrc_transaction_id": 0,
+        "rrc_setup": {
+          "radio_bearer_config": "DEFAULT",
+          "master_cell_group": "DEFAULT"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "eventType": "RRC_SETUP_COMPLETE",
+      "layer": "RRC",
+      "description": "UE sends RRC Setup Complete",
+      "duration": 500,
+      "expectedIEs": {
+        "rrc_transaction_id": 0,
+        "selected_plmn_identity": "40412"
+      }
+    },
+    {
+      "step": 6,
+      "eventType": "REGISTRATION_REQUEST",
+      "layer": "NAS",
+      "description": "UE sends Registration Request",
+      "duration": 2000,
+      "expectedIEs": {
+        "registration_type": "initial",
+        "security_capability": "DEFAULT",
+        "ue_capability": "DEFAULT"
+      }
+    },
+    {
+      "step": 7,
+      "eventType": "REGISTRATION_ACCEPT",
+      "layer": "NAS",
+      "description": "AMF sends Registration Accept",
+      "duration": 1500,
+      "expectedIEs": {
+        "registration_result": "success",
+        "guti": "4041200001234567890",
+        "tai_list": "DEFAULT"
+      }
+    }
+  ],
+  "assertions": {
+    "ssb_detection_time_ms": {"max": 5000},
+    "rach_success_rate": {"min": 0.95},
+    "rrc_setup_time_ms": {"max": 1000},
+    "registration_time_ms": {"max": 10000},
+    "overall_success_rate": {"min": 0.98}
+  }
+}
