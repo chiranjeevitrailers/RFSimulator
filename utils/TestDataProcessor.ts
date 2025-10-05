@@ -4,6 +4,8 @@
  */
 
 import { TestCase, TestResult, TestEvent, LayerStatistics, PerformanceMetrics } from './TestCaseManager';
+import { layerParameterSimulator, LayerParameterUpdate } from './LayerParameterSimulator';
+import { dataFlowManager } from './DataFlowManager';
 
 export class TestDataProcessor {
   /**
@@ -16,6 +18,35 @@ export class TestDataProcessor {
     const events: TestEvent[] = [];
     const layerStatistics: LayerStatistics[] = [];
     const performanceMetrics: PerformanceMetrics[] = [];
+
+    // Initialize layer parameter simulator
+    layerParameterSimulator.initializeBaseValues(testCase);
+    
+    // Start parameter simulation
+    layerParameterSimulator.startSimulation();
+    
+    // Subscribe to parameter updates
+    const unsubscribe = layerParameterSimulator.subscribe((update: LayerParameterUpdate) => {
+      console.log(`📊 Layer parameter update: ${update.layer}.${update.parameterName} = ${update.currentValue} ${update.unit} (${update.trend})`);
+      
+      // Convert parameter update to layer statistics
+      const layerStat: LayerStatistics = {
+        layer: update.layer,
+        metricName: update.parameterName,
+        value: update.currentValue,
+        unit: update.unit,
+        timestamp: update.timestamp,
+        trend: update.trend,
+        change: update.change,
+        changePercent: update.changePercent
+      };
+      
+      layerStatistics.push(layerStat);
+      
+      // Dispatch layer parameter update to frontends
+      dataFlowManager.dispatchLayerParameterUpdate(update);
+      dataFlowManager.dispatchLayerStatisticsUpdate(layerStat);
+    });
 
     // Process each test step
     for (const step of testCase.expectedMessageSequence) {
@@ -36,6 +67,10 @@ export class TestDataProcessor {
       // Simulate step duration
       await this.delay(step.duration || 1000);
     }
+
+    // Stop parameter simulation
+    layerParameterSimulator.stopSimulation();
+    unsubscribe();
 
     const endTime = new Date();
     

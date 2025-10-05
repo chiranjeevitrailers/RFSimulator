@@ -207,6 +207,36 @@ export class DataFlowManager {
     }
   }
 
+  /**
+   * Dispatch layer parameter update
+   */
+  public dispatchLayerParameterUpdate(update: any): void {
+    const event: DataFlowEvent = {
+      type: 'LAYER_PARAMETER_UPDATE',
+      source: 'SYSTEM',
+      target: 'ALL',
+      data: update,
+      timestamp: Date.now()
+    };
+    
+    this.dispatch(event);
+  }
+
+  /**
+   * Dispatch layer statistics update
+   */
+  public dispatchLayerStatisticsUpdate(stats: any): void {
+    const event: DataFlowEvent = {
+      type: 'LAYER_STATISTICS_UPDATE',
+      source: 'SYSTEM',
+      target: 'ALL',
+      data: stats,
+      timestamp: Date.now()
+    };
+    
+    this.dispatch(event);
+  }
+
   // Test execution management
   public startTestExecution(testCaseId: string, testCaseData: any): string {
     const executionId = `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

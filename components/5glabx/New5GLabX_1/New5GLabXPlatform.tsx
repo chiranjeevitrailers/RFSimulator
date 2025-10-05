@@ -37,6 +37,7 @@ import EnhancedLogs from './views/EnhancedLogs';
 import LayerTraceView from './views/LayerTraceView';
 import CallFlowView from './views/CallFlowView';
 import AnalyticsView from './views/AnalyticsView';
+import LayerParameterMonitor from '../views/LayerParameterMonitor';
 
 // Import professional analysis components
 import ProfessionalAnalysisPlatform from '../professional-log-analysis/ProfessionalAnalysisPlatform';
@@ -163,6 +164,7 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
   // Menu items with exact structure as specified
   const menuItems = [
     { id: 'professional', label: 'Professional Analysis', icon: Activity, badge: 'NEW' },
+    { id: 'layer-parameters', label: 'Layer Parameters', icon: Layers, badge: 'LIVE' },
     { id: 'logs', label: 'Logs Viewer', icon: FileText },
     { id: 'enhanced-logs', label: 'Enhanced Logs', icon: Search },
     { id: 'layer-trace', label: 'Layer Trace', icon: Network },
@@ -290,6 +292,8 @@ const New5GLabXPlatform: React.FC<New5GLabXPlatformProps> = ({ className = '' })
       // Main Views
       case 'professional':
         return <ProfessionalAnalysisPlatform executionId={executionId} platform="5GLABX" />;
+      case 'layer-parameters':
+        return <LayerParameterMonitor />;
       case 'logs':
         return <LogsViewer executionId={executionId} />;
       case 'enhanced-logs':
