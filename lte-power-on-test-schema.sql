@@ -109,6 +109,15 @@ ALTER TABLE metrics_aggregates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE test_results ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies (allow all for now, can be restricted later)
+-- Drop existing policies first to avoid conflicts
+DROP POLICY IF EXISTS "Allow all operations on ue_profiles" ON ue_profiles;
+DROP POLICY IF EXISTS "Allow all operations on test_cases" ON test_cases;
+DROP POLICY IF EXISTS "Allow all operations on sessions" ON sessions;
+DROP POLICY IF EXISTS "Allow all operations on events" ON events;
+DROP POLICY IF EXISTS "Allow all operations on metrics_aggregates" ON metrics_aggregates;
+DROP POLICY IF EXISTS "Allow all operations on test_results" ON test_results;
+
+-- Create RLS policies
 CREATE POLICY "Allow all operations on ue_profiles" ON ue_profiles FOR ALL USING (true);
 CREATE POLICY "Allow all operations on test_cases" ON test_cases FOR ALL USING (true);
 CREATE POLICY "Allow all operations on sessions" ON sessions FOR ALL USING (true);
