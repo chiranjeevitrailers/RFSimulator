@@ -8,7 +8,6 @@ import ProfessionalTestManager from "@/components/testing/ProfessionalTestManage
 import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
 import NewTestManager from "@/components/testing/NewTestManager_1/NewTestManager"
 import NewTestManagerFileBased from "@/components/testing/NewTestManager_1/NewTestManagerFileBased"
-import NewTestManagerWithCategories from "@/components/testing/NewTestManager_1/NewTestManagerWithCategories"
 import New5GLabXPlatform from "@/components/5glabx/New5GLabX_1/New5GLabXPlatform"
 import NewUEAnalysisPlatform from "@/components/ue-analysis/NewUEAnalysis_1/NewUEAnalysisPlatform"
 import ProfessionalAnalysisPlatform from "@/components/professional-log-analysis/ProfessionalAnalysisPlatform"
@@ -404,7 +403,7 @@ const UserDashboard: React.FC = () => {
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="h-[800px]">
-                <NewTestManagerWithCategories />
+                <NewTestManagerFileBased />
               </div>
             </div>
           </div>

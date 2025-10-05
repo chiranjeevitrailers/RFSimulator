@@ -18,7 +18,19 @@ import {
   Zap,
   Shield,
   FolderOpen,
-  File
+  File,
+  ChevronRight,
+  ChevronDown,
+  Search,
+  Filter,
+  Radio,
+  Wifi,
+  Smartphone,
+  Network,
+  Layers,
+  TestTube,
+  Target,
+  Monitor
 } from 'lucide-react';
 import { dataFlowManager, DataFlowEvent } from '@/utils/DataFlowManager';
 import { testCaseManager, TestCase } from '@/utils/TestCaseManager';
@@ -40,6 +52,16 @@ interface TestExecution {
   }>;
 }
 
+interface TestCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  testCases: TestCase[];
+  isExpanded: boolean;
+}
+
 const NewTestManagerFileBased: React.FC = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [selectedTestCases, setSelectedTestCases] = useState<string[]>([]);
@@ -55,6 +77,10 @@ const NewTestManagerFileBased: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [dataFlowStatus, setDataFlowStatus] = useState<string>('disconnected');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterTechnology, setFilterTechnology] = useState<string>('all');
+  const [categories, setCategories] = useState<TestCategory[]>([]);
 
   // Initialize DataFlowManager
   useEffect(() => {
@@ -81,6 +107,47 @@ const NewTestManagerFileBased: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  // Organize test cases by categories
+  const organizeTestCasesByCategory = (testCases: TestCase[]): TestCategory[] => {
+    const categoryMap = new Map<string, TestCase[]>();
+    
+    // Group test cases by category
+    testCases.forEach(testCase => {
+      const category = testCase.category || 'OTHER';
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)!.push(testCase);
+    });
+
+    // Create category objects
+    const categoryConfigs = {
+      'CELL_SEARCH': { name: 'Cell Search', description: 'Cell search and synchronization procedures', icon: Radio, color: 'blue' },
+      'POWER_ON': { name: 'Power On', description: 'UE power-on and initialization procedures', icon: Zap, color: 'green' },
+      'ATTACH': { name: 'Attach', description: 'Network attachment procedures', icon: Network, color: 'purple' },
+      'MOBILITY': { name: 'Mobility', description: 'Handover and mobility procedures', icon: Activity, color: 'orange' },
+      'PERFORMANCE': { name: 'Performance', description: 'Performance and throughput tests', icon: BarChart3, color: 'red' },
+      'SECURITY': { name: 'Security', description: 'Security and authentication tests', icon: Shield, color: 'yellow' },
+      'PROTOCOL': { name: 'Protocol', description: 'Protocol layer specific tests', icon: Layers, color: 'indigo' },
+      'UE_ANALYSIS': { name: 'UE Analysis', description: 'UE-specific analysis and monitoring', icon: Smartphone, color: 'pink' },
+      'NETWORK_ANALYSIS': { name: 'Network Analysis', description: 'Network analysis and monitoring', icon: Monitor, color: 'teal' },
+      'OTHER': { name: 'Other', description: 'Other test categories', icon: FileText, color: 'gray' }
+    };
+
+    return Array.from(categoryMap.entries()).map(([category, testCases]) => {
+      const config = categoryConfigs[category as keyof typeof categoryConfigs] || categoryConfigs.OTHER;
+      return {
+        id: category,
+        name: config.name,
+        description: config.description,
+        icon: config.icon,
+        color: config.color,
+        testCases,
+        isExpanded: false
+      };
+    });
+  };
+
   // Load test cases from files
   useEffect(() => {
     const loadTestCases = async () => {
@@ -91,6 +158,10 @@ const NewTestManagerFileBased: React.FC = () => {
         setTestCases(loadedTestCases);
         addLog('INFO', 'TestManager', `Loaded ${loadedTestCases.length} test cases from files`);
         console.log(`✅ Loaded ${loadedTestCases.length} test cases from files`);
+
+        // Organize test cases by categories
+        const organizedCategories = organizeTestCasesByCategory(loadedTestCases);
+        setCategories(organizedCategories);
       } catch (error) {
         console.error('❌ Error loading test cases:', error);
         addLog('ERROR', 'TestManager', `Failed to load test cases: ${error.message}`);
@@ -101,6 +172,38 @@ const NewTestManagerFileBased: React.FC = () => {
 
     loadTestCases();
   }, []);
+
+  // Filter test cases based on search and technology
+  const getFilteredTestCases = (category: TestCategory) => {
+    return category.testCases.filter(testCase => {
+      const matchesSearch = testCase.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           testCase.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTechnology = filterTechnology === 'all' || testCase.technology === filterTechnology;
+      return matchesSearch && matchesTechnology;
+    });
+  };
+
+  // Get all test cases for selected category
+  const getCurrentTestCases = () => {
+    if (selectedCategory === 'all') {
+      return testCases.filter(testCase => {
+        const matchesSearch = testCase.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             testCase.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesTechnology = filterTechnology === 'all' || testCase.technology === filterTechnology;
+        return matchesSearch && matchesTechnology;
+      });
+    }
+    
+    const category = categories.find(cat => cat.id === selectedCategory);
+    return category ? getFilteredTestCases(category) : [];
+  };
+
+  // Toggle category expansion
+  const toggleCategory = (categoryId: string) => {
+    setCategories(prev => prev.map(cat => 
+      cat.id === categoryId ? { ...cat, isExpanded: !cat.isExpanded } : cat
+    ));
+  };
 
   const addLog = (level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG', component: string, message: string) => {
     const newLog = {
