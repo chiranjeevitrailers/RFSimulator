@@ -130,7 +130,8 @@ INSERT INTO ue_profiles (id, imsi, imei, device_capabilities, default_apn, secur
 ('ue_iphone14_01', '404123456789012', '359123456789012', 
  '{"bandwidthClass": "A", "caSupport": true, "mimoSupport": "2x2", "features": ["VoLTE", "VoWiFi"]}',
  'internet',
- '{"EEA": ["EEA0", "EEA1", "EEA2"], "EIA": ["EIA0", "EIA1", "EIA2"]}');
+ '{"EEA": ["EEA0", "EEA1", "EEA2"], "EIA": ["EIA0", "EIA1", "EIA2"]}')
+ON CONFLICT (id) DO NOTHING;
 
 -- Insert LTE Power-On test case
 INSERT INTO test_cases (name, description, ue_profile_id, scenario, run_config, technology, category) VALUES
@@ -159,7 +160,8 @@ INSERT INTO test_cases (name, description, ue_profile_id, scenario, run_config, 
    }
  }',
  'LTE',
- 'POWER_ON');
+ 'POWER_ON')
+ON CONFLICT (name) DO NOTHING;
 
 -- Create a function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
