@@ -5,7 +5,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. UE Profiles Table
-CREATE TABLE ue_profiles (
+CREATE TABLE IF NOT EXISTS IF NOT EXISTS ue_profiles (
     id TEXT PRIMARY KEY,
     imsi TEXT NOT NULL,
     imei TEXT,
@@ -17,7 +17,7 @@ CREATE TABLE ue_profiles (
 );
 
 -- 2. Test Cases Table
-CREATE TABLE test_cases (
+CREATE TABLE IF NOT EXISTS IF NOT EXISTS test_cases (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE test_cases (
 );
 
 -- 3. Sessions Table (one per active attach/session)
-CREATE TABLE sessions (
+CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     test_case_id UUID REFERENCES test_cases(id),
     ue_profile_id TEXT REFERENCES ue_profiles(id),
@@ -48,7 +48,7 @@ CREATE TABLE sessions (
 );
 
 -- 4. Events Table (streaming logs)
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
     event_type TEXT NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE events (
 );
 
 -- 5. Metrics Aggregates Table (for performance)
-CREATE TABLE metrics_aggregates (
+CREATE TABLE IF NOT EXISTS metrics_aggregates (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
     metric_type TEXT NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE metrics_aggregates (
 );
 
 -- 6. Test Results Table
-CREATE TABLE test_results (
+CREATE TABLE IF NOT EXISTS test_results (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
     test_case_id UUID REFERENCES test_cases(id),
@@ -89,16 +89,16 @@ CREATE TABLE test_results (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_events_session_id ON events(session_id);
-CREATE INDEX idx_events_event_ts ON events(event_ts DESC);
-CREATE INDEX idx_events_event_type ON events(event_type);
-CREATE INDEX idx_events_layer ON events(layer);
-CREATE INDEX idx_events_ie_map_imsi ON events USING GIN ((ie_map->>'IMSI'));
-CREATE INDEX idx_sessions_test_case_id ON sessions(test_case_id);
-CREATE INDEX idx_sessions_state ON sessions(session_state);
-CREATE INDEX idx_metrics_session_id ON metrics_aggregates(session_id);
-CREATE INDEX idx_metrics_timestamp ON metrics_aggregates(timestamp DESC);
-CREATE INDEX idx_test_results_session_id ON test_results(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_session_id ON events(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_event_ts ON events(event_ts DESC);
+CREATE INDEX IF NOT EXISTS idx_events_event_type ON events(event_type);
+CREATE INDEX IF NOT EXISTS idx_events_layer ON events(layer);
+CREATE INDEX IF NOT EXISTS idx_events_ie_map_imsi ON events USING GIN ((ie_map->>'IMSI'));
+CREATE INDEX IF NOT EXISTS idx_sessions_test_case_id ON sessions(test_case_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_state ON sessions(session_state);
+CREATE INDEX IF NOT EXISTS idx_metrics_session_id ON metrics_aggregates(session_id);
+CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON metrics_aggregates(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_test_results_session_id ON test_results(session_id);
 
 -- Row Level Security (RLS) policies
 ALTER TABLE ue_profiles ENABLE ROW LEVEL SECURITY;
@@ -187,7 +187,7 @@ CREATE TRIGGER generate_event_sequence_trigger
     EXECUTE FUNCTION generate_event_sequence_number();
 
 -- Create a view for session summary
-CREATE VIEW session_summary AS
+CREATE OR REPLACE VIEW session_summary AS
 SELECT 
     s.id,
     s.session_state,
@@ -207,7 +207,7 @@ LEFT JOIN events e ON s.id = e.session_id
 GROUP BY s.id, s.session_state, s.created_at, s.updated_at, tc.name, up.imsi, s.mme_ue_s1ap_id, s.enb_ue_s1ap_id, s.metrics;
 
 -- Create a view for event timeline
-CREATE VIEW event_timeline AS
+CREATE OR REPLACE VIEW event_timeline AS
 SELECT 
     e.id,
     e.session_id,
