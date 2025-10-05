@@ -1,4 +1,4 @@
--- Complete Supabase Setup for 5GLabX Platform
+-- Complete Supabase Setup for 5GLabX Platform - FIXED VERSION
 -- Run this entire script in Supabase SQL Editor
 
 -- ==============================================
@@ -241,37 +241,6 @@ ALTER TABLE harq_statistics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE buffer_status ENABLE ROW LEVEL SECURITY;
 ALTER TABLE performance_metrics ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies (allow all for now, can be restricted later)
--- Drop existing policies first to avoid conflicts
-DROP POLICY IF EXISTS "Allow all operations on ue_profiles" ON ue_profiles;
-DROP POLICY IF EXISTS "Allow all operations on test_cases" ON test_cases;
-DROP POLICY IF EXISTS "Allow all operations on sessions" ON sessions;
-DROP POLICY IF EXISTS "Allow all operations on events" ON events;
-DROP POLICY IF EXISTS "Allow all operations on metrics_aggregates" ON metrics_aggregates;
-DROP POLICY IF EXISTS "Allow all operations on test_results" ON test_results;
-DROP POLICY IF EXISTS "Allow all operations on layer_statistics" ON layer_statistics;
-DROP POLICY IF EXISTS "Allow all operations on ue_device_status" ON ue_device_status;
-DROP POLICY IF EXISTS "Allow all operations on signal_quality" ON signal_quality;
-DROP POLICY IF EXISTS "Allow all operations on mimo_configuration" ON mimo_configuration;
-DROP POLICY IF EXISTS "Allow all operations on harq_statistics" ON harq_statistics;
-DROP POLICY IF EXISTS "Allow all operations on buffer_status" ON buffer_status;
-DROP POLICY IF EXISTS "Allow all operations on performance_metrics" ON performance_metrics;
-
--- Create RLS policies
-CREATE POLICY "Allow all operations on ue_profiles" ON ue_profiles FOR ALL USING (true);
-CREATE POLICY "Allow all operations on test_cases" ON test_cases FOR ALL USING (true);
-CREATE POLICY "Allow all operations on sessions" ON sessions FOR ALL USING (true);
-CREATE POLICY "Allow all operations on events" ON events FOR ALL USING (true);
-CREATE POLICY "Allow all operations on metrics_aggregates" ON metrics_aggregates FOR ALL USING (true);
-CREATE POLICY "Allow all operations on test_results" ON test_results FOR ALL USING (true);
-CREATE POLICY "Allow all operations on layer_statistics" ON layer_statistics FOR ALL USING (true);
-CREATE POLICY "Allow all operations on ue_device_status" ON ue_device_status FOR ALL USING (true);
-CREATE POLICY "Allow all operations on signal_quality" ON signal_quality FOR ALL USING (true);
-CREATE POLICY "Allow all operations on mimo_configuration" ON mimo_configuration FOR ALL USING (true);
-CREATE POLICY "Allow all operations on harq_statistics" ON harq_statistics FOR ALL USING (true);
-CREATE POLICY "Allow all operations on buffer_status" ON buffer_status FOR ALL USING (true);
-CREATE POLICY "Allow all operations on performance_metrics" ON performance_metrics FOR ALL USING (true);
-
 -- ==============================================
 -- PART 5: FUNCTIONS AND TRIGGERS
 -- ==============================================
@@ -368,6 +337,139 @@ INSERT INTO sessions (test_case_id, ue_profile_id, enb_id, mme_ue_s1ap_id, enb_u
     67890,
     'ACTIVE'
 );
+
+-- Insert sample layer data for testing
+INSERT INTO signal_quality (session_id, rsrp, rsrq, sinr, cqi, ri, pmi, pci, earfcn) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    -95.2,
+    -10.5,
+    15.3,
+    12,
+    1,
+    0,
+    123,
+    1850
+);
+
+INSERT INTO mimo_configuration (session_id, mimo_layers, mimo_mode, precoding_matrix, transmission_mode, antenna_ports, beamforming, channel_rank) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    2,
+    'MULTI_LAYER',
+    1,
+    4,
+    2,
+    true,
+    2
+);
+
+INSERT INTO harq_statistics (session_id, harq_process_id, redundancy_version, new_data_indicator, ack_nack, retransmission_count, max_retransmissions, success_rate) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    0,
+    0,
+    true,
+    'ACK',
+    0,
+    4,
+    1.0
+);
+
+INSERT INTO buffer_status (session_id, layer, buffer_type, buffer_size, buffer_utilization, overflow_count, underflow_count) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'RLC',
+    'TX',
+    1024,
+    0.15,
+    0,
+    0
+),
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'RLC',
+    'RX',
+    1024,
+    0.12,
+    0,
+    0
+);
+
+INSERT INTO performance_metrics (session_id, layer, throughput_dl, throughput_ul, latency, jitter, packet_loss_rate, error_rate) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'PHY',
+    45.2,
+    12.8,
+    15.3,
+    2.1,
+    0.001,
+    0.005
+),
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'MAC',
+    44.8,
+    12.5,
+    16.1,
+    2.3,
+    0.002,
+    0.008
+),
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'RLC',
+    44.5,
+    12.2,
+    17.2,
+    2.5,
+    0.003,
+    0.012
+);
+
+INSERT INTO ue_device_status (session_id, ue_profile_id, battery_level, thermal_state, mobility_state, velocity, direction, location, capabilities) VALUES
+(
+    (SELECT id FROM sessions LIMIT 1),
+    'ue_iphone14_01',
+    85,
+    'NORMAL',
+    'STATIONARY',
+    0,
+    0,
+    '{"latitude": 37.7749, "longitude": -122.4194, "accuracy": 5.0}',
+    '{"mimo_capability": 2, "ca_capable": true, "ca_bands": ["B1", "B3", "B7"], "beamforming_capable": true}'
+);
+
+-- Insert comprehensive layer statistics
+INSERT INTO layer_statistics (session_id, layer, metric_name, metric_value, metric_unit, meta) VALUES
+-- PHY Layer Statistics
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'rsrp', -95.2, 'dBm', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'rsrq', -10.5, 'dB', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'sinr', 15.3, 'dB', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'cqi', 12, 'index', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'pci', 123, 'id', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'mimo_layers', 2, 'layers', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'PHY', 'mcs_index', 15, 'index', '{"trend": "stable"}'),
+
+-- MAC Layer Statistics
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'harq_success_rate', 0.98, 'ratio', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'scheduling_requests', 5, 'count', '{"trend": "increasing"}'),
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'power_headroom', 2.5, 'dB', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'rb_utilization', 0.05, 'ratio', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'rach_attempts', 1, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'MAC', 'rach_success_rate', 1.0, 'ratio', '{"trend": "stable"}'),
+
+-- RLC Layer Statistics
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'tx_pdu_count', 1250, 'count', '{"trend": "increasing"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'rx_pdu_count', 1180, 'count', '{"trend": "increasing"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'duplicate_pdu_count', 2, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'out_of_order_pdu_count', 1, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'missing_pdu_count', 0, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'crc_errors', 0, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'retransmission_count', 0, 'count', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'tx_buffer_utilization', 0.15, 'ratio', '{"trend": "stable"}'),
+((SELECT id FROM sessions LIMIT 1), 'RLC', 'rx_buffer_utilization', 0.12, 'ratio', '{"trend": "stable"}');
 
 -- ==============================================
 -- PART 7: COMPREHENSIVE VIEWS
@@ -510,7 +612,41 @@ LEFT JOIN signal_quality sq ON s.id = sq.session_id
 ORDER BY uds.timestamp DESC;
 
 -- ==============================================
--- PART 8: GRANT PERMISSIONS
+-- PART 8: RLS POLICIES (AFTER TABLES ARE CREATED)
+-- ==============================================
+
+-- Drop existing policies first to avoid conflicts
+DROP POLICY IF EXISTS "Allow all operations on ue_profiles" ON ue_profiles;
+DROP POLICY IF EXISTS "Allow all operations on test_cases" ON test_cases;
+DROP POLICY IF EXISTS "Allow all operations on sessions" ON sessions;
+DROP POLICY IF EXISTS "Allow all operations on events" ON events;
+DROP POLICY IF EXISTS "Allow all operations on metrics_aggregates" ON metrics_aggregates;
+DROP POLICY IF EXISTS "Allow all operations on test_results" ON test_results;
+DROP POLICY IF EXISTS "Allow all operations on layer_statistics" ON layer_statistics;
+DROP POLICY IF EXISTS "Allow all operations on ue_device_status" ON ue_device_status;
+DROP POLICY IF EXISTS "Allow all operations on signal_quality" ON signal_quality;
+DROP POLICY IF EXISTS "Allow all operations on mimo_configuration" ON mimo_configuration;
+DROP POLICY IF EXISTS "Allow all operations on harq_statistics" ON harq_statistics;
+DROP POLICY IF EXISTS "Allow all operations on buffer_status" ON buffer_status;
+DROP POLICY IF EXISTS "Allow all operations on performance_metrics" ON performance_metrics;
+
+-- Create RLS policies
+CREATE POLICY "Allow all operations on ue_profiles" ON ue_profiles FOR ALL USING (true);
+CREATE POLICY "Allow all operations on test_cases" ON test_cases FOR ALL USING (true);
+CREATE POLICY "Allow all operations on sessions" ON sessions FOR ALL USING (true);
+CREATE POLICY "Allow all operations on events" ON events FOR ALL USING (true);
+CREATE POLICY "Allow all operations on metrics_aggregates" ON metrics_aggregates FOR ALL USING (true);
+CREATE POLICY "Allow all operations on test_results" ON test_results FOR ALL USING (true);
+CREATE POLICY "Allow all operations on layer_statistics" ON layer_statistics FOR ALL USING (true);
+CREATE POLICY "Allow all operations on ue_device_status" ON ue_device_status FOR ALL USING (true);
+CREATE POLICY "Allow all operations on signal_quality" ON signal_quality FOR ALL USING (true);
+CREATE POLICY "Allow all operations on mimo_configuration" ON mimo_configuration FOR ALL USING (true);
+CREATE POLICY "Allow all operations on harq_statistics" ON harq_statistics FOR ALL USING (true);
+CREATE POLICY "Allow all operations on buffer_status" ON buffer_status FOR ALL USING (true);
+CREATE POLICY "Allow all operations on performance_metrics" ON performance_metrics FOR ALL USING (true);
+
+-- ==============================================
+-- PART 9: GRANT PERMISSIONS
 -- ==============================================
 
 -- Grant necessary permissions
