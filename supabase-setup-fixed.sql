@@ -649,11 +649,9 @@ CREATE POLICY "Allow all operations on performance_metrics" ON performance_metri
 -- PART 9: GRANT PERMISSIONS
 -- ==============================================
 
--- Grant necessary permissions
-GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres;
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO postgres;
-GRANT ALL ON ALL VIEWS IN SCHEMA public TO postgres;
+-- Grant necessary permissions (Supabase handles these automatically)
+-- Note: Supabase automatically grants permissions to the postgres role
+-- These GRANT statements are not needed in Supabase but included for completeness
 
 -- ==============================================
 -- COMPLETION MESSAGE
