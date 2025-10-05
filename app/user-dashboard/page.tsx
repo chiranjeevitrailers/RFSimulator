@@ -8,6 +8,7 @@ import ProfessionalTestManager from "@/components/testing/ProfessionalTestManage
 import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
 import NewTestManager from "@/components/testing/NewTestManager_1/NewTestManager"
 import NewTestManagerFileBased from "@/components/testing/NewTestManager_1/NewTestManagerFileBased"
+import NewTestManagerWithCategories from "@/components/testing/NewTestManager_1/NewTestManagerWithCategories"
 import New5GLabXPlatform from "@/components/5glabx/New5GLabX_1/New5GLabXPlatform"
 import NewUEAnalysisPlatform from "@/components/ue-analysis/NewUEAnalysis_1/NewUEAnalysisPlatform"
 import ProfessionalAnalysisPlatform from "@/components/professional-log-analysis/ProfessionalAnalysisPlatform"
@@ -398,12 +399,12 @@ const UserDashboard: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900">File-Based Test Manager</h2>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Online</span>
+                <span className="text-sm text-gray-600">File-Based System with Categories</span>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="h-[800px]">
-                <NewTestManagerFileBased />
+                <NewTestManagerWithCategories />
               </div>
             </div>
           </div>
