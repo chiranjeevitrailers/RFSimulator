@@ -93,7 +93,7 @@ CREATE INDEX IF NOT EXISTS idx_events_session_id ON events(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_event_ts ON events(event_ts DESC);
 CREATE INDEX IF NOT EXISTS idx_events_event_type ON events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_layer ON events(layer);
-CREATE INDEX IF NOT EXISTS idx_events_ie_map_imsi ON events USING GIN ((ie_map->>'IMSI'));
+CREATE INDEX IF NOT EXISTS idx_events_ie_map ON events USING GIN (ie_map);
 CREATE INDEX IF NOT EXISTS idx_sessions_test_case_id ON sessions(test_case_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_state ON sessions(session_state);
 CREATE INDEX IF NOT EXISTS idx_metrics_session_id ON metrics_aggregates(session_id);
