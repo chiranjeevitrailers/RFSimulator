@@ -3,13 +3,9 @@
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor, TestTube, Database, Smartphone, Layers, FileText, MessageSquare } from "lucide-react"
+import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor, TestTube, Database, Layers, FileText, MessageSquare } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
 import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
-import NewTestManager from "@/components/testing/NewTestManager_1/NewTestManager"
-import NewTestManagerFileBased from "@/components/testing/NewTestManager_1/NewTestManagerFileBased"
-import New5GLabXPlatform from "@/components/5glabx/New5GLabX_1/New5GLabXPlatform"
-import NewUEAnalysisPlatform from "@/components/ue-analysis/NewUEAnalysis_1/NewUEAnalysisPlatform"
 import ProfessionalAnalysisPlatform from "@/components/professional-log-analysis/ProfessionalAnalysisPlatform"
 import TestCaseBuilder from "@/components/testing/TestCaseBuilder/TestCaseBuilder"
 import ComprehensiveTestCaseBuilder from "@/components/testing/ComprehensiveTestCaseBuilder/ComprehensiveTestCaseBuilder"
@@ -57,14 +53,6 @@ const UserDashboard: React.FC = () => {
     return <Enhanced5GLabXPlatform />;
   }, []);
 
-  const MemoizedNew5GLabXPlatform = useMemo(() => {
-    return <New5GLabXPlatform />;
-  }, []);
-
-  const MemoizedUEAnalysisPlatform = useMemo(() => {
-    return <NewUEAnalysisPlatform />;
-  }, []);
-
   const MemoizedProfessionalAnalysisPlatform = useMemo(() => {
     return <ProfessionalAnalysisPlatform executionId={null} platform="5GLABX" />;
   }, []);
@@ -105,28 +93,6 @@ const UserDashboard: React.FC = () => {
                   <TestTube className="w-4 h-4 inline mr-2" />
                   Test Manager
                 </button>
-          <button
-            onClick={() => setActiveTab("new-test-manager")}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              activeTab === "new-test-manager"
-                ? "bg-primary-100 text-primary-700"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <BarChart3 className="w-4 h-4 inline mr-2" />
-            New Test Manager
-          </button>
-          <button
-            onClick={() => setActiveTab("file-based-test-manager")}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              activeTab === "file-based-test-manager"
-                ? "bg-primary-100 text-primary-700"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <TestTube className="w-4 h-4 inline mr-2" />
-            File-Based Test Manager
-          </button>
           <button
             onClick={() => setActiveTab("test-case-builder")}
             className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -170,28 +136,6 @@ const UserDashboard: React.FC = () => {
                 >
                   <Monitor className="w-4 h-4 inline mr-2" />
                   5GLabX Platform
-                </button>
-                <button
-                  onClick={() => setActiveTab("new-5glabx")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === "new-5glabx"
-                      ? "bg-primary-100 text-primary-700"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <Database className="w-4 h-4 inline mr-2" />
-                  New 5GLabX
-                </button>
-                <button
-                  onClick={() => setActiveTab("ue-analysis")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === "ue-analysis"
-                      ? "bg-primary-100 text-primary-700"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <Smartphone className="w-4 h-4 inline mr-2" />
-                  UE Analysis
                 </button>
                 <button
                   onClick={() => setActiveTab("professional-analysis")}
@@ -273,20 +217,7 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <p className="text-gray-600 mb-4">Network analysis and monitoring with professional tools</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">New 5GLabX Platform</span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                </div>
-              </div>
-
-              {/* UE Analysis */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center mb-4">
-                  <Smartphone className="w-8 h-8 text-purple-600 mr-3" />
-                  <h3 className="text-lg font-semibold text-gray-900">UE Analysis</h3>
-                </div>
-                <p className="text-gray-600 mb-4">UE log analysis and device monitoring</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">UE Analysis Platform</span>
+                  <span className="text-sm text-gray-500">Enhanced 5GLabX Platform</span>
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 </div>
               </div>
@@ -375,39 +306,6 @@ const UserDashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === "new-test-manager" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">New Test Manager</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Online</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                <NewTestManager />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "file-based-test-manager" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">File-Based Test Manager</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">File-Based System with Categories</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                <NewTestManagerFileBased />
-              </div>
-            </div>
-          </div>
-        )}
 
         {activeTab === "test-case-builder" && (
           <div className="space-y-6">
@@ -461,39 +359,6 @@ const UserDashboard: React.FC = () => {
         )}
 
 
-        {activeTab === "new-5glabx" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">New 5GLabX Platform</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Online</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                {MemoizedNew5GLabXPlatform}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "ue-analysis" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">UE Analysis Platform</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Online</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                {MemoizedUEAnalysisPlatform}
-              </div>
-            </div>
-          </div>
-        )}
 
         {activeTab === "professional-analysis" && (
           <div className="space-y-6">
