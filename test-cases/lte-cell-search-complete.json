@@ -1,0 +1,608 @@
+{
+  "testCaseId": "LTE-001-COMPLETE",
+  "name": "LTE Cell Search & Sync Complete",
+  "description": "Complete LTE cell search procedure: RSSI scanning, PSS/SSS sync, PCI, DMRS, PBCH-MIB, PHICH, PCFICH, PDCCH, PDSCH-SIB1, PLMN match",
+  "technology": "LTE",
+  "category": "CELL_SEARCH",
+  "version": "1.0.0",
+  "ueProfile": {
+    "id": "UE-001",
+    "imsi": "001010123456789",
+    "imei": "123456789012345",
+    "deviceCapabilities": {
+      "bandwidthClass": "A",
+      "caSupport": true,
+      "mimoSupport": "4x4",
+      "features": ["LTE", "MIMO", "CA"],
+      "maxThroughput": { "downlink": 150, "uplink": 50 },
+      "powerClass": "3",
+      "frequencyBands": ["B1", "B3", "B7", "B20"]
+    },
+    "defaultApn": "internet",
+    "securitySupport": {
+      "encryption": ["AES", "SNOW3G"],
+      "integrity": ["AES", "SNOW3G"],
+      "keyLength": 128
+    }
+  },
+  "cellConfig": {
+    "pci": 123,
+    "earfcn": 1850,
+    "bandwidth": 20,
+    "tac": 1,
+    "mcc": "001",
+    "mnc": "01"
+  },
+  "expectedMessageSequence": [
+    {
+      "step": 1,
+      "eventType": "RSSI_SCAN",
+      "layer": "PHY",
+      "description": "RSSI Scanning Multiple Cells",
+      "subSteps": [
+        "Start RSSI scan on EARFCN 1850",
+        "Detect multiple cells",
+        "Measure RSSI for each cell",
+        "Select best cell based on RSSI"
+      ],
+      "expectedIEs": {
+        "RSSI-SCAN-RESULT": {
+          "type": "SEQUENCE",
+          "value": [
+            { "earfcn": 1850, "rssi": -85.2, "cellId": "CELL-001" },
+            { "earfcn": 1850, "rssi": -92.1, "cellId": "CELL-002" },
+            { "earfcn": 1850, "rssi": -88.7, "cellId": "CELL-003" }
+          ],
+          "description": "RSSI scan results for multiple cells",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.101",
+          "encoding": "BER",
+          "size": 24,
+          "criticality": "REJECT"
+        },
+        "SCANNED-EARFCN": {
+          "type": "INTEGER",
+          "value": 1850,
+          "description": "E-UTRA Absolute Radio Frequency Channel Number",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.101",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        },
+        "SCAN-DURATION": {
+          "type": "INTEGER",
+          "value": 5000,
+          "description": "Duration of RSSI scan in milliseconds",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.101",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        }
+      },
+      "assertions": {
+        "rssi_threshold": "rssi > -100",
+        "scan_completion": "scan_progress == 100",
+        "cell_detection": "cells_detected > 0"
+      },
+      "duration": 5000
+    },
+    {
+      "step": 2,
+      "eventType": "PSS_DETECTION",
+      "layer": "PHY",
+      "description": "PSS Detection and Sync",
+      "subSteps": [
+        "Detect Primary Synchronization Signal",
+        "Calculate PSS correlation",
+        "Achieve timing synchronization",
+        "Extract PSS index"
+      ],
+      "expectedIEs": {
+        "PSS-INDEX": {
+          "type": "INTEGER",
+          "value": 0,
+          "description": "Primary Synchronization Signal Index (0-2)",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 2,
+          "criticality": "REJECT",
+          "bitPosition": 0,
+          "fieldLength": 2
+        },
+        "PSS-CORRELATION": {
+          "type": "REAL",
+          "value": 0.95,
+          "description": "PSS correlation peak value",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        },
+        "PSS-TIMING": {
+          "type": "INTEGER",
+          "value": 1234,
+          "description": "PSS timing offset in samples",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        }
+      },
+      "assertions": {
+        "pss_detection": "pss_correlation > 0.8",
+        "timing_sync": "timing_offset > 0",
+        "pss_index_valid": "pss_index >= 0 && pss_index <= 2"
+      },
+      "duration": 2000
+    },
+    {
+      "step": 3,
+      "eventType": "SSS_DETECTION",
+      "layer": "PHY",
+      "description": "SSS Detection and PCI Calculation",
+      "subSteps": [
+        "Detect Secondary Synchronization Signal",
+        "Calculate SSS correlation",
+        "Calculate Physical Cell ID",
+        "Validate PCI range"
+      ],
+      "expectedIEs": {
+        "SSS-INDEX": {
+          "type": "INTEGER",
+          "value": 0,
+          "description": "Secondary Synchronization Signal Index (0-167)",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 8,
+          "criticality": "REJECT"
+        },
+        "PCI": {
+          "type": "INTEGER",
+          "value": 123,
+          "description": "Physical Cell Identifier (0-503)",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 9,
+          "criticality": "REJECT"
+        },
+        "SSS-CORRELATION": {
+          "type": "REAL",
+          "value": 0.92,
+          "description": "SSS correlation peak value",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        }
+      },
+      "assertions": {
+        "sss_detection": "sss_correlation > 0.8",
+        "pci_calculation": "pci >= 0 && pci <= 503",
+        "pci_valid": "pci == (3 * sss_index + pss_index)"
+      },
+      "duration": 1500
+    },
+    {
+      "step": 4,
+      "eventType": "DMRS_DETECTION",
+      "layer": "PHY",
+      "description": "DMRS Detection",
+      "subSteps": [
+        "Detect Demodulation Reference Signal",
+        "Measure DMRS power",
+        "Calculate DMRS SNR",
+        "Perform channel estimation"
+      ],
+      "expectedIEs": {
+        "DMRS-SEQUENCE": {
+          "type": "BIT_STRING",
+          "value": "1101010101010101",
+          "description": "DMRS sequence bits",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        },
+        "DMRS-POWER": {
+          "type": "REAL",
+          "value": -85.5,
+          "description": "DMRS received power in dBm",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        },
+        "DMRS-SNR": {
+          "type": "REAL",
+          "value": 15.2,
+          "description": "DMRS Signal to Noise Ratio in dB",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 16,
+          "criticality": "REJECT"
+        }
+      },
+      "assertions": {
+        "dmrs_detection": "dmrs_snr > 10",
+        "channel_estimation": "dmrs_power > -90",
+        "snr_threshold": "dmrs_snr > 5"
+      },
+      "duration": 1000
+    },
+    {
+      "step": 5,
+      "eventType": "PBCH_MIB_DECODE",
+      "layer": "PHY",
+      "description": "PBCH-MIB Decode",
+      "subSteps": [
+        "Decode Physical Broadcast Channel",
+        "Extract Master Information Block",
+        "Parse DL bandwidth configuration",
+        "Extract PHICH configuration",
+        "Get System Frame Number"
+      ],
+      "expectedIEs": {
+        "DL-BANDWIDTH": {
+          "type": "ENUMERATED",
+          "value": "n100",
+          "description": "Downlink bandwidth configuration (n6, n15, n25, n50, n75, n100)",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 3,
+          "criticality": "REJECT"
+        },
+        "PHICH-CONFIG": {
+          "type": "SEQUENCE",
+          "value": { "duration": "NORMAL", "resource": "ONE_SIXTH" },
+          "description": "PHICH configuration parameters",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 8,
+          "criticality": "REJECT"
+        },
+        "SYSTEM-FRAME-NUMBER": {
+          "type": "INTEGER",
+          "value": 1234,
+          "description": "System Frame Number (0-1023)",
+          "mandatory": true,
+          "standardReference": "3GPP TS 36.211",
+          "encoding": "BER",
+          "size": 10,
+          "criticality": "REJECT"
+        }
+      },
+      "assertions": {
+        "mib_decode_success": "mib_decode_success == 1",
+        "bandwidth_valid": "dl_bandwidth > 0",
+        "sfn_valid": "sfn >= 0 && sfn <= 1023"
+      },
+      "duration": 2000
+    }
+  ],
+  "assertions": {
+    "cell_search_success": "pci > 0 && pss_correlation > 0.8 && sss_correlation > 0.8",
+    "timing_sync_success": "timing_offset > 0",
+    "mib_decode_success": "mib_decode_success == 1",
+    "rssi_threshold": "rssi > -100",
+    "snr_threshold": "dmrs_snr > 10"
+  },
+  "layerParameters": {
+    "PHY": [
+      {
+        "parameterName": "rssi",
+        "description": "Received Signal Strength Indicator",
+        "unit": "dBm",
+        "currentValue": -85.2,
+        "baseValue": -100.0,
+        "minValue": -140.0,
+        "maxValue": -44.0,
+        "typicalValue": -85.0,
+        "variation": 5.0,
+        "updateInterval": 100,
+        "criticalThresholds": { "warning": -90.0, "error": -100.0, "critical": -110.0 },
+        "measurementMethod": "RSSI measurement",
+        "standardReference": "3GPP TS 36.101",
+        "dynamicChanges": [
+          {
+            "timestamp": 0,
+            "value": -100.0,
+            "change": 0.0,
+            "changePercent": 0.0,
+            "trend": "STABLE",
+            "trigger": "Initial measurement",
+            "description": "Initial RSSI measurement"
+          },
+          {
+            "timestamp": 1000,
+            "value": -95.0,
+            "change": 5.0,
+            "changePercent": 5.0,
+            "trend": "INCREASING",
+            "trigger": "Signal improvement",
+            "description": "RSSI improving during scan"
+          },
+          {
+            "timestamp": 2000,
+            "value": -90.0,
+            "change": 5.0,
+            "changePercent": 5.3,
+            "trend": "INCREASING",
+            "trigger": "Better cell found",
+            "description": "RSSI improving with better cell"
+          },
+          {
+            "timestamp": 3000,
+            "value": -85.2,
+            "change": 4.8,
+            "changePercent": 5.3,
+            "trend": "INCREASING",
+            "trigger": "Best cell selected",
+            "description": "RSSI at best cell"
+          }
+        ]
+      },
+      {
+        "parameterName": "rsrp",
+        "description": "Reference Signal Received Power",
+        "unit": "dBm",
+        "currentValue": -95.2,
+        "baseValue": -100.0,
+        "minValue": -140.0,
+        "maxValue": -44.0,
+        "typicalValue": -95.0,
+        "variation": 3.0,
+        "updateInterval": 200,
+        "criticalThresholds": { "warning": -100.0, "error": -110.0, "critical": -120.0 },
+        "measurementMethod": "RSRP measurement",
+        "standardReference": "3GPP TS 36.101",
+        "dynamicChanges": [
+          {
+            "timestamp": 5000,
+            "value": -100.0,
+            "change": 0.0,
+            "changePercent": 0.0,
+            "trend": "STABLE",
+            "trigger": "PSS detection start",
+            "description": "RSRP measurement during PSS detection"
+          },
+          {
+            "timestamp": 6000,
+            "value": -98.5,
+            "change": 1.5,
+            "changePercent": 1.5,
+            "trend": "INCREASING",
+            "trigger": "PSS sync achieved",
+            "description": "RSRP improving with PSS sync"
+          },
+          {
+            "timestamp": 7000,
+            "value": -96.0,
+            "change": 2.5,
+            "changePercent": 2.5,
+            "trend": "INCREASING",
+            "trigger": "SSS detection",
+            "description": "RSRP improving with SSS detection"
+          },
+          {
+            "timestamp": 8000,
+            "value": -95.2,
+            "change": 0.8,
+            "changePercent": 0.8,
+            "trend": "INCREASING",
+            "trigger": "DMRS detection",
+            "description": "RSRP stable after DMRS detection"
+          }
+        ]
+      },
+      {
+        "parameterName": "rsrq",
+        "description": "Reference Signal Received Quality",
+        "unit": "dB",
+        "currentValue": -10.5,
+        "baseValue": -15.0,
+        "minValue": -20.0,
+        "maxValue": -3.0,
+        "typicalValue": -10.0,
+        "variation": 2.0,
+        "updateInterval": 200,
+        "criticalThresholds": { "warning": -12.0, "error": -15.0, "critical": -18.0 },
+        "measurementMethod": "RSRQ measurement",
+        "standardReference": "3GPP TS 36.101",
+        "dynamicChanges": [
+          {
+            "timestamp": 5000,
+            "value": -15.0,
+            "change": 0.0,
+            "changePercent": 0.0,
+            "trend": "STABLE",
+            "trigger": "PSS detection start",
+            "description": "RSRQ measurement during PSS detection"
+          },
+          {
+            "timestamp": 6000,
+            "value": -13.5,
+            "change": 1.5,
+            "changePercent": 10.0,
+            "trend": "INCREASING",
+            "trigger": "PSS sync achieved",
+            "description": "RSRQ improving with PSS sync"
+          },
+          {
+            "timestamp": 7000,
+            "value": -12.0,
+            "change": 1.5,
+            "changePercent": 11.1,
+            "trend": "INCREASING",
+            "trigger": "SSS detection",
+            "description": "RSRQ improving with SSS detection"
+          },
+          {
+            "timestamp": 8000,
+            "value": -10.5,
+            "change": 1.5,
+            "changePercent": 12.5,
+            "trend": "INCREASING",
+            "trigger": "DMRS detection",
+            "description": "RSRQ stable after DMRS detection"
+          }
+        ]
+      },
+      {
+        "parameterName": "sinr",
+        "description": "Signal to Interference plus Noise Ratio",
+        "unit": "dB",
+        "currentValue": 15.3,
+        "baseValue": 10.0,
+        "minValue": -5.0,
+        "maxValue": 30.0,
+        "typicalValue": 15.0,
+        "variation": 3.0,
+        "updateInterval": 200,
+        "criticalThresholds": { "warning": 5.0, "error": 0.0, "critical": -5.0 },
+        "measurementMethod": "SINR measurement",
+        "standardReference": "3GPP TS 36.101",
+        "dynamicChanges": [
+          {
+            "timestamp": 5000,
+            "value": 10.0,
+            "change": 0.0,
+            "changePercent": 0.0,
+            "trend": "STABLE",
+            "trigger": "PSS detection start",
+            "description": "SINR measurement during PSS detection"
+          },
+          {
+            "timestamp": 6000,
+            "value": 12.5,
+            "change": 2.5,
+            "changePercent": 25.0,
+            "trend": "INCREASING",
+            "trigger": "PSS sync achieved",
+            "description": "SINR improving with PSS sync"
+          },
+          {
+            "timestamp": 7000,
+            "value": 14.0,
+            "change": 1.5,
+            "changePercent": 12.0,
+            "trend": "INCREASING",
+            "trigger": "SSS detection",
+            "description": "SINR improving with SSS detection"
+          },
+          {
+            "timestamp": 8000,
+            "value": 15.3,
+            "change": 1.3,
+            "changePercent": 9.3,
+            "trend": "INCREASING",
+            "trigger": "DMRS detection",
+            "description": "SINR stable after DMRS detection"
+          }
+        ]
+      }
+    ],
+    "MAC": [
+      {
+        "parameterName": "throughput",
+        "description": "MAC layer throughput",
+        "unit": "Mbps",
+        "currentValue": 0.0,
+        "baseValue": 0.0,
+        "minValue": 0.0,
+        "maxValue": 150.0,
+        "typicalValue": 50.0,
+        "variation": 10.0,
+        "updateInterval": 1000,
+        "criticalThresholds": { "warning": 10.0, "error": 5.0, "critical": 1.0 },
+        "measurementMethod": "MAC throughput measurement",
+        "standardReference": "3GPP TS 36.321",
+        "dynamicChanges": []
+      }
+    ],
+    "RLC": [
+      {
+        "parameterName": "buffer_occupancy",
+        "description": "RLC buffer occupancy",
+        "unit": "bytes",
+        "currentValue": 0,
+        "baseValue": 0,
+        "minValue": 0,
+        "maxValue": 1000000,
+        "typicalValue": 10000,
+        "variation": 1000,
+        "updateInterval": 50,
+        "criticalThresholds": { "warning": 800000, "error": 900000, "critical": 950000 },
+        "measurementMethod": "RLC buffer measurement",
+        "standardReference": "3GPP TS 36.322",
+        "dynamicChanges": []
+      }
+    ],
+    "PDCP": [
+      {
+        "parameterName": "sequence_number",
+        "description": "PDCP sequence number",
+        "unit": "count",
+        "currentValue": 0,
+        "baseValue": 0,
+        "minValue": 0,
+        "maxValue": 4095,
+        "typicalValue": 0,
+        "variation": 1,
+        "updateInterval": 10,
+        "criticalThresholds": { "warning": 4000, "error": 4090, "critical": 4095 },
+        "measurementMethod": "PDCP sequence tracking",
+        "standardReference": "3GPP TS 36.323",
+        "dynamicChanges": []
+      }
+    ],
+    "RRC": [
+      {
+        "parameterName": "connection_state",
+        "description": "RRC connection state",
+        "unit": "state",
+        "currentValue": 0,
+        "baseValue": 0,
+        "minValue": 0,
+        "maxValue": 2,
+        "typicalValue": 1,
+        "variation": 1,
+        "updateInterval": 1000,
+        "criticalThresholds": { "warning": 0, "error": 0, "critical": 0 },
+        "measurementMethod": "RRC state tracking",
+        "standardReference": "3GPP TS 36.331",
+        "dynamicChanges": []
+      }
+    ],
+    "NAS": [
+      {
+        "parameterName": "attach_state",
+        "description": "NAS attach state",
+        "unit": "state",
+        "currentValue": 0,
+        "baseValue": 0,
+        "minValue": 0,
+        "maxValue": 3,
+        "typicalValue": 2,
+        "variation": 1,
+        "updateInterval": 5000,
+        "criticalThresholds": { "warning": 0, "error": 0, "critical": 0 },
+        "measurementMethod": "NAS state tracking",
+        "standardReference": "3GPP TS 24.301",
+        "dynamicChanges": []
+      }
+    ]
+  }
+}
