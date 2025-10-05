@@ -5,7 +5,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. UE Profiles Table
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS ue_profiles (
+CREATE TABLE IF NOT EXISTS ue_profiles (
     id TEXT PRIMARY KEY,
     imsi TEXT NOT NULL,
     imei TEXT,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS ue_profiles (
 );
 
 -- 2. Test Cases Table
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS test_cases (
+CREATE TABLE IF NOT EXISTS test_cases (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
     description TEXT,
