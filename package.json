@@ -122,6 +122,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.9",
+    "puppeteer": "^24.23.0",
     "snyk": "^1.1248.0",
     "supabase": "^2.45.5",
     "tsx": "^4.7.0"
