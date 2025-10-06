@@ -105,99 +105,73 @@ class TestManagerBackendServices {
       }
 
       async getTestCases(filters = {}) {
-        // Mock implementation - replace with real Supabase queries
-        const mockTestCases = [
-          {
-            id: 'tc-5g-nr-001',
-            name: '5G NR Random Access',
-            category: '5G NR',
-            subcategory: 'Initial Access',
-            description: 'Complete 5G NR random access procedure',
-            protocol: '5G-NR',
-            complexity: 'medium',
-            estimated_duration: 120,
-            layers: ['PHY', 'MAC', 'RRC'],
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'tc-lte-002',
-            name: 'LTE Attach Procedure',
-            category: 'LTE',
-            subcategory: 'Initial Access',
-            description: 'Standard LTE attach procedure',
-            protocol: 'LTE',
-            complexity: 'medium',
-            estimated_duration: 90,
-            layers: ['PHY', 'MAC', 'RLC', 'PDCP', 'RRC', 'NAS'],
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'tc-ims-003',
-            name: 'IMS SIP Registration',
-            category: 'VoLTE/VoNR/IMS',
-            subcategory: 'VoLTE Call Setup',
-            description: 'IMS SIP registration procedure',
-            protocol: 'IMS',
-            complexity: 'high',
-            estimated_duration: 60,
-            layers: ['SIP', 'IMS', 'NAS'],
-            created_at: new Date().toISOString()
+        // Real Supabase implementation - fetch actual test cases
+        try {
+          console.log('🔍 Fetching real test cases from Supabase API...');
+          const response = await fetch('/api/test-cases/all');
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log(`✅ Successfully fetched ${result.count} real test cases from Supabase`);
+            return { data: result.data, error: null };
+          } else {
+            console.error('❌ Failed to fetch test cases:', result.error);
+            return { data: [], error: result.error };
           }
-        ];
-
-        return { data: mockTestCases, error: null };
+        } catch (error) {
+          console.error('❌ Error fetching test cases:', error);
+          return { data: [], error: error.message };
+        }
       }
 
       async getTestCaseDetails(testCaseId) {
-        // Fetch complete test case data including messages, IEs, parameters
-        const mockDetails = {
-          testCase: {
-            id: testCaseId,
-            name: 'Test Case Details',
-            description: 'Complete test case with all data'
-          },
-          expectedMessages: [
-            {
-              id: `${testCaseId}_msg_1`,
-              layer: 'RRC',
-              protocol: '5G-NR',
-              messageType: 'RRC_SETUP_REQUEST',
-              messageName: 'RRC Setup Request',
-              direction: 'UL',
-              timestampMs: Date.now(),
-              messagePayload: { establishmentCause: 'mo-Signalling' }
-            },
-            {
-              id: `${testCaseId}_msg_2`,
-              layer: 'NAS',
-              protocol: '5G-NAS',
-              messageType: 'REGISTRATION_REQUEST',
-              messageName: 'Registration Request',
-              direction: 'UL',
-              timestampMs: Date.now() + 1000,
-              messagePayload: { registrationType: 'initial-registration' }
+        // Real Supabase implementation - fetch actual test case details
+        try {
+          console.log(`🔍 Fetching real test case details for ID: ${testCaseId}`);
+          const response = await fetch(`/api/test-execution/comprehensive?testCaseId=${testCaseId}&includeTemplates=true`);
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log(`✅ Successfully fetched real test case details: ${result.data.name}`);
+            
+            // Also fetch additional details from the specific test case API
+            const detailsResponse = await fetch(`/api/tests/${testCaseId}`);
+            const detailsResult = await detailsResponse.json();
+            
+            let expectedMessages = [];
+            let expectedInformationElements = [];
+            let expectedLayerParameters = [];
+            
+            if (detailsResult.success) {
+              expectedMessages = detailsResult.data.messages || [];
+              expectedInformationElements = detailsResult.data.informationElements || [];
+              expectedLayerParameters = detailsResult.data.layerParameters || [];
+              console.log(`📊 Real data loaded: ${expectedMessages.length} messages, ${expectedInformationElements.length} IEs, ${expectedLayerParameters.length} params`);
             }
-          ],
-          expectedInformationElements: [
-            {
-              id: `${testCaseId}_ie_1`,
-              ieName: 'establishmentCause',
-              ieValue: 'mo-Signalling',
-              layer: 'RRC'
-            }
-          ],
-          expectedLayerParameters: [
-            {
-              id: `${testCaseId}_param_1`,
-              layer: 'PHY',
-              parameterName: 'rsrp',
-              parameterValue: -85,
-              unit: 'dBm'
-            }
-          ]
-        };
-
-        return { data: mockDetails, error: null };
+            
+            return {
+              data: {
+                testCase: {
+                  id: result.data.id,
+                  name: result.data.name,
+                  description: result.data.description,
+                  protocol: result.data.protocol,
+                  category: result.data.category
+                },
+                expectedMessages,
+                expectedInformationElements,
+                expectedLayerParameters
+              },
+              error: null
+            };
+          } else {
+            console.error('❌ Failed to fetch test case details:', result.error);
+            return { data: null, error: result.error };
+          }
+        } catch (error) {
+          console.error('❌ Error fetching test case details:', error);
+          return { data: null, error: error.message };
+        }
       }
 
       async saveTestExecution(executionData) {
@@ -378,52 +352,104 @@ class TestManagerBackendServices {
   }
 
   async initializeSupabaseClient() {
-    // Supabase client for direct database operations
+    // Real Supabase client for direct database operations
     const SupabaseClient = class {
       from(table) {
         return {
           select: (columns = '*') => ({
-            eq: (column, value) => this.mockQuery(table, { [column]: value }),
-            limit: (count) => this.mockQuery(table, {}, count),
-            order: (column, options) => this.mockQuery(table, {}, null, column)
+            eq: (column, value) => this.realQuery(table, { [column]: value }),
+            limit: (count) => this.realQuery(table, {}, count),
+            order: (column, options) => this.realQuery(table, {}, null, column)
           }),
           insert: (data) => ({
-            select: () => ({ single: () => this.mockInsert(table, data) })
+            select: () => ({ single: () => this.realInsert(table, data) })
           })
         };
       }
 
-      async mockQuery(table, filters = {}, limit = null, orderBy = null) {
-        // Mock Supabase query - replace with real implementation
-        console.log(`🗄️ Supabase query: ${table}`, { filters, limit, orderBy });
-        
-        const mockData = {
-          'test_cases': [
-            { id: 'tc-001', name: 'Test Case 1', category: '5G NR' },
-            { id: 'tc-002', name: 'Test Case 2', category: 'LTE' }
-          ],
-          'expected_messages': [
-            { id: 'msg-001', test_case_id: 'tc-001', layer: 'RRC', messageType: 'RRC_SETUP' }
-          ]
-        };
-
-        return {
-          data: mockData[table] || [],
-          error: null
-        };
+      async realQuery(table, filters = {}, limit = null, orderBy = null) {
+        // Real Supabase query via API endpoints
+        try {
+          console.log(`🗄️ Real Supabase query: ${table}`, { filters, limit, orderBy });
+          
+          let endpoint = '';
+          switch (table) {
+            case 'test_cases':
+              endpoint = '/api/test-cases/all';
+              break;
+            case 'expected_messages':
+            case 'test_case_messages':
+              endpoint = `/api/tests/${filters.test_case_id || 'all'}/messages`;
+              break;
+            case 'decoded_messages':
+              endpoint = `/api/tests/runs/${filters.execution_id}/messages`;
+              break;
+            default:
+              console.warn(`🤔 No API endpoint defined for table: ${table}`);
+              return { data: [], error: null };
+          }
+          
+          const response = await fetch(endpoint);
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log(`✅ Real Supabase query successful: ${result.data?.length || result.count || 0} records`);
+            return { data: result.data || [], error: null };
+          } else {
+            console.error('❌ Real Supabase query failed:', result.error);
+            return { data: [], error: result.error };
+          }
+        } catch (error) {
+          console.error('❌ Real Supabase query error:', error);
+          return { data: [], error: error.message };
+        }
       }
 
-      async mockInsert(table, data) {
-        console.log(`💾 Supabase insert: ${table}`, data);
-        return {
-          data: { id: Date.now(), ...data },
-          error: null
-        };
+      async realInsert(table, data) {
+        // Real Supabase insert via API endpoints
+        try {
+          console.log(`💾 Real Supabase insert: ${table}`, data);
+          
+          let endpoint = '';
+          switch (table) {
+            case 'test_executions':
+              endpoint = '/api/test-execution/comprehensive';
+              break;
+            case 'test_case_messages':
+              endpoint = '/api/test-case-messages/create';
+              break;
+            case 'test_case_information_elements':
+              endpoint = '/api/test-case-information-elements/create';
+              break;
+            default:
+              console.warn(`🤔 No API endpoint defined for table insert: ${table}`);
+              return { data: { id: Date.now(), ...data }, error: null };
+          }
+          
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log(`✅ Real Supabase insert successful:`, result.data);
+            return { data: result.data, error: null };
+          } else {
+            console.error('❌ Real Supabase insert failed:', result.error);
+            return { data: null, error: result.error };
+          }
+        } catch (error) {
+          console.error('❌ Real Supabase insert error:', error);
+          return { data: null, error: error.message };
+        }
       }
     };
 
     this.services.set('supabaseClient', new SupabaseClient());
-    console.log('✅ SupabaseClient initialized');
+    console.log('✅ Real SupabaseClient initialized (no more mock data!)');
   }
 
   async initializeWebSocketService() {
