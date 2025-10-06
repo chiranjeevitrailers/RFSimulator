@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5GLabX + Test Manager Frontend Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .platform-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .platform-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(90deg, #1e40af, #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .platform-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 24px;
+        }
+
+        .integration-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            width: 100%;
+            margin-top: 60px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 384px;
+            background: white;
+            border-right: 2px solid #e5e7eb;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Test Manager Section */
+        .test-manager-section {
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            margin: 16px;
+            background: #f0fdf4;
+        }
+
+        .test-manager-header {
+            background: #10b981;
+            color: white;
+            padding: 12px 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .test-manager-content {
+            padding: 0;
+        }
+
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            background: #f3f4f6;
+            border-bottom-color: #10b981;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Test Categories */
+        .test-category {
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: #f9fafb;
+            padding: 10px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-content {
+            padding: 8px 12px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .test-case {
+            padding: 8px;
+            margin: 4px 0;
+            background: #f8fafc;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-case:hover {
+            background: #e0f2fe;
+            border-left-color: #0ea5e9;
+        }
+
+        .test-case.selected {
+            background: #dbeafe;
+            border-left-color: #2563eb;
+        }
+
+        /* Active Execution */
+        .active-execution {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Backend Services */
+        .service-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: #f0fdf4;
+            border-left: 3px solid #10b981;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .service-name {
+            font-weight: 500;
+        }
+
+        .status-badge {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        /* 5GLabX Navigation */
+        .glabx-navigation {
+            margin: 16px;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            margin: 4px 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .nav-item.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-live { background-color: #ef4444; }
+        .status-active { background-color: #10b981; }
+        .status-processing { background-color: #f59e0b; }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 24px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .content-description {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .data-flow-indicator {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        /* Protocol Analysis */
+        .protocol-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        /* Real-time Messages */
+        .message-log {
+            background: #1f2937;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #9ca3af;
+        }
+
+        .log-layer {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .log-message {
+            color: #34d399;
+        }
+
+        /* Interactive Controls */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            margin: 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-button:hover {
+            background: #f3f4f6;
+        }
+
+        .control-button.primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .control-button.primary:hover {
+            background: #2563eb;
+        }
+
+        .expandable {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Platform Header -->
+    <div class="platform-header">
+        <div class="platform-title">5GLabX Platform + Integrated Test Manager</div>
+        <div class="integration-status">
+            <div class="status-dot"></div>
+            <span>Full Integration Active</span>
+        </div>
+    </div>
+
+    <!-- Main Platform Layout -->
+    <div class="platform-container">
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Test Manager Section -->
+                <div class="test-manager-section">
+                    <div class="test-manager-header expandable" onclick="toggleSection('testManager')">
+                        <span>🧪 Test Manager</span>
+                        <span id="testManagerIcon">▼</span>
+                    </div>
+                    <div class="test-manager-content" id="testManagerContent">
+                        <!-- Tab Navigation -->
+                        <div class="tab-navigation">
+                            <button class="tab-button active" onclick="switchTab('library')">📚<br>Library</button>
+                            <button class="tab-button" onclick="switchTab('active')">🏃<br>Active</button>
+                            <button class="tab-button" onclick="switchTab('results')">📊<br>Results</button>
+                            <button class="tab-button" onclick="switchTab('backend')">🔧<br>Backend</button>
+                        </div>
+
+                        <!-- Test Library Tab -->
+                        <div class="tab-content" id="library-content">
+                            <div class="test-category">
+                                <div class="category-header expandable" onclick="toggleCategory('5gnr')">
+                                    <span>📡 5G NR (450+ tests)</span>
+                                    <span id="5gnrIcon">▼</span>
+                                </div>
+                                <div class="category-content" id="5gnrContent">
+                                    <div class="test-case selected" onclick="selectTestCase(this)">
+                                        <strong>Initial Attach Procedure</strong><br>
+                                        <small>Complete UE attach with authentication</small>
+                                    </div>
+                                    <div class="test-case" onclick="selectTestCase(this)">
+                                        <strong>Registration Update</strong><br>
+                                        <small>Periodic registration update</small>
+                                    </div>
+                                    <div class="test-case" onclick="selectTestCase(this)">
+                                        <strong>PDU Session Establishment</strong><br>
+                                        <small>Data session setup procedure</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-category">
+                                <div class="category-header expandable" onclick="toggleCategory('lte')">
+                                    <span>📱 LTE (320+ tests)</span>
+                                    <span id="lteIcon">▶</span>
+                                </div>
+                                <div class="category-content" id="lteContent" style="display: none;">
+                                    <div class="test-case" onclick="selectTestCase(this)">LTE Attach Procedure</div>
+                                    <div class="test-case" onclick="selectTestCase(this)">TAU Procedure</div>
+                                </div>
+                            </div>
+
+                            <div class="test-category">
+                                <div class="category-header expandable" onclick="toggleCategory('volte')">
+                                    <span>📞 VoLTE/IMS (280+ tests)</span>
+                                    <span id="volteIcon">▶</span>
+                                </div>
+                                <div class="category-content" id="volteContent" style="display: none;">
+                                    <div class="test-case" onclick="selectTestCase(this)">IMS Registration</div>
+                                    <div class="test-case" onclick="selectTestCase(this)">VoLTE Call Setup</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Executions Tab -->
+                        <div class="tab-content" id="active-content" style="display: none;">
+                            <div class="active-execution">
+                                <strong>🏃 5G NR Initial Attach Procedure</strong><br>
+                                <small>Started: 10:45:23 AM</small>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: 75%;">75%</div>
+                                </div>
+                                <div style="font-size: 12px; color: #6b7280;">
+                                    Current: PDU Session Establishment<br>
+                                    ETA: 00:00:32 remaining
+                                </div>
+                            </div>
+
+                            <div style="padding: 8px; background: #f3f4f6; border-radius: 4px; font-size: 14px;">
+                                📋 <strong>Queue (3 pending):</strong><br>
+                                • LTE Attach Procedure<br>
+                                • VoLTE Call Setup<br>
+                                • Handover Test Case
+                            </div>
+                        </div>
+
+                        <!-- Results Tab -->
+                        <div class="tab-content" id="results-content" style="display: none;">
+                            <div style="font-size: 14px;">
+                                <div style="padding: 8px; margin-bottom: 8px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                    <strong>✅ 5G NR Registration Update</strong><br>
+                                    10:42:15 AM | Duration: 1m 23s | Success
+                                </div>
+                                <div style="padding: 8px; margin-bottom: 8px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                    <strong>✅ LTE Attach Procedure</strong><br>
+                                    10:38:42 AM | Duration: 2m 15s | Success
+                                </div>
+                                <div style="padding: 8px; margin-bottom: 8px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 4px;">
+                                    <strong>❌ VoLTE Call Setup</strong><br>
+                                    10:35:20 AM | Duration: 0m 45s | Failed
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backend Services Tab -->
+                        <div class="tab-content" id="backend-content" style="display: none;">
+                            <div class="service-status">
+                                <span class="service-name">Database Service</span>
+                                <span class="status-badge">✅ Active</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">Test Case Playback</span>
+                                <span class="status-badge">✅ Ready</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">Enhanced Test Case Manager</span>
+                                <span class="status-badge">✅ Active</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">API Integration</span>
+                                <span class="status-badge">✅ Connected</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">Supabase Client</span>
+                                <span class="status-badge">✅ Connected</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">WebSocket Service</span>
+                                <span class="status-badge">✅ Active</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">Real-time Processor</span>
+                                <span class="status-badge">✅ Processing</span>
+                            </div>
+                            <div class="service-status">
+                                <span class="service-name">Test Execution Service</span>
+                                <span class="status-badge">✅ Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5GLabX Navigation -->
+                <div class="glabx-navigation">
+                    <div class="nav-section">
+                        <div class="nav-section-title">📡 Protocol Layers</div>
+                        <div class="nav-item active" onclick="switchView(this, 'phy')">
+                            <span>📶 PHY Layer</span>
+                            <span class="status-indicator status-live"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'mac')">
+                            <span>📊 MAC Layer</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'rlc')">
+                            <span>🔄 RLC Layer</span>
+                            <span class="status-indicator status-processing"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'pdcp')">
+                            <span>📦 PDCP Layer</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'rrc')">
+                            <span>📻 RRC Layer</span>
+                            <span class="status-indicator status-live"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'nas')">
+                            <span>🌐 NAS Layer</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'ims')">
+                            <span>☎️ IMS Layer</span>
+                            <span class="status-indicator status-processing"></span>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">📊 Analysis Views</div>
+                        <div class="nav-item" onclick="switchView(this, 'logs')">
+                            <span>📄 Logs View</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'enhanced-logs')">
+                            <span>⚡ Enhanced Logs</span>
+                            <span class="status-indicator status-live"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'analytics')">
+                            <span>📊 Analytics</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">🌐 Specialized</div>
+                        <div class="nav-item" onclick="switchView(this, 'oran')">
+                            <span>🏗️ O-RAN Analysis</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'v2x')">
+                            <span>🚗 V2X Analysis</span>
+                            <span class="status-indicator status-processing"></span>
+                        </div>
+                        <div class="nav-item" onclick="switchView(this, 'ntn')">
+                            <span>🛰️ NTN Analysis</span>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="content-title" id="contentTitle">📶 PHY Layer Analysis</div>
+                    <div class="content-description" id="contentDescription">Real-time physical layer analysis with data from active test execution</div>
+                </div>
+
+                <div class="data-flow-indicator">
+                    🔄 <strong>Live Data Flow:</strong> Test execution "5G NR Initial Attach Procedure" → Real-time updates to all 5GLabX protocol layers
+                </div>
+
+                <div class="protocol-analysis" id="protocolContent">
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 SSB Detection</div>
+                        <div class="metric-row">
+                            <span>RSRP:</span>
+                            <span id="rsrp">-85 dBm</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>RSRQ:</span>
+                            <span id="rsrq">-12 dB</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>SINR:</span>
+                            <span id="sinr">18 dB</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>PCI:</span>
+                            <span>1</span>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 RACH Procedure</div>
+                        <div class="metric-row">
+                            <span>Preamble:</span>
+                            <span>Format 0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>RA-RNTI:</span>
+                            <span>0x002A</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>RAPID:</span>
+                            <span>15</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Status:</span>
+                            <span style="color: #10b981;">✅ Success</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-log" id="messageLog">
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.156</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Registration Request</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.234</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Authentication Request</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.298</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Authentication Response</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.445</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Security Mode Command</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.502</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Security Mode Complete</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">10:45:23.678</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Registration Accept</span>
+                    </div>
+                    <div class="log-entry" id="liveEntry" style="color: #fbbf24;">
+                        <span class="log-timestamp">10:45:23.734</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">🔄 PDU Session Establishment Request...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Controls -->
+    <div class="controls">
+        <div style="margin-bottom: 8px; font-weight: bold;">Demo Controls</div>
+        <button class="control-button primary" onclick="simulateExecution()">▶️ Execute Test</button>
+        <button class="control-button" onclick="updateMetrics()">🔄 Update Data</button>
+        <button class="control-button" onclick="addLogEntry()">📝 Add Log</button>
+    </div>
+
+    <script>
+        let currentView = 'phy';
+        let executionProgress = 75;
+        let logCounter = 7;
+
+        // Content definitions for different views
+        const viewContent = {
+            phy: {
+                title: '📶 PHY Layer Analysis',
+                description: 'Real-time physical layer analysis with data from active test execution',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 SSB Detection</div>
+                        <div class="metric-row"><span>RSRP:</span><span id="rsrp">-85 dBm</span></div>
+                        <div class="metric-row"><span>RSRQ:</span><span id="rsrq">-12 dB</span></div>
+                        <div class="metric-row"><span>SINR:</span><span id="sinr">18 dB</span></div>
+                        <div class="metric-row"><span>PCI:</span><span>1</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 RACH Procedure</div>
+                        <div class="metric-row"><span>Preamble:</span><span>Format 0</span></div>
+                        <div class="metric-row"><span>RA-RNTI:</span><span>0x002A</span></div>
+                        <div class="metric-row"><span>RAPID:</span><span>15</span></div>
+                        <div class="metric-row"><span>Status:</span><span style="color: #10b981;">✅ Success</span></div>
+                    </div>
+                `
+            },
+            mac: {
+                title: '📊 MAC Layer Analysis', 
+                description: 'MAC layer procedures and scheduling information from test execution',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 Random Access</div>
+                        <div class="metric-row"><span>Procedure:</span><span>Completed</span></div>
+                        <div class="metric-row"><span>Attempts:</span><span>1/4</span></div>
+                        <div class="metric-row"><span>Power Ramping:</span><span>+3dB</span></div>
+                        <div class="metric-row"><span>Timing Advance:</span><span>12</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title">🎯 Scheduling Reports</div>
+                        <div class="metric-row"><span>BSR:</span><span>Buffer Status Report sent</span></div>
+                        <div class="metric-row"><span>PHR:</span><span>Power Headroom: 15dB</span></div>
+                        <div class="metric-row"><span>HARQ:</span><span>Process ID: 0</span></div>
+                        <div class="metric-row"><span>Status:</span><span style="color: #10b981;">✅ Active</span></div>
+                    </div>
+                `
+            },
+            'enhanced-logs': {
+                title: '⚡ Enhanced Log Analysis',
+                description: 'Professional QXDM/Keysight-style detailed protocol analysis',
+                content: `
+                    <div class="analysis-card" style="grid-column: 1 / -1;">
+                        <div class="card-title">🔍 Message Decode Analysis</div>
+                        <div class="metric-row"><span>Current Message:</span><span>Registration Request</span></div>
+                        <div class="metric-row"><span>Compliance:</span><span style="color: #10b981;">✅ 3GPP TS 24.501</span></div>
+                        <div class="metric-row"><span>Layer:</span><span>NAS (Layer 3)</span></div>
+                        <div class="metric-row"><span>Direction:</span><span>UE → AMF</span></div>
+                        <div class="metric-row"><span>Security:</span><span>Not protected (initial)</span></div>
+                        <div class="metric-row"><span>IEs Present:</span><span>8 mandatory, 12 optional</span></div>
+                    </div>
+                `
+            }
+        };
+
+        function switchTab(tab) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tab + '-content').style.display = 'block';
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function toggleSection(section) {
+            const content = document.getElementById(section + 'Content');
+            const icon = document.getElementById(section + 'Icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        function toggleCategory(category) {
+            const content = document.getElementById(category + 'Content');
+            const icon = document.getElementById(category + 'Icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        function selectTestCase(element) {
+            // Remove selection from all test cases
+            document.querySelectorAll('.test-case').forEach(tc => {
+                tc.classList.remove('selected');
+            });
+            
+            // Add selection to clicked test case
+            element.classList.add('selected');
+        }
+
+        function switchView(element, view) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Update main content
+            currentView = view;
+            const content = viewContent[view];
+            if (content) {
+                document.getElementById('contentTitle').textContent = content.title;
+                document.getElementById('contentDescription').textContent = content.description;
+                document.getElementById('protocolContent').innerHTML = content.content;
+            }
+        }
+
+        function simulateExecution() {
+            // Simulate test execution progress
+            const progressFill = document.getElementById('progressFill');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressFill.textContent = '✅ Complete';
+                    
+                    // Add to results after completion
+                    setTimeout(() => {
+                        addLogEntry();
+                    }, 1000);
+                }
+            }, 200);
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const rsrp = document.getElementById('rsrp');
+            const rsrq = document.getElementById('rsrq');
+            const sinr = document.getElementById('sinr');
+            
+            if (rsrp) {
+                rsrp.textContent = (-85 + Math.floor(Math.random() * 10 - 5)) + ' dBm';
+                rsrq.textContent = (-12 + Math.floor(Math.random() * 6 - 3)) + ' dB';
+                sinr.textContent = (18 + Math.floor(Math.random() * 8 - 4)) + ' dB';
+            }
+        }
+
+        function addLogEntry() {
+            const messageLog = document.getElementById('messageLog');
+            const timestamp = new Date().toLocaleTimeString() + '.' + Math.floor(Math.random() * 1000);
+            
+            const messages = [
+                'Configuration Complete',
+                'Data Transfer Started', 
+                'Handover Request',
+                'Bearer Modification',
+                'Quality Report',
+                'Measurement Report'
+            ];
+            
+            const layers = ['RRC', 'NAS', 'MAC', 'PHY', 'PDCP'];
+            const directions = ['UL', 'DL'];
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'log-entry';
+            newEntry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span> | 
+                <span class="log-layer">${directions[Math.floor(Math.random() * 2)]} ${layers[Math.floor(Math.random() * layers.length)]}</span> | 
+                <span class="log-message">${messages[Math.floor(Math.random() * messages.length)]}</span>
+            `;
+            
+            messageLog.appendChild(newEntry);
+            messageLog.scrollTop = messageLog.scrollHeight;
+            
+            logCounter++;
+        }
+
+        // Auto-update metrics every 3 seconds to simulate real-time data
+        setInterval(updateMetrics, 3000);
+        
+        // Auto-add log entries every 5 seconds to simulate live execution
+        setInterval(addLogEntry, 5000);
+    </script>
+</body>
+</html>
