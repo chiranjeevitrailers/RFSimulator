@@ -27,7 +27,9 @@ const UserDashboard: React.FC = () => {
         // Load DataFormatAdapter
         const { DataFormatAdapter } = await import('@/utils/DataFormatAdapter');
         if (typeof window !== 'undefined') {
-          (window as any).DataFormatAdapter = DataFormatAdapter;
+          if (!(window as any).DataFormatAdapter) {
+            (window as any).DataFormatAdapter = DataFormatAdapter;
+          }
           console.log('✅ DataFormatAdapter loaded successfully');
         }
 
