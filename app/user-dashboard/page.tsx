@@ -3,14 +3,10 @@
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor, TestTube, Database, Layers, FileText, MessageSquare, CheckCircle } from "lucide-react"
+import { Activity, BarChart3, Settings, LogOut, User, Bell, HelpCircle, Shield, Monitor, TestTube, Database, Layers, CheckCircle } from "lucide-react"
 import ProfessionalTestManager from "@/components/testing/ProfessionalTestManager"
 import Enhanced5GLabXPlatform from "@/components/5glabx/Enhanced5GLabXPlatform"
 import Complete5GLabXWithFullTestManager from "@/components/5glabx/Complete5GLabXWithFullTestManager"
-import ProfessionalAnalysisPlatform from "@/components/professional-log-analysis/ProfessionalAnalysisPlatform"
-import TestCaseBuilder from "@/components/testing/TestCaseBuilder/TestCaseBuilder"
-import ComprehensiveTestCaseBuilder from "@/components/testing/ComprehensiveTestCaseBuilder/ComprehensiveTestCaseBuilder"
-import EnhancedTestCaseBuilder from "@/components/testing/EnhancedTestCaseBuilder/EnhancedTestCaseBuilder"
 
 const UserDashboard: React.FC = () => {
   const router = useRouter()
@@ -58,10 +54,6 @@ const UserDashboard: React.FC = () => {
     return <Complete5GLabXWithFullTestManager />;
   }, []);
 
-  const MemoizedProfessionalAnalysisPlatform = useMemo(() => {
-    return <ProfessionalAnalysisPlatform executionId={null} platform="5GLABX" />;
-  }, []);
-
   const handleSignOut = () => {
     console.log("Sign out clicked")
     router.push("/login")
@@ -98,39 +90,6 @@ const UserDashboard: React.FC = () => {
                   <TestTube className="w-4 h-4 inline mr-2" />
                   Test Manager
                 </button>
-          <button
-            onClick={() => setActiveTab("test-case-builder")}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              activeTab === "test-case-builder"
-                ? "bg-primary-100 text-primary-700"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <FileText className="w-4 h-4 inline mr-2" />
-            Test Case Builder
-          </button>
-          <button
-            onClick={() => setActiveTab("comprehensive-test-case-builder")}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              activeTab === "comprehensive-test-case-builder"
-                ? "bg-primary-100 text-primary-700"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <Database className="w-4 h-4 inline mr-2" />
-            Comprehensive Test Case Builder
-          </button>
-          <button
-            onClick={() => setActiveTab("enhanced-test-case-builder")}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              activeTab === "enhanced-test-case-builder"
-                ? "bg-primary-100 text-primary-700"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4 inline mr-2" />
-            Enhanced Test Case Builder
-          </button>
                 <button
                   onClick={() => setActiveTab("5glabx-platform")}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -152,17 +111,6 @@ const UserDashboard: React.FC = () => {
                 >
                   <Layers className="w-4 h-4 inline mr-2" />
                   5GLabX + Test Manager
-                </button>
-                <button
-                  onClick={() => setActiveTab("professional-analysis")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === "professional-analysis"
-                      ? "bg-primary-100 text-primary-700"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <Layers className="w-4 h-4 inline mr-2" />
-                  Professional Analysis
                 </button>
                 <button
                   onClick={() => setActiveTab("settings")}
@@ -238,15 +186,15 @@ const UserDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Professional Analysis */}
+              {/* 5GLabX + Test Manager Integration */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center mb-4">
-                  <Layers className="w-8 h-8 text-orange-600 mr-3" />
-                  <h3 className="text-lg font-semibold text-gray-900">Professional Analysis</h3>
+                  <Layers className="w-8 h-8 text-green-600 mr-3" />
+                  <h3 className="text-lg font-semibold text-gray-900">5GLabX + Test Manager</h3>
                 </div>
-                <p className="text-gray-600 mb-4">QXDM/Keysight-compatible professional analysis tools</p>
+                <p className="text-gray-600 mb-4">Complete integration - Test Manager + 5GLabX Protocol Analysis</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Industry Standard</span>
+                  <span className="text-sm text-gray-500">Full Integration</span>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
               </div>
@@ -322,76 +270,6 @@ const UserDashboard: React.FC = () => {
           </div>
         )}
 
-
-        {activeTab === "test-case-builder" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Test Case Builder</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">3GPP Compliant</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                <TestCaseBuilder />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "comprehensive-test-case-builder" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Comprehensive Test Case Builder</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">1000 Test Cases</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                <ComprehensiveTestCaseBuilder />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "enhanced-test-case-builder" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Enhanced Test Case Builder</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Complete Call Flows</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                <EnhancedTestCaseBuilder />
-              </div>
-            </div>
-          </div>
-        )}
-
-
-
-        {activeTab === "professional-analysis" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Professional Analysis Platform</h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-600">Live Analysis</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="h-[800px]">
-                {MemoizedProfessionalAnalysisPlatform}
-              </div>
-            </div>
-          </div>
-        )}
 
         {activeTab === "5glabx-integrated" && (
           <div className="space-y-6">
