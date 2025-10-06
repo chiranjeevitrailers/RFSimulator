@@ -1259,13 +1259,13 @@ class DataFormatAdapter {
   }
 }
 
-// Export for both Node.js and browser environments
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = DataFormatAdapter;
-  module.exports.DataFormatAdapter = DataFormatAdapter;
-} else if (typeof window !== 'undefined') {
-  window.DataFormatAdapter = new DataFormatAdapter();
-  console.log('✅ DataFormatAdapter loaded into window object');
+// Attach class to window in browser environments without instantiating
+if (typeof window !== 'undefined') {
+  // Do not overwrite if already defined
+  if (!(window).DataFormatAdapter) {
+    (window).DataFormatAdapter = DataFormatAdapter;
+    console.log('✅ DataFormatAdapter loaded into window object');
+  }
 }
 
 export default DataFormatAdapter;
