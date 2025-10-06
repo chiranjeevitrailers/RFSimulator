@@ -91,9 +91,14 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         
         // Initialize DataFormatAdapter first
         if (typeof window !== 'undefined' && (window as any).DataFormatAdapter) {
-          setDataFormatAdapter((window as any).DataFormatAdapter);
-          setAdapterAvailable(true);
-          console.log('DataFormatAdapter initialized in DataFlowProvider');
+          try {
+            setDataFormatAdapter((window as any).DataFormatAdapter);
+            setAdapterAvailable(true);
+            console.log('DataFormatAdapter initialized in DataFlowProvider');
+          } catch (error) {
+            console.error('Error initializing DataFormatAdapter:', error);
+            setAdapterAvailable(false);
+          }
         } else {
           console.warn('DataFormatAdapter not available, using fallback mode');
         }
@@ -137,19 +142,40 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 // Convert to different frontend formats using DataFormatAdapter
                 const convertedData = {
                   // For LogsView
-                  logsView: (window as any).DataFormatAdapter ? 
-                    (window as any).DataFormatAdapter.adaptLogForViewer(baseData) : 
-                    fallbackLogsFormat(baseData),
+                  logsView: (() => {
+                    try {
+                      return (window as any).DataFormatAdapter ? 
+                        (window as any).DataFormatAdapter.adaptLogForViewer(baseData) : 
+                        fallbackLogsFormat(baseData);
+                    } catch (error) {
+                      console.warn('Error adapting log for viewer:', error);
+                      return fallbackLogsFormat(baseData);
+                    }
+                  })(),
                     
                   // For EnhancedLogsView  
-                  enhancedLogsView: (window as any).DataFormatAdapter ? 
-                    (window as any).DataFormatAdapter.adaptForEnhancedLogsView(baseData) :
-                    fallbackEnhancedFormat(baseData),
+                  enhancedLogsView: (() => {
+                    try {
+                      return (window as any).DataFormatAdapter ? 
+                        (window as any).DataFormatAdapter.adaptForEnhancedLogsView(baseData) :
+                        fallbackEnhancedFormat(baseData);
+                    } catch (error) {
+                      console.warn('Error adapting for enhanced logs view:', error);
+                      return fallbackEnhancedFormat(baseData);
+                    }
+                  })(),
                     
                   // For Layer-specific views
-                  layerView: (window as any).DataFormatAdapter ? 
-                    (window as any).DataFormatAdapter.adaptForLayerView(baseData, message.layer) :
-                    fallbackLayerFormat(baseData, message.layer),
+                  layerView: (() => {
+                    try {
+                      return (window as any).DataFormatAdapter ? 
+                        (window as any).DataFormatAdapter.adaptForLayerView(baseData, message.layer) :
+                        fallbackLayerFormat(baseData, message.layer);
+                    } catch (error) {
+                      console.warn('Error adapting for layer view:', error);
+                      return fallbackLayerFormat(baseData, message.layer);
+                    }
+                  })(),
                     
                   // Original data for reference
                   original: baseData
@@ -469,9 +495,14 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Use DataFormatAdapter if available to format logs properly
       if (adapterAvailable && dataFormatAdapter) {
         try {
-          logsByLayer[layer] = layerLogs.map(log => 
-            (window as any).DataFormatAdapter.adaptLogForViewer(log)
-          ).filter(log => log !== null);
+          logsByLayer[layer] = layerLogs.map(log => {
+            try {
+              return (window as any).DataFormatAdapter.adaptLogForViewer(log);
+            } catch (error) {
+              console.warn(`Error adapting log for layer ${layer}:`, error);
+              return log;
+            }
+          }).filter(log => log !== null);
         } catch (error) {
           console.warn(`Error processing logs for layer ${layer}:`, error);
           logsByLayer[layer] = layerLogs;
@@ -497,7 +528,7 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       let adaptedData = data;
       if (adapterAvailable && dataFormatAdapter) {
         try {
-          adaptedData = dataFormatAdapter.adaptForLayerView(data, layer);
+          adaptedData = (window as any).DataFormatAdapter.adaptForLayerView(data, layer);
         } catch (error) {
           console.warn(`Error adapting data for layer ${layer}:`, error);
           adaptedData = data; // Fallback to original data
@@ -779,9 +810,9 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       if (type === 'log') {
-        return (window as any).DataFormatAdapter.adaptLogForViewer(data);
+        return (window as any).DataFormatAdapter?.adaptLogForViewer(data) || data;
       } else if (type === 'layer' && layer) {
-        return (window as any).DataFormatAdapter.adaptForLayerView(data, layer);
+        return (window as any).DataFormatAdapter?.adaptForLayerView(data, layer) || data;
       }
       return data;
     } catch (error) {
@@ -798,9 +829,9 @@ export const DataFlowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       if (type === 'log') {
-        return dataFormatAdapter.validateLogEntry(data);
+        return (window as any).DataFormatAdapter?.validateLogEntry(data) ?? true;
       } else if (type === 'layer' && layer) {
-        return dataFormatAdapter.validateLayerData(data, layer);
+        return (window as any).DataFormatAdapter?.validateLayerData(data, layer) ?? true;
       }
       return true;
     } catch (error) {

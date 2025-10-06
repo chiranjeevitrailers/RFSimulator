@@ -719,7 +719,7 @@ const CompleteTestManagerWithBackend: React.FC<{
   // Load test cases using backend services
   useEffect(() => {
     const loadTestCases = async () => {
-      if (!backendServices.isInitialized()) return;
+      if (!backendServices || !backendServices.isInitialized()) return;
 
       setLoading(true);
       try {
@@ -744,6 +744,8 @@ const CompleteTestManagerWithBackend: React.FC<{
   // Monitor backend services status
   useEffect(() => {
     const updateBackendStatus = () => {
+      if (!backendServices) return;
+      
       const status = {
         services: backendServices.getAllServices(),
         initialized: backendServices.isInitialized(),
@@ -759,7 +761,7 @@ const CompleteTestManagerWithBackend: React.FC<{
 
   // Execute tests using backend services
   const handleExecuteTests = async () => {
-    if (selectedTests.length === 0 || !backendServices.isInitialized()) return;
+    if (selectedTests.length === 0 || !backendServices || !backendServices.isInitialized()) return;
 
     setLoading(true);
     try {
@@ -1065,12 +1067,24 @@ const CompleteTestManagerSidebar: React.FC<{
   const { layerData, getLayerStatistics } = useDataFlow();
   const [layerStats, setLayerStats] = useState<Record<string, any>>({});
   const [testManagerExpanded, setTestManagerExpanded] = useState(true);
-  const [backendServices] = useState(() => new TestManagerBackendServices());
+  const [backendServices] = useState(() => {
+    try {
+      return new TestManagerBackendServices();
+    } catch (error) {
+      console.error('Error creating TestManagerBackendServices:', error);
+      return null;
+    }
+  });
   const [backendInitialized, setBackendInitialized] = useState(false);
 
   // Initialize backend services
   useEffect(() => {
     const initBackend = async () => {
+      if (!backendServices) {
+        console.error('❌ BackendServices not available');
+        return;
+      }
+      
       console.log('🚀 Initializing complete Test Manager backend...');
       const success = await backendServices.initialize();
       setBackendInitialized(success);
