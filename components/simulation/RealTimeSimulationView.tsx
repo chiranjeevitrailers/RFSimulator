@@ -70,11 +70,18 @@ interface RealTimeSimulationViewProps {
 
 const RealTimeSimulationView: React.FC<RealTimeSimulationViewProps> = ({ userId, executionId }) => {
   const [executionEngine] = useState(() => TestExecutionEngine.getInstance());
-  const [realTimeSimulator] = useState(() => new RealTimeSimulator({
-    timeAcceleration: 1,
-    enableBuffering: true,
-    enableSynchronization: true
-  }));
+  const [realTimeSimulator] = useState(() => {
+    try {
+      return new RealTimeSimulator({
+        timeAcceleration: 1,
+        enableBuffering: true,
+        enableSynchronization: true
+      });
+    } catch (error) {
+      console.error('Error creating RealTimeSimulator:', error);
+      return null;
+    }
+  });
   
   const [execution, setExecution] = useState<TestExecutionResult | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);

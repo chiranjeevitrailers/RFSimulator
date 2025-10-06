@@ -30,7 +30,14 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({
   onSimulationComplete,
   onSimulationUpdate,
 }) => {
-  const [simulator] = useState(() => new ProtocolSimulator());
+  const [simulator] = useState(() => {
+    try {
+      return new ProtocolSimulator();
+    } catch (error) {
+      console.error('Error creating ProtocolSimulator:', error);
+      return null;
+    }
+  });
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);

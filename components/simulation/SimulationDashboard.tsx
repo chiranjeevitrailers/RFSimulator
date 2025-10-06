@@ -33,7 +33,14 @@ interface SimulationDashboardProps {
 }
 
 const SimulationDashboard: React.FC<SimulationDashboardProps> = ({ userId }) => {
-  const [simulationManager] = useState(() => new SimulationManager());
+  const [simulationManager] = useState(() => {
+    try {
+      return new SimulationManager();
+    } catch (error) {
+      console.error('Error creating SimulationManager:', error);
+      return null;
+    }
+  });
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [sessions, setSessions] = useState<SimulationSession[]>([]);
   const [metrics, setMetrics] = useState<SimulationMetrics | null>(null);

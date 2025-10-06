@@ -60,7 +60,14 @@ function App() {
       isMonitoring: false
     });
 
-    const [logProcessor] = React.useState(() => new LogProcessor());
+    const [logProcessor] = React.useState(() => {
+      try {
+        return new LogProcessor();
+      } catch (error) {
+        console.error('Error creating LogProcessor:', error);
+        return null;
+      }
+    });
 
     // Initialize with empty logs - real logs will come from backend WebSocket
     React.useEffect(() => {
