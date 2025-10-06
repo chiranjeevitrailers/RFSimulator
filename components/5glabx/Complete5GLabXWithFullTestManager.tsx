@@ -528,11 +528,19 @@ class TestManagerBackendServices {
         try {
           // Get test case details
           const databaseService = this.services.get('databaseService');
-          const { data: testCaseData } = await databaseService.getTestCaseDetails(testCaseId);
+          const { data: testCaseData, error: dbError } = await databaseService.getTestCaseDetails(testCaseId);
+          
+          if (dbError) {
+            throw new Error(`Database error: ${dbError}`);
+          }
 
           // Start playback service
           const playbackService = this.services.get('testCasePlaybackService');
-          await playbackService.startPlayback({ testCaseId });
+          const playbackResult = await playbackService.startPlayback({ testCaseId });
+          
+          if (!playbackResult.success) {
+            throw new Error('Failed to start test playback');
+          }
 
           // Start real-time processing
           const realTimeProcessor = this.services.get('realTimeProcessor');
@@ -543,13 +551,26 @@ class TestManagerBackendServices {
             testCaseId,
             startTime: Date.now(),
             status: 'running',
-            testCaseData
+            testCaseData,
+            options
           });
 
-          // Broadcast to 5GLabX
+          // Broadcast to 5GLabX with complete data
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('testCaseExecutionStarted', {
               detail: {
+                testCaseId,
+                testCaseData,
+                executionId,
+                source: 'TestManagerBackend',
+                options
+              }
+            }));
+
+            // Also trigger the 5GLABX_TEST_EXECUTION event
+            window.dispatchEvent(new CustomEvent('5GLABX_TEST_EXECUTION', {
+              detail: {
+                type: '5GLABX_TEST_EXECUTION',
                 testCaseId,
                 testCaseData,
                 executionId,
@@ -558,17 +579,30 @@ class TestManagerBackendServices {
             }));
           }
 
+          console.log(`✅ Test execution started successfully: ${executionId}`);
+
           return {
             success: true,
             executionId,
             testCaseId,
-            status: 'running'
+            status: 'running',
+            testCaseData
           };
 
         } catch (error) {
           console.error('❌ Test execution error:', error);
+          
+          // Record failed execution
+          this.activeExecutions.set(executionId, {
+            testCaseId,
+            startTime: Date.now(),
+            status: 'failed',
+            error: error.message
+          });
+
           return {
             success: false,
+            executionId,
             error: error.message
           };
         }
@@ -717,13 +751,19 @@ const CompleteTestManagerWithBackend: React.FC<{
             status: 'Running',
             progress: 0,
             startTime: new Date(),
-            backend: true
+            backend: true,
+            testCaseData: result.testCaseData || {}
           };
           
           setActiveTests(prev => [...prev, activeTest]);
           
           // Trigger 5GLabX integration
           onTestExecute(activeTest);
+          
+          // Start progress simulation
+          simulateTestProgress(activeTest.id);
+        } else {
+          console.error('Test execution failed:', result.error);
         }
       }
       
@@ -733,6 +773,34 @@ const CompleteTestManagerWithBackend: React.FC<{
     } finally {
       setLoading(false);
     }
+  };
+
+  // Simulate test progress for active tests
+  const simulateTestProgress = (testId: string) => {
+    const interval = setInterval(() => {
+      setActiveTests(prev => prev.map(test => {
+        if (test.id === testId) {
+          const newProgress = Math.min(test.progress + 10, 100);
+          if (newProgress >= 100) {
+            clearInterval(interval);
+            // Move to results
+            setTimeout(() => {
+              setActiveTests(prev => prev.filter(t => t.id !== testId));
+              setRecentResults(prev => [...prev, {
+                id: testId,
+                name: test.name,
+                status: 'Completed',
+                completedAt: new Date(),
+                duration: '2m 30s',
+                success: true
+              }]);
+            }, 1000);
+          }
+          return { ...test, progress: newProgress };
+        }
+        return test;
+      }));
+    }, 1000);
   };
 
   const filteredTestCases = testCases.filter(testCase => {
@@ -989,14 +1057,28 @@ const CompleteTestManagerSidebar: React.FC<{
           (window as any).TestManagerBackendServices = backendServices;
           
           // Make services available to DataFlowProvider
-          Object.entries({
+          const servicesToMount = {
             TestCasePlaybackService: backendServices.getService('testCasePlaybackService'),
             DatabaseService: backendServices.getService('databaseService'),
             TestExecutionService: backendServices.getService('testExecutionService'),
-            SupabaseClient: backendServices.getService('supabaseClient')
-          }).forEach(([name, service]) => {
-            (window as any)[name] = service;
+            SupabaseClient: backendServices.getService('supabaseClient'),
+            WebSocketService: backendServices.getService('webSocketService'),
+            RealTimeProcessor: backendServices.getService('realTimeProcessor'),
+            APIIntegration: backendServices.getService('apiIntegration'),
+            EnhancedTestCaseManager: backendServices.getService('enhancedTestCaseManager')
+          };
+          
+          Object.entries(servicesToMount).forEach(([name, service]) => {
+            if (service) {
+              (window as any)[name] = service;
+              console.log(`✅ Mounted ${name} globally for 5GLabX integration`);
+            }
           });
+          
+          // Notify DataFlowProvider that services are available
+          window.dispatchEvent(new CustomEvent('testManagerServicesReady', {
+            detail: { services: Object.keys(servicesToMount), backendServices }
+          }));
         }
       }
     };
