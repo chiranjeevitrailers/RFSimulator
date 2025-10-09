@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Original 5GLabX Platform Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .platform-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #1e40af, #7c3aed, #059669);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .platform-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .platform-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: auto;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: 70px;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 420px;
+            background: white;
+            border-right: 3px solid #e5e7eb;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+        }
+
+        /* Test Manager Section */
+        .test-manager-section {
+            border: 3px solid #10b981;
+            border-radius: 12px;
+            margin: 20px;
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            overflow: hidden;
+        }
+
+        .test-manager-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 20px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-manager-header:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .section-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .expand-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .test-manager-content {
+            padding: 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 16px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .tab-button.active {
+            background: white;
+            border-bottom-color: #10b981;
+            color: #10b981;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .tab-content {
+            padding: 20px;
+            background: white;
+        }
+
+        /* Test Categories */
+        .test-category {
+            margin-bottom: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .test-category:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            padding: 14px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+
+        .category-content {
+            padding: 12px 16px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .test-case {
+            padding: 12px;
+            margin: 6px 0;
+            background: #f8fafc;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-case:hover {
+            background: #e0f2fe;
+            border-left-color: #0ea5e9;
+            transform: translateX(4px);
+        }
+
+        .test-case.selected {
+            background: #dbeafe;
+            border-left-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Active Execution */
+        .active-execution {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* 5GLabX Navigation */
+        .glabx-navigation {
+            margin: 20px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin: 6px 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .nav-item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item-icon {
+            font-size: 18px;
+        }
+
+        .nav-item-text {
+            font-weight: 500;
+        }
+
+        .nav-item-badge {
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .nav-item-badge.active { background-color: #10b981; }
+        .nav-item-badge.processing { background-color: #f59e0b; }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+        }
+
+        .content-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .content-description {
+            color: #6b7280;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .data-flow-indicator {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Protocol Analysis Grid */
+        .protocol-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .analysis-card {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #374151;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            padding: 4px 0;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Real-time Messages */
+        .message-log {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .log-entry {
+            margin-bottom: 6px;
+            padding: 4px 0;
+            border-left: 3px solid transparent;
+            padding-left: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .log-entry:hover {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .log-timestamp {
+            color: #9ca3af;
+        }
+
+        .log-layer {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .log-message {
+            color: #34d399;
+        }
+
+        /* Interactive Controls */
+        .controls {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border: 2px solid #e5e7eb;
+            z-index: 100;
+        }
+
+        .control-button {
+            padding: 10px 20px;
+            margin: 6px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .control-button:hover {
+            background: #f3f4f6;
+            transform: translateY(-2px);
+        }
+
+        .control-button.primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .control-button.primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Platform Header -->
+    <div class="platform-header">
+        <div class="platform-logo">
+            <span class="section-icon">🧬</span>
+            <span>5GLabX Platform - Original Layout</span>
+        </div>
+        <div class="platform-status">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+            <div class="status-indicator">
+                <span>📊 Live Analysis Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Test Manager Section -->
+            <div class="test-manager-section">
+                <div class="test-manager-header" onclick="toggleSection('testManager')">
+                    <div>
+                        <span class="section-icon">🧪</span>
+                        <span>Test Manager Integration</span>
+                    </div>
+                    <span class="expand-icon" id="testManagerIcon">▼</span>
+                </div>
+                <div class="test-manager-content" id="testManagerContent">
+                    <!-- Tab Navigation -->
+                    <div class="tab-navigation">
+                        <button class="tab-button active" onclick="switchTab('library')">
+                            📚<br><small>Test Library</small>
+                        </button>
+                        <button class="tab-button" onclick="switchTab('active')">
+                            🏃<br><small>Active Tests</small>
+                        </button>
+                        <button class="tab-button" onclick="switchTab('results')">
+                            📊<br><small>Results</small>
+                        </button>
+                        <button class="tab-button" onclick="switchTab('backend')">
+                            🔧<br><small>Backend</small>
+                        </button>
+                    </div>
+
+                    <!-- Test Library Tab -->
+                    <div class="tab-content" id="library-content">
+                        <div class="test-category">
+                            <div class="category-header" onclick="toggleCategory('5gnr')">
+                                <span>📡 5G NR Tests (450+)</span>
+                                <span id="5gnrIcon">▼</span>
+                            </div>
+                            <div class="category-content" id="5gnrContent">
+                                <div class="test-case selected" onclick="selectTestCase(this)">
+                                    <strong>Initial Attach Procedure</strong><br>
+                                    <small>Complete UE attach with authentication & PDU session</small>
+                                </div>
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>Registration Update</strong><br>
+                                    <small>Periodic registration update procedure</small>
+                                </div>
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>PDU Session Establishment</strong><br>
+                                    <small>Data session setup and configuration</small>
+                                </div>
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>Handover Procedures</strong><br>
+                                    <small>Inter-cell and inter-frequency handovers</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="test-category">
+                            <div class="category-header" onclick="toggleCategory('lte')">
+                                <span>📱 LTE Tests (320+)</span>
+                                <span id="lteIcon">▶</span>
+                            </div>
+                            <div class="category-content" id="lteContent" style="display: none;">
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>LTE Attach Procedure</strong><br>
+                                    <small>Complete LTE attach with EPS bearer setup</small>
+                                </div>
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>TAU Procedure</strong><br>
+                                    <small>Tracking Area Update procedures</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="test-category">
+                            <div class="category-header" onclick="toggleCategory('volte')">
+                                <span>📞 VoLTE/IMS Tests (280+)</span>
+                                <span id="volteIcon">▶</span>
+                            </div>
+                            <div class="category-content" id="volteContent" style="display: none;">
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>IMS Registration</strong><br>
+                                    <small>Complete IMS registration procedure</small>
+                                </div>
+                                <div class="test-case" onclick="selectTestCase(this)">
+                                    <strong>VoLTE Call Setup</strong><br>
+                                    <small>Voice call establishment over LTE</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Executions Tab -->
+                    <div class="tab-content" id="active-content" style="display: none;">
+                        <div class="active-execution">
+                            <strong>🏃 5G NR Initial Attach Procedure</strong><br>
+                            <small>Started: 10:45:23 AM</small>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 75%;">75%</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280;">
+                                Current Step: PDU Session Establishment<br>
+                                ETA: 00:00:32 remaining
+                            </div>
+                        </div>
+
+                        <div style="padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: 14px;">
+                            📋 <strong>Execution Queue (3 pending):</strong><br>
+                            • LTE Attach Procedure<br>
+                            • VoLTE Call Setup<br>
+                            • Handover Test Case
+                        </div>
+                    </div>
+
+                    <!-- Results Tab -->
+                    <div class="tab-content" id="results-content" style="display: none;">
+                        <div style="font-size: 14px;">
+                            <div style="padding: 12px; margin-bottom: 8px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 6px;">
+                                <strong>✅ 5G NR Registration Update</strong><br>
+                                10:42:15 AM | Duration: 1m 23s | Success
+                            </div>
+                            <div style="padding: 12px; margin-bottom: 8px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 6px;">
+                                <strong>✅ LTE Attach Procedure</strong><br>
+                                10:38:42 AM | Duration: 2m 15s | Success
+                            </div>
+                            <div style="padding: 12px; margin-bottom: 8px; background: #fef2f2; border-left: 4px solid #ef4444; border-radius: 6px;">
+                                <strong>❌ VoLTE Call Setup</strong><br>
+                                10:35:20 AM | Duration: 0m 45s | Failed
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backend Services Tab -->
+                    <div class="tab-content" id="backend-content" style="display: none;">
+                        <div style="font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin: 4px 0; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                <span style="font-weight: 500;">Database Service</span>
+                                <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">✅ Active</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin: 4px 0; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                <span style="font-weight: 500;">Test Execution Engine</span>
+                                <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">✅ Ready</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin: 4px 0; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                <span style="font-weight: 500;">WebSocket Service</span>
+                                <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">✅ Connected</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin: 4px 0; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px;">
+                                <span style="font-weight: 500;">Real-time Processor</span>
+                                <span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">🔄 Processing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5GLabX Navigation -->
+            <div class="glabx-navigation">
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>📡</span>
+                        <span>Protocol Layers</span>
+                    </div>
+                    <div class="nav-item active" onclick="switchView(this, 'phy')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📶</span>
+                            <span class="nav-item-text">PHY Layer</span>
+                        </div>
+                        <span class="nav-item-badge">LIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'mac')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📊</span>
+                            <span class="nav-item-text">MAC Layer</span>
+                        </div>
+                        <span class="nav-item-badge active">ACTIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'rlc')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🔄</span>
+                            <span class="nav-item-text">RLC Layer</span>
+                        </div>
+                        <span class="nav-item-badge processing">PROC</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'pdcp')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📦</span>
+                            <span class="nav-item-text">PDCP Layer</span>
+                        </div>
+                        <span class="nav-item-badge active">ACTIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'rrc')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📻</span>
+                            <span class="nav-item-text">RRC Layer</span>
+                        </div>
+                        <span class="nav-item-badge">LIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'nas')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🌐</span>
+                            <span class="nav-item-text">NAS Layer</span>
+                        </div>
+                        <span class="nav-item-badge active">ACTIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'ims')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">☎️</span>
+                            <span class="nav-item-text">IMS Layer</span>
+                        </div>
+                        <span class="nav-item-badge processing">PROC</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>📊</span>
+                        <span>Analysis Views</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'logs')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📄</span>
+                            <span class="nav-item-text">Logs View</span>
+                        </div>
+                        <span class="nav-item-badge active">456</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'enhanced-logs')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">⚡</span>
+                            <span class="nav-item-text">Enhanced Logs</span>
+                        </div>
+                        <span class="nav-item-badge">LIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'analytics')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📊</span>
+                            <span class="nav-item-text">Analytics</span>
+                        </div>
+                        <span class="nav-item-badge active">REAL-TIME</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'layer-trace')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🔍</span>
+                            <span class="nav-item-text">Layer Trace</span>
+                        </div>
+                        <span class="nav-item-badge">LIVE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'call-flow')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📞</span>
+                            <span class="nav-item-text">Call Flow</span>
+                        </div>
+                        <span class="nav-item-badge active">SEQUENCE</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>🌐</span>
+                        <span>Specialized Analysis</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'oran')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🏗️</span>
+                            <span class="nav-item-text">O-RAN Analysis</span>
+                        </div>
+                        <span class="nav-item-badge active">INTERFACES</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'v2x')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🚗</span>
+                            <span class="nav-item-text">V2X Analysis</span>
+                        </div>
+                        <span class="nav-item-badge processing">SIDELINK</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'ntn')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🛰️</span>
+                            <span class="nav-item-text">NTN Analysis</span>
+                        </div>
+                        <span class="nav-item-badge active">SATELLITE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'nbiot')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">📡</span>
+                            <span class="nav-item-text">NB-IoT Analysis</span>
+                        </div>
+                        <span class="nav-item-badge active">LOW POWER</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>🏢</span>
+                        <span>Core Network</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'amf')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🎯</span>
+                            <span class="nav-item-text">AMF Analyzer</span>
+                        </div>
+                        <span class="nav-item-badge active">5G CORE</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'smf')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">🔧</span>
+                            <span class="nav-item-text">SMF Analyzer</span>
+                        </div>
+                        <span class="nav-item-badge processing">SESSION</span>
+                    </div>
+                    <div class="nav-item" onclick="switchView(this, 'upf')">
+                        <div class="nav-item-content">
+                            <span class="nav-item-icon">⚡</span>
+                            <span class="nav-item-text">UPF Analyzer</span>
+                        </div>
+                        <span class="nav-item-badge active">USER PLANE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="content-title" id="contentTitle">
+                    <span>📶</span>
+                    <span>PHY Layer Analysis</span>
+                </div>
+                <div class="content-description" id="contentDescription">
+                    Real-time physical layer analysis with live data from active test execution
+                </div>
+            </div>
+
+            <div class="data-flow-indicator">
+                🔄 <strong>Live Data Flow:</strong> Test execution "5G NR Initial Attach Procedure" → Real-time updates to all 5GLabX protocol layers and analysis views
+            </div>
+
+            <div class="protocol-analysis" id="protocolContent">
+                <div class="analysis-card">
+                    <div class="card-title">
+                        <span>🎯</span>
+                        <span>SSB Detection</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">RSRP:</span>
+                        <span class="metric-value" id="rsrp">-85 dBm</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">RSRQ:</span>
+                        <span class="metric-value" id="rsrq">-12 dB</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">SINR:</span>
+                        <span class="metric-value" id="sinr">18 dB</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">PCI:</span>
+                        <span class="metric-value">1</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">SSB Index:</span>
+                        <span class="metric-value">4/8</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">
+                        <span>🎯</span>
+                        <span>RACH Procedure</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Preamble:</span>
+                        <span class="metric-value">Format 0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">RA-RNTI:</span>
+                        <span class="metric-value">0x002A</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">RAPID:</span>
+                        <span class="metric-value">15</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Timing Advance:</span>
+                        <span class="metric-value">12</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Status:</span>
+                        <span class="metric-value" style="color: #10b981;">✅ Success</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">
+                        <span>📈</span>
+                        <span>Throughput Analysis</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">UL Throughput:</span>
+                        <span class="metric-value">75 Mbps</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">DL Throughput:</span>
+                        <span class="metric-value">120 Mbps</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">BLER Rate:</span>
+                        <span class="metric-value">0.1%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Modulation:</span>
+                        <span class="metric-value">256QAM</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">
+                        <span>🔧</span>
+                        <span>Configuration Status</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Frequency:</span>
+                        <span class="metric-value">3.5 GHz</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Bandwidth:</span>
+                        <span class="metric-value">100 MHz</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Numerology:</span>
+                        <span class="metric-value">μ=1 (30kHz SCS)</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Duplex Mode:</span>
+                        <span class="metric-value">TDD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-log" id="messageLog">
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.156</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Registration Request</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.234</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Authentication Request</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.298</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Authentication Response</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.445</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Security Mode Command</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.502</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">Security Mode Complete</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">10:45:23.678</span> | <span class="log-layer">DL NAS</span> | <span class="log-message">Registration Accept</span>
+                </div>
+                <div class="log-entry" id="liveEntry" style="color: #fbbf24;">
+                    <span class="log-timestamp">10:45:23.734</span> | <span class="log-layer">UL NAS</span> | <span class="log-message">🔄 PDU Session Establishment Request...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Controls -->
+    <div class="controls">
+        <div style="margin-bottom: 12px; font-weight: bold; font-size: 16px;">🎮 Demo Controls</div>
+        <button class="control-button primary" onclick="simulateExecution()">▶️ Execute Test</button>
+        <button class="control-button" onclick="updateMetrics()">🔄 Update Metrics</button>
+        <button class="control-button" onclick="addLogEntry()">📝 Add Log Entry</button>
+        <button class="control-button" onclick="switchToRandomView()">🎲 Random View</button>
+    </div>
+
+    <script>
+        let currentView = 'phy';
+        let executionProgress = 75;
+        let logCounter = 7;
+
+        // Content definitions for different views
+        const viewContent = {
+            phy: {
+                title: '📶 PHY Layer Analysis',
+                description: 'Real-time physical layer analysis with live data from active test execution',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🎯</span><span>SSB Detection</span></div>
+                        <div class="metric-row"><span class="metric-label">RSRP:</span><span class="metric-value" id="rsrp">-85 dBm</span></div>
+                        <div class="metric-row"><span class="metric-label">RSRQ:</span><span class="metric-value" id="rsrq">-12 dB</span></div>
+                        <div class="metric-row"><span class="metric-label">SINR:</span><span class="metric-value" id="sinr">18 dB</span></div>
+                        <div class="metric-row"><span class="metric-label">PCI:</span><span class="metric-value">1</span></div>
+                        <div class="metric-row"><span class="metric-label">SSB Index:</span><span class="metric-value">4/8</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🎯</span><span>RACH Procedure</span></div>
+                        <div class="metric-row"><span class="metric-label">Preamble:</span><span class="metric-value">Format 0</span></div>
+                        <div class="metric-row"><span class="metric-label">RA-RNTI:</span><span class="metric-value">0x002A</span></div>
+                        <div class="metric-row"><span class="metric-label">RAPID:</span><span class="metric-value">15</span></div>
+                        <div class="metric-row"><span class="metric-label">Status:</span><span class="metric-value" style="color: #10b981;">✅ Success</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>📈</span><span>Throughput Analysis</span></div>
+                        <div class="metric-row"><span class="metric-label">UL Throughput:</span><span class="metric-value">75 Mbps</span></div>
+                        <div class="metric-row"><span class="metric-label">DL Throughput:</span><span class="metric-value">120 Mbps</span></div>
+                        <div class="metric-row"><span class="metric-label">BLER Rate:</span><span class="metric-value">0.1%</span></div>
+                    </div>
+                `
+            },
+            mac: {
+                title: '📊 MAC Layer Analysis',
+                description: 'MAC layer procedures and scheduling information from test execution',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🎯</span><span>Random Access</span></div>
+                        <div class="metric-row"><span class="metric-label">Procedure:</span><span class="metric-value">Completed</span></div>
+                        <div class="metric-row"><span class="metric-label">Attempts:</span><span class="metric-value">1/4</span></div>
+                        <div class="metric-row"><span class="metric-label">Power Ramping:</span><span class="metric-value">+3dB</span></div>
+                        <div class="metric-row"><span class="metric-label">Timing Advance:</span><span class="metric-value">12</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>📊</span><span>Scheduling Reports</span></div>
+                        <div class="metric-row"><span class="metric-label">BSR:</span><span class="metric-value">Buffer Status Report sent</span></div>
+                        <div class="metric-row"><span class="metric-label">PHR:</span><span class="metric-value">Power Headroom: 15dB</span></div>
+                        <div class="metric-row"><span class="metric-label">HARQ:</span><span class="metric-value">Process ID: 0</span></div>
+                        <div class="metric-row"><span class="metric-label">Status:</span><span class="metric-value" style="color: #10b981;">✅ Active</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🔄</span><span>HARQ Processes</span></div>
+                        <div class="metric-row"><span class="metric-label">Active Processes:</span><span class="metric-value">8</span></div>
+                        <div class="metric-row"><span class="metric-label">Retransmissions:</span><span class="metric-value">2</span></div>
+                        <div class="metric-row"><span class="metric-label">Success Rate:</span><span class="metric-value">98.5%</span></div>
+                    </div>
+                `
+            },
+            'enhanced-logs': {
+                title: '⚡ Enhanced Log Analysis',
+                description: 'Professional QXDM/Keysight-style detailed protocol analysis',
+                content: `
+                    <div class="analysis-card" style="grid-column: 1 / -1;">
+                        <div class="card-title"><span>🔍</span><span>Message Decode Analysis</span></div>
+                        <div class="metric-row"><span class="metric-label">Current Message:</span><span class="metric-value">Registration Request</span></div>
+                        <div class="metric-row"><span class="metric-label">Compliance:</span><span class="metric-value" style="color: #10b981;">✅ 3GPP TS 24.501</span></div>
+                        <div class="metric-row"><span class="metric-label">Layer:</span><span class="metric-value">NAS (Layer 3)</span></div>
+                        <div class="metric-row"><span class="metric-label">Direction:</span><span class="metric-value">UE → AMF</span></div>
+                        <div class="metric-row"><span class="metric-label">Security:</span><span class="metric-value">Not protected (initial)</span></div>
+                        <div class="metric-row"><span class="metric-label">IEs Present:</span><span class="metric-value">8 mandatory, 12 optional</span></div>
+                    </div>
+                `
+            },
+            oran: {
+                title: '🏗️ O-RAN Analysis',
+                description: 'Open RAN architecture analysis and interface monitoring',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🏗️</span><span>O-RAN Interfaces</span></div>
+                        <div class="metric-row"><span class="metric-label">A1 Interface:</span><span class="metric-value" style="color: #10b981;">✅ Active</span></div>
+                        <div class="metric-row"><span class="metric-label">E2 Interface:</span><span class="metric-value" style="color: #10b981;">✅ Connected</span></div>
+                        <div class="metric-row"><span class="metric-label">O1 Interface:</span><span class="metric-value" style="color: #f59e0b;">⚠️ Degraded</span></div>
+                        <div class="metric-row"><span class="metric-label">Open Fronthaul:</span><span class="metric-value" style="color: #10b981;">✅ Operational</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>📡</span><span>RAN Functions</span></div>
+                        <div class="metric-row"><span class="metric-label">KPM Service:</span><span class="metric-value" style="color: #10b981;">✅ Running</span></div>
+                        <div class="metric-row"><span class="metric-label">RC Service:</span><span class="metric-value" style="color: #10b981;">✅ Active</span></div>
+                        <div class="metric-row"><span class="metric-label">QoS Control:</span><span class="metric-value" style="color: #10b981;">✅ Enabled</span></div>
+                    </div>
+                `
+            },
+            v2x: {
+                title: '🚗 V2X Analysis',
+                description: 'Vehicle-to-Everything communication analysis and sidelink monitoring',
+                content: `
+                    <div class="analysis-card">
+                        <div class="card-title"><span>🚗</span><span>V2X Sidelink</span></div>
+                        <div class="metric-row"><span class="metric-label">PC5 Interface:</span><span class="metric-value" style="color: #10b981;">✅ Active</span></div>
+                        <div class="metric-row"><span class="metric-label">Resource Pool:</span><span class="metric-value">Mode 4 (Sensing)</span></div>
+                        <div class="metric-row"><span class="metric-label">PSSCH Power:</span><span class="metric-value">23 dBm</span></div>
+                        <div class="metric-row"><span class="metric-label">CBR:</span><span class="metric-value">15%</span></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="card-title"><span>📡</span><span>V2X Messages</span></div>
+                        <div class="metric-row"><span class="metric-label">CAM Messages:</span><span class="metric-value">45/sec</span></div>
+                        <div class="metric-row"><span class="metric-label">DENM Messages:</span><span class="metric-value">2/sec</span></div>
+                        <div class="metric-row"><span class="metric-label">Latency:</span><span class="metric-value">12ms</span></div>
+                    </div>
+                `
+            }
+        };
+
+        function switchTab(tab) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tab + '-content').style.display = 'block';
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function toggleSection(section) {
+            const content = document.getElementById(section + 'Content');
+            const icon = document.getElementById(section + 'Icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        function toggleCategory(category) {
+            const content = document.getElementById(category + 'Content');
+            const icon = document.getElementById(category + 'Icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        function selectTestCase(element) {
+            // Remove selection from all test cases
+            document.querySelectorAll('.test-case').forEach(tc => {
+                tc.classList.remove('selected');
+            });
+            
+            // Add selection to clicked test case
+            element.classList.add('selected');
+        }
+
+        function switchView(element, view) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Update main content
+            currentView = view;
+            const content = viewContent[view];
+            if (content) {
+                document.getElementById('contentTitle').innerHTML = `<span>${content.title.split(' ')[0]}</span><span>${content.title.substring(content.title.indexOf(' ') + 1)}</span>`;
+                document.getElementById('contentDescription').textContent = content.description;
+                document.getElementById('protocolContent').innerHTML = content.content;
+            }
+        }
+
+        function simulateExecution() {
+            // Simulate test execution progress
+            const progressFill = document.getElementById('progressFill');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressFill.textContent = '✅ Complete';
+                    progressFill.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+                    
+                    // Add to results after completion
+                    setTimeout(() => {
+                        addLogEntry();
+                    }, 1000);
+                }
+            }, 200);
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const rsrp = document.getElementById('rsrp');
+            const rsrq = document.getElementById('rsrq');
+            const sinr = document.getElementById('sinr');
+            
+            if (rsrp) {
+                rsrp.textContent = (-85 + Math.floor(Math.random() * 10 - 5)) + ' dBm';
+                rsrq.textContent = (-12 + Math.floor(Math.random() * 6 - 3)) + ' dB';
+                sinr.textContent = (18 + Math.floor(Math.random() * 8 - 4)) + ' dB';
+            }
+        }
+
+        function addLogEntry() {
+            const messageLog = document.getElementById('messageLog');
+            const timestamp = new Date().toLocaleTimeString() + '.' + Math.floor(Math.random() * 1000);
+            
+            const messages = [
+                'Configuration Complete',
+                'Data Transfer Started', 
+                'Handover Request',
+                'Bearer Modification',
+                'Quality Report',
+                'Measurement Report',
+                'RRC Reconfiguration',
+                'PDU Session Modification',
+                'Service Request',
+                'Context Setup'
+            ];
+            
+            const layers = ['RRC', 'NAS', 'MAC', 'PHY', 'PDCP', 'RLC'];
+            const directions = ['UL', 'DL'];
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'log-entry';
+            newEntry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span> | 
+                <span class="log-layer">${directions[Math.floor(Math.random() * 2)]} ${layers[Math.floor(Math.random() * layers.length)]}</span> | 
+                <span class="log-message">${messages[Math.floor(Math.random() * messages.length)]}</span>
+            `;
+            
+            messageLog.appendChild(newEntry);
+            messageLog.scrollTop = messageLog.scrollHeight;
+            
+            logCounter++;
+        }
+
+        function switchToRandomView() {
+            const views = Object.keys(viewContent);
+            const randomView = views[Math.floor(Math.random() * views.length)];
+            
+            // Find the nav item for this view and click it
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const text = item.querySelector('.nav-item-text').textContent.toLowerCase();
+                if (text.includes(randomView) || (randomView === 'enhanced-logs' && text.includes('enhanced'))) {
+                    item.click();
+                }
+            });
+        }
+
+        // Auto-update metrics every 3 seconds to simulate real-time data
+        setInterval(updateMetrics, 3000);
+        
+        // Auto-add log entries every 5 seconds to simulate live execution
+        setInterval(addLogEntry, 5000);
+
+        // Simulate progress updates
+        setInterval(() => {
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill && progressFill.textContent !== '✅ Complete') {
+                let currentProgress = parseInt(progressFill.style.width) || 75;
+                if (currentProgress < 100) {
+                    currentProgress += Math.floor(Math.random() * 3);
+                    if (currentProgress > 100) currentProgress = 100;
+                    progressFill.style.width = currentProgress + '%';
+                    progressFill.textContent = currentProgress + '%';
+                }
+            }
+        }, 8000);
+    </script>
+</body>
+</html>
